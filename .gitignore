@@ -1,0 +1,58 @@
+# ---- Unity generated ----
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]serSettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Never ignore meta files that belong to tracked assets
+!/[Aa]ssets/**/*.meta
+
+# ---- Addressables / StreamingAssets ----
+/[Aa]ssets/AddressableAssetsData/*/*.bin*
+/[Aa]ssets/StreamingAssets/aa.meta
+/[Aa]ssets/StreamingAssets/aa/*
+
+# ---- IDE / editors ----
+.vs/
+.vscode/
+.idea/
+.consulo/
+.gradle/
+ExportedObj/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ---- Builds / packages ----
+*.apk
+*.aab
+*.app
+*.unitypackage
+*.unitypackage.meta
+crashlytics-build.properties
+sysinfo.txt
+
+# ---- Plastic SCM / Unity Version Control (not used, git is the VCS here) ----
+.plastic/
+/[Aa]ssets/Plugins/PlasticSCM*
