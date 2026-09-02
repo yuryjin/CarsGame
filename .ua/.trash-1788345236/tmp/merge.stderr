@@ -1,0 +1,13 @@
+Found 3 batch files (3 logical batches, 0 multi-part):
+  batch-1.json: 24 nodes, 45 edges
+  batch-2.json: 27 nodes, 40 edges
+  batch-3.json: 27 nodes, 38 edges
+
+Input: 78 nodes, 123 edges
+
+Output: 78 nodes, 123 edges
+
+Imports edge recovery:
+  Recovered 0 `imports` edges from importMap (22 entries scanned)
+
+Written to /home/user/projects/games/Unity/newgames/CarsGame/.ua/intermediate/assembled-graph.json (82 KB)

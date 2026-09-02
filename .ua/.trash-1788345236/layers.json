@@ -1,0 +1,66 @@
+[
+  {
+    "id": "layer:vehicle-physics",
+    "name": "Физика и управление автомобилем",
+    "description": "Rigidbody-модель машины (тяга, руление, боковое сцепление, прижимная сила, сброс) в CarController, её облегчённый вариант для машины-мишени TargetCar и настройки PhysX и фиксированного шага времени, от которых напрямую зависит FixedUpdate-цикл.",
+    "nodeIds": [
+      "file:Assets/Scripts/CarController.cs",
+      "file:Assets/Scripts/TargetCar.cs",
+      "config:ProjectSettings/DynamicsManager.asset",
+      "config:ProjectSettings/TimeManager.asset"
+    ]
+  },
+  {
+    "id": "layer:ai-opponents",
+    "name": "AI-оппоненты",
+    "description": "Waypoint-навигация машин соперников: OpponentDriver строит маршрут со смещением полосы, вычисляет руление и скорость и подаёт команды в CarController через SetInput, не трогая физику напрямую.",
+    "nodeIds": [
+      "file:Assets/Scripts/OpponentDriver.cs"
+    ]
+  },
+  {
+    "id": "layer:combat",
+    "name": "Бой и разрушение",
+    "description": "Замкнутый контур стрельбы и урона: пушка CarCannon порождает снаряды Projectile, которые наносят урон CarHealth, а тот отключает управление и пушку у обломка, рисует HP-бар и возрождает машину.",
+    "nodeIds": [
+      "file:Assets/Scripts/CarCannon.cs",
+      "file:Assets/Scripts/Projectile.cs",
+      "file:Assets/Scripts/CarHealth.cs"
+    ]
+  },
+  {
+    "id": "layer:presentation",
+    "name": "Визуализация и рендеринг",
+    "description": "Всё, что отвечает за картинку без влияния на геймплей: камера преследования, процедурный генератор мешей кузова и колёс, а также URP-ассеты пайплайна и рендереров для профилей PC и Mobile вместе с QualitySettings, которые их выбирают.",
+    "nodeIds": [
+      "file:Assets/Scripts/CarCameraFollow.cs",
+      "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "config:Assets/Settings/PC_RPAsset.asset",
+      "config:Assets/Settings/Mobile_RPAsset.asset",
+      "config:Assets/Settings/PC_Renderer.asset",
+      "config:Assets/Settings/Mobile_Renderer.asset",
+      "config:ProjectSettings/QualitySettings.asset"
+    ]
+  },
+  {
+    "id": "layer:project-config",
+    "name": "Ввод и конфигурация проекта",
+    "description": "Проектные настройки Unity, задающие окружение для скриптов: action-ассет Input System, манифест пакетов (URP, Input System, AI Assistant), список сцен сборки, реестр тегов и слоёв и настройки редакторного AI-ассистента.",
+    "nodeIds": [
+      "config:Assets/InputSystem_Actions.inputactions",
+      "config:Packages/manifest.json",
+      "config:ProjectSettings/EditorBuildSettings.asset",
+      "config:ProjectSettings/TagManager.asset",
+      "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json"
+    ]
+  },
+  {
+    "id": "layer:documentation",
+    "name": "Документация",
+    "description": "Автосгенерированный контекст проекта для AI-ассистентов с описанием архитектуры, конвенций и инструментария, а также запись версии редактора Unity 6000.5.9f1.",
+    "nodeIds": [
+      "document:Docs/AI/UnityProjectContext.md",
+      "document:ProjectSettings/ProjectVersion.txt"
+    ]
+  }
+]

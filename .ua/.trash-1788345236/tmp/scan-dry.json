@@ -1,0 +1,156 @@
+{
+  "scriptCompleted": true,
+  "files": [
+    {
+      "path": "Assets/InputSystem_Actions.inputactions",
+      "language": "inputactions",
+      "sizeLines": 1056,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarCameraFollow.cs",
+      "language": "csharp",
+      "sizeLines": 46,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarCannon.cs",
+      "language": "csharp",
+      "sizeLines": 172,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarController.cs",
+      "language": "csharp",
+      "sizeLines": 368,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarHealth.cs",
+      "language": "csharp",
+      "sizeLines": 302,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/OpponentDriver.cs",
+      "language": "csharp",
+      "sizeLines": 145,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "language": "csharp",
+      "sizeLines": 505,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/Projectile.cs",
+      "language": "csharp",
+      "sizeLines": 85,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/TargetCar.cs",
+      "language": "csharp",
+      "sizeLines": 74,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/Mobile_Renderer.asset",
+      "language": "asset",
+      "sizeLines": 52,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/Mobile_RPAsset.asset",
+      "language": "asset",
+      "sizeLines": 143,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/PC_Renderer.asset",
+      "language": "asset",
+      "sizeLines": 95,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/PC_RPAsset.asset",
+      "language": "asset",
+      "sizeLines": 143,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Docs/AI/UnityProjectContext.md",
+      "language": "markdown",
+      "sizeLines": 104,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "Packages/manifest.json",
+      "language": "json",
+      "sizeLines": 52,
+      "fileCategory": "config"
+    },
+    {
+      "path": "ProjectSettings/DynamicsManager.asset",
+      "language": "asset",
+      "sizeLines": 36,
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/EditorBuildSettings.asset",
+      "language": "asset",
+      "sizeLines": 13,
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "language": "json",
+      "sizeLines": 10,
+      "fileCategory": "config"
+    },
+    {
+      "path": "ProjectSettings/ProjectVersion.txt",
+      "language": "txt",
+      "sizeLines": 2,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "ProjectSettings/QualitySettings.asset",
+      "language": "asset",
+      "sizeLines": 134,
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/TagManager.asset",
+      "language": "asset",
+      "sizeLines": 76,
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/TimeManager.asset",
+      "language": "asset",
+      "sizeLines": 9,
+      "fileCategory": "code"
+    }
+  ],
+  "totalFiles": 22,
+  "filteredByIgnore": 94,
+  "estimatedComplexity": "small",
+  "stats": {
+    "filesScanned": 22,
+    "byCategory": {
+      "code": 18,
+      "docs": 2,
+      "config": 2
+    },
+    "byLanguage": {
+      "inputactions": 1,
+      "csharp": 8,
+      "asset": 9,
+      "markdown": 1,
+      "json": 2,
+      "txt": 1
+    }
+  }
+}

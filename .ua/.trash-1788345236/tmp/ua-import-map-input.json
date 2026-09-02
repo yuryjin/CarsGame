@@ -1,0 +1,115 @@
+{
+  "projectRoot": "/home/user/projects/games/Unity/newgames/CarsGame",
+  "files": [
+    {
+      "path": "Assets/InputSystem_Actions.inputactions",
+      "language": "inputactions",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarCameraFollow.cs",
+      "language": "csharp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarCannon.cs",
+      "language": "csharp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarController.cs",
+      "language": "csharp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarHealth.cs",
+      "language": "csharp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/OpponentDriver.cs",
+      "language": "csharp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "language": "csharp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/Projectile.cs",
+      "language": "csharp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/TargetCar.cs",
+      "language": "csharp",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/Mobile_Renderer.asset",
+      "language": "asset",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/Mobile_RPAsset.asset",
+      "language": "asset",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/PC_Renderer.asset",
+      "language": "asset",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/PC_RPAsset.asset",
+      "language": "asset",
+      "fileCategory": "code"
+    },
+    {
+      "path": "Docs/AI/UnityProjectContext.md",
+      "language": "markdown",
+      "fileCategory": "docs"
+    },
+    {
+      "path": "Packages/manifest.json",
+      "language": "json",
+      "fileCategory": "config"
+    },
+    {
+      "path": "ProjectSettings/DynamicsManager.asset",
+      "language": "asset",
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/EditorBuildSettings.asset",
+      "language": "asset",
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "language": "json",
+      "fileCategory": "config"
+    },
+    {
+      "path": "ProjectSettings/ProjectVersion.txt",
+      "language": "txt",
+      "fileCategory": "docs"
+    },
+    {
+      "path": "ProjectSettings/QualitySettings.asset",
+      "language": "asset",
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/TagManager.asset",
+      "language": "asset",
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/TimeManager.asset",
+      "language": "asset",
+      "fileCategory": "code"
+    }
+  ]
+}

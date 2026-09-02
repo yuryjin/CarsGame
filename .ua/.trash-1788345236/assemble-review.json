@@ -1,0 +1,19 @@
+{
+  "fixedSectionOk": true,
+  "nodesRecovered": 0,
+  "edgesRestored": 0,
+  "crossBatchEdgesAdded": 0,
+  "typesRemapped": 0,
+  "complexityRemapped": 0,
+  "notes": [
+    "Секция «Fixed» пуста: скрипт слияния не исправлял ни ID, ни типы, ни complexity (78 узлов и 123 ребра на входе и выходе, 0 дубликатов, 0 отброшенных рёбер) — данные батчей уже соответствовали конвенции.",
+    "Секция «Could not fix» пуста: все узлы имеют id, типы только из допустимого набора (function 47, config 12, class 9, file 8, document 2), complexity только simple/moderate/complex (49/23/6), висячих рёбер нет, префикс id совпадает с типом у всех узлов.",
+    "Кросс-батчевая проверка по import map: все 8 связей file→file присутствуют как рёбра imports с weight 0.7; добавлять ничего не потребовалось. 14 не-C#-файлов имеют пустые списки импортов, что ожидаемо.",
+    "Кросс-батчевые рёбра calls (например, CarHealth.Respawn → CarController.ResetCar, батч 1 → батч 2) уже присутствуют и ссылаются на существующие узлы; каждый узел function/class имеет входящее ребро contains.",
+    "Все summary на русском; у всех узлов есть теги.",
+    "Наблюдение по полноте (не ошибка слияния, а пробел анализа батчей): в графе отсутствуют узлы для ряда приватных методов — CarHealth: Awake, Update, SetControlsEnabled, SpawnExplosion, OnGUI, DrawScreenBar, OnDestroy; CarCannon: Update, MakeMaterial; CarController: ApplyCoastDeceleration, ApplyDownforce, CalculateSpeed, CheckGrounded, UpdateAudio; CarCameraFollow: Start; OpponentDriver: OnDisable; Projectile: Awake; TargetCar: ReturnToStart. Узлы не добавлялись, чтобы не создавать спекулятивные данные.",
+    "Мелкая несогласованность именования: методы вложенного класса ExplosionFlash в CarHealth.cs получили квалифицированные id (function:...:ExplosionFlash.Start, ExplosionFlash.Update), тогда как остальные функции используют голое имя метода. ID оставлены без изменений ради стабильности ссылок из других фаз.",
+    "ProjectSettings/ProjectVersion.txt помечен как document, хотя по содержанию это конфигурационный файл версии редактора; допустимо, изменения не вносились.",
+    "Узлы config для .asset/.inputactions соответствуют замыслу (scanner относил их к code) — не является проблемой."
+  ]
+}

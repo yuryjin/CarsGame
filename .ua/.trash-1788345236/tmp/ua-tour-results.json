@@ -1,0 +1,525 @@
+{
+  "scriptCompleted": true,
+  "entryPointCandidates": [
+    {
+      "id": "file:Assets/Scripts/CarCannon.cs",
+      "score": 1,
+      "name": "CarCannon.cs",
+      "type": "file",
+      "summary": "Реализует пушку на крыше автомобиля: при старте процедурно собирает башню и ствол из примитивов, по нажатию ЛКМ/Ctrl/правого бампера геймпада выпускает снаряд Projectile с отдачей по Rigidbody и вспышкой у дульного среза."
+    },
+    {
+      "id": "file:Assets/Scripts/CarHealth.cs",
+      "score": 1,
+      "name": "CarHealth.cs",
+      "type": "file",
+      "summary": "Управляет здоровьем автомобиля: считает урон от сильных боковых столкновений по импульсу Rigidbody, принимает урон от снарядов, при нуле HP превращает машину в обломок с взрывом и через задержку возрождает её; также рисует HP-бар через OnGUI. Дополнительно содержит ExplosionFlash — дешёвый эффект взрыва."
+    },
+    {
+      "id": "file:Assets/Scripts/OpponentDriver.cs",
+      "score": 1,
+      "name": "OpponentDriver.cs",
+      "type": "file",
+      "summary": "AI-водитель оппонента: строит маршрут из дочерних waypoint-трансформов со смещением полосы, вычисляет угол до следующей точки и подаёт газ/руль/тормоз в CarController через SetInput. Автоматически сбрасывает перевернувшуюся машину через ResetCar."
+    },
+    {
+      "id": "file:Assets/Scripts/TargetCar.cs",
+      "score": 1,
+      "name": "TargetCar.cs",
+      "type": "file",
+      "summary": "Машина-мишень без водителя, по которой можно стрелять и таранить. Без CarController самостоятельно настраивает ту же физику (масса, сферические коллайдеры колёс, материал без трения) через статические методы CarController, применяет сопротивление качению и возвращается на стартовую позицию после уничтожения по событию CarHealth.OnRespawned."
+    },
+    {
+      "id": "file:Assets/Scripts/CarCameraFollow.cs",
+      "score": 1,
+      "name": "CarCameraFollow.cs",
+      "type": "file",
+      "summary": "Компонент камеры преследования: в LateUpdate плавно подтягивает камеру к смещённой позиции за машиной, поворачивает её на точку перед автомобилем и динамически расширяет поле зрения (FOV) в зависимости от скорости Rigidbody."
+    }
+  ],
+  "fanInRanking": [
+    {
+      "id": "file:Assets/Scripts/CarController.cs",
+      "fanIn": 8,
+      "name": "CarController.cs"
+    },
+    {
+      "id": "config:Packages/manifest.json",
+      "fanIn": 3,
+      "name": "manifest.json"
+    },
+    {
+      "id": "file:Assets/Scripts/CarHealth.cs",
+      "fanIn": 2,
+      "name": "CarHealth.cs"
+    },
+    {
+      "id": "file:Assets/Scripts/Projectile.cs",
+      "fanIn": 2,
+      "name": "Projectile.cs"
+    },
+    {
+      "id": "config:Assets/InputSystem_Actions.inputactions",
+      "fanIn": 2,
+      "name": "InputSystem_Actions.inputactions"
+    },
+    {
+      "id": "config:Assets/Settings/PC_RPAsset.asset",
+      "fanIn": 2,
+      "name": "PC_RPAsset.asset"
+    },
+    {
+      "id": "config:Assets/Settings/Mobile_RPAsset.asset",
+      "fanIn": 2,
+      "name": "Mobile_RPAsset.asset"
+    },
+    {
+      "id": "config:ProjectSettings/DynamicsManager.asset",
+      "fanIn": 2,
+      "name": "DynamicsManager.asset"
+    },
+    {
+      "id": "file:Assets/Scripts/CarCannon.cs",
+      "fanIn": 1,
+      "name": "CarCannon.cs"
+    },
+    {
+      "id": "file:Assets/Scripts/OpponentDriver.cs",
+      "fanIn": 1,
+      "name": "OpponentDriver.cs"
+    },
+    {
+      "id": "file:Assets/Scripts/CarCameraFollow.cs",
+      "fanIn": 1,
+      "name": "CarCameraFollow.cs"
+    },
+    {
+      "id": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "fanIn": 1,
+      "name": "ProceduralCarBuilder.cs"
+    },
+    {
+      "id": "config:Assets/Settings/PC_Renderer.asset",
+      "fanIn": 1,
+      "name": "PC_Renderer.asset"
+    },
+    {
+      "id": "config:Assets/Settings/Mobile_Renderer.asset",
+      "fanIn": 1,
+      "name": "Mobile_Renderer.asset"
+    },
+    {
+      "id": "config:ProjectSettings/EditorBuildSettings.asset",
+      "fanIn": 1,
+      "name": "EditorBuildSettings.asset"
+    },
+    {
+      "id": "document:ProjectSettings/ProjectVersion.txt",
+      "fanIn": 1,
+      "name": "ProjectVersion.txt"
+    },
+    {
+      "id": "file:Assets/Scripts/TargetCar.cs",
+      "fanIn": 0,
+      "name": "TargetCar.cs"
+    },
+    {
+      "id": "config:ProjectSettings/TimeManager.asset",
+      "fanIn": 0,
+      "name": "TimeManager.asset"
+    },
+    {
+      "id": "config:ProjectSettings/TagManager.asset",
+      "fanIn": 0,
+      "name": "TagManager.asset"
+    },
+    {
+      "id": "config:ProjectSettings/QualitySettings.asset",
+      "fanIn": 0,
+      "name": "QualitySettings.asset"
+    }
+  ],
+  "fanOutRanking": [
+    {
+      "id": "document:Docs/AI/UnityProjectContext.md",
+      "fanOut": 7,
+      "name": "UnityProjectContext.md"
+    },
+    {
+      "id": "config:Packages/manifest.json",
+      "fanOut": 4,
+      "name": "manifest.json"
+    },
+    {
+      "id": "file:Assets/Scripts/CarHealth.cs",
+      "fanOut": 3,
+      "name": "CarHealth.cs"
+    },
+    {
+      "id": "file:Assets/Scripts/TargetCar.cs",
+      "fanOut": 2,
+      "name": "TargetCar.cs"
+    },
+    {
+      "id": "config:ProjectSettings/TimeManager.asset",
+      "fanOut": 2,
+      "name": "TimeManager.asset"
+    },
+    {
+      "id": "config:ProjectSettings/QualitySettings.asset",
+      "fanOut": 2,
+      "name": "QualitySettings.asset"
+    },
+    {
+      "id": "file:Assets/Scripts/CarCannon.cs",
+      "fanOut": 1,
+      "name": "CarCannon.cs"
+    },
+    {
+      "id": "file:Assets/Scripts/Projectile.cs",
+      "fanOut": 1,
+      "name": "Projectile.cs"
+    },
+    {
+      "id": "file:Assets/Scripts/OpponentDriver.cs",
+      "fanOut": 1,
+      "name": "OpponentDriver.cs"
+    },
+    {
+      "id": "config:Assets/InputSystem_Actions.inputactions",
+      "fanOut": 1,
+      "name": "InputSystem_Actions.inputactions"
+    },
+    {
+      "id": "config:Assets/Settings/PC_RPAsset.asset",
+      "fanOut": 1,
+      "name": "PC_RPAsset.asset"
+    },
+    {
+      "id": "config:Assets/Settings/Mobile_RPAsset.asset",
+      "fanOut": 1,
+      "name": "Mobile_RPAsset.asset"
+    },
+    {
+      "id": "config:ProjectSettings/DynamicsManager.asset",
+      "fanOut": 1,
+      "name": "DynamicsManager.asset"
+    },
+    {
+      "id": "config:ProjectSettings/TagManager.asset",
+      "fanOut": 1,
+      "name": "TagManager.asset"
+    },
+    {
+      "id": "config:ProjectSettings/EditorBuildSettings.asset",
+      "fanOut": 1,
+      "name": "EditorBuildSettings.asset"
+    },
+    {
+      "id": "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "fanOut": 1,
+      "name": "Settings.json"
+    },
+    {
+      "id": "document:ProjectSettings/ProjectVersion.txt",
+      "fanOut": 1,
+      "name": "ProjectVersion.txt"
+    },
+    {
+      "id": "file:Assets/Scripts/CarController.cs",
+      "fanOut": 0,
+      "name": "CarController.cs"
+    },
+    {
+      "id": "file:Assets/Scripts/CarCameraFollow.cs",
+      "fanOut": 0,
+      "name": "CarCameraFollow.cs"
+    },
+    {
+      "id": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "fanOut": 0,
+      "name": "ProceduralCarBuilder.cs"
+    }
+  ],
+  "bfsTraversal": {
+    "startNode": "file:Assets/Scripts/CarCannon.cs",
+    "order": [
+      "file:Assets/Scripts/CarCannon.cs",
+      "file:Assets/Scripts/Projectile.cs",
+      "file:Assets/Scripts/CarHealth.cs",
+      "file:Assets/Scripts/CarController.cs"
+    ],
+    "depthMap": {
+      "file:Assets/Scripts/CarCannon.cs": 0,
+      "file:Assets/Scripts/Projectile.cs": 1,
+      "file:Assets/Scripts/CarHealth.cs": 2,
+      "file:Assets/Scripts/CarController.cs": 3
+    },
+    "byDepth": {
+      "0": [
+        "file:Assets/Scripts/CarCannon.cs"
+      ],
+      "1": [
+        "file:Assets/Scripts/Projectile.cs"
+      ],
+      "2": [
+        "file:Assets/Scripts/CarHealth.cs"
+      ],
+      "3": [
+        "file:Assets/Scripts/CarController.cs"
+      ]
+    }
+  },
+  "nonCodeFiles": {
+    "documentation": [
+      {
+        "id": "document:ProjectSettings/ProjectVersion.txt",
+        "name": "ProjectVersion.txt",
+        "type": "document",
+        "summary": "Фиксирует версию редактора Unity 6000.5.9f1 (ревизия b57deb96f08d), с которой открывался проект."
+      },
+      {
+        "id": "document:Docs/AI/UnityProjectContext.md",
+        "name": "UnityProjectContext.md",
+        "type": "document",
+        "summary": "Автосгенерированный контекст проекта для AI-ассистентов из 14 разделов: окружение (Unity 6000.5.9f1, URP, Input System), структура каталогов, архитектура (Rigidbody-CarController, маршрут оппонентов по Track_Markings, процедурные меши), конвенции кода, состояние тестирования, доступный Unity-инструментарий и ограничения."
+      }
+    ],
+    "infrastructure": [],
+    "data": [],
+    "config": [
+      {
+        "id": "config:Assets/InputSystem_Actions.inputactions",
+        "name": "InputSystem_Actions.inputactions",
+        "type": "config",
+        "summary": "Ассет Unity Input System с двумя action map (Player: Move, Look, Attack, Interact, Crouch, Jump, Previous, Next, Sprint; UI: Navigate, Submit, Cancel, Point, Click и др.) и привязками для схем Keyboard&Mouse, Gamepad, Touch, Joystick и XR."
+      },
+      {
+        "id": "config:Assets/Settings/PC_RPAsset.asset",
+        "name": "PC_RPAsset.asset",
+        "type": "config",
+        "summary": "Ассет URP-пайплайна для профиля качества PC: HDR, полный RenderScale 1.0, 4 каскада теней на дистанции 50, SRP Batcher; ссылается на PC_Renderer и общий Volume Profile сцены."
+      },
+      {
+        "id": "config:Assets/Settings/Mobile_RPAsset.asset",
+        "name": "Mobile_RPAsset.asset",
+        "type": "config",
+        "summary": "Ассет URP-пайплайна для мобильного профиля качества: пониженный RenderScale 0.8, один каскад теней, HDR и SRP Batcher; ссылается на Mobile_Renderer."
+      },
+      {
+        "id": "config:Assets/Settings/PC_Renderer.asset",
+        "name": "PC_Renderer.asset",
+        "type": "config",
+        "summary": "Universal Renderer Data для ПК: Deferred-режим рендеринга и подключённая renderer feature Screen Space Ambient Occlusion с набором шумовых текстур."
+      },
+      {
+        "id": "config:Assets/Settings/Mobile_Renderer.asset",
+        "name": "Mobile_Renderer.asset",
+        "type": "config",
+        "summary": "Облегчённый Universal Renderer Data для мобильных платформ: Forward-рендеринг без дополнительных renderer features."
+      },
+      {
+        "id": "config:ProjectSettings/DynamicsManager.asset",
+        "name": "DynamicsManager.asset",
+        "type": "config",
+        "summary": "Настройки PhysX-физики проекта: гравитация −9.81 по Y, 6 итераций солвера позиции и 1 скорости, полностью открытая матрица столкновений слоёв, автосимуляция и лимит угловой скорости 50 — фундамент для Rigidbody-физики автомобилей."
+      },
+      {
+        "id": "config:ProjectSettings/TimeManager.asset",
+        "name": "TimeManager.asset",
+        "type": "config",
+        "summary": "Тайминги проекта: фиксированный шаг физики 0.02 с (50 Гц), максимальный шаг 0.333 с и timeScale 1 — определяет частоту вызовов FixedUpdate в коде управления машиной."
+      },
+      {
+        "id": "config:ProjectSettings/TagManager.asset",
+        "name": "TagManager.asset",
+        "type": "config",
+        "summary": "Реестр тегов, слоёв и слоёв рендеринга проекта: пользовательские теги не заданы, используются только встроенные слои (Default, TransparentFX, Ignore Raycast, Water, UI) и стандартные Light Layer 1–7 для URP."
+      },
+      {
+        "id": "config:ProjectSettings/QualitySettings.asset",
+        "name": "QualitySettings.asset",
+        "type": "config",
+        "summary": "Два уровня качества — Mobile и PC (текущий PC), каждый привязан к своему URP-ассету (Mobile_RPAsset и PC_RPAsset) через customRenderPipeline; задаёт дефолтный уровень по платформам."
+      },
+      {
+        "id": "config:ProjectSettings/EditorBuildSettings.asset",
+        "name": "EditorBuildSettings.asset",
+        "type": "config",
+        "summary": "Список сцен сборки (единственная включённая сцена Assets/Scenes/SampleScene.unity) и объекты конфигурации: проектный action asset Input System и настройки App UI."
+      },
+      {
+        "id": "config:Packages/manifest.json",
+        "name": "manifest.json",
+        "type": "config",
+        "summary": "Манифест Unity Package Manager: URP 17.5.0, Input System 1.20.0, AI Navigation, AI Assistant (2.19.0-pre.1), Test Framework, Timeline, uGUI, Visual Scripting и полный набор встроенных модулей движка."
+      },
+      {
+        "id": "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+        "name": "Settings.json",
+        "type": "config",
+        "summary": "Настройки пакета Unity AI Assistant: включены git-чекпоинты с хранением 2 недели, стандартный экземпляр git, кастомные инструкции не заданы, флаги onboarding-баннеров."
+      }
+    ]
+  },
+  "clusters": [
+    {
+      "nodes": [
+        "file:Assets/Scripts/CarHealth.cs",
+        "file:Assets/Scripts/Projectile.cs",
+        "file:Assets/Scripts/CarCannon.cs"
+      ],
+      "edgeCount": 4
+    }
+  ],
+  "layers": {
+    "count": 6,
+    "list": [
+      {
+        "id": "layer:vehicle-physics",
+        "name": "Физика и управление автомобилем",
+        "description": "Rigidbody-модель машины (тяга, руление, боковое сцепление, прижимная сила, сброс) в CarController, её облегчённый вариант для машины-мишени TargetCar и настройки PhysX и фиксированного шага времени, от которых напрямую зависит FixedUpdate-цикл."
+      },
+      {
+        "id": "layer:ai-opponents",
+        "name": "AI-оппоненты",
+        "description": "Waypoint-навигация машин соперников: OpponentDriver строит маршрут со смещением полосы, вычисляет руление и скорость и подаёт команды в CarController через SetInput, не трогая физику напрямую."
+      },
+      {
+        "id": "layer:combat",
+        "name": "Бой и разрушение",
+        "description": "Замкнутый контур стрельбы и урона: пушка CarCannon порождает снаряды Projectile, которые наносят урон CarHealth, а тот отключает управление и пушку у обломка, рисует HP-бар и возрождает машину."
+      },
+      {
+        "id": "layer:presentation",
+        "name": "Визуализация и рендеринг",
+        "description": "Всё, что отвечает за картинку без влияния на геймплей: камера преследования, процедурный генератор мешей кузова и колёс, а также URP-ассеты пайплайна и рендереров для профилей PC и Mobile вместе с QualitySettings, которые их выбирают."
+      },
+      {
+        "id": "layer:project-config",
+        "name": "Ввод и конфигурация проекта",
+        "description": "Проектные настройки Unity, задающие окружение для скриптов: action-ассет Input System, манифест пакетов (URP, Input System, AI Assistant), список сцен сборки, реестр тегов и слоёв и настройки редакторного AI-ассистента."
+      },
+      {
+        "id": "layer:documentation",
+        "name": "Документация",
+        "description": "Автосгенерированный контекст проекта для AI-ассистентов с описанием архитектуры, конвенций и инструментария, а также запись версии редактора Unity 6000.5.9f1."
+      }
+    ]
+  },
+  "nodeSummaryIndex": {
+    "file:Assets/Scripts/CarCannon.cs": {
+      "name": "CarCannon.cs",
+      "type": "file",
+      "summary": "Реализует пушку на крыше автомобиля: при старте процедурно собирает башню и ствол из примитивов, по нажатию ЛКМ/Ctrl/правого бампера геймпада выпускает снаряд Projectile с отдачей по Rigidbody и вспышкой у дульного среза."
+    },
+    "file:Assets/Scripts/CarHealth.cs": {
+      "name": "CarHealth.cs",
+      "type": "file",
+      "summary": "Управляет здоровьем автомобиля: считает урон от сильных боковых столкновений по импульсу Rigidbody, принимает урон от снарядов, при нуле HP превращает машину в обломок с взрывом и через задержку возрождает её; также рисует HP-бар через OnGUI. Дополнительно содержит ExplosionFlash — дешёвый эффект взрыва."
+    },
+    "file:Assets/Scripts/Projectile.cs": {
+      "name": "Projectile.cs",
+      "type": "file",
+      "summary": "Описывает снаряд пушки: статическая фабрика Spawn создаёт сферу с Rigidbody и игнорирует коллизии со стрелявшей машиной; при первом контакте наносит урон CarHealth, толкает цель импульсом, порождает ExplosionFlash и уничтожается."
+    },
+    "file:Assets/Scripts/CarController.cs": {
+      "name": "CarController.cs",
+      "type": "file",
+      "summary": "Реализует физику автомобиля на Rigidbody: тягу, торможение, руление, боковое сцепление, прижимную силу, визуальное вращение колёс и звук двигателя. Читает ввод игрока через Unity Input System (клавиатура/геймпад) либо принимает команды от AI через SetInput и рисует HUD-спидометр с подсказками через OnGUI."
+    },
+    "file:Assets/Scripts/OpponentDriver.cs": {
+      "name": "OpponentDriver.cs",
+      "type": "file",
+      "summary": "AI-водитель оппонента: строит маршрут из дочерних waypoint-трансформов со смещением полосы, вычисляет угол до следующей точки и подаёт газ/руль/тормоз в CarController через SetInput. Автоматически сбрасывает перевернувшуюся машину через ResetCar."
+    },
+    "file:Assets/Scripts/TargetCar.cs": {
+      "name": "TargetCar.cs",
+      "type": "file",
+      "summary": "Машина-мишень без водителя, по которой можно стрелять и таранить. Без CarController самостоятельно настраивает ту же физику (масса, сферические коллайдеры колёс, материал без трения) через статические методы CarController, применяет сопротивление качению и возвращается на стартовую позицию после уничтожения по событию CarHealth.OnRespawned."
+    },
+    "file:Assets/Scripts/CarCameraFollow.cs": {
+      "name": "CarCameraFollow.cs",
+      "type": "file",
+      "summary": "Компонент камеры преследования: в LateUpdate плавно подтягивает камеру к смещённой позиции за машиной, поворачивает её на точку перед автомобилем и динамически расширяет поле зрения (FOV) в зависимости от скорости Rigidbody."
+    },
+    "file:Assets/Scripts/ProceduralCarBuilder.cs": {
+      "name": "ProceduralCarBuilder.cs",
+      "type": "file",
+      "summary": "Статический строитель визуальной модели спортивного автомобиля: программно генерирует меши кузова, стеклянного фонаря, карбонового аэрообвеса и фар по кольцевым сечениям, а также собирает зеркала, выхлопы и детализированные колёса из примитивов."
+    },
+    "config:Assets/InputSystem_Actions.inputactions": {
+      "name": "InputSystem_Actions.inputactions",
+      "type": "config",
+      "summary": "Ассет Unity Input System с двумя action map (Player: Move, Look, Attack, Interact, Crouch, Jump, Previous, Next, Sprint; UI: Navigate, Submit, Cancel, Point, Click и др.) и привязками для схем Keyboard&Mouse, Gamepad, Touch, Joystick и XR."
+    },
+    "config:Assets/Settings/PC_RPAsset.asset": {
+      "name": "PC_RPAsset.asset",
+      "type": "config",
+      "summary": "Ассет URP-пайплайна для профиля качества PC: HDR, полный RenderScale 1.0, 4 каскада теней на дистанции 50, SRP Batcher; ссылается на PC_Renderer и общий Volume Profile сцены."
+    },
+    "config:Assets/Settings/Mobile_RPAsset.asset": {
+      "name": "Mobile_RPAsset.asset",
+      "type": "config",
+      "summary": "Ассет URP-пайплайна для мобильного профиля качества: пониженный RenderScale 0.8, один каскад теней, HDR и SRP Batcher; ссылается на Mobile_Renderer."
+    },
+    "config:Assets/Settings/PC_Renderer.asset": {
+      "name": "PC_Renderer.asset",
+      "type": "config",
+      "summary": "Universal Renderer Data для ПК: Deferred-режим рендеринга и подключённая renderer feature Screen Space Ambient Occlusion с набором шумовых текстур."
+    },
+    "config:Assets/Settings/Mobile_Renderer.asset": {
+      "name": "Mobile_Renderer.asset",
+      "type": "config",
+      "summary": "Облегчённый Universal Renderer Data для мобильных платформ: Forward-рендеринг без дополнительных renderer features."
+    },
+    "config:ProjectSettings/DynamicsManager.asset": {
+      "name": "DynamicsManager.asset",
+      "type": "config",
+      "summary": "Настройки PhysX-физики проекта: гравитация −9.81 по Y, 6 итераций солвера позиции и 1 скорости, полностью открытая матрица столкновений слоёв, автосимуляция и лимит угловой скорости 50 — фундамент для Rigidbody-физики автомобилей."
+    },
+    "config:ProjectSettings/TimeManager.asset": {
+      "name": "TimeManager.asset",
+      "type": "config",
+      "summary": "Тайминги проекта: фиксированный шаг физики 0.02 с (50 Гц), максимальный шаг 0.333 с и timeScale 1 — определяет частоту вызовов FixedUpdate в коде управления машиной."
+    },
+    "config:ProjectSettings/TagManager.asset": {
+      "name": "TagManager.asset",
+      "type": "config",
+      "summary": "Реестр тегов, слоёв и слоёв рендеринга проекта: пользовательские теги не заданы, используются только встроенные слои (Default, TransparentFX, Ignore Raycast, Water, UI) и стандартные Light Layer 1–7 для URP."
+    },
+    "config:ProjectSettings/QualitySettings.asset": {
+      "name": "QualitySettings.asset",
+      "type": "config",
+      "summary": "Два уровня качества — Mobile и PC (текущий PC), каждый привязан к своему URP-ассету (Mobile_RPAsset и PC_RPAsset) через customRenderPipeline; задаёт дефолтный уровень по платформам."
+    },
+    "config:ProjectSettings/EditorBuildSettings.asset": {
+      "name": "EditorBuildSettings.asset",
+      "type": "config",
+      "summary": "Список сцен сборки (единственная включённая сцена Assets/Scenes/SampleScene.unity) и объекты конфигурации: проектный action asset Input System и настройки App UI."
+    },
+    "config:Packages/manifest.json": {
+      "name": "manifest.json",
+      "type": "config",
+      "summary": "Манифест Unity Package Manager: URP 17.5.0, Input System 1.20.0, AI Navigation, AI Assistant (2.19.0-pre.1), Test Framework, Timeline, uGUI, Visual Scripting и полный набор встроенных модулей движка."
+    },
+    "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json": {
+      "name": "Settings.json",
+      "type": "config",
+      "summary": "Настройки пакета Unity AI Assistant: включены git-чекпоинты с хранением 2 недели, стандартный экземпляр git, кастомные инструкции не заданы, флаги onboarding-баннеров."
+    },
+    "document:ProjectSettings/ProjectVersion.txt": {
+      "name": "ProjectVersion.txt",
+      "type": "document",
+      "summary": "Фиксирует версию редактора Unity 6000.5.9f1 (ревизия b57deb96f08d), с которой открывался проект."
+    },
+    "document:Docs/AI/UnityProjectContext.md": {
+      "name": "UnityProjectContext.md",
+      "type": "document",
+      "summary": "Автосгенерированный контекст проекта для AI-ассистентов из 14 разделов: окружение (Unity 6000.5.9f1, URP, Input System), структура каталогов, архитектура (Rigidbody-CarController, маршрут оппонентов по Track_Markings, процедурные меши), конвенции кода, состояние тестирования, доступный Unity-инструментарий и ограничения."
+    }
+  },
+  "totalNodes": 22,
+  "totalEdges": 123,
+  "fileLevelEdges": 33
+}

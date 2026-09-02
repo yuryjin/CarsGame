@@ -1,0 +1,2346 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "CarsGame",
+    "languages": [
+      "csharp",
+      "json",
+      "markdown",
+      "yaml"
+    ],
+    "frameworks": [
+      "Unity",
+      "Universal Render Pipeline (URP)",
+      "Unity Input System"
+    ],
+    "description": "Небольшой однoсценовый прототип аркадной гонки со стрельбой на Unity 6 (URP, Unity Input System): процедурная трасса, один автомобиль игрока на Rigidbody-физике, три AI-оппонента, пушка со снарядами и система здоровья/разрушения машин. Весь игровой код — C# MonoBehaviour-скрипты в Assets/Scripts в пространстве имён RacingGame.",
+    "analyzedAt": "2026-09-02T10:33:56.039200Z",
+    "gitCommitHash": "1e49f9978b1a83a88dd964080c61268ae7a7e662"
+  },
+  "nodes": [
+    {
+      "id": "file:Assets/Scripts/CarCannon.cs",
+      "type": "file",
+      "name": "CarCannon.cs",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "summary": "Реализует пушку на крыше автомобиля: при старте процедурно собирает башню и ствол из примитивов, по нажатию ЛКМ/Ctrl/правого бампера геймпада выпускает снаряд Projectile с отдачей по Rigidbody и вспышкой у дульного среза.",
+      "tags": [
+        "оружие",
+        "component",
+        "input-system",
+        "процедурная-геометрия",
+        "gameplay"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Unity MonoBehaviour с lifecycle-методами Awake/Update; опрос ввода через Unity Input System (Keyboard.current, Mouse.current, Gamepad.current); материалы создаются через Shader.Find с fallback на Standard."
+    },
+    {
+      "id": "file:Assets/Scripts/CarHealth.cs",
+      "type": "file",
+      "name": "CarHealth.cs",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "summary": "Управляет здоровьем автомобиля: считает урон от сильных боковых столкновений по импульсу Rigidbody, принимает урон от снарядов, при нуле HP превращает машину в обломок с взрывом и через задержку возрождает её; также рисует HP-бар через OnGUI. Дополнительно содержит ExplosionFlash — дешёвый эффект взрыва.",
+      "tags": [
+        "здоровье",
+        "component",
+        "физика",
+        "hud",
+        "gameplay"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Публикует C#-события (event Action) OnHealthChanged/OnDied/OnRespawned для подписчиков; использует MaterialPropertyBlock для перекраски обломка без создания копий материалов и Shader.PropertyToID для кэширования идентификаторов свойств шейдера."
+    },
+    {
+      "id": "file:Assets/Scripts/Projectile.cs",
+      "type": "file",
+      "name": "Projectile.cs",
+      "filePath": "Assets/Scripts/Projectile.cs",
+      "summary": "Описывает снаряд пушки: статическая фабрика Spawn создаёт сферу с Rigidbody и игнорирует коллизии со стрелявшей машиной; при первом контакте наносит урон CarHealth, толкает цель импульсом, порождает ExplosionFlash и уничтожается.",
+      "tags": [
+        "снаряд",
+        "factory",
+        "физика",
+        "component",
+        "gameplay"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Атрибут [RequireComponent(typeof(Rigidbody))] гарантирует наличие Rigidbody; статический метод-фабрика собирает GameObject во время выполнения вместо использования префаба."
+    },
+    {
+      "id": "class:Assets/Scripts/CarCannon.cs:CarCannon",
+      "type": "class",
+      "name": "CarCannon",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        10,
+        171
+      ],
+      "summary": "MonoBehaviour пушки на крыше: хранит параметры стрельбы (интервал, скорость и урон снаряда, сила отдачи), строит визуальную башню и обрабатывает выстрел с анимацией отката ствола.",
+      "tags": [
+        "оружие",
+        "component",
+        "monobehaviour",
+        "input-system"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:Assets/Scripts/CarHealth.cs:CarHealth",
+      "type": "class",
+      "name": "CarHealth",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        11,
+        249
+      ],
+      "summary": "MonoBehaviour очков здоровья машины: урон от столкновений и снарядов, состояние IsDead, таймер возрождения, отключение CarController/CarCannon у обломка и отрисовка HP-бара на экране или над машиной.",
+      "tags": [
+        "здоровье",
+        "component",
+        "monobehaviour",
+        "события",
+        "hud"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:Assets/Scripts/CarHealth.cs:ExplosionFlash",
+      "type": "class",
+      "name": "ExplosionFlash",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        252,
+        301
+      ],
+      "summary": "Одноразовый эффект взрыва: расширяющаяся оранжевая полупрозрачная сфера и затухающий точечный свет, самоуничтожается по истечении duration и освобождает созданный материал.",
+      "tags": [
+        "vfx",
+        "component",
+        "monobehaviour",
+        "эффекты"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:Assets/Scripts/Projectile.cs:Projectile",
+      "type": "class",
+      "name": "Projectile",
+      "filePath": "Assets/Scripts/Projectile.cs",
+      "lineRange": [
+        9,
+        84
+      ],
+      "summary": "MonoBehaviour снаряда пушки с фабрикой Spawn; при столкновении наносит урон CarHealth цели, прикладывает импульс и уничтожает себя после первого контакта.",
+      "tags": [
+        "снаряд",
+        "component",
+        "monobehaviour",
+        "factory"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCannon.cs:Awake",
+      "type": "function",
+      "name": "Awake",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        34,
+        45
+      ],
+      "summary": "Кэширует Rigidbody, при отсутствии ссылок на ствол/дуло строит башню через BuildTurret, запоминает положение покоя ствола и добавляет точечный свет вспышки на дульный срез.",
+      "tags": [
+        "lifecycle",
+        "инициализация",
+        "unity"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCannon.cs:WantsToFire",
+      "type": "function",
+      "name": "WantsToFire",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        57,
+        69
+      ],
+      "summary": "Опрашивает Unity Input System и возвращает true, если зажаты Ctrl, левая кнопка мыши либо правый бампер или западная кнопка геймпада.",
+      "tags": [
+        "input-system",
+        "ввод",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCannon.cs:TryFire",
+      "type": "function",
+      "name": "TryFire",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        71,
+        85
+      ],
+      "summary": "Публичный выстрел с учётом перезарядки: создаёт снаряд через Projectile.Spawn со скоростью дула плюс скорость машины, запускает откат ствола, вспышку и прикладывает импульс отдачи к Rigidbody.",
+      "tags": [
+        "оружие",
+        "стрельба",
+        "gameplay",
+        "public-api"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCannon.cs:BuildTurret",
+      "type": "function",
+      "name": "BuildTurret",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        87,
+        146
+      ],
+      "summary": "Процедурно собирает башню из примитивов (кольцо-основание, корпус, труба ствола, дульный тормоз, точка дула) под родительским объектом Cannon_Turret, удаляя коллайдеры и назначая тёмный материал.",
+      "tags": [
+        "процедурная-геометрия",
+        "инициализация",
+        "visuals"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCannon.cs:FindMaterialOnCar",
+      "type": "function",
+      "name": "FindMaterialOnCar",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        148,
+        161
+      ],
+      "summary": "Ищет среди Renderer-ов машины материал, имя которого содержит одну из переданных подстрок, чтобы переиспользовать его для башни.",
+      "tags": [
+        "utility",
+        "материалы",
+        "поиск"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:OnCollisionEnter",
+      "type": "function",
+      "name": "OnCollisionEnter",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        70,
+        99
+      ],
+      "summary": "Вычисляет урон от столкновения: игнорирует снаряды и вертикальные удары (приземления), берёт скорость удара как impulse/mass, применяет порог, коэффициент, максимум и кулдаун, затем вызывает TakeDamage.",
+      "tags": [
+        "физика",
+        "столкновения",
+        "урон",
+        "event-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "type": "function",
+      "name": "TakeDamage",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        101,
+        109
+      ],
+      "summary": "Публично снимает здоровье, вызывает событие OnHealthChanged и при достижении нуля переводит машину в состояние обломка через Die.",
+      "tags": [
+        "здоровье",
+        "урон",
+        "public-api",
+        "события"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:Heal",
+      "type": "function",
+      "name": "Heal",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        111,
+        116
+      ],
+      "summary": "Публично восстанавливает здоровье до maxHealth (не действует на разбитую машину) и уведомляет подписчиков OnHealthChanged.",
+      "tags": [
+        "здоровье",
+        "лечение",
+        "public-api"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:Die",
+      "type": "function",
+      "name": "Die",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        118,
+        132
+      ],
+      "summary": "Переводит машину в состояние обломка: выставляет IsDead и таймер возрождения, отключает управление и пушку, перекрашивает кузов, создаёт взрыв, повышает демпфирование Rigidbody и вызывает OnDied.",
+      "tags": [
+        "здоровье",
+        "смерть",
+        "state-machine",
+        "события"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:Respawn",
+      "type": "function",
+      "name": "Respawn",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        134,
+        152
+      ],
+      "summary": "Возрождает машину с полным HP: сбрасывает демпфирование и скорости Rigidbody, вызывает CarController.ResetCar, возвращает исходный цвет, включает управление и рассылает события OnHealthChanged и OnRespawned.",
+      "tags": [
+        "здоровье",
+        "возрождение",
+        "state-machine",
+        "события"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:TintWreck",
+      "type": "function",
+      "name": "TintWreck",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        163,
+        187
+      ],
+      "summary": "Перекрашивает все Renderer-ы машины в тёмный цвет обломка через MaterialPropertyBlock (с выбором _BaseColor для URP или _Color) либо снимает блок свойств для возврата к исходному виду.",
+      "tags": [
+        "visuals",
+        "материалы",
+        "urp"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:DrawWorldBar",
+      "type": "function",
+      "name": "DrawWorldBar",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        209,
+        220
+      ],
+      "summary": "Проецирует точку над машиной через Camera.main в экранные координаты и рисует маленький HP-бар над автомобилем (используется для AI-целей).",
+      "tags": [
+        "hud",
+        "ongui",
+        "visuals"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:DrawBar",
+      "type": "function",
+      "name": "DrawBar",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        222,
+        248
+      ],
+      "summary": "Рисует полосу здоровья IMGUI: тёмную подложку, заливку с цветом от красного к зелёному пропорционально HP и, опционально, текст «HP x / y» или таймер «РАЗБИТА».",
+      "tags": [
+        "hud",
+        "ongui",
+        "visuals"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:ExplosionFlash.Start",
+      "type": "function",
+      "name": "ExplosionFlash.Start",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        262,
+        278
+      ],
+      "summary": "Создаёт сферу без коллайдера с unlit-материалом оранжевого цвета (URP Unlit с fallback на Unlit/Color) и добавляет точечный свет взрыва.",
+      "tags": [
+        "vfx",
+        "инициализация",
+        "lifecycle"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:ExplosionFlash.Update",
+      "type": "function",
+      "name": "ExplosionFlash.Update",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        280,
+        295
+      ],
+      "summary": "Анимирует взрыв по нормализованному времени: расширяет сферу по sqrt(t), гасит свет и прозрачность, по завершении уничтожает GameObject.",
+      "tags": [
+        "vfx",
+        "анимация",
+        "lifecycle"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/Projectile.cs:Spawn",
+      "type": "function",
+      "name": "Spawn",
+      "filePath": "Assets/Scripts/Projectile.cs",
+      "lineRange": [
+        20,
+        50
+      ],
+      "summary": "Статическая фабрика снаряда: создаёт сферу с Rigidbody (непрерывная детекция столкновений, интерполяция), задаёт скорость, урон и владельца, отключает коллизии со всеми коллайдерами стрелявшей машины.",
+      "tags": [
+        "factory",
+        "снаряд",
+        "физика",
+        "public-api"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/Projectile.cs:OnCollisionEnter",
+      "type": "function",
+      "name": "OnCollisionEnter",
+      "filePath": "Assets/Scripts/Projectile.cs",
+      "lineRange": [
+        58,
+        83
+      ],
+      "summary": "Обрабатывает первый контакт снаряда: наносит урон CarHealth цели (кроме владельца), прикладывает импульс к Rigidbody цели по направлению полёта, создаёт компактный ExplosionFlash в точке удара и уничтожает снаряд.",
+      "tags": [
+        "физика",
+        "столкновения",
+        "урон",
+        "event-handler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:Assets/Scripts/CarController.cs",
+      "type": "file",
+      "name": "CarController.cs",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "summary": "Реализует физику автомобиля на Rigidbody: тягу, торможение, руление, боковое сцепление, прижимную силу, визуальное вращение колёс и звук двигателя. Читает ввод игрока через Unity Input System (клавиатура/геймпад) либо принимает команды от AI через SetInput и рисует HUD-спидометр с подсказками через OnGUI.",
+      "tags": [
+        "monobehaviour",
+        "физика-автомобиля",
+        "input-system",
+        "игровой-контроллер",
+        "hud"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Атрибут [RequireComponent(typeof(Rigidbody))] гарантирует наличие Rigidbody на объекте. Публичные поля с [Header] сериализуются в Inspector Unity; [SerializeField] private показывает приватное состояние в редакторе. Статические методы CreateWheelColliders и ApplyFrictionlessBodyMaterial имеют приватные перегрузки-обёртки без параметров, что позволяет переиспользовать настройку физики из TargetCar. Сцепление шин моделируется вручную, поэтому все коллайдеры получают PhysicsMaterial с нулевым трением."
+    },
+    {
+      "id": "file:Assets/Scripts/OpponentDriver.cs",
+      "type": "file",
+      "name": "OpponentDriver.cs",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "summary": "AI-водитель оппонента: строит маршрут из дочерних waypoint-трансформов со смещением полосы, вычисляет угол до следующей точки и подаёт газ/руль/тормоз в CarController через SetInput. Автоматически сбрасывает перевернувшуюся машину через ResetCar.",
+      "tags": [
+        "monobehaviour",
+        "ai",
+        "waypoint-навигация",
+        "оппонент",
+        "игровой-контроллер"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Класс объявлен sealed и требует CarController через [RequireComponent]. Используется Debug.Assert для проверки маршрута на дубликаты waypoint-ов; при невалидном маршруте компонент отключает сам себя (enabled = false)."
+    },
+    {
+      "id": "file:Assets/Scripts/TargetCar.cs",
+      "type": "file",
+      "name": "TargetCar.cs",
+      "filePath": "Assets/Scripts/TargetCar.cs",
+      "summary": "Машина-мишень без водителя, по которой можно стрелять и таранить. Без CarController самостоятельно настраивает ту же физику (масса, сферические коллайдеры колёс, материал без трения) через статические методы CarController, применяет сопротивление качению и возвращается на стартовую позицию после уничтожения по событию CarHealth.OnRespawned.",
+      "tags": [
+        "monobehaviour",
+        "мишень",
+        "физика-автомобиля",
+        "respawn",
+        "event-handler"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "[RequireComponent(typeof(Rigidbody), typeof(CarHealth))] задаёт зависимости компонента. Подписка на событие health.OnRespawned += ReturnToStart — типичный паттерн делегатов/событий C#; XML-документация /// <summary> с <see cref=\"CarController\"/> используется для описания класса."
+    },
+    {
+      "id": "class:Assets/Scripts/CarController.cs:CarController",
+      "type": "class",
+      "name": "CarController",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        6,
+        367
+      ],
+      "summary": "MonoBehaviour-контроллер автомобиля: управляет Rigidbody через силы и импульсы в FixedUpdate, обрабатывает ввод игрока или внешние команды, отвечает за сброс машины и HUD.",
+      "tags": [
+        "monobehaviour",
+        "физика-автомобиля",
+        "игровой-контроллер",
+        "компонент"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:Assets/Scripts/OpponentDriver.cs:OpponentDriver",
+      "type": "class",
+      "name": "OpponentDriver",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        5,
+        144
+      ],
+      "summary": "Sealed MonoBehaviour, ведущий машину оппонента по кольцевому маршруту из waypoint-ов и передающий управляющие сигналы в CarController.",
+      "tags": [
+        "monobehaviour",
+        "ai",
+        "waypoint-навигация",
+        "компонент"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:Assets/Scripts/TargetCar.cs:TargetCar",
+      "type": "class",
+      "name": "TargetCar",
+      "filePath": "Assets/Scripts/TargetCar.cs",
+      "lineRange": [
+        11,
+        73
+      ],
+      "summary": "MonoBehaviour для бесхозной машины-мишени: настраивает физику как у игрока при отсутствии CarController, гасит скорость и возвращается на старт после респауна.",
+      "tags": [
+        "monobehaviour",
+        "мишень",
+        "respawn",
+        "компонент"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:Awake",
+      "type": "function",
+      "name": "Awake",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        48,
+        63
+      ],
+      "summary": "Инициализирует Rigidbody (масса 1250 кг, центр масс, демпфирование, непрерывная детекция столкновений), создаёт колёсные коллайдеры, применяет материал без трения и запоминает стартовую позицию для сброса.",
+      "tags": [
+        "lifecycle",
+        "инициализация",
+        "физика"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:CreateWheelColliders",
+      "type": "function",
+      "name": "CreateWheelColliders",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        74,
+        88
+      ],
+      "summary": "Статический метод: создаёт дочерние GameObject со SphereCollider в позициях колёс, чтобы машина катилась через бордюры и ступеньки трассы. Используется также TargetCar.",
+      "tags": [
+        "static",
+        "физика",
+        "коллайдеры",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ApplyFrictionlessBodyMaterial",
+      "type": "function",
+      "name": "ApplyFrictionlessBodyMaterial",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        99,
+        114
+      ],
+      "summary": "Статический метод: назначает всем коллайдерам машины PhysicsMaterial с нулевым трением и отскоком, так как сцепление моделируется скриптом. Используется также TargetCar.",
+      "tags": [
+        "static",
+        "физика",
+        "physics-material",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:Update",
+      "type": "function",
+      "name": "Update",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        116,
+        128
+      ],
+      "summary": "Покадровый цикл: читает ввод игрока (если playerControlled), обновляет визуал колёс и звук, сбрасывает машину при падении ниже -10 или по клавише R.",
+      "tags": [
+        "lifecycle",
+        "game-loop",
+        "input"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:FixedUpdate",
+      "type": "function",
+      "name": "FixedUpdate",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        130,
+        144
+      ],
+      "summary": "Физический цикл: проверяет контакт с землёй, считает скорость, применяет мотор, руление, сцепление и прижимную силу; запоминает последнюю безопасную позицию при медленном движении.",
+      "tags": [
+        "lifecycle",
+        "физика",
+        "game-loop"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ReadInput",
+      "type": "function",
+      "name": "ReadInput",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        146,
+        176
+      ],
+      "summary": "Считывает управление с клавиатуры (WASD/стрелки/пробел) и геймпада (левый стик, триггеры, кнопка A) через Unity Input System в moveInput, steerInput и isBraking.",
+      "tags": [
+        "input-system",
+        "клавиатура",
+        "геймпад"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:SetInput",
+      "type": "function",
+      "name": "SetInput",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        178,
+        183
+      ],
+      "summary": "Публичный API для внешнего управления (AI): задаёт газ, руль и тормоз с ограничением диапазона [-1, 1].",
+      "tags": [
+        "public-api",
+        "input",
+        "ai"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ApplyMotor",
+      "type": "function",
+      "name": "ApplyMotor",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        196,
+        244
+      ],
+      "summary": "Основная логика тяги: импульсное торможение с ограничением до полной остановки, разгон вперёд с падением силы к maxSpeed, реверс и торможение при смене направления, накат через ApplyCoastDeceleration.",
+      "tags": [
+        "физика",
+        "мотор",
+        "торможение"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ApplySteering",
+      "type": "function",
+      "name": "ApplySteering",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        255,
+        274
+      ],
+      "summary": "Плавно доводит угол руля к целевому (уменьшая максимум на высокой скорости) и прикладывает крутящий момент вокруг оси Y пропорционально скорости.",
+      "tags": [
+        "физика",
+        "руление",
+        "torque"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ApplyFriction",
+      "type": "function",
+      "name": "ApplyFriction",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        276,
+        285
+      ],
+      "summary": "Имитирует сцепление шин: гасит боковую составляющую скорости импульсом, ослабляя сцепление при торможении для заноса.",
+      "tags": [
+        "физика",
+        "сцепление",
+        "боковая-сила"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:UpdateWheelVisuals",
+      "type": "function",
+      "name": "UpdateWheelVisuals",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        296,
+        323
+      ],
+      "summary": "Поворачивает передние колёса на угол руления и вращает меши всех четырёх колёс пропорционально скорости.",
+      "tags": [
+        "визуал",
+        "колёса",
+        "анимация"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ResetCar",
+      "type": "function",
+      "name": "ResetCar",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        332,
+        338
+      ],
+      "summary": "Публичный метод сброса: обнуляет скорости и телепортирует машину на последнюю безопасную позицию с ориентацией по горизонту.",
+      "tags": [
+        "public-api",
+        "respawn",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:OnGUI",
+      "type": "function",
+      "name": "OnGUI",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        340,
+        366
+      ],
+      "summary": "Рисует IMGUI-оверлей со спидометром в км/ч и подсказками по управлению (на русском) для машины игрока.",
+      "tags": [
+        "hud",
+        "imgui",
+        "ui"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:Awake",
+      "type": "function",
+      "name": "Awake",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        18,
+        47
+      ],
+      "summary": "Находит CarController, отключает управление игроком, валидирует наличие минимум трёх waypoint-ов, строит маршрут, проверяет его на дубликаты и разворачивает машину к ближайшей точке маршрута.",
+      "tags": [
+        "lifecycle",
+        "инициализация",
+        "валидация"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:Update",
+      "type": "function",
+      "name": "Update",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        49,
+        72
+      ],
+      "summary": "Каждый кадр вычисляет угол до целевого waypoint-а, преобразует его в руление, снижает целевую скорость в поворотах, тормозит при превышении и вызывает car.SetInput; после 2 секунд переворота сбрасывает машину через car.ResetCar.",
+      "tags": [
+        "ai",
+        "game-loop",
+        "waypoint-навигация"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:BuildRoute",
+      "type": "function",
+      "name": "BuildRoute",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        74,
+        92
+      ],
+      "summary": "Строит массив точек маршрута из дочерних трансформов waypoints, смещая каждую точку вбок по касательной на laneOffset, чтобы оппоненты ехали по разным полосам.",
+      "tags": [
+        "waypoint-навигация",
+        "маршрут",
+        "геометрия"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:AdvancePassedWaypoints",
+      "type": "function",
+      "name": "AdvancePassedWaypoints",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        94,
+        108
+      ],
+      "summary": "Продвигает индекс waypoint-а, пропуская уже пройденные точки (в радиусе или позади машины), и возвращает горизонтальный вектор до следующей цели.",
+      "tags": [
+        "waypoint-навигация",
+        "ai"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:FindNearestWaypoint",
+      "type": "function",
+      "name": "FindNearestWaypoint",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        110,
+        126
+      ],
+      "summary": "Возвращает индекс ближайшей по горизонтали точки маршрута к текущей позиции машины.",
+      "tags": [
+        "waypoint-навигация",
+        "поиск",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:IsValidRoute",
+      "type": "function",
+      "name": "IsValidRoute",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        128,
+        138
+      ],
+      "summary": "Статическая проверка, что соседние точки маршрута не совпадают (расстояние по горизонтали не меньше 0.5 м).",
+      "tags": [
+        "static",
+        "валидация",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/TargetCar.cs:Awake",
+      "type": "function",
+      "name": "Awake",
+      "filePath": "Assets/Scripts/TargetCar.cs",
+      "lineRange": [
+        23,
+        53
+      ],
+      "summary": "Определяет наличие CarController; без него настраивает Rigidbody как у игрока и вызывает CarController.CreateWheelColliders/ApplyFrictionlessBodyMaterial. Запоминает стартовую позу, настраивает отображение полосы здоровья CarHealth и подписывается на OnRespawned.",
+      "tags": [
+        "lifecycle",
+        "инициализация",
+        "физика",
+        "event-handler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/TargetCar.cs:FixedUpdate",
+      "type": "function",
+      "name": "FixedUpdate",
+      "filePath": "Assets/Scripts/TargetCar.cs",
+      "lineRange": [
+        55,
+        65
+      ],
+      "summary": "Для машины без контроллера применяет импульс сопротивления качению, чтобы сдвинутая мишень постепенно останавливалась.",
+      "tags": [
+        "физика",
+        "game-loop"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:Assets/Scripts/CarCameraFollow.cs",
+      "type": "file",
+      "name": "CarCameraFollow.cs",
+      "filePath": "Assets/Scripts/CarCameraFollow.cs",
+      "summary": "Компонент камеры преследования: в LateUpdate плавно подтягивает камеру к смещённой позиции за машиной, поворачивает её на точку перед автомобилем и динамически расширяет поле зрения (FOV) в зависимости от скорости Rigidbody.",
+      "tags": [
+        "component",
+        "камера",
+        "monobehaviour",
+        "геймплей",
+        "smoothing"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Логика вынесена в LateUpdate, чтобы камера обновлялась после перемещения машины в текущем кадре; сглаживание через Vector3.Lerp/Quaternion.Slerp с коэффициентом на Time.deltaTime."
+    },
+    {
+      "id": "class:Assets/Scripts/CarCameraFollow.cs:CarCameraFollow",
+      "type": "class",
+      "name": "CarCameraFollow",
+      "filePath": "Assets/Scripts/CarCameraFollow.cs",
+      "lineRange": [
+        5,
+        45
+      ],
+      "summary": "MonoBehaviour следования камеры за целевым Transform с настраиваемым смещением, скоростями сглаживания позиции и поворота и множителем FOV от скорости.",
+      "tags": [
+        "component",
+        "камера",
+        "monobehaviour",
+        "геймплей"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCameraFollow.cs:LateUpdate",
+      "type": "function",
+      "name": "LateUpdate",
+      "filePath": "Assets/Scripts/CarCameraFollow.cs",
+      "lineRange": [
+        24,
+        44
+      ],
+      "summary": "Каждый кадр после Update интерполирует позицию и поворот камеры к желаемым значениям относительно цели и подстраивает fieldOfView по величине linearVelocity Rigidbody в диапазоне 55–85.",
+      "tags": [
+        "unity-lifecycle",
+        "камера",
+        "smoothing",
+        "fov"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "type": "file",
+      "name": "ProceduralCarBuilder.cs",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "summary": "Статический строитель визуальной модели спортивного автомобиля: программно генерирует меши кузова, стеклянного фонаря, карбонового аэрообвеса и фар по кольцевым сечениям, а также собирает зеркала, выхлопы и детализированные колёса из примитивов.",
+      "tags": [
+        "utility",
+        "процедурная-генерация",
+        "mesh",
+        "factory",
+        "визуал"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Статический класс без состояния; меши строятся вручную через List<Vector3>/List<int> и Mesh.SetVertices/SetTriangles с последующим RecalculateNormals/Tangents. Кузов задаётся как набор поперечных сечений (рингов), соединяемых квадами, — типичный подход «loft» для процедурных моделей."
+    },
+    {
+      "id": "class:Assets/Scripts/ProceduralCarBuilder.cs:ProceduralCarBuilder",
+      "type": "class",
+      "name": "ProceduralCarBuilder",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        6,
+        504
+      ],
+      "summary": "Статический класс с публичной точкой входа BuildSleekSportsCar и набором приватных генераторов мешей для отдельных частей автомобиля.",
+      "tags": [
+        "utility",
+        "процедурная-генерация",
+        "factory",
+        "static-class"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:BuildSleekSportsCar",
+      "type": "function",
+      "name": "BuildSleekSportsCar",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        8,
+        81
+      ],
+      "summary": "Создаёт корневой GameObject автомобиля и последовательно добавляет кузов, фонарь, аэрокит, фары, зеркала и выхлопы, назначая переданные материалы каждому MeshRenderer.",
+      "tags": [
+        "точка-входа",
+        "factory",
+        "процедурная-генерация",
+        "визуал"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateCarBodyMesh",
+      "type": "function",
+      "name": "GenerateCarBodyMesh",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        83,
+        183
+      ],
+      "summary": "Строит меш кузова из 9 поперечных сечений по 8 вершин каждое (сужающийся нос, колёсные арки, линия талии, задняя палуба), соединяет кольца квадами и закрывает нос и хвост.",
+      "tags": [
+        "mesh",
+        "процедурная-генерация",
+        "геометрия"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateCanopyMesh",
+      "type": "function",
+      "name": "GenerateCanopyMesh",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        185,
+        265
+      ],
+      "summary": "Генерирует обтекаемый стеклянный купол кабины из 5 колец по 6 точек и добавляет фронтальную и заднюю плоскости лобового и заднего стекла.",
+      "tags": [
+        "mesh",
+        "процедурная-генерация",
+        "геометрия"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateAeroKitMesh",
+      "type": "function",
+      "name": "GenerateAeroKitMesh",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        267,
+        339
+      ],
+      "summary": "Собирает карбоновый аэрообвес (передний сплиттер, пороги, диффузор, стойки и антикрыло с боковинами) из набора коробок через локальный помощник AddBox.",
+      "tags": [
+        "mesh",
+        "процедурная-генерация",
+        "геометрия"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateLightsMesh",
+      "type": "function",
+      "name": "GenerateLightsMesh",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        341,
+        386
+      ],
+      "summary": "Формирует меш угловатых передних фар и заднего LED-светового бруса, врезанных в кузов, с помощью помощника AddQuad.",
+      "tags": [
+        "mesh",
+        "процедурная-генерация",
+        "геометрия"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateSideMirror",
+      "type": "function",
+      "name": "CreateSideMirror",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        388,
+        420
+      ],
+      "summary": "Создаёт боковое зеркало из трёх примитивов (ножка, корпус, стекло) с удалением коллайдеров и зеркальным расположением по флагу isLeft.",
+      "tags": [
+        "helpers",
+        "примитивы",
+        "визуал"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateExhaust",
+      "type": "function",
+      "name": "CreateExhaust",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        422,
+        434
+      ],
+      "summary": "Добавляет выхлопную трубу-цилиндр с хромированным наконечником в заданной X-позиции, снимая коллайдеры.",
+      "tags": [
+        "helpers",
+        "примитивы",
+        "визуал"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateHighDetailWheel",
+      "type": "function",
+      "name": "CreateHighDetailWheel",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        436,
+        503
+      ],
+      "summary": "Публично собирает детализированное колесо: шину, легкосплавный обод, многоспицевую вставку, тормозной диск и красный суппорт на отдельном pivot; возвращает Transform колеса.",
+      "tags": [
+        "helpers",
+        "примитивы",
+        "колёса",
+        "визуал"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:Assets/InputSystem_Actions.inputactions",
+      "type": "config",
+      "name": "InputSystem_Actions.inputactions",
+      "filePath": "Assets/InputSystem_Actions.inputactions",
+      "summary": "Ассет Unity Input System с двумя action map (Player: Move, Look, Attack, Interact, Crouch, Jump, Previous, Next, Sprint; UI: Navigate, Submit, Cancel, Point, Click и др.) и привязками для схем Keyboard&Mouse, Gamepad, Touch, Joystick и XR.",
+      "tags": [
+        "configuration",
+        "input-system",
+        "action-map",
+        "ввод"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Стандартный шаблонный набор действий Unity 6; зарегистрирован как проектный action asset через com.unity.input.settings.actions в EditorBuildSettings."
+    },
+    {
+      "id": "config:Assets/Settings/PC_RPAsset.asset",
+      "type": "config",
+      "name": "PC_RPAsset.asset",
+      "filePath": "Assets/Settings/PC_RPAsset.asset",
+      "summary": "Ассет URP-пайплайна для профиля качества PC: HDR, полный RenderScale 1.0, 4 каскада теней на дистанции 50, SRP Batcher; ссылается на PC_Renderer и общий Volume Profile сцены.",
+      "tags": [
+        "configuration",
+        "urp",
+        "render-pipeline",
+        "графика"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:Assets/Settings/Mobile_RPAsset.asset",
+      "type": "config",
+      "name": "Mobile_RPAsset.asset",
+      "filePath": "Assets/Settings/Mobile_RPAsset.asset",
+      "summary": "Ассет URP-пайплайна для мобильного профиля качества: пониженный RenderScale 0.8, один каскад теней, HDR и SRP Batcher; ссылается на Mobile_Renderer.",
+      "tags": [
+        "configuration",
+        "urp",
+        "render-pipeline",
+        "mobile",
+        "графика"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:Assets/Settings/PC_Renderer.asset",
+      "type": "config",
+      "name": "PC_Renderer.asset",
+      "filePath": "Assets/Settings/PC_Renderer.asset",
+      "summary": "Universal Renderer Data для ПК: Deferred-режим рендеринга и подключённая renderer feature Screen Space Ambient Occlusion с набором шумовых текстур.",
+      "tags": [
+        "configuration",
+        "urp",
+        "renderer",
+        "ssao",
+        "графика"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:Assets/Settings/Mobile_Renderer.asset",
+      "type": "config",
+      "name": "Mobile_Renderer.asset",
+      "filePath": "Assets/Settings/Mobile_Renderer.asset",
+      "summary": "Облегчённый Universal Renderer Data для мобильных платформ: Forward-рендеринг без дополнительных renderer features.",
+      "tags": [
+        "configuration",
+        "urp",
+        "renderer",
+        "mobile",
+        "графика"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:ProjectSettings/DynamicsManager.asset",
+      "type": "config",
+      "name": "DynamicsManager.asset",
+      "filePath": "ProjectSettings/DynamicsManager.asset",
+      "summary": "Настройки PhysX-физики проекта: гравитация −9.81 по Y, 6 итераций солвера позиции и 1 скорости, полностью открытая матрица столкновений слоёв, автосимуляция и лимит угловой скорости 50 — фундамент для Rigidbody-физики автомобилей.",
+      "tags": [
+        "configuration",
+        "физика",
+        "physx",
+        "rigidbody"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:ProjectSettings/TimeManager.asset",
+      "type": "config",
+      "name": "TimeManager.asset",
+      "filePath": "ProjectSettings/TimeManager.asset",
+      "summary": "Тайминги проекта: фиксированный шаг физики 0.02 с (50 Гц), максимальный шаг 0.333 с и timeScale 1 — определяет частоту вызовов FixedUpdate в коде управления машиной.",
+      "tags": [
+        "configuration",
+        "физика",
+        "fixed-timestep",
+        "timing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:ProjectSettings/TagManager.asset",
+      "type": "config",
+      "name": "TagManager.asset",
+      "filePath": "ProjectSettings/TagManager.asset",
+      "summary": "Реестр тегов, слоёв и слоёв рендеринга проекта: пользовательские теги не заданы, используются только встроенные слои (Default, TransparentFX, Ignore Raycast, Water, UI) и стандартные Light Layer 1–7 для URP.",
+      "tags": [
+        "configuration",
+        "слои",
+        "теги",
+        "rendering-layers"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:ProjectSettings/QualitySettings.asset",
+      "type": "config",
+      "name": "QualitySettings.asset",
+      "filePath": "ProjectSettings/QualitySettings.asset",
+      "summary": "Два уровня качества — Mobile и PC (текущий PC), каждый привязан к своему URP-ассету (Mobile_RPAsset и PC_RPAsset) через customRenderPipeline; задаёт дефолтный уровень по платформам.",
+      "tags": [
+        "configuration",
+        "качество",
+        "urp",
+        "графика"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:ProjectSettings/EditorBuildSettings.asset",
+      "type": "config",
+      "name": "EditorBuildSettings.asset",
+      "filePath": "ProjectSettings/EditorBuildSettings.asset",
+      "summary": "Список сцен сборки (единственная включённая сцена Assets/Scenes/SampleScene.unity) и объекты конфигурации: проектный action asset Input System и настройки App UI.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "сцены",
+        "input-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:Packages/manifest.json",
+      "type": "config",
+      "name": "manifest.json",
+      "filePath": "Packages/manifest.json",
+      "summary": "Манифест Unity Package Manager: URP 17.5.0, Input System 1.20.0, AI Navigation, AI Assistant (2.19.0-pre.1), Test Framework, Timeline, uGUI, Visual Scripting и полный набор встроенных модулей движка.",
+      "tags": [
+        "configuration",
+        "package-manager",
+        "зависимости",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "type": "config",
+      "name": "Settings.json",
+      "filePath": "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "summary": "Настройки пакета Unity AI Assistant: включены git-чекпоинты с хранением 2 недели, стандартный экземпляр git, кастомные инструкции не заданы, флаги onboarding-баннеров.",
+      "tags": [
+        "configuration",
+        "ai-assistant",
+        "editor-tooling",
+        "settings"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:ProjectSettings/ProjectVersion.txt",
+      "type": "document",
+      "name": "ProjectVersion.txt",
+      "filePath": "ProjectSettings/ProjectVersion.txt",
+      "summary": "Фиксирует версию редактора Unity 6000.5.9f1 (ревизия b57deb96f08d), с которой открывался проект.",
+      "tags": [
+        "документация",
+        "версия",
+        "unity-editor"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:Docs/AI/UnityProjectContext.md",
+      "type": "document",
+      "name": "UnityProjectContext.md",
+      "filePath": "Docs/AI/UnityProjectContext.md",
+      "summary": "Автосгенерированный контекст проекта для AI-ассистентов из 14 разделов: окружение (Unity 6000.5.9f1, URP, Input System), структура каталогов, архитектура (Rigidbody-CarController, маршрут оппонентов по Track_Markings, процедурные меши), конвенции кода, состояние тестирования, доступный Unity-инструментарий и ограничения.",
+      "tags": [
+        "документация",
+        "ai-onboarding",
+        "архитектура",
+        "обзор"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Содержимое обёрнуто в маркеры <!-- unity-onboarding:generated:start/end -->, т.е. файл регенерируется инструментом; таблицы с колонками Confidence/Evidence привязывают каждое утверждение к источникам."
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "class:Assets/Scripts/CarCannon.cs:CarCannon",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "class:Assets/Scripts/CarHealth.cs:CarHealth",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "class:Assets/Scripts/CarHealth.cs:ExplosionFlash",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "class:Assets/Scripts/Projectile.cs:Projectile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:Awake",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:WantsToFire",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:TryFire",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:BuildTurret",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:FindMaterialOnCar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:OnCollisionEnter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:Heal",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:Die",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:Respawn",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:TintWreck",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:DrawWorldBar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:DrawBar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:ExplosionFlash.Start",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:ExplosionFlash.Update",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "function:Assets/Scripts/Projectile.cs:Spawn",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "function:Assets/Scripts/Projectile.cs:OnCollisionEnter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "class:Assets/Scripts/CarCannon.cs:CarCannon",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:TryFire",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "class:Assets/Scripts/CarHealth.cs:CarHealth",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "class:Assets/Scripts/CarHealth.cs:ExplosionFlash",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:Heal",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "class:Assets/Scripts/Projectile.cs:Projectile",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "function:Assets/Scripts/Projectile.cs:Spawn",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "file:Assets/Scripts/Projectile.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "file:Assets/Scripts/CarCannon.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "file:Assets/Scripts/Projectile.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "file:Assets/Scripts/CarHealth.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:Assets/Scripts/CarCannon.cs:TryFire",
+      "target": "function:Assets/Scripts/Projectile.cs:Spawn",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/Projectile.cs:OnCollisionEnter",
+      "target": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/Projectile.cs:OnCollisionEnter",
+      "target": "class:Assets/Scripts/CarHealth.cs:ExplosionFlash",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:Respawn",
+      "target": "function:Assets/Scripts/CarController.cs:ResetCar",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarCannon.cs:Awake",
+      "target": "function:Assets/Scripts/CarCannon.cs:BuildTurret",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarCannon.cs:BuildTurret",
+      "target": "function:Assets/Scripts/CarCannon.cs:FindMaterialOnCar",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:OnCollisionEnter",
+      "target": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "target": "function:Assets/Scripts/CarHealth.cs:Die",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:Die",
+      "target": "function:Assets/Scripts/CarHealth.cs:TintWreck",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:Respawn",
+      "target": "function:Assets/Scripts/CarHealth.cs:TintWreck",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:DrawWorldBar",
+      "target": "function:Assets/Scripts/CarHealth.cs:DrawBar",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "class:Assets/Scripts/CarController.cs:CarController",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "class:Assets/Scripts/OpponentDriver.cs:OpponentDriver",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "class:Assets/Scripts/TargetCar.cs:TargetCar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:Awake",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:CreateWheelColliders",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ApplyFrictionlessBodyMaterial",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:Update",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:FixedUpdate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ReadInput",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:SetInput",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ApplyMotor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ApplySteering",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ApplyFriction",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:UpdateWheelVisuals",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ResetCar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:OnGUI",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:Awake",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:Update",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:BuildRoute",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:AdvancePassedWaypoints",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:FindNearestWaypoint",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:IsValidRoute",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "function:Assets/Scripts/TargetCar.cs:Awake",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "function:Assets/Scripts/TargetCar.cs:FixedUpdate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "class:Assets/Scripts/CarController.cs:CarController",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "class:Assets/Scripts/OpponentDriver.cs:OpponentDriver",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "class:Assets/Scripts/TargetCar.cs:TargetCar",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:CreateWheelColliders",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ApplyFrictionlessBodyMaterial",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:SetInput",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ResetCar",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "file:Assets/Scripts/CarHealth.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:Assets/Scripts/OpponentDriver.cs:Update",
+      "target": "function:Assets/Scripts/CarController.cs:SetInput",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/OpponentDriver.cs:Update",
+      "target": "function:Assets/Scripts/CarController.cs:ResetCar",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/TargetCar.cs:Awake",
+      "target": "function:Assets/Scripts/CarController.cs:CreateWheelColliders",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/TargetCar.cs:Awake",
+      "target": "function:Assets/Scripts/CarController.cs:ApplyFrictionlessBodyMaterial",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "file:Assets/Scripts/CarHealth.cs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:Assets/Scripts/CarCameraFollow.cs",
+      "target": "class:Assets/Scripts/CarCameraFollow.cs:CarCameraFollow",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCameraFollow.cs",
+      "target": "function:Assets/Scripts/CarCameraFollow.cs:LateUpdate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCameraFollow.cs",
+      "target": "class:Assets/Scripts/CarCameraFollow.cs:CarCameraFollow",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:BuildSleekSportsCar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateCarBodyMesh",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateCanopyMesh",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateAeroKitMesh",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateLightsMesh",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateSideMirror",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateExhaust",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateHighDetailWheel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "class:Assets/Scripts/ProceduralCarBuilder.cs:ProceduralCarBuilder",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "class:Assets/Scripts/ProceduralCarBuilder.cs:ProceduralCarBuilder",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:BuildSleekSportsCar",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateHighDetailWheel",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "config:Assets/InputSystem_Actions.inputactions",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Assets/Settings/PC_RPAsset.asset",
+      "target": "config:Assets/Settings/PC_Renderer.asset",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Assets/Settings/Mobile_RPAsset.asset",
+      "target": "config:Assets/Settings/Mobile_Renderer.asset",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/DynamicsManager.asset",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/TimeManager.asset",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/TimeManager.asset",
+      "target": "config:ProjectSettings/DynamicsManager.asset",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:ProjectSettings/TagManager.asset",
+      "target": "config:ProjectSettings/DynamicsManager.asset",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:ProjectSettings/QualitySettings.asset",
+      "target": "config:Assets/Settings/PC_RPAsset.asset",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/QualitySettings.asset",
+      "target": "config:Assets/Settings/Mobile_RPAsset.asset",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/EditorBuildSettings.asset",
+      "target": "config:Assets/InputSystem_Actions.inputactions",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Packages/manifest.json",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Packages/manifest.json",
+      "target": "config:Assets/InputSystem_Actions.inputactions",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Packages/manifest.json",
+      "target": "config:Assets/Settings/PC_RPAsset.asset",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Packages/manifest.json",
+      "target": "config:Assets/Settings/Mobile_RPAsset.asset",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "target": "config:Packages/manifest.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:ProjectSettings/ProjectVersion.txt",
+      "target": "config:Packages/manifest.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/OpponentDriver.cs",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/CarCameraFollow.cs",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "config:Packages/manifest.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "config:ProjectSettings/EditorBuildSettings.asset",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "document:ProjectSettings/ProjectVersion.txt",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:vehicle-physics",
+      "name": "Физика и управление автомобилем",
+      "description": "Rigidbody-модель машины (тяга, руление, боковое сцепление, прижимная сила, сброс) в CarController, её облегчённый вариант для машины-мишени TargetCar и настройки PhysX и фиксированного шага времени, от которых напрямую зависит FixedUpdate-цикл.",
+      "nodeIds": [
+        "file:Assets/Scripts/CarController.cs",
+        "file:Assets/Scripts/TargetCar.cs",
+        "config:ProjectSettings/DynamicsManager.asset",
+        "config:ProjectSettings/TimeManager.asset"
+      ]
+    },
+    {
+      "id": "layer:ai-opponents",
+      "name": "AI-оппоненты",
+      "description": "Waypoint-навигация машин соперников: OpponentDriver строит маршрут со смещением полосы, вычисляет руление и скорость и подаёт команды в CarController через SetInput, не трогая физику напрямую.",
+      "nodeIds": [
+        "file:Assets/Scripts/OpponentDriver.cs"
+      ]
+    },
+    {
+      "id": "layer:combat",
+      "name": "Бой и разрушение",
+      "description": "Замкнутый контур стрельбы и урона: пушка CarCannon порождает снаряды Projectile, которые наносят урон CarHealth, а тот отключает управление и пушку у обломка, рисует HP-бар и возрождает машину.",
+      "nodeIds": [
+        "file:Assets/Scripts/CarCannon.cs",
+        "file:Assets/Scripts/Projectile.cs",
+        "file:Assets/Scripts/CarHealth.cs"
+      ]
+    },
+    {
+      "id": "layer:presentation",
+      "name": "Визуализация и рендеринг",
+      "description": "Всё, что отвечает за картинку без влияния на геймплей: камера преследования, процедурный генератор мешей кузова и колёс, а также URP-ассеты пайплайна и рендереров для профилей PC и Mobile вместе с QualitySettings, которые их выбирают.",
+      "nodeIds": [
+        "file:Assets/Scripts/CarCameraFollow.cs",
+        "file:Assets/Scripts/ProceduralCarBuilder.cs",
+        "config:Assets/Settings/PC_RPAsset.asset",
+        "config:Assets/Settings/Mobile_RPAsset.asset",
+        "config:Assets/Settings/PC_Renderer.asset",
+        "config:Assets/Settings/Mobile_Renderer.asset",
+        "config:ProjectSettings/QualitySettings.asset"
+      ]
+    },
+    {
+      "id": "layer:project-config",
+      "name": "Ввод и конфигурация проекта",
+      "description": "Проектные настройки Unity, задающие окружение для скриптов: action-ассет Input System, манифест пакетов (URP, Input System, AI Assistant), список сцен сборки, реестр тегов и слоёв и настройки редакторного AI-ассистента.",
+      "nodeIds": [
+        "config:Assets/InputSystem_Actions.inputactions",
+        "config:Packages/manifest.json",
+        "config:ProjectSettings/EditorBuildSettings.asset",
+        "config:ProjectSettings/TagManager.asset",
+        "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json"
+      ]
+    },
+    {
+      "id": "layer:documentation",
+      "name": "Документация",
+      "description": "Автосгенерированный контекст проекта для AI-ассистентов с описанием архитектуры, конвенций и инструментария, а также запись версии редактора Unity 6000.5.9f1.",
+      "nodeIds": [
+        "document:Docs/AI/UnityProjectContext.md",
+        "document:ProjectSettings/ProjectVersion.txt"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Обзор проекта и его окружение",
+      "description": "Начните с автосгенерированного контекста проекта: он описывает CarsGame как односценовый прототип аркадной гонки со стрельбой, где весь геймплей собран из MonoBehaviour-скриптов в Assets/Scripts (пространство имён RacingGame), связанных сериализованными ссылками в единственной сцене SampleScene. Кодового entry point здесь нет — сцена сама поднимает компоненты при запуске. ProjectVersion.txt фиксирует редактор Unity 6000.5.9f1, а manifest.json объявляет ключевые зависимости — URP 17.5.0, Input System 1.20.0 и AI Assistant, — от которых напрямую зависят и скрипты, и ассеты, с которыми мы познакомимся дальше.",
+      "nodeIds": [
+        "document:Docs/AI/UnityProjectContext.md",
+        "document:ProjectSettings/ProjectVersion.txt",
+        "config:Packages/manifest.json"
+      ],
+      "languageLesson": "Unity-проект не имеет функции main: точкой входа служит сцена из списка сборки, а жизненный цикл кода определяют callback-методы MonoBehaviour (Awake, Start, Update, FixedUpdate). Packages/manifest.json — аналог package.json: Unity Package Manager разрешает по нему версии пакетов, а точный результат разрешения фиксируется в packages-lock.json."
+    },
+    {
+      "order": 2,
+      "title": "Ввод и настройки физики",
+      "description": "Прежде чем читать код управления машиной, посмотрите на три ассета, которые задают его окружение. InputSystem_Actions.inputactions описывает action map Player (Move, Attack и др.) и привязки для клавиатуры, геймпада и тача — именно эти действия читает контроллер игрока. DynamicsManager.asset задаёт PhysX-параметры (гравитация −9.81, итерации солвера, матрица столкновений слоёв), а TimeManager.asset — фиксированный шаг 0.02 с (50 Гц), который определяет, как часто вызывается FixedUpdate. Все три ассета в графе помечены как configures для CarController: без них поведение физики машины понять нельзя.",
+      "nodeIds": [
+        "config:Assets/InputSystem_Actions.inputactions",
+        "config:ProjectSettings/DynamicsManager.asset",
+        "config:ProjectSettings/TimeManager.asset"
+      ],
+      "languageLesson": "Файлы ProjectSettings/*.asset — это YAML с заголовком %YAML 1.1 и тегами вида --- !u!55 &1, где число после !u! — тип сериализуемого объекта Unity. Ассет .inputactions хранится как обычный JSON: массив maps → actions → bindings, где каждая привязка ссылается на устройство путём вида <Gamepad>/leftStick."
+    },
+    {
+      "order": 3,
+      "title": "CarController — ядро физики машины",
+      "description": "CarController — структурный центр проекта: на него ссылаются 8 узлов графа (импорты OpponentDriver, CarHealth, TargetCar и configures-связи от настроек из шага 2). В FixedUpdate он реализует Rigidbody-физику — тягу, торможение, руление, боковое сцепление и прижимную силу, — а также вращает колёса и озвучивает двигатель. Ключевое проектное решение: контроллер не знает, кто им управляет. Ввод приходит либо от игрока через Unity Input System, либо извне через метод SetInput, а ResetCar позволяет вернуть машину в исходное состояние — этим позже воспользуются AI и система здоровья.",
+      "nodeIds": [
+        "file:Assets/Scripts/CarController.cs"
+      ],
+      "languageLesson": "В Unity вся работа с Rigidbody (AddForce, изменение velocity) выполняется в FixedUpdate — он вызывается с фиксированным шагом из TimeManager независимо от частоты кадров, поэтому силы применяются детерминированно. Чтение ввода при этом уместно делать в Update и кешировать до следующего физического шага."
+    },
+    {
+      "order": 4,
+      "title": "AI-оппоненты на waypoint-маршруте",
+      "description": "OpponentDriver показывает, зачем контроллеру из шага 3 нужен метод SetInput: AI не трогает физику напрямую, а лишь подаёт газ, руль и тормоз в тот же CarController, что и игрок. Маршрут строится из упорядоченных дочерних трансформов объекта Track_Markings в сцене, к которым добавляется смещение полосы, чтобы три соперника не ехали по одной линии. Водитель вычисляет угол до следующей точки, переводит его в руление и скорость, а перевернувшуюся машину автоматически сбрасывает через ResetCar. Так слой AI-оппонентов целиком опирается на слой физики, ничего в нём не дублируя.",
+      "nodeIds": [
+        "file:Assets/Scripts/OpponentDriver.cs"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "Боевой контур: пушка, снаряд, здоровье",
+      "description": "Три скрипта образуют единственный тесно связанный кластер графа (4 взаимных ссылки) и читаются только вместе. CarCannon при старте процедурно собирает башню на крыше и по нажатию ЛКМ/Ctrl/правого бампера порождает Projectile, отдавая импульс отдачи в Rigidbody. Projectile через статическую фабрику Spawn создаёт сферу, игнорирует коллизии со стрелявшей машиной и при первом контакте наносит урон CarHealth. CarHealth замыкает цикл: он также считает урон от сильных боковых столкновений, при нуле HP превращает машину в обломок, отключает управление и пушку, а через задержку возрождает её вызовом CarController.ResetCar из шага 3.",
+      "nodeIds": [
+        "file:Assets/Scripts/CarCannon.cs",
+        "file:Assets/Scripts/Projectile.cs",
+        "file:Assets/Scripts/CarHealth.cs"
+      ],
+      "languageLesson": "Статический фабричный метод (static factory) вроде Projectile.Spawn(...) — распространённый в Unity приём вместо префабов: он создаёт GameObject, навешивает компоненты через AddComponent<T>() и настраивает их за один вызов. Physics.IgnoreCollision позволяет точечно выключить столкновение двух коллайдеров, не меняя глобальную матрицу слоёв из DynamicsManager."
+    },
+    {
+      "order": 6,
+      "title": "TargetCar — пассивная мишень",
+      "description": "TargetCar — машина без водителя, по которой можно стрелять и которую можно таранить. Она не использует CarController как компонент, но переиспользует его статические методы, чтобы настроить ту же физику: массу, сферические коллайдеры колёс и материал без трения. Это иллюстрирует второй способ повторного использования кода в проекте — не через SetInput, а через общие статические хелперы. Мишень подписывается на событие CarHealth.OnRespawned из шага 5, чтобы после уничтожения и возрождения вернуться на исходную позицию.",
+      "nodeIds": [
+        "file:Assets/Scripts/TargetCar.cs"
+      ],
+      "languageLesson": "C#-события (event Action) — стандартный способ ослабить связность между компонентами Unity: CarHealth просто сообщает «я возродился», не зная о TargetCar. Подписку обычно делают в OnEnable, а отписку — в OnDisable, иначе уничтоженный объект останется в списке подписчиков и вызовет MissingReferenceException."
+    },
+    {
+      "order": 7,
+      "title": "Камера и процедурный кузов",
+      "description": "Слой презентации не влияет на геймплей, но делает его видимым. CarCameraFollow в LateUpdate плавно подтягивает камеру к точке позади машины игрока, поворачивает её на точку впереди и расширяет поле зрения (FOV) в зависимости от скорости Rigidbody из шага 3, усиливая ощущение разгона. ProceduralCarBuilder — статический строитель, который генерирует меши кузова, стеклянного фонаря, аэрообвеса и фар по кольцевым сечениям и собирает зеркала, выхлопы и детализированные колёса: в проекте нет готовых 3D-моделей, вся геометрия рождается в коде.",
+      "nodeIds": [
+        "file:Assets/Scripts/CarCameraFollow.cs",
+        "file:Assets/Scripts/ProceduralCarBuilder.cs"
+      ],
+      "languageLesson": "LateUpdate вызывается после всех Update и FixedUpdate текущего кадра, поэтому камера в нём видит уже финальную позицию машины и не дрожит. Процедурные меши в Unity строятся через класс Mesh: массивы vertices, triangles (индексы по три, обход по часовой стрелке для лицевой стороны), normals и uv, после чего вызывается RecalculateBounds."
+    },
+    {
+      "order": 8,
+      "title": "Рендеринг: URP-профили и качество",
+      "description": "Картинка из шага 7 проходит через Universal Render Pipeline, сконфигурированный двумя парами ассетов. PC_RPAsset включает HDR, RenderScale 1.0 и 4 каскада теней и ссылается на PC_Renderer с Deferred-режимом и эффектом Screen Space Ambient Occlusion; Mobile_RPAsset снижает RenderScale до 0.8 и использует один каскад теней, а Mobile_Renderer — облегчённый Forward-рендерер без дополнительных фич. QualitySettings.asset связывает всё воедино: два уровня качества, Mobile и PC (активен PC), каждый через customRenderPipeline привязан к своему URP-ассету, а дефолтный уровень выбирается по платформе.",
+      "nodeIds": [
+        "config:Assets/Settings/PC_RPAsset.asset",
+        "config:Assets/Settings/PC_Renderer.asset",
+        "config:Assets/Settings/Mobile_RPAsset.asset",
+        "config:Assets/Settings/Mobile_Renderer.asset",
+        "config:ProjectSettings/QualitySettings.asset"
+      ],
+      "languageLesson": "В URP есть два уровня конфигурации: Pipeline Asset (глобальные параметры — HDR, тени, масштаб рендера) и Renderer Data (способ отрисовки — Forward или Deferred — плюс список renderer features). Ссылки между ассетами в YAML хранятся как {fileID, guid, type}, поэтому переименование файла безопасно, а вот потеря .meta-файла с GUID рвёт связь."
+    },
+    {
+      "order": 9,
+      "title": "Сцены, теги и инструменты редактора",
+      "description": "Завершают картину три служебных настройки. EditorBuildSettings.asset содержит список сцен сборки — единственную SampleScene, которая и является фактической точкой входа проекта, — а также ссылку на проектный action asset Input System из шага 2. TagManager.asset показывает, что пользовательские теги и слои не заданы: проект обходится встроенными слоями (Default, UI и т. д.) и стандартными Light Layer для URP, что согласуется с полностью открытой матрицей столкновений из DynamicsManager. Settings.json пакета AI Assistant включает git-чекпоинты с хранением 2 недели — это инструмент разработки, а не часть игры, но он объясняет, откуда взялся автосгенерированный контекст из шага 1.",
+      "nodeIds": [
+        "config:ProjectSettings/EditorBuildSettings.asset",
+        "config:ProjectSettings/TagManager.asset",
+        "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json"
+      ]
+    }
+  ]
+}

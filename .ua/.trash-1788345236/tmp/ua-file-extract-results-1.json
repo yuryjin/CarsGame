@@ -1,0 +1,1290 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 3,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "Assets/Scripts/CarCannon.cs",
+      "language": "csharp",
+      "fileCategory": "code",
+      "totalLines": 172,
+      "nonEmptyLines": 145,
+      "functions": [
+        {
+          "name": "Awake",
+          "startLine": 34,
+          "endLine": 45,
+          "params": []
+        },
+        {
+          "name": "Update",
+          "startLine": 47,
+          "endLine": 55,
+          "params": []
+        },
+        {
+          "name": "WantsToFire",
+          "startLine": 57,
+          "endLine": 69,
+          "params": []
+        },
+        {
+          "name": "TryFire",
+          "startLine": 71,
+          "endLine": 85,
+          "params": []
+        },
+        {
+          "name": "BuildTurret",
+          "startLine": 87,
+          "endLine": 146,
+          "params": []
+        },
+        {
+          "name": "FindMaterialOnCar",
+          "startLine": 148,
+          "endLine": 161,
+          "params": []
+        },
+        {
+          "name": "MakeMaterial",
+          "startLine": 163,
+          "endLine": 170,
+          "params": [
+            "color"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "CarCannon",
+          "startLine": 10,
+          "endLine": 171,
+          "methods": [
+            "Awake",
+            "Update",
+            "WantsToFire",
+            "TryFire",
+            "BuildTurret",
+            "FindMaterialOnCar",
+            "MakeMaterial"
+          ],
+          "properties": [
+            "fireInterval",
+            "shellSpeed",
+            "shellDamage",
+            "recoilForce",
+            "playerControlled",
+            "turretLocalPosition",
+            "barrelLength",
+            "barrel",
+            "muzzle",
+            "rb",
+            "nextFireTime",
+            "recoilOffset",
+            "barrelRestPosition",
+            "shellMaterial",
+            "muzzleLight"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "fireInterval",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "shellSpeed",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "shellDamage",
+          "line": 15,
+          "isDefault": false
+        },
+        {
+          "name": "recoilForce",
+          "line": 16,
+          "isDefault": false
+        },
+        {
+          "name": "playerControlled",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "turretLocalPosition",
+          "line": 19,
+          "isDefault": false
+        },
+        {
+          "name": "barrelLength",
+          "line": 21,
+          "isDefault": false
+        },
+        {
+          "name": "barrel",
+          "line": 23,
+          "isDefault": false
+        },
+        {
+          "name": "muzzle",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "TryFire",
+          "line": 71,
+          "isDefault": false
+        },
+        {
+          "name": "CarCannon",
+          "line": 10,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Awake",
+          "callee": "GetComponent<Rigidbody>",
+          "lineNumber": 36
+        },
+        {
+          "caller": "Awake",
+          "callee": "BuildTurret",
+          "lineNumber": 37
+        },
+        {
+          "caller": "Awake",
+          "callee": "muzzle.gameObject.AddComponent<Light>",
+          "lineNumber": 40
+        },
+        {
+          "caller": "Awake",
+          "callee": "new Color",
+          "lineNumber": 42
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.MoveTowards",
+          "lineNumber": 50
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.MoveTowards",
+          "lineNumber": 52
+        },
+        {
+          "caller": "Update",
+          "callee": "WantsToFire",
+          "lineNumber": 54
+        },
+        {
+          "caller": "Update",
+          "callee": "TryFire",
+          "lineNumber": 54
+        },
+        {
+          "caller": "TryFire",
+          "callee": "Projectile.Spawn",
+          "lineNumber": 78
+        },
+        {
+          "caller": "TryFire",
+          "callee": "rb.AddForceAtPosition",
+          "lineNumber": 82
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "FindMaterialOnCar",
+          "lineNumber": 89
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "MakeMaterial",
+          "lineNumber": 89
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Color",
+          "lineNumber": 89
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "MakeMaterial",
+          "lineNumber": 90
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Color",
+          "lineNumber": 90
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new GameObject",
+          "lineNumber": 92
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "turret.SetParent",
+          "lineNumber": 93
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 98
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "Destroy",
+          "lineNumber": 100
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "ring.GetComponent<Collider>",
+          "lineNumber": 100
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "ring.transform.SetParent",
+          "lineNumber": 101
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Vector3",
+          "lineNumber": 102
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Vector3",
+          "lineNumber": 103
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "ring.GetComponent<Renderer>",
+          "lineNumber": 104
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 107
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "Destroy",
+          "lineNumber": 109
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "housing.GetComponent<Collider>",
+          "lineNumber": 109
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "housing.transform.SetParent",
+          "lineNumber": 110
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Vector3",
+          "lineNumber": 111
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Vector3",
+          "lineNumber": 112
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "housing.GetComponent<Renderer>",
+          "lineNumber": 113
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new GameObject",
+          "lineNumber": 116
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "barrelPivot.SetParent",
+          "lineNumber": 117
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Vector3",
+          "lineNumber": 118
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 121
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "Destroy",
+          "lineNumber": 123
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "tube.GetComponent<Collider>",
+          "lineNumber": 123
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "tube.transform.SetParent",
+          "lineNumber": 124
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 125
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Vector3",
+          "lineNumber": 126
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Vector3",
+          "lineNumber": 127
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "tube.GetComponent<Renderer>",
+          "lineNumber": 128
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 130
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "Destroy",
+          "lineNumber": 132
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "brake.GetComponent<Collider>",
+          "lineNumber": 132
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "brake.transform.SetParent",
+          "lineNumber": 133
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 134
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Vector3",
+          "lineNumber": 135
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Vector3",
+          "lineNumber": 136
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "brake.GetComponent<Renderer>",
+          "lineNumber": 137
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new GameObject",
+          "lineNumber": 139
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "muzzlePoint.SetParent",
+          "lineNumber": 140
+        },
+        {
+          "caller": "BuildTurret",
+          "callee": "new Vector3",
+          "lineNumber": 141
+        },
+        {
+          "caller": "FindMaterialOnCar",
+          "callee": "GetComponentsInChildren<Renderer>",
+          "lineNumber": 150
+        },
+        {
+          "caller": "FindMaterialOnCar",
+          "callee": "m.name.ToLowerInvariant",
+          "lineNumber": 154
+        },
+        {
+          "caller": "FindMaterialOnCar",
+          "callee": "n.Contains",
+          "lineNumber": 157
+        },
+        {
+          "caller": "MakeMaterial",
+          "callee": "Shader.Find",
+          "lineNumber": 165
+        },
+        {
+          "caller": "MakeMaterial",
+          "callee": "Shader.Find",
+          "lineNumber": 165
+        },
+        {
+          "caller": "MakeMaterial",
+          "callee": "new Material",
+          "lineNumber": 166
+        },
+        {
+          "caller": "MakeMaterial",
+          "callee": "m.HasProperty",
+          "lineNumber": 167
+        },
+        {
+          "caller": "MakeMaterial",
+          "callee": "m.SetColor",
+          "lineNumber": 167
+        },
+        {
+          "caller": "MakeMaterial",
+          "callee": "m.HasProperty",
+          "lineNumber": 168
+        },
+        {
+          "caller": "MakeMaterial",
+          "callee": "m.SetColor",
+          "lineNumber": 168
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 11,
+        "functionCount": 7,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "Assets/Scripts/CarHealth.cs",
+      "language": "csharp",
+      "fileCategory": "code",
+      "totalLines": 302,
+      "nonEmptyLines": 246,
+      "functions": [
+        {
+          "name": "Awake",
+          "startLine": 55,
+          "endLine": 60,
+          "params": []
+        },
+        {
+          "name": "Update",
+          "startLine": 62,
+          "endLine": 68,
+          "params": []
+        },
+        {
+          "name": "OnCollisionEnter",
+          "startLine": 70,
+          "endLine": 99,
+          "params": [
+            "collision"
+          ]
+        },
+        {
+          "name": "TakeDamage",
+          "startLine": 101,
+          "endLine": 109,
+          "params": [
+            "amount"
+          ]
+        },
+        {
+          "name": "Heal",
+          "startLine": 111,
+          "endLine": 116,
+          "params": [
+            "amount"
+          ]
+        },
+        {
+          "name": "Die",
+          "startLine": 118,
+          "endLine": 132,
+          "params": []
+        },
+        {
+          "name": "Respawn",
+          "startLine": 134,
+          "endLine": 152,
+          "params": []
+        },
+        {
+          "name": "SetControlsEnabled",
+          "startLine": 154,
+          "endLine": 161,
+          "params": [
+            "enabled"
+          ]
+        },
+        {
+          "name": "TintWreck",
+          "startLine": 163,
+          "endLine": 187,
+          "params": [
+            "wrecked"
+          ]
+        },
+        {
+          "name": "SpawnExplosion",
+          "startLine": 189,
+          "endLine": 194,
+          "params": []
+        },
+        {
+          "name": "OnGUI",
+          "startLine": 196,
+          "endLine": 200,
+          "params": []
+        },
+        {
+          "name": "DrawScreenBar",
+          "startLine": 202,
+          "endLine": 207,
+          "params": []
+        },
+        {
+          "name": "DrawWorldBar",
+          "startLine": 209,
+          "endLine": 220,
+          "params": []
+        },
+        {
+          "name": "DrawBar",
+          "startLine": 222,
+          "endLine": 248,
+          "params": [
+            "rect",
+            "withText"
+          ]
+        },
+        {
+          "name": "Start",
+          "startLine": 262,
+          "endLine": 278,
+          "params": []
+        },
+        {
+          "name": "Update",
+          "startLine": 280,
+          "endLine": 295,
+          "params": []
+        },
+        {
+          "name": "OnDestroy",
+          "startLine": 297,
+          "endLine": 300,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "CarHealth",
+          "startLine": 11,
+          "endLine": 249,
+          "methods": [
+            "Awake",
+            "Update",
+            "OnCollisionEnter",
+            "TakeDamage",
+            "Heal",
+            "Die",
+            "Respawn",
+            "SetControlsEnabled",
+            "TintWreck",
+            "SpawnExplosion",
+            "OnGUI",
+            "DrawScreenBar",
+            "DrawWorldBar",
+            "DrawBar"
+          ],
+          "properties": [
+            "maxHealth",
+            "currentHealth",
+            "minImpactSpeed",
+            "damagePerImpactSpeed",
+            "maxCollisionDamage",
+            "collisionDamageCooldown",
+            "respawnDelay",
+            "respawnOnDeath",
+            "showScreenBar",
+            "showWorldBar",
+            "logImpacts",
+            "Health",
+            "IsDead",
+            "rb",
+            "lastCollisionDamageTime",
+            "respawnTimer",
+            "renderers",
+            "propertyBlock",
+            "BaseColorId",
+            "ColorId"
+          ]
+        },
+        {
+          "name": "ExplosionFlash",
+          "startLine": 252,
+          "endLine": 301,
+          "methods": [
+            "Start",
+            "Update",
+            "OnDestroy"
+          ],
+          "properties": [
+            "duration",
+            "maxRadius",
+            "time",
+            "sphere",
+            "flashLight",
+            "material"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "maxHealth",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "minImpactSpeed",
+          "line": 18,
+          "isDefault": false
+        },
+        {
+          "name": "damagePerImpactSpeed",
+          "line": 21,
+          "isDefault": false
+        },
+        {
+          "name": "maxCollisionDamage",
+          "line": 23,
+          "isDefault": false
+        },
+        {
+          "name": "collisionDamageCooldown",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "respawnDelay",
+          "line": 28,
+          "isDefault": false
+        },
+        {
+          "name": "respawnOnDeath",
+          "line": 30,
+          "isDefault": false
+        },
+        {
+          "name": "showScreenBar",
+          "line": 32,
+          "isDefault": false
+        },
+        {
+          "name": "showWorldBar",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "logImpacts",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "Health",
+          "line": 44,
+          "isDefault": false
+        },
+        {
+          "name": "IsDead",
+          "line": 45,
+          "isDefault": false
+        },
+        {
+          "name": "TakeDamage",
+          "line": 101,
+          "isDefault": false
+        },
+        {
+          "name": "Heal",
+          "line": 111,
+          "isDefault": false
+        },
+        {
+          "name": "CarHealth",
+          "line": 11,
+          "isDefault": false
+        },
+        {
+          "name": "duration",
+          "line": 254,
+          "isDefault": false
+        },
+        {
+          "name": "maxRadius",
+          "line": 255,
+          "isDefault": false
+        },
+        {
+          "name": "ExplosionFlash",
+          "line": 252,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Awake",
+          "callee": "GetComponent<Rigidbody>",
+          "lineNumber": 57
+        },
+        {
+          "caller": "Awake",
+          "callee": "new MaterialPropertyBlock",
+          "lineNumber": 59
+        },
+        {
+          "caller": "Update",
+          "callee": "Respawn",
+          "lineNumber": 67
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "collision.collider.GetComponentInParent<Projectile>",
+          "lineNumber": 75
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "collision.GetContact",
+          "lineNumber": 79
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "Vector3.Dot",
+          "lineNumber": 80
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "Mathf.Clamp",
+          "lineNumber": 86
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "Debug.Log",
+          "lineNumber": 90
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "TakeDamage",
+          "lineNumber": 98
+        },
+        {
+          "caller": "TakeDamage",
+          "callee": "Mathf.Max",
+          "lineNumber": 105
+        },
+        {
+          "caller": "TakeDamage",
+          "callee": "OnHealthChanged?.Invoke",
+          "lineNumber": 106
+        },
+        {
+          "caller": "TakeDamage",
+          "callee": "Die",
+          "lineNumber": 108
+        },
+        {
+          "caller": "Heal",
+          "callee": "Mathf.Min",
+          "lineNumber": 114
+        },
+        {
+          "caller": "Heal",
+          "callee": "OnHealthChanged?.Invoke",
+          "lineNumber": 115
+        },
+        {
+          "caller": "Die",
+          "callee": "SetControlsEnabled",
+          "lineNumber": 123
+        },
+        {
+          "caller": "Die",
+          "callee": "TintWreck",
+          "lineNumber": 124
+        },
+        {
+          "caller": "Die",
+          "callee": "SpawnExplosion",
+          "lineNumber": 125
+        },
+        {
+          "caller": "Die",
+          "callee": "OnDied?.Invoke",
+          "lineNumber": 131
+        },
+        {
+          "caller": "Respawn",
+          "callee": "GetComponent<CarController>",
+          "lineNumber": 144
+        },
+        {
+          "caller": "Respawn",
+          "callee": "controller.ResetCar",
+          "lineNumber": 145
+        },
+        {
+          "caller": "Respawn",
+          "callee": "TintWreck",
+          "lineNumber": 147
+        },
+        {
+          "caller": "Respawn",
+          "callee": "SetControlsEnabled",
+          "lineNumber": 148
+        },
+        {
+          "caller": "Respawn",
+          "callee": "OnHealthChanged?.Invoke",
+          "lineNumber": 150
+        },
+        {
+          "caller": "Respawn",
+          "callee": "OnRespawned?.Invoke",
+          "lineNumber": 151
+        },
+        {
+          "caller": "SetControlsEnabled",
+          "callee": "GetComponent<CarController>",
+          "lineNumber": 156
+        },
+        {
+          "caller": "SetControlsEnabled",
+          "callee": "GetComponent<CarCannon>",
+          "lineNumber": 159
+        },
+        {
+          "caller": "TintWreck",
+          "callee": "GetComponentsInChildren<Renderer>",
+          "lineNumber": 167
+        },
+        {
+          "caller": "TintWreck",
+          "callee": "propertyBlock.Clear",
+          "lineNumber": 177
+        },
+        {
+          "caller": "TintWreck",
+          "callee": "r.sharedMaterial.HasProperty",
+          "lineNumber": 178
+        },
+        {
+          "caller": "TintWreck",
+          "callee": "propertyBlock.SetColor",
+          "lineNumber": 179
+        },
+        {
+          "caller": "TintWreck",
+          "callee": "new Color",
+          "lineNumber": 179
+        },
+        {
+          "caller": "TintWreck",
+          "callee": "r.SetPropertyBlock",
+          "lineNumber": 180
+        },
+        {
+          "caller": "TintWreck",
+          "callee": "r.SetPropertyBlock",
+          "lineNumber": 184
+        },
+        {
+          "caller": "SpawnExplosion",
+          "callee": "new GameObject",
+          "lineNumber": 191
+        },
+        {
+          "caller": "SpawnExplosion",
+          "callee": "fx.AddComponent<ExplosionFlash>",
+          "lineNumber": 193
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "DrawScreenBar",
+          "lineNumber": 198
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "DrawWorldBar",
+          "lineNumber": 199
+        },
+        {
+          "caller": "DrawScreenBar",
+          "callee": "new Rect",
+          "lineNumber": 205
+        },
+        {
+          "caller": "DrawScreenBar",
+          "callee": "DrawBar",
+          "lineNumber": 206
+        },
+        {
+          "caller": "DrawWorldBar",
+          "callee": "cam.WorldToScreenPoint",
+          "lineNumber": 214
+        },
+        {
+          "caller": "DrawWorldBar",
+          "callee": "new Rect",
+          "lineNumber": 218
+        },
+        {
+          "caller": "DrawWorldBar",
+          "callee": "DrawBar",
+          "lineNumber": 219
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "new Color",
+          "lineNumber": 227
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "GUI.DrawTexture",
+          "lineNumber": 228
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "Color.Lerp",
+          "lineNumber": 230
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "new Color",
+          "lineNumber": 230
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "new Color",
+          "lineNumber": 230
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "new Rect",
+          "lineNumber": 231
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "GUI.DrawTexture",
+          "lineNumber": 232
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "new GUIStyle",
+          "lineNumber": 237
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "Mathf.CeilToInt",
+          "lineNumber": 245
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "Mathf.CeilToInt",
+          "lineNumber": 246
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "Mathf.RoundToInt",
+          "lineNumber": 246
+        },
+        {
+          "caller": "DrawBar",
+          "callee": "GUI.Label",
+          "lineNumber": 247
+        },
+        {
+          "caller": "Start",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 264
+        },
+        {
+          "caller": "Start",
+          "callee": "Destroy",
+          "lineNumber": 265
+        },
+        {
+          "caller": "Start",
+          "callee": "go.GetComponent<Collider>",
+          "lineNumber": 265
+        },
+        {
+          "caller": "Start",
+          "callee": "go.transform.SetParent",
+          "lineNumber": 266
+        },
+        {
+          "caller": "Start",
+          "callee": "Shader.Find",
+          "lineNumber": 269
+        },
+        {
+          "caller": "Start",
+          "callee": "Shader.Find",
+          "lineNumber": 269
+        },
+        {
+          "caller": "Start",
+          "callee": "new Material",
+          "lineNumber": 270
+        },
+        {
+          "caller": "Start",
+          "callee": "new Color",
+          "lineNumber": 270
+        },
+        {
+          "caller": "Start",
+          "callee": "go.GetComponent<Renderer>",
+          "lineNumber": 271
+        },
+        {
+          "caller": "Start",
+          "callee": "gameObject.AddComponent<Light>",
+          "lineNumber": 273
+        },
+        {
+          "caller": "Start",
+          "callee": "new Color",
+          "lineNumber": 275
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.Clamp01",
+          "lineNumber": 283
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.Lerp",
+          "lineNumber": 285
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.Sqrt",
+          "lineNumber": 285
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.Lerp",
+          "lineNumber": 286
+        },
+        {
+          "caller": "Update",
+          "callee": "Destroy",
+          "lineNumber": 294
+        },
+        {
+          "caller": "OnDestroy",
+          "callee": "Destroy",
+          "lineNumber": 299
+        }
+      ],
+      "metrics": {
+        "importCount": 3,
+        "exportCount": 18,
+        "functionCount": 17,
+        "classCount": 2
+      }
+    },
+    {
+      "path": "Assets/Scripts/Projectile.cs",
+      "language": "csharp",
+      "fileCategory": "code",
+      "totalLines": 85,
+      "nonEmptyLines": 71,
+      "functions": [
+        {
+          "name": "Spawn",
+          "startLine": 20,
+          "endLine": 50,
+          "params": [
+            "owner",
+            "position",
+            "velocity",
+            "damage",
+            "material"
+          ]
+        },
+        {
+          "name": "Awake",
+          "startLine": 52,
+          "endLine": 56,
+          "params": []
+        },
+        {
+          "name": "OnCollisionEnter",
+          "startLine": 58,
+          "endLine": 83,
+          "params": [
+            "collision"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Projectile",
+          "startLine": 9,
+          "endLine": 84,
+          "methods": [
+            "Spawn",
+            "Awake",
+            "OnCollisionEnter"
+          ],
+          "properties": [
+            "damage",
+            "lifetime",
+            "hitImpulse",
+            "owner",
+            "rb",
+            "consumed"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "damage",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "lifetime",
+          "line": 13,
+          "isDefault": false
+        },
+        {
+          "name": "hitImpulse",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "Spawn",
+          "line": 20,
+          "isDefault": false
+        },
+        {
+          "name": "Projectile",
+          "line": 9,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Spawn",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 22
+        },
+        {
+          "caller": "Spawn",
+          "callee": "go.GetComponent<Renderer>",
+          "lineNumber": 28
+        },
+        {
+          "caller": "Spawn",
+          "callee": "go.AddComponent<Rigidbody>",
+          "lineNumber": 30
+        },
+        {
+          "caller": "Spawn",
+          "callee": "go.AddComponent<Projectile>",
+          "lineNumber": 38
+        },
+        {
+          "caller": "Spawn",
+          "callee": "go.GetComponent<Collider>",
+          "lineNumber": 43
+        },
+        {
+          "caller": "Spawn",
+          "callee": "owner.GetComponentsInChildren<Collider>",
+          "lineNumber": 44
+        },
+        {
+          "caller": "Spawn",
+          "callee": "Physics.IgnoreCollision",
+          "lineNumber": 46
+        },
+        {
+          "caller": "Awake",
+          "callee": "GetComponent<Rigidbody>",
+          "lineNumber": 54
+        },
+        {
+          "caller": "Awake",
+          "callee": "Destroy",
+          "lineNumber": 55
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "collision.collider.GetComponentInParent<CarHealth>",
+          "lineNumber": 63
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "health.TakeDamage",
+          "lineNumber": 66
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "targetBody.AddForceAtPosition",
+          "lineNumber": 73
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "collision.GetContact",
+          "lineNumber": 73
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "new GameObject",
+          "lineNumber": 76
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "collision.GetContact",
+          "lineNumber": 77
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "flash.AddComponent<ExplosionFlash>",
+          "lineNumber": 78
+        },
+        {
+          "caller": "OnCollisionEnter",
+          "callee": "Destroy",
+          "lineNumber": 82
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 5,
+        "functionCount": 3,
+        "classCount": 1
+      }
+    }
+  ]
+}

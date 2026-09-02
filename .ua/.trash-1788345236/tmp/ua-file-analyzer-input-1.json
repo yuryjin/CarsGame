@@ -1,0 +1,13 @@
+{
+  "projectRoot": "/home/user/projects/games/Unity/newgames/CarsGame",
+  "batchFiles": [
+    {"path": "Assets/Scripts/CarCannon.cs", "language": "csharp", "sizeLines": 172, "fileCategory": "code"},
+    {"path": "Assets/Scripts/CarHealth.cs", "language": "csharp", "sizeLines": 302, "fileCategory": "code"},
+    {"path": "Assets/Scripts/Projectile.cs", "language": "csharp", "sizeLines": 85, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "Assets/Scripts/CarCannon.cs": ["Assets/Scripts/Projectile.cs"],
+    "Assets/Scripts/CarHealth.cs": ["Assets/Scripts/CarCannon.cs", "Assets/Scripts/CarController.cs", "Assets/Scripts/Projectile.cs"],
+    "Assets/Scripts/Projectile.cs": ["Assets/Scripts/CarHealth.cs"]
+  }
+}

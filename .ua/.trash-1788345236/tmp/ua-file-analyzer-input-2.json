@@ -1,0 +1,13 @@
+{
+  "projectRoot": "/home/user/projects/games/Unity/newgames/CarsGame",
+  "batchFiles": [
+    {"path": "Assets/Scripts/CarController.cs", "language": "csharp", "sizeLines": 368, "fileCategory": "code"},
+    {"path": "Assets/Scripts/OpponentDriver.cs", "language": "csharp", "sizeLines": 145, "fileCategory": "code"},
+    {"path": "Assets/Scripts/TargetCar.cs", "language": "csharp", "sizeLines": 74, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "Assets/Scripts/CarController.cs": [],
+    "Assets/Scripts/OpponentDriver.cs": ["Assets/Scripts/CarController.cs"],
+    "Assets/Scripts/TargetCar.cs": ["Assets/Scripts/CarController.cs", "Assets/Scripts/CarHealth.cs"]
+  }
+}

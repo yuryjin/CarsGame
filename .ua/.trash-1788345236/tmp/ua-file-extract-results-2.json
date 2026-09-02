@@ -1,0 +1,1112 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 3,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "Assets/Scripts/CarController.cs",
+      "language": "csharp",
+      "fileCategory": "code",
+      "totalLines": 368,
+      "nonEmptyLines": 316,
+      "functions": [
+        {
+          "name": "Awake",
+          "startLine": 48,
+          "endLine": 63,
+          "params": []
+        },
+        {
+          "name": "CreateWheelColliders",
+          "startLine": 68,
+          "endLine": 71,
+          "params": []
+        },
+        {
+          "name": "CreateWheelColliders",
+          "startLine": 74,
+          "endLine": 88,
+          "params": [
+            "root",
+            "wheels",
+            "radius"
+          ]
+        },
+        {
+          "name": "ApplyFrictionlessBodyMaterial",
+          "startLine": 94,
+          "endLine": 97,
+          "params": []
+        },
+        {
+          "name": "ApplyFrictionlessBodyMaterial",
+          "startLine": 99,
+          "endLine": 114,
+          "params": [
+            "car"
+          ]
+        },
+        {
+          "name": "Update",
+          "startLine": 116,
+          "endLine": 128,
+          "params": []
+        },
+        {
+          "name": "FixedUpdate",
+          "startLine": 130,
+          "endLine": 144,
+          "params": []
+        },
+        {
+          "name": "ReadInput",
+          "startLine": 146,
+          "endLine": 176,
+          "params": []
+        },
+        {
+          "name": "SetInput",
+          "startLine": 178,
+          "endLine": 183,
+          "params": [
+            "throttle",
+            "steering",
+            "braking"
+          ]
+        },
+        {
+          "name": "CheckGrounded",
+          "startLine": 185,
+          "endLine": 189,
+          "params": []
+        },
+        {
+          "name": "CalculateSpeed",
+          "startLine": 191,
+          "endLine": 194,
+          "params": []
+        },
+        {
+          "name": "ApplyMotor",
+          "startLine": 196,
+          "endLine": 244,
+          "params": []
+        },
+        {
+          "name": "ApplyCoastDeceleration",
+          "startLine": 248,
+          "endLine": 253,
+          "params": [
+            "forwardSpeed"
+          ]
+        },
+        {
+          "name": "ApplySteering",
+          "startLine": 255,
+          "endLine": 274,
+          "params": []
+        },
+        {
+          "name": "ApplyFriction",
+          "startLine": 276,
+          "endLine": 285,
+          "params": []
+        },
+        {
+          "name": "ApplyDownforce",
+          "startLine": 287,
+          "endLine": 294,
+          "params": []
+        },
+        {
+          "name": "UpdateWheelVisuals",
+          "startLine": 296,
+          "endLine": 323,
+          "params": []
+        },
+        {
+          "name": "UpdateAudio",
+          "startLine": 325,
+          "endLine": 330,
+          "params": []
+        },
+        {
+          "name": "ResetCar",
+          "startLine": 332,
+          "endLine": 338,
+          "params": []
+        },
+        {
+          "name": "OnGUI",
+          "startLine": 340,
+          "endLine": 366,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "CarController",
+          "startLine": 6,
+          "endLine": 367,
+          "methods": [
+            "Awake",
+            "CreateWheelColliders",
+            "CreateWheelColliders",
+            "ApplyFrictionlessBodyMaterial",
+            "ApplyFrictionlessBodyMaterial",
+            "Update",
+            "FixedUpdate",
+            "ReadInput",
+            "SetInput",
+            "CheckGrounded",
+            "CalculateSpeed",
+            "ApplyMotor",
+            "ApplyCoastDeceleration",
+            "ApplySteering",
+            "ApplyFriction",
+            "ApplyDownforce",
+            "UpdateWheelVisuals",
+            "UpdateAudio",
+            "ResetCar",
+            "OnGUI"
+          ],
+          "properties": [
+            "frontLeftWheel",
+            "frontRightWheel",
+            "rearLeftWheel",
+            "rearRightWheel",
+            "wheelRadius",
+            "motorTorque",
+            "maxSpeed",
+            "brakeForce",
+            "reverseTorque",
+            "maxSteerAngle",
+            "steerSpeed",
+            "grip",
+            "downforce",
+            "coastDeceleration",
+            "centerOfMassOffset",
+            "engineAudio",
+            "playerControlled",
+            "currentSpeedKmh",
+            "currentSteerAngle",
+            "isGrounded",
+            "rb",
+            "moveInput",
+            "steerInput",
+            "isBraking",
+            "lastGroundedPos",
+            "lastGroundedRot",
+            "SpeedKmh"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "frontLeftWheel",
+          "line": 9,
+          "isDefault": false
+        },
+        {
+          "name": "frontRightWheel",
+          "line": 11,
+          "isDefault": false
+        },
+        {
+          "name": "rearLeftWheel",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "rearRightWheel",
+          "line": 13,
+          "isDefault": false
+        },
+        {
+          "name": "wheelRadius",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "motorTorque",
+          "line": 16,
+          "isDefault": false
+        },
+        {
+          "name": "maxSpeed",
+          "line": 18,
+          "isDefault": false
+        },
+        {
+          "name": "brakeForce",
+          "line": 19,
+          "isDefault": false
+        },
+        {
+          "name": "reverseTorque",
+          "line": 20,
+          "isDefault": false
+        },
+        {
+          "name": "maxSteerAngle",
+          "line": 21,
+          "isDefault": false
+        },
+        {
+          "name": "steerSpeed",
+          "line": 22,
+          "isDefault": false
+        },
+        {
+          "name": "grip",
+          "line": 23,
+          "isDefault": false
+        },
+        {
+          "name": "downforce",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "coastDeceleration",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "centerOfMassOffset",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "engineAudio",
+          "line": 28,
+          "isDefault": false
+        },
+        {
+          "name": "playerControlled",
+          "line": 31,
+          "isDefault": false
+        },
+        {
+          "name": "SpeedKmh",
+          "line": 46,
+          "isDefault": false
+        },
+        {
+          "name": "CreateWheelColliders",
+          "line": 74,
+          "isDefault": false
+        },
+        {
+          "name": "ApplyFrictionlessBodyMaterial",
+          "line": 99,
+          "isDefault": false
+        },
+        {
+          "name": "SetInput",
+          "line": 178,
+          "isDefault": false
+        },
+        {
+          "name": "ResetCar",
+          "line": 332,
+          "isDefault": false
+        },
+        {
+          "name": "CarController",
+          "line": 6,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Awake",
+          "callee": "GetComponent<Rigidbody>",
+          "lineNumber": 50
+        },
+        {
+          "caller": "Awake",
+          "callee": "CreateWheelColliders",
+          "lineNumber": 58
+        },
+        {
+          "caller": "Awake",
+          "callee": "ApplyFrictionlessBodyMaterial",
+          "lineNumber": 59
+        },
+        {
+          "caller": "CreateWheelColliders",
+          "callee": "CreateWheelColliders",
+          "lineNumber": 70
+        },
+        {
+          "caller": "CreateWheelColliders",
+          "callee": "new GameObject",
+          "lineNumber": 80
+        },
+        {
+          "caller": "CreateWheelColliders",
+          "callee": "wheelCollider.transform.SetParent",
+          "lineNumber": 82
+        },
+        {
+          "caller": "CreateWheelColliders",
+          "callee": "root.InverseTransformPoint",
+          "lineNumber": 83
+        },
+        {
+          "caller": "CreateWheelColliders",
+          "callee": "wheelCollider.AddComponent<SphereCollider>",
+          "lineNumber": 85
+        },
+        {
+          "caller": "ApplyFrictionlessBodyMaterial",
+          "callee": "ApplyFrictionlessBodyMaterial",
+          "lineNumber": 96
+        },
+        {
+          "caller": "ApplyFrictionlessBodyMaterial",
+          "callee": "new PhysicsMaterial",
+          "lineNumber": 101
+        },
+        {
+          "caller": "ApplyFrictionlessBodyMaterial",
+          "callee": "car.GetComponentsInChildren<Collider>",
+          "lineNumber": 110
+        },
+        {
+          "caller": "Update",
+          "callee": "ReadInput",
+          "lineNumber": 118
+        },
+        {
+          "caller": "Update",
+          "callee": "UpdateWheelVisuals",
+          "lineNumber": 119
+        },
+        {
+          "caller": "Update",
+          "callee": "UpdateAudio",
+          "lineNumber": 120
+        },
+        {
+          "caller": "Update",
+          "callee": "ResetCar",
+          "lineNumber": 126
+        },
+        {
+          "caller": "FixedUpdate",
+          "callee": "CheckGrounded",
+          "lineNumber": 132
+        },
+        {
+          "caller": "FixedUpdate",
+          "callee": "CalculateSpeed",
+          "lineNumber": 133
+        },
+        {
+          "caller": "FixedUpdate",
+          "callee": "ApplyMotor",
+          "lineNumber": 134
+        },
+        {
+          "caller": "FixedUpdate",
+          "callee": "ApplySteering",
+          "lineNumber": 135
+        },
+        {
+          "caller": "FixedUpdate",
+          "callee": "ApplyFriction",
+          "lineNumber": 136
+        },
+        {
+          "caller": "FixedUpdate",
+          "callee": "ApplyDownforce",
+          "lineNumber": 137
+        },
+        {
+          "caller": "FixedUpdate",
+          "callee": "Vector3.Dot",
+          "lineNumber": 139
+        },
+        {
+          "caller": "FixedUpdate",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 142
+        },
+        {
+          "caller": "ReadInput",
+          "callee": "g.leftStick.x.ReadValue",
+          "lineNumber": 165
+        },
+        {
+          "caller": "ReadInput",
+          "callee": "Mathf.Abs",
+          "lineNumber": 166
+        },
+        {
+          "caller": "ReadInput",
+          "callee": "g.rightTrigger.ReadValue",
+          "lineNumber": 168
+        },
+        {
+          "caller": "ReadInput",
+          "callee": "g.leftTrigger.ReadValue",
+          "lineNumber": 169
+        },
+        {
+          "caller": "SetInput",
+          "callee": "Mathf.Clamp",
+          "lineNumber": 180
+        },
+        {
+          "caller": "SetInput",
+          "callee": "Mathf.Clamp",
+          "lineNumber": 181
+        },
+        {
+          "caller": "CheckGrounded",
+          "callee": "Physics.Raycast",
+          "lineNumber": 188
+        },
+        {
+          "caller": "CalculateSpeed",
+          "callee": "Vector3.Dot",
+          "lineNumber": 193
+        },
+        {
+          "caller": "ApplyMotor",
+          "callee": "Vector3.Dot",
+          "lineNumber": 201
+        },
+        {
+          "caller": "ApplyMotor",
+          "callee": "Mathf.Abs",
+          "lineNumber": 202
+        },
+        {
+          "caller": "ApplyMotor",
+          "callee": "Mathf.Min",
+          "lineNumber": 210
+        },
+        {
+          "caller": "ApplyMotor",
+          "callee": "rb.AddForce",
+          "lineNumber": 211
+        },
+        {
+          "caller": "ApplyMotor",
+          "callee": "rb.AddForce",
+          "lineNumber": 220
+        },
+        {
+          "caller": "ApplyMotor",
+          "callee": "Mathf.Clamp01",
+          "lineNumber": 224
+        },
+        {
+          "caller": "ApplyMotor",
+          "callee": "rb.AddForce",
+          "lineNumber": 225
+        },
+        {
+          "caller": "ApplyMotor",
+          "callee": "rb.AddForce",
+          "lineNumber": 233
+        },
+        {
+          "caller": "ApplyMotor",
+          "callee": "rb.AddForce",
+          "lineNumber": 237
+        },
+        {
+          "caller": "ApplyMotor",
+          "callee": "ApplyCoastDeceleration",
+          "lineNumber": 242
+        },
+        {
+          "caller": "ApplyCoastDeceleration",
+          "callee": "Mathf.Clamp",
+          "lineNumber": 251
+        },
+        {
+          "caller": "ApplyCoastDeceleration",
+          "callee": "rb.AddForce",
+          "lineNumber": 252
+        },
+        {
+          "caller": "ApplySteering",
+          "callee": "Mathf.Clamp01",
+          "lineNumber": 260
+        },
+        {
+          "caller": "ApplySteering",
+          "callee": "Mathf.Abs",
+          "lineNumber": 260
+        },
+        {
+          "caller": "ApplySteering",
+          "callee": "Mathf.Lerp",
+          "lineNumber": 261
+        },
+        {
+          "caller": "ApplySteering",
+          "callee": "Mathf.MoveTowards",
+          "lineNumber": 264
+        },
+        {
+          "caller": "ApplySteering",
+          "callee": "Vector3.Dot",
+          "lineNumber": 269
+        },
+        {
+          "caller": "ApplySteering",
+          "callee": "Mathf.Clamp",
+          "lineNumber": 271
+        },
+        {
+          "caller": "ApplySteering",
+          "callee": "rb.AddTorque",
+          "lineNumber": 272
+        },
+        {
+          "caller": "ApplyFriction",
+          "callee": "Vector3.Dot",
+          "lineNumber": 281
+        },
+        {
+          "caller": "ApplyFriction",
+          "callee": "rb.AddForce",
+          "lineNumber": 284
+        },
+        {
+          "caller": "ApplyDownforce",
+          "callee": "rb.AddForce",
+          "lineNumber": 292
+        },
+        {
+          "caller": "UpdateWheelVisuals",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 302
+        },
+        {
+          "caller": "UpdateWheelVisuals",
+          "callee": "frontLeftWheel.GetChild(0).Rotate",
+          "lineNumber": 304
+        },
+        {
+          "caller": "UpdateWheelVisuals",
+          "callee": "frontLeftWheel.GetChild",
+          "lineNumber": 304
+        },
+        {
+          "caller": "UpdateWheelVisuals",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 309
+        },
+        {
+          "caller": "UpdateWheelVisuals",
+          "callee": "frontRightWheel.GetChild(0).Rotate",
+          "lineNumber": 311
+        },
+        {
+          "caller": "UpdateWheelVisuals",
+          "callee": "frontRightWheel.GetChild",
+          "lineNumber": 311
+        },
+        {
+          "caller": "UpdateWheelVisuals",
+          "callee": "rearLeftWheel.GetChild(0).Rotate",
+          "lineNumber": 316
+        },
+        {
+          "caller": "UpdateWheelVisuals",
+          "callee": "rearLeftWheel.GetChild",
+          "lineNumber": 316
+        },
+        {
+          "caller": "UpdateWheelVisuals",
+          "callee": "rearRightWheel.GetChild(0).Rotate",
+          "lineNumber": 321
+        },
+        {
+          "caller": "UpdateWheelVisuals",
+          "callee": "rearRightWheel.GetChild",
+          "lineNumber": 321
+        },
+        {
+          "caller": "UpdateAudio",
+          "callee": "Mathf.Lerp",
+          "lineNumber": 328
+        },
+        {
+          "caller": "UpdateAudio",
+          "callee": "Mathf.Abs",
+          "lineNumber": 328
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "new GUIStyle",
+          "lineNumber": 345
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "new GUIStyle",
+          "lineNumber": 350
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "new Color",
+          "lineNumber": 353
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "new GUIStyle",
+          "lineNumber": 355
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "new Color",
+          "lineNumber": 357
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "GUILayout.BeginArea",
+          "lineNumber": 359
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "new Rect",
+          "lineNumber": 359
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "GUILayout.Label",
+          "lineNumber": 360
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "Mathf.RoundToInt",
+          "lineNumber": 360
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "Mathf.Abs",
+          "lineNumber": 360
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "GUILayout.Label",
+          "lineNumber": 361
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "GUILayout.Label",
+          "lineNumber": 362
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "GUILayout.Label",
+          "lineNumber": 363
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "GUILayout.Label",
+          "lineNumber": 364
+        },
+        {
+          "caller": "OnGUI",
+          "callee": "GUILayout.EndArea",
+          "lineNumber": 365
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 23,
+        "functionCount": 20,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "Assets/Scripts/OpponentDriver.cs",
+      "language": "csharp",
+      "fileCategory": "code",
+      "totalLines": 145,
+      "nonEmptyLines": 123,
+      "functions": [
+        {
+          "name": "Awake",
+          "startLine": 18,
+          "endLine": 47,
+          "params": []
+        },
+        {
+          "name": "Update",
+          "startLine": 49,
+          "endLine": 72,
+          "params": []
+        },
+        {
+          "name": "BuildRoute",
+          "startLine": 74,
+          "endLine": 92,
+          "params": []
+        },
+        {
+          "name": "AdvancePassedWaypoints",
+          "startLine": 94,
+          "endLine": 108,
+          "params": []
+        },
+        {
+          "name": "FindNearestWaypoint",
+          "startLine": 110,
+          "endLine": 126,
+          "params": []
+        },
+        {
+          "name": "IsValidRoute",
+          "startLine": 128,
+          "endLine": 138,
+          "params": [
+            "points"
+          ]
+        },
+        {
+          "name": "OnDisable",
+          "startLine": 140,
+          "endLine": 143,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "OpponentDriver",
+          "startLine": 5,
+          "endLine": 144,
+          "methods": [
+            "Awake",
+            "Update",
+            "BuildRoute",
+            "AdvancePassedWaypoints",
+            "FindNearestWaypoint",
+            "IsValidRoute",
+            "OnDisable"
+          ],
+          "properties": [
+            "car",
+            "waypoints",
+            "targetSpeedKmh",
+            "laneOffset",
+            "WaypointRadius",
+            "route",
+            "waypointIndex",
+            "overturnedTime"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "car",
+          "line": 8,
+          "isDefault": false
+        },
+        {
+          "name": "waypoints",
+          "line": 9,
+          "isDefault": false
+        },
+        {
+          "name": "targetSpeedKmh",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "laneOffset",
+          "line": 11,
+          "isDefault": false
+        },
+        {
+          "name": "OpponentDriver",
+          "line": 5,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Awake",
+          "callee": "GetComponent<CarController>",
+          "lineNumber": 20
+        },
+        {
+          "caller": "Awake",
+          "callee": "Debug.LogError",
+          "lineNumber": 25
+        },
+        {
+          "caller": "Awake",
+          "callee": "BuildRoute",
+          "lineNumber": 30
+        },
+        {
+          "caller": "Awake",
+          "callee": "IsValidRoute",
+          "lineNumber": 31
+        },
+        {
+          "caller": "Awake",
+          "callee": "Debug.Assert",
+          "lineNumber": 32
+        },
+        {
+          "caller": "Awake",
+          "callee": "FindNearestWaypoint",
+          "lineNumber": 39
+        },
+        {
+          "caller": "Awake",
+          "callee": "Quaternion.LookRotation",
+          "lineNumber": 45
+        },
+        {
+          "caller": "Update",
+          "callee": "AdvancePassedWaypoints",
+          "lineNumber": 53
+        },
+        {
+          "caller": "Update",
+          "callee": "transform.InverseTransformDirection",
+          "lineNumber": 54
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.Atan2",
+          "lineNumber": 55
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.Clamp",
+          "lineNumber": 56
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.InverseLerp",
+          "lineNumber": 58
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.Abs",
+          "lineNumber": 58
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.Lerp",
+          "lineNumber": 59
+        },
+        {
+          "caller": "Update",
+          "callee": "Mathf.Abs",
+          "lineNumber": 60
+        },
+        {
+          "caller": "Update",
+          "callee": "car.SetInput",
+          "lineNumber": 62
+        },
+        {
+          "caller": "Update",
+          "callee": "Vector3.Dot",
+          "lineNumber": 64
+        },
+        {
+          "caller": "Update",
+          "callee": "car.ResetCar",
+          "lineNumber": 68
+        },
+        {
+          "caller": "Update",
+          "callee": "FindNearestWaypoint",
+          "lineNumber": 69
+        },
+        {
+          "caller": "BuildRoute",
+          "callee": "waypoints.GetChild",
+          "lineNumber": 81
+        },
+        {
+          "caller": "BuildRoute",
+          "callee": "waypoints.GetChild",
+          "lineNumber": 82
+        },
+        {
+          "caller": "BuildRoute",
+          "callee": "Vector3.Cross",
+          "lineNumber": 86
+        },
+        {
+          "caller": "BuildRoute",
+          "callee": "waypoints.GetChild",
+          "lineNumber": 88
+        },
+        {
+          "caller": "AdvancePassedWaypoints",
+          "callee": "transform.InverseTransformDirection",
+          "lineNumber": 102
+        },
+        {
+          "caller": "OnDisable",
+          "callee": "car.SetInput",
+          "lineNumber": 142
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 5,
+        "functionCount": 7,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "Assets/Scripts/TargetCar.cs",
+      "language": "csharp",
+      "fileCategory": "code",
+      "totalLines": 74,
+      "nonEmptyLines": 63,
+      "functions": [
+        {
+          "name": "Awake",
+          "startLine": 23,
+          "endLine": 53,
+          "params": []
+        },
+        {
+          "name": "FixedUpdate",
+          "startLine": 55,
+          "endLine": 65,
+          "params": []
+        },
+        {
+          "name": "ReturnToStart",
+          "startLine": 67,
+          "endLine": 72,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "TargetCar",
+          "startLine": 11,
+          "endLine": 73,
+          "methods": [
+            "Awake",
+            "FixedUpdate",
+            "ReturnToStart"
+          ],
+          "properties": [
+            "wheelRadius",
+            "rollingDeceleration",
+            "rb",
+            "hasController",
+            "startPosition",
+            "startRotation"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "wheelRadius",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "rollingDeceleration",
+          "line": 15,
+          "isDefault": false
+        },
+        {
+          "name": "TargetCar",
+          "line": 11,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Awake",
+          "callee": "GetComponent<Rigidbody>",
+          "lineNumber": 25
+        },
+        {
+          "caller": "Awake",
+          "callee": "GetComponent<CarController>",
+          "lineNumber": 26
+        },
+        {
+          "caller": "Awake",
+          "callee": "new Vector3",
+          "lineNumber": 31
+        },
+        {
+          "caller": "Awake",
+          "callee": "transform.Find",
+          "lineNumber": 39
+        },
+        {
+          "caller": "Awake",
+          "callee": "transform.Find",
+          "lineNumber": 39
+        },
+        {
+          "caller": "Awake",
+          "callee": "transform.Find",
+          "lineNumber": 40
+        },
+        {
+          "caller": "Awake",
+          "callee": "transform.Find",
+          "lineNumber": 40
+        },
+        {
+          "caller": "Awake",
+          "callee": "CarController.CreateWheelColliders",
+          "lineNumber": 42
+        },
+        {
+          "caller": "Awake",
+          "callee": "CarController.ApplyFrictionlessBodyMaterial",
+          "lineNumber": 43
+        },
+        {
+          "caller": "Awake",
+          "callee": "GetComponent<CarHealth>",
+          "lineNumber": 49
+        },
+        {
+          "caller": "FixedUpdate",
+          "callee": "new Vector3",
+          "lineNumber": 60
+        },
+        {
+          "caller": "FixedUpdate",
+          "callee": "Mathf.Min",
+          "lineNumber": 63
+        },
+        {
+          "caller": "FixedUpdate",
+          "callee": "rb.AddForce",
+          "lineNumber": 64
+        },
+        {
+          "caller": "ReturnToStart",
+          "callee": "transform.SetPositionAndRotation",
+          "lineNumber": 71
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 3,
+        "functionCount": 3,
+        "classCount": 1
+      }
+    }
+  ]
+}

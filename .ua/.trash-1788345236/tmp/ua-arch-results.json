@@ -1,0 +1,297 @@
+{
+  "scriptCompleted": true,
+  "commonPrefix": "",
+  "flatStructure": false,
+  "directoryGroups": {
+    "Assets": [
+      "file:Assets/Scripts/CarCannon.cs",
+      "file:Assets/Scripts/CarHealth.cs",
+      "file:Assets/Scripts/Projectile.cs",
+      "file:Assets/Scripts/CarController.cs",
+      "file:Assets/Scripts/OpponentDriver.cs",
+      "file:Assets/Scripts/TargetCar.cs",
+      "file:Assets/Scripts/CarCameraFollow.cs",
+      "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "config:Assets/InputSystem_Actions.inputactions",
+      "config:Assets/Settings/PC_RPAsset.asset",
+      "config:Assets/Settings/Mobile_RPAsset.asset",
+      "config:Assets/Settings/PC_Renderer.asset",
+      "config:Assets/Settings/Mobile_Renderer.asset"
+    ],
+    "ProjectSettings": [
+      "config:ProjectSettings/DynamicsManager.asset",
+      "config:ProjectSettings/TimeManager.asset",
+      "config:ProjectSettings/TagManager.asset",
+      "config:ProjectSettings/QualitySettings.asset",
+      "config:ProjectSettings/EditorBuildSettings.asset",
+      "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "document:ProjectSettings/ProjectVersion.txt"
+    ],
+    "Packages": [
+      "config:Packages/manifest.json"
+    ],
+    "Docs": [
+      "document:Docs/AI/UnityProjectContext.md"
+    ]
+  },
+  "nodeTypeGroups": {
+    "file": [
+      "file:Assets/Scripts/CarCannon.cs",
+      "file:Assets/Scripts/CarHealth.cs",
+      "file:Assets/Scripts/Projectile.cs",
+      "file:Assets/Scripts/CarController.cs",
+      "file:Assets/Scripts/OpponentDriver.cs",
+      "file:Assets/Scripts/TargetCar.cs",
+      "file:Assets/Scripts/CarCameraFollow.cs",
+      "file:Assets/Scripts/ProceduralCarBuilder.cs"
+    ],
+    "config": [
+      "config:Assets/InputSystem_Actions.inputactions",
+      "config:Assets/Settings/PC_RPAsset.asset",
+      "config:Assets/Settings/Mobile_RPAsset.asset",
+      "config:Assets/Settings/PC_Renderer.asset",
+      "config:Assets/Settings/Mobile_Renderer.asset",
+      "config:ProjectSettings/DynamicsManager.asset",
+      "config:ProjectSettings/TimeManager.asset",
+      "config:ProjectSettings/TagManager.asset",
+      "config:ProjectSettings/QualitySettings.asset",
+      "config:ProjectSettings/EditorBuildSettings.asset",
+      "config:Packages/manifest.json",
+      "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json"
+    ],
+    "document": [
+      "document:ProjectSettings/ProjectVersion.txt",
+      "document:Docs/AI/UnityProjectContext.md"
+    ]
+  },
+  "crossCategoryEdges": [
+    {
+      "fromType": "file",
+      "toType": "file",
+      "edgeType": "imports",
+      "count": 8
+    },
+    {
+      "fromType": "file",
+      "toType": "file",
+      "edgeType": "depends_on",
+      "count": 2
+    },
+    {
+      "fromType": "config",
+      "toType": "file",
+      "edgeType": "configures",
+      "count": 4
+    },
+    {
+      "fromType": "config",
+      "toType": "config",
+      "edgeType": "depends_on",
+      "count": 5
+    },
+    {
+      "fromType": "config",
+      "toType": "config",
+      "edgeType": "related",
+      "count": 3
+    },
+    {
+      "fromType": "config",
+      "toType": "config",
+      "edgeType": "configures",
+      "count": 3
+    },
+    {
+      "fromType": "document",
+      "toType": "config",
+      "edgeType": "related",
+      "count": 1
+    },
+    {
+      "fromType": "document",
+      "toType": "file",
+      "edgeType": "documents",
+      "count": 4
+    },
+    {
+      "fromType": "document",
+      "toType": "config",
+      "edgeType": "documents",
+      "count": 2
+    },
+    {
+      "fromType": "document",
+      "toType": "document",
+      "edgeType": "documents",
+      "count": 1
+    }
+  ],
+  "nonCodeToCode": [
+    {
+      "source": "config:Assets/InputSystem_Actions.inputactions",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures"
+    },
+    {
+      "source": "config:ProjectSettings/DynamicsManager.asset",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures"
+    },
+    {
+      "source": "config:ProjectSettings/TimeManager.asset",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures"
+    },
+    {
+      "source": "config:Packages/manifest.json",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures"
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "documents"
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/OpponentDriver.cs",
+      "type": "documents"
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "type": "documents"
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/CarCameraFollow.cs",
+      "type": "documents"
+    }
+  ],
+  "groupImportsFrom": {},
+  "groupImportedBy": {},
+  "interGroupImports": [],
+  "intraGroupDensity": {
+    "Assets": {
+      "internalEdges": 8,
+      "totalEdges": 8,
+      "density": 1
+    },
+    "ProjectSettings": {
+      "internalEdges": 0,
+      "totalEdges": 0,
+      "density": 0
+    },
+    "Packages": {
+      "internalEdges": 0,
+      "totalEdges": 0,
+      "density": 0
+    },
+    "Docs": {
+      "internalEdges": 0,
+      "totalEdges": 0,
+      "density": 0
+    }
+  },
+  "patternMatches": {
+    "Assets": "assets",
+    "ProjectSettings": "config",
+    "Packages": "config",
+    "Docs": "documentation"
+  },
+  "filePatternMatches": {
+    "config:Assets/InputSystem_Actions.inputactions": "config",
+    "config:Assets/Settings/PC_RPAsset.asset": "config",
+    "config:Assets/Settings/Mobile_RPAsset.asset": "config",
+    "config:Assets/Settings/PC_Renderer.asset": "config",
+    "config:Assets/Settings/Mobile_Renderer.asset": "config",
+    "config:ProjectSettings/DynamicsManager.asset": "config",
+    "config:ProjectSettings/TimeManager.asset": "config",
+    "config:ProjectSettings/TagManager.asset": "config",
+    "config:ProjectSettings/QualitySettings.asset": "config",
+    "config:ProjectSettings/EditorBuildSettings.asset": "config",
+    "config:Packages/manifest.json": "config",
+    "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json": "config",
+    "document:ProjectSettings/ProjectVersion.txt": "config",
+    "document:Docs/AI/UnityProjectContext.md": "documentation"
+  },
+  "deploymentTopology": {
+    "hasDockerfile": false,
+    "hasCompose": false,
+    "hasK8s": false,
+    "hasTerraform": false,
+    "hasCI": false,
+    "infraFiles": []
+  },
+  "dataPipeline": {
+    "schemaFiles": [],
+    "migrationFiles": [],
+    "dataModelFiles": [],
+    "apiHandlerFiles": []
+  },
+  "docCoverage": {
+    "groupsWithDocs": 4,
+    "totalGroups": 4,
+    "coverageRatio": 1,
+    "undocumentedGroups": []
+  },
+  "dependencyDirection": [
+    {
+      "dependent": "ProjectSettings",
+      "dependsOn": "Assets",
+      "edges": 5,
+      "reverse": 0
+    },
+    {
+      "dependent": "Packages",
+      "dependsOn": "Assets",
+      "edges": 4,
+      "reverse": 0
+    },
+    {
+      "dependent": "Docs",
+      "dependsOn": "Assets",
+      "edges": 4,
+      "reverse": 0
+    },
+    {
+      "dependent": "Docs",
+      "dependsOn": "Packages",
+      "edges": 1,
+      "reverse": 0
+    },
+    {
+      "dependent": "Docs",
+      "dependsOn": "ProjectSettings",
+      "edges": 2,
+      "reverse": 0
+    }
+  ],
+  "fileStats": {
+    "totalFileNodes": 22,
+    "filesPerGroup": {
+      "Assets": 13,
+      "ProjectSettings": 7,
+      "Packages": 1,
+      "Docs": 1
+    },
+    "nodeTypeCounts": {
+      "file": 8,
+      "config": 12,
+      "document": 2
+    }
+  },
+  "fileFanIn": {
+    "file:Assets/Scripts/Projectile.cs": 2,
+    "file:Assets/Scripts/CarCannon.cs": 1,
+    "file:Assets/Scripts/CarController.cs": 3,
+    "file:Assets/Scripts/CarHealth.cs": 2
+  },
+  "fileFanOut": {
+    "file:Assets/Scripts/CarCannon.cs": 1,
+    "file:Assets/Scripts/CarHealth.cs": 3,
+    "file:Assets/Scripts/Projectile.cs": 1,
+    "file:Assets/Scripts/OpponentDriver.cs": 1,
+    "file:Assets/Scripts/TargetCar.cs": 2
+  }
+}

@@ -1,0 +1,696 @@
+{
+  "nodes": [
+    {
+      "id": "file:Assets/Scripts/CarCameraFollow.cs",
+      "type": "file",
+      "name": "CarCameraFollow.cs",
+      "filePath": "Assets/Scripts/CarCameraFollow.cs",
+      "summary": "Компонент камеры преследования: в LateUpdate плавно подтягивает камеру к смещённой позиции за машиной, поворачивает её на точку перед автомобилем и динамически расширяет поле зрения (FOV) в зависимости от скорости Rigidbody.",
+      "tags": [
+        "component",
+        "камера",
+        "monobehaviour",
+        "геймплей",
+        "smoothing"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Логика вынесена в LateUpdate, чтобы камера обновлялась после перемещения машины в текущем кадре; сглаживание через Vector3.Lerp/Quaternion.Slerp с коэффициентом на Time.deltaTime."
+    },
+    {
+      "id": "class:Assets/Scripts/CarCameraFollow.cs:CarCameraFollow",
+      "type": "class",
+      "name": "CarCameraFollow",
+      "filePath": "Assets/Scripts/CarCameraFollow.cs",
+      "lineRange": [
+        5,
+        45
+      ],
+      "summary": "MonoBehaviour следования камеры за целевым Transform с настраиваемым смещением, скоростями сглаживания позиции и поворота и множителем FOV от скорости.",
+      "tags": [
+        "component",
+        "камера",
+        "monobehaviour",
+        "геймплей"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCameraFollow.cs:LateUpdate",
+      "type": "function",
+      "name": "LateUpdate",
+      "filePath": "Assets/Scripts/CarCameraFollow.cs",
+      "lineRange": [
+        24,
+        44
+      ],
+      "summary": "Каждый кадр после Update интерполирует позицию и поворот камеры к желаемым значениям относительно цели и подстраивает fieldOfView по величине linearVelocity Rigidbody в диапазоне 55–85.",
+      "tags": [
+        "unity-lifecycle",
+        "камера",
+        "smoothing",
+        "fov"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "type": "file",
+      "name": "ProceduralCarBuilder.cs",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "summary": "Статический строитель визуальной модели спортивного автомобиля: программно генерирует меши кузова, стеклянного фонаря, карбонового аэрообвеса и фар по кольцевым сечениям, а также собирает зеркала, выхлопы и детализированные колёса из примитивов.",
+      "tags": [
+        "utility",
+        "процедурная-генерация",
+        "mesh",
+        "factory",
+        "визуал"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Статический класс без состояния; меши строятся вручную через List<Vector3>/List<int> и Mesh.SetVertices/SetTriangles с последующим RecalculateNormals/Tangents. Кузов задаётся как набор поперечных сечений (рингов), соединяемых квадами, — типичный подход «loft» для процедурных моделей."
+    },
+    {
+      "id": "class:Assets/Scripts/ProceduralCarBuilder.cs:ProceduralCarBuilder",
+      "type": "class",
+      "name": "ProceduralCarBuilder",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        6,
+        504
+      ],
+      "summary": "Статический класс с публичной точкой входа BuildSleekSportsCar и набором приватных генераторов мешей для отдельных частей автомобиля.",
+      "tags": [
+        "utility",
+        "процедурная-генерация",
+        "factory",
+        "static-class"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:BuildSleekSportsCar",
+      "type": "function",
+      "name": "BuildSleekSportsCar",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        8,
+        81
+      ],
+      "summary": "Создаёт корневой GameObject автомобиля и последовательно добавляет кузов, фонарь, аэрокит, фары, зеркала и выхлопы, назначая переданные материалы каждому MeshRenderer.",
+      "tags": [
+        "точка-входа",
+        "factory",
+        "процедурная-генерация",
+        "визуал"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateCarBodyMesh",
+      "type": "function",
+      "name": "GenerateCarBodyMesh",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        83,
+        183
+      ],
+      "summary": "Строит меш кузова из 9 поперечных сечений по 8 вершин каждое (сужающийся нос, колёсные арки, линия талии, задняя палуба), соединяет кольца квадами и закрывает нос и хвост.",
+      "tags": [
+        "mesh",
+        "процедурная-генерация",
+        "геометрия"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateCanopyMesh",
+      "type": "function",
+      "name": "GenerateCanopyMesh",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        185,
+        265
+      ],
+      "summary": "Генерирует обтекаемый стеклянный купол кабины из 5 колец по 6 точек и добавляет фронтальную и заднюю плоскости лобового и заднего стекла.",
+      "tags": [
+        "mesh",
+        "процедурная-генерация",
+        "геометрия"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateAeroKitMesh",
+      "type": "function",
+      "name": "GenerateAeroKitMesh",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        267,
+        339
+      ],
+      "summary": "Собирает карбоновый аэрообвес (передний сплиттер, пороги, диффузор, стойки и антикрыло с боковинами) из набора коробок через локальный помощник AddBox.",
+      "tags": [
+        "mesh",
+        "процедурная-генерация",
+        "геометрия"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateLightsMesh",
+      "type": "function",
+      "name": "GenerateLightsMesh",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        341,
+        386
+      ],
+      "summary": "Формирует меш угловатых передних фар и заднего LED-светового бруса, врезанных в кузов, с помощью помощника AddQuad.",
+      "tags": [
+        "mesh",
+        "процедурная-генерация",
+        "геометрия"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateSideMirror",
+      "type": "function",
+      "name": "CreateSideMirror",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        388,
+        420
+      ],
+      "summary": "Создаёт боковое зеркало из трёх примитивов (ножка, корпус, стекло) с удалением коллайдеров и зеркальным расположением по флагу isLeft.",
+      "tags": [
+        "helpers",
+        "примитивы",
+        "визуал"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateExhaust",
+      "type": "function",
+      "name": "CreateExhaust",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        422,
+        434
+      ],
+      "summary": "Добавляет выхлопную трубу-цилиндр с хромированным наконечником в заданной X-позиции, снимая коллайдеры.",
+      "tags": [
+        "helpers",
+        "примитивы",
+        "визуал"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateHighDetailWheel",
+      "type": "function",
+      "name": "CreateHighDetailWheel",
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "lineRange": [
+        436,
+        503
+      ],
+      "summary": "Публично собирает детализированное колесо: шину, легкосплавный обод, многоспицевую вставку, тормозной диск и красный суппорт на отдельном pivot; возвращает Transform колеса.",
+      "tags": [
+        "helpers",
+        "примитивы",
+        "колёса",
+        "визуал"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:Assets/InputSystem_Actions.inputactions",
+      "type": "config",
+      "name": "InputSystem_Actions.inputactions",
+      "filePath": "Assets/InputSystem_Actions.inputactions",
+      "summary": "Ассет Unity Input System с двумя action map (Player: Move, Look, Attack, Interact, Crouch, Jump, Previous, Next, Sprint; UI: Navigate, Submit, Cancel, Point, Click и др.) и привязками для схем Keyboard&Mouse, Gamepad, Touch, Joystick и XR.",
+      "tags": [
+        "configuration",
+        "input-system",
+        "action-map",
+        "ввод"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Стандартный шаблонный набор действий Unity 6; зарегистрирован как проектный action asset через com.unity.input.settings.actions в EditorBuildSettings."
+    },
+    {
+      "id": "config:Assets/Settings/PC_RPAsset.asset",
+      "type": "config",
+      "name": "PC_RPAsset.asset",
+      "filePath": "Assets/Settings/PC_RPAsset.asset",
+      "summary": "Ассет URP-пайплайна для профиля качества PC: HDR, полный RenderScale 1.0, 4 каскада теней на дистанции 50, SRP Batcher; ссылается на PC_Renderer и общий Volume Profile сцены.",
+      "tags": [
+        "configuration",
+        "urp",
+        "render-pipeline",
+        "графика"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:Assets/Settings/Mobile_RPAsset.asset",
+      "type": "config",
+      "name": "Mobile_RPAsset.asset",
+      "filePath": "Assets/Settings/Mobile_RPAsset.asset",
+      "summary": "Ассет URP-пайплайна для мобильного профиля качества: пониженный RenderScale 0.8, один каскад теней, HDR и SRP Batcher; ссылается на Mobile_Renderer.",
+      "tags": [
+        "configuration",
+        "urp",
+        "render-pipeline",
+        "mobile",
+        "графика"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:Assets/Settings/PC_Renderer.asset",
+      "type": "config",
+      "name": "PC_Renderer.asset",
+      "filePath": "Assets/Settings/PC_Renderer.asset",
+      "summary": "Universal Renderer Data для ПК: Deferred-режим рендеринга и подключённая renderer feature Screen Space Ambient Occlusion с набором шумовых текстур.",
+      "tags": [
+        "configuration",
+        "urp",
+        "renderer",
+        "ssao",
+        "графика"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:Assets/Settings/Mobile_Renderer.asset",
+      "type": "config",
+      "name": "Mobile_Renderer.asset",
+      "filePath": "Assets/Settings/Mobile_Renderer.asset",
+      "summary": "Облегчённый Universal Renderer Data для мобильных платформ: Forward-рендеринг без дополнительных renderer features.",
+      "tags": [
+        "configuration",
+        "urp",
+        "renderer",
+        "mobile",
+        "графика"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:ProjectSettings/DynamicsManager.asset",
+      "type": "config",
+      "name": "DynamicsManager.asset",
+      "filePath": "ProjectSettings/DynamicsManager.asset",
+      "summary": "Настройки PhysX-физики проекта: гравитация −9.81 по Y, 6 итераций солвера позиции и 1 скорости, полностью открытая матрица столкновений слоёв, автосимуляция и лимит угловой скорости 50 — фундамент для Rigidbody-физики автомобилей.",
+      "tags": [
+        "configuration",
+        "физика",
+        "physx",
+        "rigidbody"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:ProjectSettings/TimeManager.asset",
+      "type": "config",
+      "name": "TimeManager.asset",
+      "filePath": "ProjectSettings/TimeManager.asset",
+      "summary": "Тайминги проекта: фиксированный шаг физики 0.02 с (50 Гц), максимальный шаг 0.333 с и timeScale 1 — определяет частоту вызовов FixedUpdate в коде управления машиной.",
+      "tags": [
+        "configuration",
+        "физика",
+        "fixed-timestep",
+        "timing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:ProjectSettings/TagManager.asset",
+      "type": "config",
+      "name": "TagManager.asset",
+      "filePath": "ProjectSettings/TagManager.asset",
+      "summary": "Реестр тегов, слоёв и слоёв рендеринга проекта: пользовательские теги не заданы, используются только встроенные слои (Default, TransparentFX, Ignore Raycast, Water, UI) и стандартные Light Layer 1–7 для URP.",
+      "tags": [
+        "configuration",
+        "слои",
+        "теги",
+        "rendering-layers"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:ProjectSettings/QualitySettings.asset",
+      "type": "config",
+      "name": "QualitySettings.asset",
+      "filePath": "ProjectSettings/QualitySettings.asset",
+      "summary": "Два уровня качества — Mobile и PC (текущий PC), каждый привязан к своему URP-ассету (Mobile_RPAsset и PC_RPAsset) через customRenderPipeline; задаёт дефолтный уровень по платформам.",
+      "tags": [
+        "configuration",
+        "качество",
+        "urp",
+        "графика"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:ProjectSettings/EditorBuildSettings.asset",
+      "type": "config",
+      "name": "EditorBuildSettings.asset",
+      "filePath": "ProjectSettings/EditorBuildSettings.asset",
+      "summary": "Список сцен сборки (единственная включённая сцена Assets/Scenes/SampleScene.unity) и объекты конфигурации: проектный action asset Input System и настройки App UI.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "сцены",
+        "input-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:Packages/manifest.json",
+      "type": "config",
+      "name": "manifest.json",
+      "filePath": "Packages/manifest.json",
+      "summary": "Манифест Unity Package Manager: URP 17.5.0, Input System 1.20.0, AI Navigation, AI Assistant (2.19.0-pre.1), Test Framework, Timeline, uGUI, Visual Scripting и полный набор встроенных модулей движка.",
+      "tags": [
+        "configuration",
+        "package-manager",
+        "зависимости",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "type": "config",
+      "name": "Settings.json",
+      "filePath": "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "summary": "Настройки пакета Unity AI Assistant: включены git-чекпоинты с хранением 2 недели, стандартный экземпляр git, кастомные инструкции не заданы, флаги onboarding-баннеров.",
+      "tags": [
+        "configuration",
+        "ai-assistant",
+        "editor-tooling",
+        "settings"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:ProjectSettings/ProjectVersion.txt",
+      "type": "document",
+      "name": "ProjectVersion.txt",
+      "filePath": "ProjectSettings/ProjectVersion.txt",
+      "summary": "Фиксирует версию редактора Unity 6000.5.9f1 (ревизия b57deb96f08d), с которой открывался проект.",
+      "tags": [
+        "документация",
+        "версия",
+        "unity-editor"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:Docs/AI/UnityProjectContext.md",
+      "type": "document",
+      "name": "UnityProjectContext.md",
+      "filePath": "Docs/AI/UnityProjectContext.md",
+      "summary": "Автосгенерированный контекст проекта для AI-ассистентов из 14 разделов: окружение (Unity 6000.5.9f1, URP, Input System), структура каталогов, архитектура (Rigidbody-CarController, маршрут оппонентов по Track_Markings, процедурные меши), конвенции кода, состояние тестирования, доступный Unity-инструментарий и ограничения.",
+      "tags": [
+        "документация",
+        "ai-onboarding",
+        "архитектура",
+        "обзор"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Содержимое обёрнуто в маркеры <!-- unity-onboarding:generated:start/end -->, т.е. файл регенерируется инструментом; таблицы с колонками Confidence/Evidence привязывают каждое утверждение к источникам."
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:Assets/Scripts/CarCameraFollow.cs",
+      "target": "class:Assets/Scripts/CarCameraFollow.cs:CarCameraFollow",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCameraFollow.cs",
+      "target": "function:Assets/Scripts/CarCameraFollow.cs:LateUpdate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCameraFollow.cs",
+      "target": "class:Assets/Scripts/CarCameraFollow.cs:CarCameraFollow",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:BuildSleekSportsCar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateCarBodyMesh",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateCanopyMesh",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateAeroKitMesh",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:GenerateLightsMesh",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateSideMirror",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateExhaust",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateHighDetailWheel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "class:Assets/Scripts/ProceduralCarBuilder.cs:ProceduralCarBuilder",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "class:Assets/Scripts/ProceduralCarBuilder.cs:ProceduralCarBuilder",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:BuildSleekSportsCar",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "target": "function:Assets/Scripts/ProceduralCarBuilder.cs:CreateHighDetailWheel",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "config:Assets/InputSystem_Actions.inputactions",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Assets/Settings/PC_RPAsset.asset",
+      "target": "config:Assets/Settings/PC_Renderer.asset",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Assets/Settings/Mobile_RPAsset.asset",
+      "target": "config:Assets/Settings/Mobile_Renderer.asset",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/DynamicsManager.asset",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/TimeManager.asset",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/TimeManager.asset",
+      "target": "config:ProjectSettings/DynamicsManager.asset",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:ProjectSettings/TagManager.asset",
+      "target": "config:ProjectSettings/DynamicsManager.asset",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:ProjectSettings/QualitySettings.asset",
+      "target": "config:Assets/Settings/PC_RPAsset.asset",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/QualitySettings.asset",
+      "target": "config:Assets/Settings/Mobile_RPAsset.asset",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/EditorBuildSettings.asset",
+      "target": "config:Assets/InputSystem_Actions.inputactions",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Packages/manifest.json",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Packages/manifest.json",
+      "target": "config:Assets/InputSystem_Actions.inputactions",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Packages/manifest.json",
+      "target": "config:Assets/Settings/PC_RPAsset.asset",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:Packages/manifest.json",
+      "target": "config:Assets/Settings/Mobile_RPAsset.asset",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "target": "config:Packages/manifest.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:ProjectSettings/ProjectVersion.txt",
+      "target": "config:Packages/manifest.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/OpponentDriver.cs",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/ProceduralCarBuilder.cs",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "file:Assets/Scripts/CarCameraFollow.cs",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "config:Packages/manifest.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "config:ProjectSettings/EditorBuildSettings.asset",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:Docs/AI/UnityProjectContext.md",
+      "target": "document:ProjectSettings/ProjectVersion.txt",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

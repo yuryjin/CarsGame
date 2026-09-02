@@ -1,0 +1,738 @@
+{
+  "nodes": [
+    {
+      "id": "file:Assets/Scripts/CarCannon.cs",
+      "type": "file",
+      "name": "CarCannon.cs",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "summary": "Реализует пушку на крыше автомобиля: при старте процедурно собирает башню и ствол из примитивов, по нажатию ЛКМ/Ctrl/правого бампера геймпада выпускает снаряд Projectile с отдачей по Rigidbody и вспышкой у дульного среза.",
+      "tags": [
+        "оружие",
+        "component",
+        "input-system",
+        "процедурная-геометрия",
+        "gameplay"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Unity MonoBehaviour с lifecycle-методами Awake/Update; опрос ввода через Unity Input System (Keyboard.current, Mouse.current, Gamepad.current); материалы создаются через Shader.Find с fallback на Standard."
+    },
+    {
+      "id": "file:Assets/Scripts/CarHealth.cs",
+      "type": "file",
+      "name": "CarHealth.cs",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "summary": "Управляет здоровьем автомобиля: считает урон от сильных боковых столкновений по импульсу Rigidbody, принимает урон от снарядов, при нуле HP превращает машину в обломок с взрывом и через задержку возрождает её; также рисует HP-бар через OnGUI. Дополнительно содержит ExplosionFlash — дешёвый эффект взрыва.",
+      "tags": [
+        "здоровье",
+        "component",
+        "физика",
+        "hud",
+        "gameplay"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Публикует C#-события (event Action) OnHealthChanged/OnDied/OnRespawned для подписчиков; использует MaterialPropertyBlock для перекраски обломка без создания копий материалов и Shader.PropertyToID для кэширования идентификаторов свойств шейдера."
+    },
+    {
+      "id": "file:Assets/Scripts/Projectile.cs",
+      "type": "file",
+      "name": "Projectile.cs",
+      "filePath": "Assets/Scripts/Projectile.cs",
+      "summary": "Описывает снаряд пушки: статическая фабрика Spawn создаёт сферу с Rigidbody и игнорирует коллизии со стрелявшей машиной; при первом контакте наносит урон CarHealth, толкает цель импульсом, порождает ExplosionFlash и уничтожается.",
+      "tags": [
+        "снаряд",
+        "factory",
+        "физика",
+        "component",
+        "gameplay"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Атрибут [RequireComponent(typeof(Rigidbody))] гарантирует наличие Rigidbody; статический метод-фабрика собирает GameObject во время выполнения вместо использования префаба."
+    },
+    {
+      "id": "class:Assets/Scripts/CarCannon.cs:CarCannon",
+      "type": "class",
+      "name": "CarCannon",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        10,
+        171
+      ],
+      "summary": "MonoBehaviour пушки на крыше: хранит параметры стрельбы (интервал, скорость и урон снаряда, сила отдачи), строит визуальную башню и обрабатывает выстрел с анимацией отката ствола.",
+      "tags": [
+        "оружие",
+        "component",
+        "monobehaviour",
+        "input-system"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:Assets/Scripts/CarHealth.cs:CarHealth",
+      "type": "class",
+      "name": "CarHealth",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        11,
+        249
+      ],
+      "summary": "MonoBehaviour очков здоровья машины: урон от столкновений и снарядов, состояние IsDead, таймер возрождения, отключение CarController/CarCannon у обломка и отрисовка HP-бара на экране или над машиной.",
+      "tags": [
+        "здоровье",
+        "component",
+        "monobehaviour",
+        "события",
+        "hud"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:Assets/Scripts/CarHealth.cs:ExplosionFlash",
+      "type": "class",
+      "name": "ExplosionFlash",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        252,
+        301
+      ],
+      "summary": "Одноразовый эффект взрыва: расширяющаяся оранжевая полупрозрачная сфера и затухающий точечный свет, самоуничтожается по истечении duration и освобождает созданный материал.",
+      "tags": [
+        "vfx",
+        "component",
+        "monobehaviour",
+        "эффекты"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:Assets/Scripts/Projectile.cs:Projectile",
+      "type": "class",
+      "name": "Projectile",
+      "filePath": "Assets/Scripts/Projectile.cs",
+      "lineRange": [
+        9,
+        84
+      ],
+      "summary": "MonoBehaviour снаряда пушки с фабрикой Spawn; при столкновении наносит урон CarHealth цели, прикладывает импульс и уничтожает себя после первого контакта.",
+      "tags": [
+        "снаряд",
+        "component",
+        "monobehaviour",
+        "factory"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCannon.cs:Awake",
+      "type": "function",
+      "name": "Awake",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        34,
+        45
+      ],
+      "summary": "Кэширует Rigidbody, при отсутствии ссылок на ствол/дуло строит башню через BuildTurret, запоминает положение покоя ствола и добавляет точечный свет вспышки на дульный срез.",
+      "tags": [
+        "lifecycle",
+        "инициализация",
+        "unity"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCannon.cs:WantsToFire",
+      "type": "function",
+      "name": "WantsToFire",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        57,
+        69
+      ],
+      "summary": "Опрашивает Unity Input System и возвращает true, если зажаты Ctrl, левая кнопка мыши либо правый бампер или западная кнопка геймпада.",
+      "tags": [
+        "input-system",
+        "ввод",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCannon.cs:TryFire",
+      "type": "function",
+      "name": "TryFire",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        71,
+        85
+      ],
+      "summary": "Публичный выстрел с учётом перезарядки: создаёт снаряд через Projectile.Spawn со скоростью дула плюс скорость машины, запускает откат ствола, вспышку и прикладывает импульс отдачи к Rigidbody.",
+      "tags": [
+        "оружие",
+        "стрельба",
+        "gameplay",
+        "public-api"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCannon.cs:BuildTurret",
+      "type": "function",
+      "name": "BuildTurret",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        87,
+        146
+      ],
+      "summary": "Процедурно собирает башню из примитивов (кольцо-основание, корпус, труба ствола, дульный тормоз, точка дула) под родительским объектом Cannon_Turret, удаляя коллайдеры и назначая тёмный материал.",
+      "tags": [
+        "процедурная-геометрия",
+        "инициализация",
+        "visuals"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/CarCannon.cs:FindMaterialOnCar",
+      "type": "function",
+      "name": "FindMaterialOnCar",
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "lineRange": [
+        148,
+        161
+      ],
+      "summary": "Ищет среди Renderer-ов машины материал, имя которого содержит одну из переданных подстрок, чтобы переиспользовать его для башни.",
+      "tags": [
+        "utility",
+        "материалы",
+        "поиск"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:OnCollisionEnter",
+      "type": "function",
+      "name": "OnCollisionEnter",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        70,
+        99
+      ],
+      "summary": "Вычисляет урон от столкновения: игнорирует снаряды и вертикальные удары (приземления), берёт скорость удара как impulse/mass, применяет порог, коэффициент, максимум и кулдаун, затем вызывает TakeDamage.",
+      "tags": [
+        "физика",
+        "столкновения",
+        "урон",
+        "event-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "type": "function",
+      "name": "TakeDamage",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        101,
+        109
+      ],
+      "summary": "Публично снимает здоровье, вызывает событие OnHealthChanged и при достижении нуля переводит машину в состояние обломка через Die.",
+      "tags": [
+        "здоровье",
+        "урон",
+        "public-api",
+        "события"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:Heal",
+      "type": "function",
+      "name": "Heal",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        111,
+        116
+      ],
+      "summary": "Публично восстанавливает здоровье до maxHealth (не действует на разбитую машину) и уведомляет подписчиков OnHealthChanged.",
+      "tags": [
+        "здоровье",
+        "лечение",
+        "public-api"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:Die",
+      "type": "function",
+      "name": "Die",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        118,
+        132
+      ],
+      "summary": "Переводит машину в состояние обломка: выставляет IsDead и таймер возрождения, отключает управление и пушку, перекрашивает кузов, создаёт взрыв, повышает демпфирование Rigidbody и вызывает OnDied.",
+      "tags": [
+        "здоровье",
+        "смерть",
+        "state-machine",
+        "события"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:Respawn",
+      "type": "function",
+      "name": "Respawn",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        134,
+        152
+      ],
+      "summary": "Возрождает машину с полным HP: сбрасывает демпфирование и скорости Rigidbody, вызывает CarController.ResetCar, возвращает исходный цвет, включает управление и рассылает события OnHealthChanged и OnRespawned.",
+      "tags": [
+        "здоровье",
+        "возрождение",
+        "state-machine",
+        "события"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:TintWreck",
+      "type": "function",
+      "name": "TintWreck",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        163,
+        187
+      ],
+      "summary": "Перекрашивает все Renderer-ы машины в тёмный цвет обломка через MaterialPropertyBlock (с выбором _BaseColor для URP или _Color) либо снимает блок свойств для возврата к исходному виду.",
+      "tags": [
+        "visuals",
+        "материалы",
+        "urp"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:DrawWorldBar",
+      "type": "function",
+      "name": "DrawWorldBar",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        209,
+        220
+      ],
+      "summary": "Проецирует точку над машиной через Camera.main в экранные координаты и рисует маленький HP-бар над автомобилем (используется для AI-целей).",
+      "tags": [
+        "hud",
+        "ongui",
+        "visuals"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:DrawBar",
+      "type": "function",
+      "name": "DrawBar",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        222,
+        248
+      ],
+      "summary": "Рисует полосу здоровья IMGUI: тёмную подложку, заливку с цветом от красного к зелёному пропорционально HP и, опционально, текст «HP x / y» или таймер «РАЗБИТА».",
+      "tags": [
+        "hud",
+        "ongui",
+        "visuals"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:ExplosionFlash.Start",
+      "type": "function",
+      "name": "ExplosionFlash.Start",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        262,
+        278
+      ],
+      "summary": "Создаёт сферу без коллайдера с unlit-материалом оранжевого цвета (URP Unlit с fallback на Unlit/Color) и добавляет точечный свет взрыва.",
+      "tags": [
+        "vfx",
+        "инициализация",
+        "lifecycle"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarHealth.cs:ExplosionFlash.Update",
+      "type": "function",
+      "name": "ExplosionFlash.Update",
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "lineRange": [
+        280,
+        295
+      ],
+      "summary": "Анимирует взрыв по нормализованному времени: расширяет сферу по sqrt(t), гасит свет и прозрачность, по завершении уничтожает GameObject.",
+      "tags": [
+        "vfx",
+        "анимация",
+        "lifecycle"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/Projectile.cs:Spawn",
+      "type": "function",
+      "name": "Spawn",
+      "filePath": "Assets/Scripts/Projectile.cs",
+      "lineRange": [
+        20,
+        50
+      ],
+      "summary": "Статическая фабрика снаряда: создаёт сферу с Rigidbody (непрерывная детекция столкновений, интерполяция), задаёт скорость, урон и владельца, отключает коллизии со всеми коллайдерами стрелявшей машины.",
+      "tags": [
+        "factory",
+        "снаряд",
+        "физика",
+        "public-api"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/Projectile.cs:OnCollisionEnter",
+      "type": "function",
+      "name": "OnCollisionEnter",
+      "filePath": "Assets/Scripts/Projectile.cs",
+      "lineRange": [
+        58,
+        83
+      ],
+      "summary": "Обрабатывает первый контакт снаряда: наносит урон CarHealth цели (кроме владельца), прикладывает импульс к Rigidbody цели по направлению полёта, создаёт компактный ExplosionFlash в точке удара и уничтожает снаряд.",
+      "tags": [
+        "физика",
+        "столкновения",
+        "урон",
+        "event-handler"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "class:Assets/Scripts/CarCannon.cs:CarCannon",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "class:Assets/Scripts/CarHealth.cs:CarHealth",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "class:Assets/Scripts/CarHealth.cs:ExplosionFlash",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "class:Assets/Scripts/Projectile.cs:Projectile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:Awake",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:WantsToFire",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:TryFire",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:BuildTurret",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:FindMaterialOnCar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:OnCollisionEnter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:Heal",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:Die",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:Respawn",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:TintWreck",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:DrawWorldBar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:DrawBar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:ExplosionFlash.Start",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:ExplosionFlash.Update",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "function:Assets/Scripts/Projectile.cs:Spawn",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "function:Assets/Scripts/Projectile.cs:OnCollisionEnter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "class:Assets/Scripts/CarCannon.cs:CarCannon",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "function:Assets/Scripts/CarCannon.cs:TryFire",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "class:Assets/Scripts/CarHealth.cs:CarHealth",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "class:Assets/Scripts/CarHealth.cs:ExplosionFlash",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "function:Assets/Scripts/CarHealth.cs:Heal",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "class:Assets/Scripts/Projectile.cs:Projectile",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "function:Assets/Scripts/Projectile.cs:Spawn",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarCannon.cs",
+      "target": "file:Assets/Scripts/Projectile.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "file:Assets/Scripts/CarCannon.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/CarHealth.cs",
+      "target": "file:Assets/Scripts/Projectile.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/Projectile.cs",
+      "target": "file:Assets/Scripts/CarHealth.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:Assets/Scripts/CarCannon.cs:TryFire",
+      "target": "function:Assets/Scripts/Projectile.cs:Spawn",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/Projectile.cs:OnCollisionEnter",
+      "target": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/Projectile.cs:OnCollisionEnter",
+      "target": "class:Assets/Scripts/CarHealth.cs:ExplosionFlash",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:Respawn",
+      "target": "function:Assets/Scripts/CarController.cs:ResetCar",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarCannon.cs:Awake",
+      "target": "function:Assets/Scripts/CarCannon.cs:BuildTurret",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarCannon.cs:BuildTurret",
+      "target": "function:Assets/Scripts/CarCannon.cs:FindMaterialOnCar",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:OnCollisionEnter",
+      "target": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:TakeDamage",
+      "target": "function:Assets/Scripts/CarHealth.cs:Die",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:Die",
+      "target": "function:Assets/Scripts/CarHealth.cs:TintWreck",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:Respawn",
+      "target": "function:Assets/Scripts/CarHealth.cs:TintWreck",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/CarHealth.cs:DrawWorldBar",
+      "target": "function:Assets/Scripts/CarHealth.cs:DrawBar",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

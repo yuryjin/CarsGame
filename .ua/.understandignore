@@ -1,0 +1,42 @@
+# .understandignore — Unity CarsGame (custom, tailored for Understand Anything)
+# Unity meta / caches / editor state
+*.meta
+Library/
+Temp/
+Logs/
+obj/
+UserSettings/
+.plastic/
+.vs/
+.idea/
+*.csproj
+*.sln
+# Agent scratch / other tools
+graphify-out/
+.claude/
+.ua/
+# Huge serialized YAML scene (76k lines) and media/binary assets
+*.unity
+*.fbx
+*.png
+*.wlt
+*.lock
+Packages/packages-lock.json
+# URP template boilerplate (not game code)
+Assets/TutorialInfo/
+Assets/Readme.asset
+# Heavy generated render-pipeline / project settings YAML; keep the informative ones
+Assets/Settings/DefaultVolumeProfile.asset
+Assets/Settings/UniversalRenderPipelineGlobalSettings.asset
+Assets/Settings/SampleSceneProfile.asset
+ProjectSettings/*.asset
+!ProjectSettings/EditorBuildSettings.asset
+!ProjectSettings/TagManager.asset
+!ProjectSettings/DynamicsManager.asset
+!ProjectSettings/TimeManager.asset
+!ProjectSettings/QualitySettings.asset
+ProjectSettings/SceneTemplateSettings.json
+# Repo housekeeping files with no architectural value
+.gitattributes
+.graphifyignore
+ignore.conf

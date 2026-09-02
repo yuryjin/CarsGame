@@ -1,0 +1,1888 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 16,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "Assets/InputSystem_Actions.inputactions",
+      "language": "inputactions",
+      "fileCategory": "code",
+      "totalLines": 1057,
+      "nonEmptyLines": 1057,
+      "metrics": {}
+    },
+    {
+      "path": "Assets/Scripts/CarCameraFollow.cs",
+      "language": "csharp",
+      "fileCategory": "code",
+      "totalLines": 46,
+      "nonEmptyLines": 39,
+      "functions": [
+        {
+          "name": "Start",
+          "startLine": 18,
+          "endLine": 22,
+          "params": []
+        },
+        {
+          "name": "LateUpdate",
+          "startLine": 24,
+          "endLine": 44,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "CarCameraFollow",
+          "startLine": 5,
+          "endLine": 45,
+          "methods": [
+            "Start",
+            "LateUpdate"
+          ],
+          "properties": [
+            "target",
+            "targetRigidbody",
+            "offset",
+            "positionSmoothSpeed",
+            "rotationSmoothSpeed",
+            "lookAtHeightOffset",
+            "speedFovMultiplier",
+            "cam",
+            "initialFov"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "target",
+          "line": 7,
+          "isDefault": false
+        },
+        {
+          "name": "targetRigidbody",
+          "line": 8,
+          "isDefault": false
+        },
+        {
+          "name": "offset",
+          "line": 9,
+          "isDefault": false
+        },
+        {
+          "name": "positionSmoothSpeed",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "rotationSmoothSpeed",
+          "line": 11,
+          "isDefault": false
+        },
+        {
+          "name": "lookAtHeightOffset",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "speedFovMultiplier",
+          "line": 13,
+          "isDefault": false
+        },
+        {
+          "name": "CarCameraFollow",
+          "line": 5,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Start",
+          "callee": "GetComponent<Camera>",
+          "lineNumber": 20
+        },
+        {
+          "caller": "LateUpdate",
+          "callee": "target.TransformPoint",
+          "lineNumber": 29
+        },
+        {
+          "caller": "LateUpdate",
+          "callee": "Vector3.Lerp",
+          "lineNumber": 30
+        },
+        {
+          "caller": "LateUpdate",
+          "callee": "Quaternion.LookRotation",
+          "lineNumber": 34
+        },
+        {
+          "caller": "LateUpdate",
+          "callee": "Quaternion.Slerp",
+          "lineNumber": 35
+        },
+        {
+          "caller": "LateUpdate",
+          "callee": "Mathf.Clamp",
+          "lineNumber": 41
+        },
+        {
+          "caller": "LateUpdate",
+          "callee": "Mathf.Lerp",
+          "lineNumber": 42
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 8,
+        "functionCount": 2,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "language": "csharp",
+      "fileCategory": "code",
+      "totalLines": 505,
+      "nonEmptyLines": 432,
+      "functions": [
+        {
+          "name": "BuildSleekSportsCar",
+          "startLine": 8,
+          "endLine": 81,
+          "params": [
+            "bodyPaintMat",
+            "carbonDarkMat",
+            "glassMat",
+            "tireMat",
+            "rimMat",
+            "brakeMat",
+            "headlightMat",
+            "taillightMat",
+            "interiorMat"
+          ]
+        },
+        {
+          "name": "GenerateCarBodyMesh",
+          "startLine": 83,
+          "endLine": 183,
+          "params": []
+        },
+        {
+          "name": "GenerateCanopyMesh",
+          "startLine": 185,
+          "endLine": 265,
+          "params": []
+        },
+        {
+          "name": "GenerateAeroKitMesh",
+          "startLine": 267,
+          "endLine": 339,
+          "params": []
+        },
+        {
+          "name": "GenerateLightsMesh",
+          "startLine": 341,
+          "endLine": 386,
+          "params": []
+        },
+        {
+          "name": "CreateSideMirror",
+          "startLine": 388,
+          "endLine": 420,
+          "params": [
+            "parent",
+            "carbonMat",
+            "glassMat",
+            "isLeft"
+          ]
+        },
+        {
+          "name": "CreateExhaust",
+          "startLine": 422,
+          "endLine": 434,
+          "params": [
+            "parent",
+            "carbonMat",
+            "chromeMat",
+            "xPos"
+          ]
+        },
+        {
+          "name": "CreateHighDetailWheel",
+          "startLine": 436,
+          "endLine": 503,
+          "params": [
+            "name",
+            "parent",
+            "localPos",
+            "tireMat",
+            "rimMat",
+            "brakeMat"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "ProceduralCarBuilder",
+          "startLine": 6,
+          "endLine": 504,
+          "methods": [
+            "BuildSleekSportsCar",
+            "GenerateCarBodyMesh",
+            "GenerateCanopyMesh",
+            "GenerateAeroKitMesh",
+            "GenerateLightsMesh",
+            "CreateSideMirror",
+            "CreateExhaust",
+            "CreateHighDetailWheel"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "BuildSleekSportsCar",
+          "line": 8,
+          "isDefault": false
+        },
+        {
+          "name": "CreateHighDetailWheel",
+          "line": 436,
+          "isDefault": false
+        },
+        {
+          "name": "ProceduralCarBuilder",
+          "line": 6,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "new GameObject",
+          "lineNumber": 19
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "new GameObject",
+          "lineNumber": 23
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "new GameObject",
+          "lineNumber": 29
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "bodyObj.AddComponent<MeshFilter>",
+          "lineNumber": 34
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "bodyObj.AddComponent<MeshRenderer>",
+          "lineNumber": 35
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "GenerateCarBodyMesh",
+          "lineNumber": 36
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "new GameObject",
+          "lineNumber": 40
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "canopyObj.AddComponent<MeshFilter>",
+          "lineNumber": 45
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "canopyObj.AddComponent<MeshRenderer>",
+          "lineNumber": 46
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "GenerateCanopyMesh",
+          "lineNumber": 47
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "new GameObject",
+          "lineNumber": 51
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "aeroObj.AddComponent<MeshFilter>",
+          "lineNumber": 56
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "aeroObj.AddComponent<MeshRenderer>",
+          "lineNumber": 57
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "GenerateAeroKitMesh",
+          "lineNumber": 58
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "new GameObject",
+          "lineNumber": 62
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "lightsObj.AddComponent<MeshFilter>",
+          "lineNumber": 67
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "lightsObj.AddComponent<MeshRenderer>",
+          "lineNumber": 68
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "GenerateLightsMesh",
+          "lineNumber": 69
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "CreateSideMirror",
+          "lineNumber": 73
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "CreateSideMirror",
+          "lineNumber": 74
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "CreateExhaust",
+          "lineNumber": 77
+        },
+        {
+          "caller": "BuildSleekSportsCar",
+          "callee": "CreateExhaust",
+          "lineNumber": 78
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Mesh",
+          "lineNumber": 85
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new List<Vector3>",
+          "lineNumber": 97
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new List<Vector2>",
+          "lineNumber": 98
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new List<int>",
+          "lineNumber": 99
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 112
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 113
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 114
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 115
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 116
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 117
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 118
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 119
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 121
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 121
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 121
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 121
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 122
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 122
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 122
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 122
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "uvs.Add",
+          "lineNumber": 126
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector2",
+          "lineNumber": 126
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 143
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 143
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 143
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 144
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 144
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 144
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 151
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 151
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "uvs.Add",
+          "lineNumber": 152
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector2",
+          "lineNumber": 152
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 157
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 158
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 159
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 165
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 165
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "uvs.Add",
+          "lineNumber": 166
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "new Vector2",
+          "lineNumber": 166
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 171
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 172
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 173
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "mesh.SetVertices",
+          "lineNumber": 176
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "mesh.SetUVs",
+          "lineNumber": 177
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "mesh.SetTriangles",
+          "lineNumber": 178
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "mesh.RecalculateNormals",
+          "lineNumber": 179
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "mesh.RecalculateBounds",
+          "lineNumber": 180
+        },
+        {
+          "caller": "GenerateCarBodyMesh",
+          "callee": "mesh.RecalculateTangents",
+          "lineNumber": 181
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Mesh",
+          "lineNumber": 187
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new List<Vector3>",
+          "lineNumber": 195
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new List<Vector2>",
+          "lineNumber": 196
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new List<int>",
+          "lineNumber": 197
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 208
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 209
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "Mathf.Lerp",
+          "lineNumber": 209
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 210
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 211
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 212
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "Mathf.Lerp",
+          "lineNumber": 212
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 213
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 215
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 215
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 215
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 215
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 215
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 215
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "uvs.Add",
+          "lineNumber": 216
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Vector2",
+          "lineNumber": 216
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 231
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 231
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 231
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 232
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 232
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 232
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 238
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 238
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "uvs.Add",
+          "lineNumber": 239
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Vector2",
+          "lineNumber": 239
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 242
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 243
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 244
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "verts.Add",
+          "lineNumber": 250
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Vector3",
+          "lineNumber": 250
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "uvs.Add",
+          "lineNumber": 251
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "new Vector2",
+          "lineNumber": 251
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 254
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 255
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "tris.Add",
+          "lineNumber": 256
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "mesh.SetVertices",
+          "lineNumber": 259
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "mesh.SetUVs",
+          "lineNumber": 260
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "mesh.SetTriangles",
+          "lineNumber": 261
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "mesh.RecalculateNormals",
+          "lineNumber": 262
+        },
+        {
+          "caller": "GenerateCanopyMesh",
+          "callee": "mesh.RecalculateBounds",
+          "lineNumber": 263
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Mesh",
+          "lineNumber": 269
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new List<Vector3>",
+          "lineNumber": 270
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new List<int>",
+          "lineNumber": 271
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 278
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 279
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 280
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 281
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 282
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 283
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 284
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 285
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "verts.Add",
+          "lineNumber": 291
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "tris.AddRange",
+          "lineNumber": 309
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "AddBox",
+          "lineNumber": 313
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 313
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 313
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "AddBox",
+          "lineNumber": 316
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 316
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 316
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "AddBox",
+          "lineNumber": 319
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 319
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 319
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "AddBox",
+          "lineNumber": 322
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 322
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 322
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 322
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "AddBox",
+          "lineNumber": 325
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 325
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 325
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 325
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "AddBox",
+          "lineNumber": 326
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 326
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 326
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 326
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "AddBox",
+          "lineNumber": 329
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 329
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 329
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 329
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "AddBox",
+          "lineNumber": 331
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 331
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 331
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 331
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "AddBox",
+          "lineNumber": 332
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 332
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "new Vector3",
+          "lineNumber": 332
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 332
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "mesh.SetVertices",
+          "lineNumber": 334
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "mesh.SetTriangles",
+          "lineNumber": 335
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "mesh.RecalculateNormals",
+          "lineNumber": 336
+        },
+        {
+          "caller": "GenerateAeroKitMesh",
+          "callee": "mesh.RecalculateBounds",
+          "lineNumber": 337
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new Mesh",
+          "lineNumber": 343
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new List<Vector3>",
+          "lineNumber": 344
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new List<int>",
+          "lineNumber": 345
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new List<int>",
+          "lineNumber": 346
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "verts.Add",
+          "lineNumber": 354
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "verts.Add",
+          "lineNumber": 355
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "verts.Add",
+          "lineNumber": 356
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "verts.Add",
+          "lineNumber": 357
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "tailTris.Add",
+          "lineNumber": 361
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "tailTris.Add",
+          "lineNumber": 361
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "tailTris.Add",
+          "lineNumber": 361
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "tailTris.Add",
+          "lineNumber": 362
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "tailTris.Add",
+          "lineNumber": 362
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "tailTris.Add",
+          "lineNumber": 362
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "headTris.Add",
+          "lineNumber": 366
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "headTris.Add",
+          "lineNumber": 366
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "headTris.Add",
+          "lineNumber": 366
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "headTris.Add",
+          "lineNumber": 367
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "headTris.Add",
+          "lineNumber": 367
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "headTris.Add",
+          "lineNumber": 367
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "AddQuad",
+          "lineNumber": 372
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new Vector3",
+          "lineNumber": 372
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new Vector2",
+          "lineNumber": 372
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 372
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "AddQuad",
+          "lineNumber": 373
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new Vector3",
+          "lineNumber": 373
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new Vector2",
+          "lineNumber": 373
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 373
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "AddQuad",
+          "lineNumber": 376
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new Vector3",
+          "lineNumber": 376
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new Vector2",
+          "lineNumber": 376
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 376
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "AddQuad",
+          "lineNumber": 377
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new Vector3",
+          "lineNumber": 377
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new Vector2",
+          "lineNumber": 377
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 377
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "AddQuad",
+          "lineNumber": 378
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new Vector3",
+          "lineNumber": 378
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "new Vector2",
+          "lineNumber": 378
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 378
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "mesh.SetVertices",
+          "lineNumber": 380
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "mesh.SetTriangles",
+          "lineNumber": 381
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "mesh.SetTriangles",
+          "lineNumber": 382
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "mesh.RecalculateNormals",
+          "lineNumber": 383
+        },
+        {
+          "caller": "GenerateLightsMesh",
+          "callee": "mesh.RecalculateBounds",
+          "lineNumber": 384
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "new GameObject",
+          "lineNumber": 391
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "new Vector3",
+          "lineNumber": 393
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 394
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 397
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "new Vector3",
+          "lineNumber": 400
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "stem.GetComponent<MeshRenderer>",
+          "lineNumber": 401
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "Object.DestroyImmediate",
+          "lineNumber": 402
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "stem.GetComponent<Collider>",
+          "lineNumber": 402
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 405
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "new Vector3",
+          "lineNumber": 407
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "new Vector3",
+          "lineNumber": 408
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "housing.GetComponent<MeshRenderer>",
+          "lineNumber": 409
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "Object.DestroyImmediate",
+          "lineNumber": 410
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "housing.GetComponent<Collider>",
+          "lineNumber": 410
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 413
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "new Vector3",
+          "lineNumber": 415
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 416
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "new Vector3",
+          "lineNumber": 417
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "glass.GetComponent<MeshRenderer>",
+          "lineNumber": 418
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "Object.DestroyImmediate",
+          "lineNumber": 419
+        },
+        {
+          "caller": "CreateSideMirror",
+          "callee": "glass.GetComponent<Collider>",
+          "lineNumber": 419
+        },
+        {
+          "caller": "CreateExhaust",
+          "callee": "new GameObject",
+          "lineNumber": 424
+        },
+        {
+          "caller": "CreateExhaust",
+          "callee": "new Vector3",
+          "lineNumber": 426
+        },
+        {
+          "caller": "CreateExhaust",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 428
+        },
+        {
+          "caller": "CreateExhaust",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 430
+        },
+        {
+          "caller": "CreateExhaust",
+          "callee": "new Vector3",
+          "lineNumber": 431
+        },
+        {
+          "caller": "CreateExhaust",
+          "callee": "tip.GetComponent<MeshRenderer>",
+          "lineNumber": 432
+        },
+        {
+          "caller": "CreateExhaust",
+          "callee": "Object.DestroyImmediate",
+          "lineNumber": 433
+        },
+        {
+          "caller": "CreateExhaust",
+          "callee": "tip.GetComponent<Collider>",
+          "lineNumber": 433
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "new GameObject",
+          "lineNumber": 438
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "new GameObject",
+          "lineNumber": 443
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 449
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 453
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "new Vector3",
+          "lineNumber": 454
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "tire.GetComponent<MeshRenderer>",
+          "lineNumber": 455
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "Object.DestroyImmediate",
+          "lineNumber": 456
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "tire.GetComponent<Collider>",
+          "lineNumber": 456
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 459
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "new Vector3",
+          "lineNumber": 463
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 464
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "new Vector3",
+          "lineNumber": 465
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "rim.GetComponent<MeshRenderer>",
+          "lineNumber": 466
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "Object.DestroyImmediate",
+          "lineNumber": 467
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "rim.GetComponent<Collider>",
+          "lineNumber": 467
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 474
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "new Vector3",
+          "lineNumber": 477
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 478
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "new Vector3",
+          "lineNumber": 479
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "spoke.GetComponent<MeshRenderer>",
+          "lineNumber": 480
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "Object.DestroyImmediate",
+          "lineNumber": 481
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "spoke.GetComponent<Collider>",
+          "lineNumber": 481
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 485
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "new Vector3",
+          "lineNumber": 488
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "Quaternion.Euler",
+          "lineNumber": 489
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "new Vector3",
+          "lineNumber": 490
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "brakeDisc.GetComponent<MeshRenderer>",
+          "lineNumber": 491
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "Object.DestroyImmediate",
+          "lineNumber": 492
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "brakeDisc.GetComponent<Collider>",
+          "lineNumber": 492
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "GameObject.CreatePrimitive",
+          "lineNumber": 494
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "new Vector3",
+          "lineNumber": 497
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "new Vector3",
+          "lineNumber": 498
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "caliper.GetComponent<MeshRenderer>",
+          "lineNumber": 499
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "Object.DestroyImmediate",
+          "lineNumber": 500
+        },
+        {
+          "caller": "CreateHighDetailWheel",
+          "callee": "caliper.GetComponent<Collider>",
+          "lineNumber": 500
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 8,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "Assets/Settings/Mobile_Renderer.asset",
+      "language": "asset",
+      "fileCategory": "code",
+      "totalLines": 52,
+      "nonEmptyLines": 52,
+      "metrics": {}
+    },
+    {
+      "path": "Assets/Settings/Mobile_RPAsset.asset",
+      "language": "asset",
+      "fileCategory": "code",
+      "totalLines": 143,
+      "nonEmptyLines": 143,
+      "metrics": {}
+    },
+    {
+      "path": "Assets/Settings/PC_Renderer.asset",
+      "language": "asset",
+      "fileCategory": "code",
+      "totalLines": 95,
+      "nonEmptyLines": 95,
+      "metrics": {}
+    },
+    {
+      "path": "Assets/Settings/PC_RPAsset.asset",
+      "language": "asset",
+      "fileCategory": "code",
+      "totalLines": 143,
+      "nonEmptyLines": 143,
+      "metrics": {}
+    },
+    {
+      "path": "Docs/AI/UnityProjectContext.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 104,
+      "nonEmptyLines": 76,
+      "sections": [
+        {
+          "heading": "Unity Project Context",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Project Summary",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Confirmed Environment",
+          "level": 2,
+          "line": 12
+        },
+        {
+          "heading": "Important Packages And Frameworks",
+          "level": 2,
+          "line": 19
+        },
+        {
+          "heading": "Directory Structure",
+          "level": 2,
+          "line": 29
+        },
+        {
+          "heading": "Assembly Boundaries",
+          "level": 2,
+          "line": 37
+        },
+        {
+          "heading": "Scenes And Startup Flow",
+          "level": 2,
+          "line": 43
+        },
+        {
+          "heading": "Architecture",
+          "level": 2,
+          "line": 49
+        },
+        {
+          "heading": "Coding Conventions",
+          "level": 2,
+          "line": 58
+        },
+        {
+          "heading": "Testing And Validation",
+          "level": 2,
+          "line": 65
+        },
+        {
+          "heading": "Available Unity Tooling",
+          "level": 2,
+          "line": 72
+        },
+        {
+          "heading": "Important Constraints",
+          "level": 2,
+          "line": 81
+        },
+        {
+          "heading": "Unknowns And Confidence",
+          "level": 2,
+          "line": 87
+        },
+        {
+          "heading": "Source Files Inspected",
+          "level": 2,
+          "line": 92
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 14
+      }
+    },
+    {
+      "path": "Packages/manifest.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 52,
+      "nonEmptyLines": 52,
+      "sections": [
+        {
+          "heading": "dependencies",
+          "level": 1,
+          "line": 2
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    },
+    {
+      "path": "ProjectSettings/DynamicsManager.asset",
+      "language": "asset",
+      "fileCategory": "code",
+      "totalLines": 36,
+      "nonEmptyLines": 36,
+      "metrics": {}
+    },
+    {
+      "path": "ProjectSettings/EditorBuildSettings.asset",
+      "language": "asset",
+      "fileCategory": "code",
+      "totalLines": 13,
+      "nonEmptyLines": 13,
+      "metrics": {}
+    },
+    {
+      "path": "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 11,
+      "nonEmptyLines": 11,
+      "sections": [
+        {
+          "heading": "CustomInstructionsGUID",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "CheckpointEnabled",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "GitInstanceTypeValue",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "CustomGitPath",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "CheckpointRetentionWeeks",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "PlanExecutionPromptDismissed",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "CheckpointDiscoveryBannerDismissed",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "CheckpointDiscoveryUserDisabled",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "CheckpointDiscoveryFlowStarted",
+          "level": 1,
+          "line": 10
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 9
+      }
+    },
+    {
+      "path": "ProjectSettings/ProjectVersion.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 2,
+      "nonEmptyLines": 2,
+      "metrics": {}
+    },
+    {
+      "path": "ProjectSettings/QualitySettings.asset",
+      "language": "asset",
+      "fileCategory": "code",
+      "totalLines": 134,
+      "nonEmptyLines": 134,
+      "metrics": {}
+    },
+    {
+      "path": "ProjectSettings/TagManager.asset",
+      "language": "asset",
+      "fileCategory": "code",
+      "totalLines": 76,
+      "nonEmptyLines": 76,
+      "metrics": {}
+    },
+    {
+      "path": "ProjectSettings/TimeManager.asset",
+      "language": "asset",
+      "fileCategory": "code",
+      "totalLines": 9,
+      "nonEmptyLines": 9,
+      "metrics": {}
+    }
+  ]
+}

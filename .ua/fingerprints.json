@@ -1,0 +1,1184 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "1e49f9978b1a83a88dd964080c61268ae7a7e662",
+  "generatedAt": "2026-09-02T10:33:56.262Z",
+  "files": {
+    "Assets/InputSystem_Actions.inputactions": {
+      "filePath": "Assets/InputSystem_Actions.inputactions",
+      "contentHash": "1c6cbb519d65ecfe19a29231735b7f54741a20ac1a8ad4f46a18e1bfb28a3c39",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1057,
+      "hasStructuralAnalysis": false
+    },
+    "Assets/Scripts/CarCameraFollow.cs": {
+      "filePath": "Assets/Scripts/CarCameraFollow.cs",
+      "contentHash": "41ac5ff82ad761fefeb30611e601b0e9acbf7d98f50fbc644dfc893d084a782a",
+      "functions": [
+        {
+          "name": "Start",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "LateUpdate",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 21
+        }
+      ],
+      "classes": [
+        {
+          "name": "CarCameraFollow",
+          "methods": [
+            "Start",
+            "LateUpdate"
+          ],
+          "properties": [
+            "target",
+            "targetRigidbody",
+            "offset",
+            "positionSmoothSpeed",
+            "rotationSmoothSpeed",
+            "lookAtHeightOffset",
+            "speedFovMultiplier",
+            "cam",
+            "initialFov"
+          ],
+          "exported": true,
+          "lineCount": 41
+        }
+      ],
+      "imports": [
+        {
+          "source": "UnityEngine",
+          "specifiers": [
+            "UnityEngine"
+          ]
+        }
+      ],
+      "exports": [
+        "target",
+        "targetRigidbody",
+        "offset",
+        "positionSmoothSpeed",
+        "rotationSmoothSpeed",
+        "lookAtHeightOffset",
+        "speedFovMultiplier",
+        "CarCameraFollow"
+      ],
+      "totalLines": 47,
+      "hasStructuralAnalysis": true
+    },
+    "Assets/Scripts/CarCannon.cs": {
+      "filePath": "Assets/Scripts/CarCannon.cs",
+      "contentHash": "d6aeda01f5d7ae9356a52b2513b7de834084dfd9c5a7290408aa3d446b3a9b8f",
+      "functions": [
+        {
+          "name": "Awake",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 12
+        },
+        {
+          "name": "Update",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 9
+        },
+        {
+          "name": "WantsToFire",
+          "params": [],
+          "returnType": "bool",
+          "exported": false,
+          "lineCount": 13
+        },
+        {
+          "name": "TryFire",
+          "params": [],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "BuildTurret",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 60
+        },
+        {
+          "name": "FindMaterialOnCar",
+          "params": [],
+          "returnType": "Material",
+          "exported": false,
+          "lineCount": 14
+        },
+        {
+          "name": "MakeMaterial",
+          "params": [
+            "color"
+          ],
+          "returnType": "Material",
+          "exported": false,
+          "lineCount": 8
+        }
+      ],
+      "classes": [
+        {
+          "name": "CarCannon",
+          "methods": [
+            "Awake",
+            "Update",
+            "WantsToFire",
+            "TryFire",
+            "BuildTurret",
+            "FindMaterialOnCar",
+            "MakeMaterial"
+          ],
+          "properties": [
+            "fireInterval",
+            "shellSpeed",
+            "shellDamage",
+            "recoilForce",
+            "playerControlled",
+            "turretLocalPosition",
+            "barrelLength",
+            "barrel",
+            "muzzle",
+            "rb",
+            "nextFireTime",
+            "recoilOffset",
+            "barrelRestPosition",
+            "shellMaterial",
+            "muzzleLight"
+          ],
+          "exported": true,
+          "lineCount": 162
+        }
+      ],
+      "imports": [
+        {
+          "source": "UnityEngine",
+          "specifiers": [
+            "UnityEngine"
+          ]
+        },
+        {
+          "source": "UnityEngine.InputSystem",
+          "specifiers": [
+            "InputSystem"
+          ]
+        }
+      ],
+      "exports": [
+        "fireInterval",
+        "shellSpeed",
+        "shellDamage",
+        "recoilForce",
+        "playerControlled",
+        "turretLocalPosition",
+        "barrelLength",
+        "barrel",
+        "muzzle",
+        "TryFire",
+        "CarCannon"
+      ],
+      "totalLines": 173,
+      "hasStructuralAnalysis": true
+    },
+    "Assets/Scripts/CarController.cs": {
+      "filePath": "Assets/Scripts/CarController.cs",
+      "contentHash": "55f0519b02077f3a2a92df7e82e91e07d56611c86f2603688a301ad7521bb41a",
+      "functions": [
+        {
+          "name": "Awake",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 16
+        },
+        {
+          "name": "CreateWheelColliders",
+          "params": [],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "CreateWheelColliders",
+          "params": [
+            "root",
+            "wheels",
+            "radius"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "ApplyFrictionlessBodyMaterial",
+          "params": [],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "ApplyFrictionlessBodyMaterial",
+          "params": [
+            "car"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "Update",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 13
+        },
+        {
+          "name": "FixedUpdate",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 15
+        },
+        {
+          "name": "ReadInput",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 31
+        },
+        {
+          "name": "SetInput",
+          "params": [
+            "throttle",
+            "steering",
+            "braking"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "CheckGrounded",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "CalculateSpeed",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 4
+        },
+        {
+          "name": "ApplyMotor",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 49
+        },
+        {
+          "name": "ApplyCoastDeceleration",
+          "params": [
+            "forwardSpeed"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 6
+        },
+        {
+          "name": "ApplySteering",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 20
+        },
+        {
+          "name": "ApplyFriction",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 10
+        },
+        {
+          "name": "ApplyDownforce",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "UpdateWheelVisuals",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 28
+        },
+        {
+          "name": "UpdateAudio",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 6
+        },
+        {
+          "name": "ResetCar",
+          "params": [],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "OnGUI",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 27
+        }
+      ],
+      "classes": [
+        {
+          "name": "CarController",
+          "methods": [
+            "Awake",
+            "CreateWheelColliders",
+            "CreateWheelColliders",
+            "ApplyFrictionlessBodyMaterial",
+            "ApplyFrictionlessBodyMaterial",
+            "Update",
+            "FixedUpdate",
+            "ReadInput",
+            "SetInput",
+            "CheckGrounded",
+            "CalculateSpeed",
+            "ApplyMotor",
+            "ApplyCoastDeceleration",
+            "ApplySteering",
+            "ApplyFriction",
+            "ApplyDownforce",
+            "UpdateWheelVisuals",
+            "UpdateAudio",
+            "ResetCar",
+            "OnGUI"
+          ],
+          "properties": [
+            "frontLeftWheel",
+            "frontRightWheel",
+            "rearLeftWheel",
+            "rearRightWheel",
+            "wheelRadius",
+            "motorTorque",
+            "maxSpeed",
+            "brakeForce",
+            "reverseTorque",
+            "maxSteerAngle",
+            "steerSpeed",
+            "grip",
+            "downforce",
+            "coastDeceleration",
+            "centerOfMassOffset",
+            "engineAudio",
+            "playerControlled",
+            "currentSpeedKmh",
+            "currentSteerAngle",
+            "isGrounded",
+            "rb",
+            "moveInput",
+            "steerInput",
+            "isBraking",
+            "lastGroundedPos",
+            "lastGroundedRot",
+            "SpeedKmh"
+          ],
+          "exported": true,
+          "lineCount": 362
+        }
+      ],
+      "imports": [
+        {
+          "source": "UnityEngine",
+          "specifiers": [
+            "UnityEngine"
+          ]
+        },
+        {
+          "source": "UnityEngine.InputSystem",
+          "specifiers": [
+            "InputSystem"
+          ]
+        }
+      ],
+      "exports": [
+        "frontLeftWheel",
+        "frontRightWheel",
+        "rearLeftWheel",
+        "rearRightWheel",
+        "wheelRadius",
+        "motorTorque",
+        "maxSpeed",
+        "brakeForce",
+        "reverseTorque",
+        "maxSteerAngle",
+        "steerSpeed",
+        "grip",
+        "downforce",
+        "coastDeceleration",
+        "centerOfMassOffset",
+        "engineAudio",
+        "playerControlled",
+        "SpeedKmh",
+        "CreateWheelColliders",
+        "ApplyFrictionlessBodyMaterial",
+        "SetInput",
+        "ResetCar",
+        "CarController"
+      ],
+      "totalLines": 369,
+      "hasStructuralAnalysis": true
+    },
+    "Assets/Scripts/CarHealth.cs": {
+      "filePath": "Assets/Scripts/CarHealth.cs",
+      "contentHash": "e5f0287fe2894afc47f71a7b8c516fa5b8f5ada00f48e7836eb01c36a1e67d88",
+      "functions": [
+        {
+          "name": "Awake",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 6
+        },
+        {
+          "name": "Update",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "OnCollisionEnter",
+          "params": [
+            "collision"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 30
+        },
+        {
+          "name": "TakeDamage",
+          "params": [
+            "amount"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "Heal",
+          "params": [
+            "amount"
+          ],
+          "returnType": "void",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "Die",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 15
+        },
+        {
+          "name": "Respawn",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 19
+        },
+        {
+          "name": "SetControlsEnabled",
+          "params": [
+            "enabled"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "TintWreck",
+          "params": [
+            "wrecked"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 25
+        },
+        {
+          "name": "SpawnExplosion",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 6
+        },
+        {
+          "name": "OnGUI",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "DrawScreenBar",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 6
+        },
+        {
+          "name": "DrawWorldBar",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 12
+        },
+        {
+          "name": "DrawBar",
+          "params": [
+            "rect",
+            "withText"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 27
+        },
+        {
+          "name": "Start",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 17
+        },
+        {
+          "name": "Update",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 16
+        },
+        {
+          "name": "OnDestroy",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 4
+        }
+      ],
+      "classes": [
+        {
+          "name": "CarHealth",
+          "methods": [
+            "Awake",
+            "Update",
+            "OnCollisionEnter",
+            "TakeDamage",
+            "Heal",
+            "Die",
+            "Respawn",
+            "SetControlsEnabled",
+            "TintWreck",
+            "SpawnExplosion",
+            "OnGUI",
+            "DrawScreenBar",
+            "DrawWorldBar",
+            "DrawBar"
+          ],
+          "properties": [
+            "maxHealth",
+            "currentHealth",
+            "minImpactSpeed",
+            "damagePerImpactSpeed",
+            "maxCollisionDamage",
+            "collisionDamageCooldown",
+            "respawnDelay",
+            "respawnOnDeath",
+            "showScreenBar",
+            "showWorldBar",
+            "logImpacts",
+            "Health",
+            "IsDead",
+            "rb",
+            "lastCollisionDamageTime",
+            "respawnTimer",
+            "renderers",
+            "propertyBlock",
+            "BaseColorId",
+            "ColorId"
+          ],
+          "exported": true,
+          "lineCount": 239
+        },
+        {
+          "name": "ExplosionFlash",
+          "methods": [
+            "Start",
+            "Update",
+            "OnDestroy"
+          ],
+          "properties": [
+            "duration",
+            "maxRadius",
+            "time",
+            "sphere",
+            "flashLight",
+            "material"
+          ],
+          "exported": true,
+          "lineCount": 50
+        }
+      ],
+      "imports": [
+        {
+          "source": "System",
+          "specifiers": [
+            "System"
+          ]
+        },
+        {
+          "source": "UnityEngine",
+          "specifiers": [
+            "UnityEngine"
+          ]
+        }
+      ],
+      "exports": [
+        "maxHealth",
+        "minImpactSpeed",
+        "damagePerImpactSpeed",
+        "maxCollisionDamage",
+        "collisionDamageCooldown",
+        "respawnDelay",
+        "respawnOnDeath",
+        "showScreenBar",
+        "showWorldBar",
+        "logImpacts",
+        "Health",
+        "IsDead",
+        "TakeDamage",
+        "Heal",
+        "CarHealth",
+        "duration",
+        "maxRadius",
+        "ExplosionFlash"
+      ],
+      "totalLines": 303,
+      "hasStructuralAnalysis": true
+    },
+    "Assets/Scripts/OpponentDriver.cs": {
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "contentHash": "5aae32fdf61bbdb789c6a885032c62de06219168ae95698c8d64a758a41de47c",
+      "functions": [
+        {
+          "name": "Awake",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 30
+        },
+        {
+          "name": "Update",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 24
+        },
+        {
+          "name": "BuildRoute",
+          "params": [],
+          "returnType": "Vector3[]",
+          "exported": false,
+          "lineCount": 19
+        },
+        {
+          "name": "AdvancePassedWaypoints",
+          "params": [],
+          "returnType": "Vector3",
+          "exported": false,
+          "lineCount": 15
+        },
+        {
+          "name": "FindNearestWaypoint",
+          "params": [],
+          "returnType": "int",
+          "exported": false,
+          "lineCount": 17
+        },
+        {
+          "name": "IsValidRoute",
+          "params": [
+            "points"
+          ],
+          "returnType": "bool",
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "OnDisable",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 4
+        }
+      ],
+      "classes": [
+        {
+          "name": "OpponentDriver",
+          "methods": [
+            "Awake",
+            "Update",
+            "BuildRoute",
+            "AdvancePassedWaypoints",
+            "FindNearestWaypoint",
+            "IsValidRoute",
+            "OnDisable"
+          ],
+          "properties": [
+            "car",
+            "waypoints",
+            "targetSpeedKmh",
+            "laneOffset",
+            "WaypointRadius",
+            "route",
+            "waypointIndex",
+            "overturnedTime"
+          ],
+          "exported": true,
+          "lineCount": 140
+        }
+      ],
+      "imports": [
+        {
+          "source": "UnityEngine",
+          "specifiers": [
+            "UnityEngine"
+          ]
+        }
+      ],
+      "exports": [
+        "car",
+        "waypoints",
+        "targetSpeedKmh",
+        "laneOffset",
+        "OpponentDriver"
+      ],
+      "totalLines": 146,
+      "hasStructuralAnalysis": true
+    },
+    "Assets/Scripts/ProceduralCarBuilder.cs": {
+      "filePath": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "contentHash": "bdf76f865fa3a6c7a1cb51177b0008e62dedd58b7a431252ba937a4d9be7dde0",
+      "functions": [
+        {
+          "name": "BuildSleekSportsCar",
+          "params": [
+            "bodyPaintMat",
+            "carbonDarkMat",
+            "glassMat",
+            "tireMat",
+            "rimMat",
+            "brakeMat",
+            "headlightMat",
+            "taillightMat",
+            "interiorMat"
+          ],
+          "returnType": "GameObject",
+          "exported": true,
+          "lineCount": 74
+        },
+        {
+          "name": "GenerateCarBodyMesh",
+          "params": [],
+          "returnType": "Mesh",
+          "exported": false,
+          "lineCount": 101
+        },
+        {
+          "name": "GenerateCanopyMesh",
+          "params": [],
+          "returnType": "Mesh",
+          "exported": false,
+          "lineCount": 81
+        },
+        {
+          "name": "GenerateAeroKitMesh",
+          "params": [],
+          "returnType": "Mesh",
+          "exported": false,
+          "lineCount": 73
+        },
+        {
+          "name": "GenerateLightsMesh",
+          "params": [],
+          "returnType": "Mesh",
+          "exported": false,
+          "lineCount": 46
+        },
+        {
+          "name": "CreateSideMirror",
+          "params": [
+            "parent",
+            "carbonMat",
+            "glassMat",
+            "isLeft"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 33
+        },
+        {
+          "name": "CreateExhaust",
+          "params": [
+            "parent",
+            "carbonMat",
+            "chromeMat",
+            "xPos"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 13
+        },
+        {
+          "name": "CreateHighDetailWheel",
+          "params": [
+            "name",
+            "parent",
+            "localPos",
+            "tireMat",
+            "rimMat",
+            "brakeMat"
+          ],
+          "returnType": "Transform",
+          "exported": true,
+          "lineCount": 68
+        }
+      ],
+      "classes": [
+        {
+          "name": "ProceduralCarBuilder",
+          "methods": [
+            "BuildSleekSportsCar",
+            "GenerateCarBodyMesh",
+            "GenerateCanopyMesh",
+            "GenerateAeroKitMesh",
+            "GenerateLightsMesh",
+            "CreateSideMirror",
+            "CreateExhaust",
+            "CreateHighDetailWheel"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 499
+        }
+      ],
+      "imports": [
+        {
+          "source": "System.Collections.Generic",
+          "specifiers": [
+            "Generic"
+          ]
+        },
+        {
+          "source": "UnityEngine",
+          "specifiers": [
+            "UnityEngine"
+          ]
+        }
+      ],
+      "exports": [
+        "BuildSleekSportsCar",
+        "CreateHighDetailWheel",
+        "ProceduralCarBuilder"
+      ],
+      "totalLines": 506,
+      "hasStructuralAnalysis": true
+    },
+    "Assets/Scripts/Projectile.cs": {
+      "filePath": "Assets/Scripts/Projectile.cs",
+      "contentHash": "66027056a6b8b990ebc682a0de035be6cc49d89cc16e64e09d94acff3fb00a44",
+      "functions": [
+        {
+          "name": "Spawn",
+          "params": [
+            "owner",
+            "position",
+            "velocity",
+            "damage",
+            "material"
+          ],
+          "returnType": "Projectile",
+          "exported": true,
+          "lineCount": 31
+        },
+        {
+          "name": "Awake",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "OnCollisionEnter",
+          "params": [
+            "collision"
+          ],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 26
+        }
+      ],
+      "classes": [
+        {
+          "name": "Projectile",
+          "methods": [
+            "Spawn",
+            "Awake",
+            "OnCollisionEnter"
+          ],
+          "properties": [
+            "damage",
+            "lifetime",
+            "hitImpulse",
+            "owner",
+            "rb",
+            "consumed"
+          ],
+          "exported": true,
+          "lineCount": 76
+        }
+      ],
+      "imports": [
+        {
+          "source": "UnityEngine",
+          "specifiers": [
+            "UnityEngine"
+          ]
+        }
+      ],
+      "exports": [
+        "damage",
+        "lifetime",
+        "hitImpulse",
+        "Spawn",
+        "Projectile"
+      ],
+      "totalLines": 86,
+      "hasStructuralAnalysis": true
+    },
+    "Assets/Scripts/TargetCar.cs": {
+      "filePath": "Assets/Scripts/TargetCar.cs",
+      "contentHash": "a00548dd3e485c96e00a68f50b3ec8ecc73c23c0936275fc54e7cf9fbc566ff2",
+      "functions": [
+        {
+          "name": "Awake",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 31
+        },
+        {
+          "name": "FixedUpdate",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "ReturnToStart",
+          "params": [],
+          "returnType": "void",
+          "exported": false,
+          "lineCount": 6
+        }
+      ],
+      "classes": [
+        {
+          "name": "TargetCar",
+          "methods": [
+            "Awake",
+            "FixedUpdate",
+            "ReturnToStart"
+          ],
+          "properties": [
+            "wheelRadius",
+            "rollingDeceleration",
+            "rb",
+            "hasController",
+            "startPosition",
+            "startRotation"
+          ],
+          "exported": true,
+          "lineCount": 63
+        }
+      ],
+      "imports": [
+        {
+          "source": "UnityEngine",
+          "specifiers": [
+            "UnityEngine"
+          ]
+        }
+      ],
+      "exports": [
+        "wheelRadius",
+        "rollingDeceleration",
+        "TargetCar"
+      ],
+      "totalLines": 75,
+      "hasStructuralAnalysis": true
+    },
+    "Assets/Settings/Mobile_Renderer.asset": {
+      "filePath": "Assets/Settings/Mobile_Renderer.asset",
+      "contentHash": "aa93274c9521fa941170becec9e87c5fa36b8587eefd5eeb5c0eed0d1d4b1dbe",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 53,
+      "hasStructuralAnalysis": false
+    },
+    "Assets/Settings/Mobile_RPAsset.asset": {
+      "filePath": "Assets/Settings/Mobile_RPAsset.asset",
+      "contentHash": "ba642b95fe751d42a081a346b4dee94ced67b3e7c8ed8c4f2929f6eb51d55b18",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 144,
+      "hasStructuralAnalysis": false
+    },
+    "Assets/Settings/PC_Renderer.asset": {
+      "filePath": "Assets/Settings/PC_Renderer.asset",
+      "contentHash": "3d0b01d8ded3327263b6690be128a3de58d17c514943ae42fe743a3e084a9c79",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 96,
+      "hasStructuralAnalysis": false
+    },
+    "Assets/Settings/PC_RPAsset.asset": {
+      "filePath": "Assets/Settings/PC_RPAsset.asset",
+      "contentHash": "7cfa894e760f2aa087d24b2fa260e2efa497b58b89d52e4c2b28371cf6336aaf",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 144,
+      "hasStructuralAnalysis": false
+    },
+    "Docs/AI/UnityProjectContext.md": {
+      "filePath": "Docs/AI/UnityProjectContext.md",
+      "contentHash": "0c8f6333a69e74d08f1c3f06c0a80470a2b9d88aec935b0ca9899697439a9517",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 105,
+      "hasStructuralAnalysis": true
+    },
+    "Packages/manifest.json": {
+      "filePath": "Packages/manifest.json",
+      "contentHash": "e17568d73b2f42a76534e2ba829f29ee5f3d82007316b696acb2ed68c95d8114",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 53,
+      "hasStructuralAnalysis": true
+    },
+    "ProjectSettings/DynamicsManager.asset": {
+      "filePath": "ProjectSettings/DynamicsManager.asset",
+      "contentHash": "b7c9a9dc08b98990109d4346f68745e15e238de400f96c583e53e1c83c743a78",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 37,
+      "hasStructuralAnalysis": false
+    },
+    "ProjectSettings/EditorBuildSettings.asset": {
+      "filePath": "ProjectSettings/EditorBuildSettings.asset",
+      "contentHash": "746171162169ec7b3f70ac4a8c2fd7c3c94d982ff2cf1da6d10986fd56757a95",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": false
+    },
+    "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json": {
+      "filePath": "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "contentHash": "0458dd8377fcd691e99cb4392b6c3370666fb421948e867705dd604941d29b27",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "ProjectSettings/ProjectVersion.txt": {
+      "filePath": "ProjectSettings/ProjectVersion.txt",
+      "contentHash": "e06e05029943a1f6537d7cf3ca00ae2fb38dfe68d41075504802051e78c1d707",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3,
+      "hasStructuralAnalysis": false
+    },
+    "ProjectSettings/QualitySettings.asset": {
+      "filePath": "ProjectSettings/QualitySettings.asset",
+      "contentHash": "6814d6cc3eb850dd7d2a069a8b17ba9f7591deba8b1758a855978bd9c8627643",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 135,
+      "hasStructuralAnalysis": false
+    },
+    "ProjectSettings/TagManager.asset": {
+      "filePath": "ProjectSettings/TagManager.asset",
+      "contentHash": "23fc56b484aa3d7edf5914cd3591f7a823ccef5e3f3496f8a51f30388ead63dc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 77,
+      "hasStructuralAnalysis": false
+    },
+    "ProjectSettings/TimeManager.asset": {
+      "filePath": "ProjectSettings/TimeManager.asset",
+      "contentHash": "1a83e54adbbda7c9f4851103a0c6ab7f6448a3343d4ea5b7620452fa08416ecd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 10,
+      "hasStructuralAnalysis": false
+    }
+  }
+}

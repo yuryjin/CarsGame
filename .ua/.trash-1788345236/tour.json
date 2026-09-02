@@ -1,0 +1,94 @@
+[
+  {
+    "order": 1,
+    "title": "Обзор проекта и его окружение",
+    "description": "Начните с автосгенерированного контекста проекта: он описывает CarsGame как односценовый прототип аркадной гонки со стрельбой, где весь геймплей собран из MonoBehaviour-скриптов в Assets/Scripts (пространство имён RacingGame), связанных сериализованными ссылками в единственной сцене SampleScene. Кодового entry point здесь нет — сцена сама поднимает компоненты при запуске. ProjectVersion.txt фиксирует редактор Unity 6000.5.9f1, а manifest.json объявляет ключевые зависимости — URP 17.5.0, Input System 1.20.0 и AI Assistant, — от которых напрямую зависят и скрипты, и ассеты, с которыми мы познакомимся дальше.",
+    "nodeIds": [
+      "document:Docs/AI/UnityProjectContext.md",
+      "document:ProjectSettings/ProjectVersion.txt",
+      "config:Packages/manifest.json"
+    ],
+    "languageLesson": "Unity-проект не имеет функции main: точкой входа служит сцена из списка сборки, а жизненный цикл кода определяют callback-методы MonoBehaviour (Awake, Start, Update, FixedUpdate). Packages/manifest.json — аналог package.json: Unity Package Manager разрешает по нему версии пакетов, а точный результат разрешения фиксируется в packages-lock.json."
+  },
+  {
+    "order": 2,
+    "title": "Ввод и настройки физики",
+    "description": "Прежде чем читать код управления машиной, посмотрите на три ассета, которые задают его окружение. InputSystem_Actions.inputactions описывает action map Player (Move, Attack и др.) и привязки для клавиатуры, геймпада и тача — именно эти действия читает контроллер игрока. DynamicsManager.asset задаёт PhysX-параметры (гравитация −9.81, итерации солвера, матрица столкновений слоёв), а TimeManager.asset — фиксированный шаг 0.02 с (50 Гц), который определяет, как часто вызывается FixedUpdate. Все три ассета в графе помечены как configures для CarController: без них поведение физики машины понять нельзя.",
+    "nodeIds": [
+      "config:Assets/InputSystem_Actions.inputactions",
+      "config:ProjectSettings/DynamicsManager.asset",
+      "config:ProjectSettings/TimeManager.asset"
+    ],
+    "languageLesson": "Файлы ProjectSettings/*.asset — это YAML с заголовком %YAML 1.1 и тегами вида --- !u!55 &1, где число после !u! — тип сериализуемого объекта Unity. Ассет .inputactions хранится как обычный JSON: массив maps → actions → bindings, где каждая привязка ссылается на устройство путём вида <Gamepad>/leftStick."
+  },
+  {
+    "order": 3,
+    "title": "CarController — ядро физики машины",
+    "description": "CarController — структурный центр проекта: на него ссылаются 8 узлов графа (импорты OpponentDriver, CarHealth, TargetCar и configures-связи от настроек из шага 2). В FixedUpdate он реализует Rigidbody-физику — тягу, торможение, руление, боковое сцепление и прижимную силу, — а также вращает колёса и озвучивает двигатель. Ключевое проектное решение: контроллер не знает, кто им управляет. Ввод приходит либо от игрока через Unity Input System, либо извне через метод SetInput, а ResetCar позволяет вернуть машину в исходное состояние — этим позже воспользуются AI и система здоровья.",
+    "nodeIds": [
+      "file:Assets/Scripts/CarController.cs"
+    ],
+    "languageLesson": "В Unity вся работа с Rigidbody (AddForce, изменение velocity) выполняется в FixedUpdate — он вызывается с фиксированным шагом из TimeManager независимо от частоты кадров, поэтому силы применяются детерминированно. Чтение ввода при этом уместно делать в Update и кешировать до следующего физического шага."
+  },
+  {
+    "order": 4,
+    "title": "AI-оппоненты на waypoint-маршруте",
+    "description": "OpponentDriver показывает, зачем контроллеру из шага 3 нужен метод SetInput: AI не трогает физику напрямую, а лишь подаёт газ, руль и тормоз в тот же CarController, что и игрок. Маршрут строится из упорядоченных дочерних трансформов объекта Track_Markings в сцене, к которым добавляется смещение полосы, чтобы три соперника не ехали по одной линии. Водитель вычисляет угол до следующей точки, переводит его в руление и скорость, а перевернувшуюся машину автоматически сбрасывает через ResetCar. Так слой AI-оппонентов целиком опирается на слой физики, ничего в нём не дублируя.",
+    "nodeIds": [
+      "file:Assets/Scripts/OpponentDriver.cs"
+    ]
+  },
+  {
+    "order": 5,
+    "title": "Боевой контур: пушка, снаряд, здоровье",
+    "description": "Три скрипта образуют единственный тесно связанный кластер графа (4 взаимных ссылки) и читаются только вместе. CarCannon при старте процедурно собирает башню на крыше и по нажатию ЛКМ/Ctrl/правого бампера порождает Projectile, отдавая импульс отдачи в Rigidbody. Projectile через статическую фабрику Spawn создаёт сферу, игнорирует коллизии со стрелявшей машиной и при первом контакте наносит урон CarHealth. CarHealth замыкает цикл: он также считает урон от сильных боковых столкновений, при нуле HP превращает машину в обломок, отключает управление и пушку, а через задержку возрождает её вызовом CarController.ResetCar из шага 3.",
+    "nodeIds": [
+      "file:Assets/Scripts/CarCannon.cs",
+      "file:Assets/Scripts/Projectile.cs",
+      "file:Assets/Scripts/CarHealth.cs"
+    ],
+    "languageLesson": "Статический фабричный метод (static factory) вроде Projectile.Spawn(...) — распространённый в Unity приём вместо префабов: он создаёт GameObject, навешивает компоненты через AddComponent<T>() и настраивает их за один вызов. Physics.IgnoreCollision позволяет точечно выключить столкновение двух коллайдеров, не меняя глобальную матрицу слоёв из DynamicsManager."
+  },
+  {
+    "order": 6,
+    "title": "TargetCar — пассивная мишень",
+    "description": "TargetCar — машина без водителя, по которой можно стрелять и которую можно таранить. Она не использует CarController как компонент, но переиспользует его статические методы, чтобы настроить ту же физику: массу, сферические коллайдеры колёс и материал без трения. Это иллюстрирует второй способ повторного использования кода в проекте — не через SetInput, а через общие статические хелперы. Мишень подписывается на событие CarHealth.OnRespawned из шага 5, чтобы после уничтожения и возрождения вернуться на исходную позицию.",
+    "nodeIds": [
+      "file:Assets/Scripts/TargetCar.cs"
+    ],
+    "languageLesson": "C#-события (event Action) — стандартный способ ослабить связность между компонентами Unity: CarHealth просто сообщает «я возродился», не зная о TargetCar. Подписку обычно делают в OnEnable, а отписку — в OnDisable, иначе уничтоженный объект останется в списке подписчиков и вызовет MissingReferenceException."
+  },
+  {
+    "order": 7,
+    "title": "Камера и процедурный кузов",
+    "description": "Слой презентации не влияет на геймплей, но делает его видимым. CarCameraFollow в LateUpdate плавно подтягивает камеру к точке позади машины игрока, поворачивает её на точку впереди и расширяет поле зрения (FOV) в зависимости от скорости Rigidbody из шага 3, усиливая ощущение разгона. ProceduralCarBuilder — статический строитель, который генерирует меши кузова, стеклянного фонаря, аэрообвеса и фар по кольцевым сечениям и собирает зеркала, выхлопы и детализированные колёса: в проекте нет готовых 3D-моделей, вся геометрия рождается в коде.",
+    "nodeIds": [
+      "file:Assets/Scripts/CarCameraFollow.cs",
+      "file:Assets/Scripts/ProceduralCarBuilder.cs"
+    ],
+    "languageLesson": "LateUpdate вызывается после всех Update и FixedUpdate текущего кадра, поэтому камера в нём видит уже финальную позицию машины и не дрожит. Процедурные меши в Unity строятся через класс Mesh: массивы vertices, triangles (индексы по три, обход по часовой стрелке для лицевой стороны), normals и uv, после чего вызывается RecalculateBounds."
+  },
+  {
+    "order": 8,
+    "title": "Рендеринг: URP-профили и качество",
+    "description": "Картинка из шага 7 проходит через Universal Render Pipeline, сконфигурированный двумя парами ассетов. PC_RPAsset включает HDR, RenderScale 1.0 и 4 каскада теней и ссылается на PC_Renderer с Deferred-режимом и эффектом Screen Space Ambient Occlusion; Mobile_RPAsset снижает RenderScale до 0.8 и использует один каскад теней, а Mobile_Renderer — облегчённый Forward-рендерер без дополнительных фич. QualitySettings.asset связывает всё воедино: два уровня качества, Mobile и PC (активен PC), каждый через customRenderPipeline привязан к своему URP-ассету, а дефолтный уровень выбирается по платформе.",
+    "nodeIds": [
+      "config:Assets/Settings/PC_RPAsset.asset",
+      "config:Assets/Settings/PC_Renderer.asset",
+      "config:Assets/Settings/Mobile_RPAsset.asset",
+      "config:Assets/Settings/Mobile_Renderer.asset",
+      "config:ProjectSettings/QualitySettings.asset"
+    ],
+    "languageLesson": "В URP есть два уровня конфигурации: Pipeline Asset (глобальные параметры — HDR, тени, масштаб рендера) и Renderer Data (способ отрисовки — Forward или Deferred — плюс список renderer features). Ссылки между ассетами в YAML хранятся как {fileID, guid, type}, поэтому переименование файла безопасно, а вот потеря .meta-файла с GUID рвёт связь."
+  },
+  {
+    "order": 9,
+    "title": "Сцены, теги и инструменты редактора",
+    "description": "Завершают картину три служебных настройки. EditorBuildSettings.asset содержит список сцен сборки — единственную SampleScene, которая и является фактической точкой входа проекта, — а также ссылку на проектный action asset Input System из шага 2. TagManager.asset показывает, что пользовательские теги и слои не заданы: проект обходится встроенными слоями (Default, UI и т. д.) и стандартными Light Layer для URP, что согласуется с полностью открытой матрицей столкновений из DynamicsManager. Settings.json пакета AI Assistant включает git-чекпоинты с хранением 2 недели — это инструмент разработки, а не часть игры, но он объясняет, откуда взялся автосгенерированный контекст из шага 1.",
+    "nodeIds": [
+      "config:ProjectSettings/EditorBuildSettings.asset",
+      "config:ProjectSettings/TagManager.asset",
+      "config:ProjectSettings/Packages/com.unity.ai.assistant/Settings.json"
+    ]
+  }
+]

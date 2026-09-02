@@ -17,7 +17,7 @@
   "Assets/Scripts/CarHealth.cs": {
     "mtime": 1788221079.793407,
     "ast_hash": "40bbc477a20853fd1b7e82e1d2b961a5",
-    "semantic_hash": ""
+    "semantic_hash": "40bbc477a20853fd1b7e82e1d2b961a5"
   },
   "Assets/Scripts/OpponentDriver.cs": {
     "mtime": 1788220396.7104754,
@@ -57,16 +57,41 @@
   "Assets/Scripts/TargetCar.cs": {
     "mtime": 1788220866.9372952,
     "ast_hash": "15efae4edc7bf3ccbf1360fbfad322bc",
-    "semantic_hash": ""
+    "semantic_hash": "15efae4edc7bf3ccbf1360fbfad322bc"
   },
   "Docs/AI/UnityProjectContext.md": {
     "mtime": 1788220584.2575562,
     "ast_hash": "57c261760e0e9e0a8e83dd1befcb62c6",
-    "semantic_hash": ""
+    "semantic_hash": "57c261760e0e9e0a8e83dd1befcb62c6"
   },
   "ProjectSettings/ProjectVersion.txt": {
     "mtime": 1788211606.44273,
     "ast_hash": "7a203d1c668295c334102ae7e4a42936",
+    "semantic_hash": "7a203d1c668295c334102ae7e4a42936"
+  },
+  "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json": {
+    "mtime": 1788219423.8831112,
+    "ast_hash": "",
+    "semantic_hash": ""
+  },
+  "ProjectSettings/SceneTemplateSettings.json": {
+    "mtime": 1788218597.2737906,
+    "ast_hash": "",
+    "semantic_hash": ""
+  },
+  ".ua/tmp/ua-build-batch-2.py": {
+    "mtime": 1788344408.4382331,
+    "ast_hash": "ef5dacc32601c7087f7e07ccf8f4a772",
+    "semantic_hash": ""
+  },
+  ".ua/tmp/import-stderr.txt": {
+    "mtime": 1788344191.0444074,
+    "ast_hash": "12f3ea86bb6f34650a596e1b3ea36a92",
+    "semantic_hash": ""
+  },
+  ".ua/tmp/scan-stderr.txt": {
+    "mtime": 1788344175.9180675,
+    "ast_hash": "9f2789a86cce9de72ae2f88d43bb93e3",
     "semantic_hash": ""
   }
 }

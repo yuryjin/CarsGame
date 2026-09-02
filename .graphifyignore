@@ -37,3 +37,5 @@ UserSettings/
 # Agent scratch
 .claude/
 graphify-out/
+# Understand Anything data dir (knowledge graph, fingerprints)
+.ua/

@@ -1,0 +1,3 @@
+Loaded 22 files (18 code).
+Info: compute-batches: merged 16 small batches (16 files) into 1 misc batches — singletons and orphans consolidated
+Wrote 3 batches (sizes: max=16, min=3) to /home/user/projects/games/Unity/newgames/CarsGame/.ua/intermediate/batches.json

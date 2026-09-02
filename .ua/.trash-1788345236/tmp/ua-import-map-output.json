@@ -1,0 +1,32 @@
+{
+  "scriptCompleted": true,
+  "stats": {
+    "filesScanned": 22,
+    "filesWithImports": 0,
+    "totalEdges": 0
+  },
+  "importMap": {
+    "Assets/InputSystem_Actions.inputactions": [],
+    "Assets/Scripts/CarCameraFollow.cs": [],
+    "Assets/Scripts/CarCannon.cs": [],
+    "Assets/Scripts/CarController.cs": [],
+    "Assets/Scripts/CarHealth.cs": [],
+    "Assets/Scripts/OpponentDriver.cs": [],
+    "Assets/Scripts/ProceduralCarBuilder.cs": [],
+    "Assets/Scripts/Projectile.cs": [],
+    "Assets/Scripts/TargetCar.cs": [],
+    "Assets/Settings/Mobile_Renderer.asset": [],
+    "Assets/Settings/Mobile_RPAsset.asset": [],
+    "Assets/Settings/PC_Renderer.asset": [],
+    "Assets/Settings/PC_RPAsset.asset": [],
+    "Docs/AI/UnityProjectContext.md": [],
+    "Packages/manifest.json": [],
+    "ProjectSettings/DynamicsManager.asset": [],
+    "ProjectSettings/EditorBuildSettings.asset": [],
+    "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json": [],
+    "ProjectSettings/ProjectVersion.txt": [],
+    "ProjectSettings/QualitySettings.asset": [],
+    "ProjectSettings/TagManager.asset": [],
+    "ProjectSettings/TimeManager.asset": []
+  }
+}

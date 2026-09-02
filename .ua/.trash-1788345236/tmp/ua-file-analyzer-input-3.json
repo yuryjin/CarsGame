@@ -1,0 +1,22 @@
+{
+  "projectRoot": "/home/user/projects/games/Unity/newgames/CarsGame",
+  "batchFiles": [
+    {"path": "Assets/InputSystem_Actions.inputactions", "language": "inputactions", "sizeLines": 1056, "fileCategory": "code"},
+    {"path": "Assets/Scripts/CarCameraFollow.cs", "language": "csharp", "sizeLines": 46, "fileCategory": "code"},
+    {"path": "Assets/Scripts/ProceduralCarBuilder.cs", "language": "csharp", "sizeLines": 505, "fileCategory": "code"},
+    {"path": "Assets/Settings/Mobile_Renderer.asset", "language": "asset", "sizeLines": 52, "fileCategory": "code"},
+    {"path": "Assets/Settings/Mobile_RPAsset.asset", "language": "asset", "sizeLines": 143, "fileCategory": "code"},
+    {"path": "Assets/Settings/PC_Renderer.asset", "language": "asset", "sizeLines": 95, "fileCategory": "code"},
+    {"path": "Assets/Settings/PC_RPAsset.asset", "language": "asset", "sizeLines": 143, "fileCategory": "code"},
+    {"path": "Docs/AI/UnityProjectContext.md", "language": "markdown", "sizeLines": 104, "fileCategory": "docs"},
+    {"path": "Packages/manifest.json", "language": "json", "sizeLines": 52, "fileCategory": "config"},
+    {"path": "ProjectSettings/DynamicsManager.asset", "language": "asset", "sizeLines": 36, "fileCategory": "code"},
+    {"path": "ProjectSettings/EditorBuildSettings.asset", "language": "asset", "sizeLines": 13, "fileCategory": "code"},
+    {"path": "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json", "language": "json", "sizeLines": 10, "fileCategory": "config"},
+    {"path": "ProjectSettings/ProjectVersion.txt", "language": "txt", "sizeLines": 2, "fileCategory": "docs"},
+    {"path": "ProjectSettings/QualitySettings.asset", "language": "asset", "sizeLines": 134, "fileCategory": "code"},
+    {"path": "ProjectSettings/TagManager.asset", "language": "asset", "sizeLines": 76, "fileCategory": "code"},
+    {"path": "ProjectSettings/TimeManager.asset", "language": "asset", "sizeLines": 9, "fileCategory": "code"}
+  ],
+  "batchImportData": {}
+}

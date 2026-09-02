@@ -1,0 +1,82 @@
+{
+  "Assets/Scripts/CarCameraFollow.cs": {
+    "mtime": 1788217277.1455486,
+    "ast_hash": "3fab0b5c58c7f56abaca39da2669b1f2",
+    "semantic_hash": "3fab0b5c58c7f56abaca39da2669b1f2"
+  },
+  "Assets/Scripts/CarCannon.cs": {
+    "mtime": 1788220096.5191927,
+    "ast_hash": "bf59dbc065d3563f271f8290cafe5f29",
+    "semantic_hash": "bf59dbc065d3563f271f8290cafe5f29"
+  },
+  "Assets/Scripts/CarController.cs": {
+    "mtime": 1788220396.5104709,
+    "ast_hash": "79dc22ea3a5f37112dd0ca61baf6cd95",
+    "semantic_hash": "79dc22ea3a5f37112dd0ca61baf6cd95"
+  },
+  "Assets/Scripts/CarHealth.cs": {
+    "mtime": 1788221079.793407,
+    "ast_hash": "40bbc477a20853fd1b7e82e1d2b961a5",
+    "semantic_hash": "40bbc477a20853fd1b7e82e1d2b961a5"
+  },
+  "Assets/Scripts/OpponentDriver.cs": {
+    "mtime": 1788220396.7104754,
+    "ast_hash": "c2f3779cac3eae14b0436a6495aa810b",
+    "semantic_hash": "c2f3779cac3eae14b0436a6495aa810b"
+  },
+  "Assets/Scripts/ProceduralCarBuilder.cs": {
+    "mtime": 1788219387.7245507,
+    "ast_hash": "9ce4d491512d1a70db416cd6083918b3",
+    "semantic_hash": "9ce4d491512d1a70db416cd6083918b3"
+  },
+  "Assets/Scripts/Projectile.cs": {
+    "mtime": 1788220096.5151927,
+    "ast_hash": "c99b17da678594e1b85562081280138c",
+    "semantic_hash": "c99b17da678594e1b85562081280138c"
+  },
+  "Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs": {
+    "mtime": 1788211512.6017916,
+    "ast_hash": "495d312368d1780508d6f46f0b35705c",
+    "semantic_hash": "495d312368d1780508d6f46f0b35705c"
+  },
+  "Assets/TutorialInfo/Scripts/Readme.cs": {
+    "mtime": 1788211512.6017916,
+    "ast_hash": "927655e7fd40aab43030236dee149080",
+    "semantic_hash": "927655e7fd40aab43030236dee149080"
+  },
+  "Packages/manifest.json": {
+    "mtime": 1788216899.9850335,
+    "ast_hash": "504b2c13aea12ab2e059ec71ad6a9001",
+    "semantic_hash": "504b2c13aea12ab2e059ec71ad6a9001"
+  },
+  "Packages/packages-lock.json": {
+    "mtime": 1788217126.9514422,
+    "ast_hash": "82f59e804fb92a9dd1a511cacd017d88",
+    "semantic_hash": "82f59e804fb92a9dd1a511cacd017d88"
+  },
+  "Assets/Scripts/TargetCar.cs": {
+    "mtime": 1788220866.9372952,
+    "ast_hash": "15efae4edc7bf3ccbf1360fbfad322bc",
+    "semantic_hash": "15efae4edc7bf3ccbf1360fbfad322bc"
+  },
+  "Docs/AI/UnityProjectContext.md": {
+    "mtime": 1788220584.2575562,
+    "ast_hash": "57c261760e0e9e0a8e83dd1befcb62c6",
+    "semantic_hash": "57c261760e0e9e0a8e83dd1befcb62c6"
+  },
+  "ProjectSettings/ProjectVersion.txt": {
+    "mtime": 1788211606.44273,
+    "ast_hash": "7a203d1c668295c334102ae7e4a42936",
+    "semantic_hash": "7a203d1c668295c334102ae7e4a42936"
+  },
+  "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json": {
+    "mtime": 1788219423.8831112,
+    "ast_hash": "48991ff28a42215e99a89971c967f58d",
+    "semantic_hash": "48991ff28a42215e99a89971c967f58d"
+  },
+  "ProjectSettings/SceneTemplateSettings.json": {
+    "mtime": 1788218597.2737906,
+    "ast_hash": "eeb26e313b89cd9334b828428a4847ef",
+    "semantic_hash": "eeb26e313b89cd9334b828428a4847ef"
+  }
+}

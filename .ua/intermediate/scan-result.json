@@ -1,0 +1,189 @@
+{
+  "name": "CarsGame",
+  "description": "Небольшой однoсценовый прототип аркадной гонки со стрельбой на Unity 6 (URP, Unity Input System): процедурная трасса, один автомобиль игрока на Rigidbody-физике, три AI-оппонента, пушка со снарядами и система здоровья/разрушения машин. Весь игровой код — C# MonoBehaviour-скрипты в Assets/Scripts в пространстве имён RacingGame.",
+  "languages": [
+    "csharp",
+    "json",
+    "markdown",
+    "yaml"
+  ],
+  "frameworks": [
+    "Unity",
+    "Universal Render Pipeline (URP)",
+    "Unity Input System"
+  ],
+  "files": [
+    {
+      "path": "Assets/InputSystem_Actions.inputactions",
+      "language": "inputactions",
+      "sizeLines": 1056,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarCameraFollow.cs",
+      "language": "csharp",
+      "sizeLines": 46,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarCannon.cs",
+      "language": "csharp",
+      "sizeLines": 172,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarController.cs",
+      "language": "csharp",
+      "sizeLines": 368,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/CarHealth.cs",
+      "language": "csharp",
+      "sizeLines": 302,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/OpponentDriver.cs",
+      "language": "csharp",
+      "sizeLines": 145,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "language": "csharp",
+      "sizeLines": 505,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/Projectile.cs",
+      "language": "csharp",
+      "sizeLines": 85,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Scripts/TargetCar.cs",
+      "language": "csharp",
+      "sizeLines": 74,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/Mobile_Renderer.asset",
+      "language": "asset",
+      "sizeLines": 52,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/Mobile_RPAsset.asset",
+      "language": "asset",
+      "sizeLines": 143,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/PC_Renderer.asset",
+      "language": "asset",
+      "sizeLines": 95,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Assets/Settings/PC_RPAsset.asset",
+      "language": "asset",
+      "sizeLines": 143,
+      "fileCategory": "code"
+    },
+    {
+      "path": "Docs/AI/UnityProjectContext.md",
+      "language": "markdown",
+      "sizeLines": 104,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "Packages/manifest.json",
+      "language": "json",
+      "sizeLines": 52,
+      "fileCategory": "config"
+    },
+    {
+      "path": "ProjectSettings/DynamicsManager.asset",
+      "language": "asset",
+      "sizeLines": 36,
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/EditorBuildSettings.asset",
+      "language": "asset",
+      "sizeLines": 13,
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json",
+      "language": "json",
+      "sizeLines": 10,
+      "fileCategory": "config"
+    },
+    {
+      "path": "ProjectSettings/ProjectVersion.txt",
+      "language": "txt",
+      "sizeLines": 2,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "ProjectSettings/QualitySettings.asset",
+      "language": "asset",
+      "sizeLines": 134,
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/TagManager.asset",
+      "language": "asset",
+      "sizeLines": 76,
+      "fileCategory": "code"
+    },
+    {
+      "path": "ProjectSettings/TimeManager.asset",
+      "language": "asset",
+      "sizeLines": 9,
+      "fileCategory": "code"
+    }
+  ],
+  "totalFiles": 22,
+  "filteredByIgnore": 95,
+  "estimatedComplexity": "small",
+  "importMap": {
+    "Assets/InputSystem_Actions.inputactions": [],
+    "Assets/Scripts/CarCameraFollow.cs": [],
+    "Assets/Scripts/CarCannon.cs": [
+      "Assets/Scripts/Projectile.cs"
+    ],
+    "Assets/Scripts/CarController.cs": [],
+    "Assets/Scripts/CarHealth.cs": [
+      "Assets/Scripts/CarCannon.cs",
+      "Assets/Scripts/CarController.cs",
+      "Assets/Scripts/Projectile.cs"
+    ],
+    "Assets/Scripts/OpponentDriver.cs": [
+      "Assets/Scripts/CarController.cs"
+    ],
+    "Assets/Scripts/ProceduralCarBuilder.cs": [],
+    "Assets/Scripts/Projectile.cs": [
+      "Assets/Scripts/CarHealth.cs"
+    ],
+    "Assets/Scripts/TargetCar.cs": [
+      "Assets/Scripts/CarController.cs",
+      "Assets/Scripts/CarHealth.cs"
+    ],
+    "Assets/Settings/Mobile_Renderer.asset": [],
+    "Assets/Settings/Mobile_RPAsset.asset": [],
+    "Assets/Settings/PC_Renderer.asset": [],
+    "Assets/Settings/PC_RPAsset.asset": [],
+    "Docs/AI/UnityProjectContext.md": [],
+    "Packages/manifest.json": [],
+    "ProjectSettings/DynamicsManager.asset": [],
+    "ProjectSettings/EditorBuildSettings.asset": [],
+    "ProjectSettings/Packages/com.unity.ai.assistant/Settings.json": [],
+    "ProjectSettings/ProjectVersion.txt": [],
+    "ProjectSettings/QualitySettings.asset": [],
+    "ProjectSettings/TagManager.asset": [],
+    "ProjectSettings/TimeManager.asset": []
+  }
+}

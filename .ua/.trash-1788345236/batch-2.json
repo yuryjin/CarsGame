@@ -1,0 +1,746 @@
+{
+  "nodes": [
+    {
+      "id": "file:Assets/Scripts/CarController.cs",
+      "type": "file",
+      "name": "CarController.cs",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "summary": "Реализует физику автомобиля на Rigidbody: тягу, торможение, руление, боковое сцепление, прижимную силу, визуальное вращение колёс и звук двигателя. Читает ввод игрока через Unity Input System (клавиатура/геймпад) либо принимает команды от AI через SetInput и рисует HUD-спидометр с подсказками через OnGUI.",
+      "tags": [
+        "monobehaviour",
+        "физика-автомобиля",
+        "input-system",
+        "игровой-контроллер",
+        "hud"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Атрибут [RequireComponent(typeof(Rigidbody))] гарантирует наличие Rigidbody на объекте. Публичные поля с [Header] сериализуются в Inspector Unity; [SerializeField] private показывает приватное состояние в редакторе. Статические методы CreateWheelColliders и ApplyFrictionlessBodyMaterial имеют приватные перегрузки-обёртки без параметров, что позволяет переиспользовать настройку физики из TargetCar. Сцепление шин моделируется вручную, поэтому все коллайдеры получают PhysicsMaterial с нулевым трением."
+    },
+    {
+      "id": "file:Assets/Scripts/OpponentDriver.cs",
+      "type": "file",
+      "name": "OpponentDriver.cs",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "summary": "AI-водитель оппонента: строит маршрут из дочерних waypoint-трансформов со смещением полосы, вычисляет угол до следующей точки и подаёт газ/руль/тормоз в CarController через SetInput. Автоматически сбрасывает перевернувшуюся машину через ResetCar.",
+      "tags": [
+        "monobehaviour",
+        "ai",
+        "waypoint-навигация",
+        "оппонент",
+        "игровой-контроллер"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Класс объявлен sealed и требует CarController через [RequireComponent]. Используется Debug.Assert для проверки маршрута на дубликаты waypoint-ов; при невалидном маршруте компонент отключает сам себя (enabled = false)."
+    },
+    {
+      "id": "file:Assets/Scripts/TargetCar.cs",
+      "type": "file",
+      "name": "TargetCar.cs",
+      "filePath": "Assets/Scripts/TargetCar.cs",
+      "summary": "Машина-мишень без водителя, по которой можно стрелять и таранить. Без CarController самостоятельно настраивает ту же физику (масса, сферические коллайдеры колёс, материал без трения) через статические методы CarController, применяет сопротивление качению и возвращается на стартовую позицию после уничтожения по событию CarHealth.OnRespawned.",
+      "tags": [
+        "monobehaviour",
+        "мишень",
+        "физика-автомобиля",
+        "respawn",
+        "event-handler"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "[RequireComponent(typeof(Rigidbody), typeof(CarHealth))] задаёт зависимости компонента. Подписка на событие health.OnRespawned += ReturnToStart — типичный паттерн делегатов/событий C#; XML-документация /// <summary> с <see cref=\"CarController\"/> используется для описания класса."
+    },
+    {
+      "id": "class:Assets/Scripts/CarController.cs:CarController",
+      "type": "class",
+      "name": "CarController",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        6,
+        367
+      ],
+      "summary": "MonoBehaviour-контроллер автомобиля: управляет Rigidbody через силы и импульсы в FixedUpdate, обрабатывает ввод игрока или внешние команды, отвечает за сброс машины и HUD.",
+      "tags": [
+        "monobehaviour",
+        "физика-автомобиля",
+        "игровой-контроллер",
+        "компонент"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:Assets/Scripts/OpponentDriver.cs:OpponentDriver",
+      "type": "class",
+      "name": "OpponentDriver",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        5,
+        144
+      ],
+      "summary": "Sealed MonoBehaviour, ведущий машину оппонента по кольцевому маршруту из waypoint-ов и передающий управляющие сигналы в CarController.",
+      "tags": [
+        "monobehaviour",
+        "ai",
+        "waypoint-навигация",
+        "компонент"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:Assets/Scripts/TargetCar.cs:TargetCar",
+      "type": "class",
+      "name": "TargetCar",
+      "filePath": "Assets/Scripts/TargetCar.cs",
+      "lineRange": [
+        11,
+        73
+      ],
+      "summary": "MonoBehaviour для бесхозной машины-мишени: настраивает физику как у игрока при отсутствии CarController, гасит скорость и возвращается на старт после респауна.",
+      "tags": [
+        "monobehaviour",
+        "мишень",
+        "respawn",
+        "компонент"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:Awake",
+      "type": "function",
+      "name": "Awake",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        48,
+        63
+      ],
+      "summary": "Инициализирует Rigidbody (масса 1250 кг, центр масс, демпфирование, непрерывная детекция столкновений), создаёт колёсные коллайдеры, применяет материал без трения и запоминает стартовую позицию для сброса.",
+      "tags": [
+        "lifecycle",
+        "инициализация",
+        "физика"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:CreateWheelColliders",
+      "type": "function",
+      "name": "CreateWheelColliders",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        74,
+        88
+      ],
+      "summary": "Статический метод: создаёт дочерние GameObject со SphereCollider в позициях колёс, чтобы машина катилась через бордюры и ступеньки трассы. Используется также TargetCar.",
+      "tags": [
+        "static",
+        "физика",
+        "коллайдеры",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ApplyFrictionlessBodyMaterial",
+      "type": "function",
+      "name": "ApplyFrictionlessBodyMaterial",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        99,
+        114
+      ],
+      "summary": "Статический метод: назначает всем коллайдерам машины PhysicsMaterial с нулевым трением и отскоком, так как сцепление моделируется скриптом. Используется также TargetCar.",
+      "tags": [
+        "static",
+        "физика",
+        "physics-material",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:Update",
+      "type": "function",
+      "name": "Update",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        116,
+        128
+      ],
+      "summary": "Покадровый цикл: читает ввод игрока (если playerControlled), обновляет визуал колёс и звук, сбрасывает машину при падении ниже -10 или по клавише R.",
+      "tags": [
+        "lifecycle",
+        "game-loop",
+        "input"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:FixedUpdate",
+      "type": "function",
+      "name": "FixedUpdate",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        130,
+        144
+      ],
+      "summary": "Физический цикл: проверяет контакт с землёй, считает скорость, применяет мотор, руление, сцепление и прижимную силу; запоминает последнюю безопасную позицию при медленном движении.",
+      "tags": [
+        "lifecycle",
+        "физика",
+        "game-loop"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ReadInput",
+      "type": "function",
+      "name": "ReadInput",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        146,
+        176
+      ],
+      "summary": "Считывает управление с клавиатуры (WASD/стрелки/пробел) и геймпада (левый стик, триггеры, кнопка A) через Unity Input System в moveInput, steerInput и isBraking.",
+      "tags": [
+        "input-system",
+        "клавиатура",
+        "геймпад"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:SetInput",
+      "type": "function",
+      "name": "SetInput",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        178,
+        183
+      ],
+      "summary": "Публичный API для внешнего управления (AI): задаёт газ, руль и тормоз с ограничением диапазона [-1, 1].",
+      "tags": [
+        "public-api",
+        "input",
+        "ai"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ApplyMotor",
+      "type": "function",
+      "name": "ApplyMotor",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        196,
+        244
+      ],
+      "summary": "Основная логика тяги: импульсное торможение с ограничением до полной остановки, разгон вперёд с падением силы к maxSpeed, реверс и торможение при смене направления, накат через ApplyCoastDeceleration.",
+      "tags": [
+        "физика",
+        "мотор",
+        "торможение"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ApplySteering",
+      "type": "function",
+      "name": "ApplySteering",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        255,
+        274
+      ],
+      "summary": "Плавно доводит угол руля к целевому (уменьшая максимум на высокой скорости) и прикладывает крутящий момент вокруг оси Y пропорционально скорости.",
+      "tags": [
+        "физика",
+        "руление",
+        "torque"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ApplyFriction",
+      "type": "function",
+      "name": "ApplyFriction",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        276,
+        285
+      ],
+      "summary": "Имитирует сцепление шин: гасит боковую составляющую скорости импульсом, ослабляя сцепление при торможении для заноса.",
+      "tags": [
+        "физика",
+        "сцепление",
+        "боковая-сила"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:UpdateWheelVisuals",
+      "type": "function",
+      "name": "UpdateWheelVisuals",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        296,
+        323
+      ],
+      "summary": "Поворачивает передние колёса на угол руления и вращает меши всех четырёх колёс пропорционально скорости.",
+      "tags": [
+        "визуал",
+        "колёса",
+        "анимация"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:ResetCar",
+      "type": "function",
+      "name": "ResetCar",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        332,
+        338
+      ],
+      "summary": "Публичный метод сброса: обнуляет скорости и телепортирует машину на последнюю безопасную позицию с ориентацией по горизонту.",
+      "tags": [
+        "public-api",
+        "respawn",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/CarController.cs:OnGUI",
+      "type": "function",
+      "name": "OnGUI",
+      "filePath": "Assets/Scripts/CarController.cs",
+      "lineRange": [
+        340,
+        366
+      ],
+      "summary": "Рисует IMGUI-оверлей со спидометром в км/ч и подсказками по управлению (на русском) для машины игрока.",
+      "tags": [
+        "hud",
+        "imgui",
+        "ui"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:Awake",
+      "type": "function",
+      "name": "Awake",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        18,
+        47
+      ],
+      "summary": "Находит CarController, отключает управление игроком, валидирует наличие минимум трёх waypoint-ов, строит маршрут, проверяет его на дубликаты и разворачивает машину к ближайшей точке маршрута.",
+      "tags": [
+        "lifecycle",
+        "инициализация",
+        "валидация"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:Update",
+      "type": "function",
+      "name": "Update",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        49,
+        72
+      ],
+      "summary": "Каждый кадр вычисляет угол до целевого waypoint-а, преобразует его в руление, снижает целевую скорость в поворотах, тормозит при превышении и вызывает car.SetInput; после 2 секунд переворота сбрасывает машину через car.ResetCar.",
+      "tags": [
+        "ai",
+        "game-loop",
+        "waypoint-навигация"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:BuildRoute",
+      "type": "function",
+      "name": "BuildRoute",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        74,
+        92
+      ],
+      "summary": "Строит массив точек маршрута из дочерних трансформов waypoints, смещая каждую точку вбок по касательной на laneOffset, чтобы оппоненты ехали по разным полосам.",
+      "tags": [
+        "waypoint-навигация",
+        "маршрут",
+        "геометрия"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:AdvancePassedWaypoints",
+      "type": "function",
+      "name": "AdvancePassedWaypoints",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        94,
+        108
+      ],
+      "summary": "Продвигает индекс waypoint-а, пропуская уже пройденные точки (в радиусе или позади машины), и возвращает горизонтальный вектор до следующей цели.",
+      "tags": [
+        "waypoint-навигация",
+        "ai"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:FindNearestWaypoint",
+      "type": "function",
+      "name": "FindNearestWaypoint",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        110,
+        126
+      ],
+      "summary": "Возвращает индекс ближайшей по горизонтали точки маршрута к текущей позиции машины.",
+      "tags": [
+        "waypoint-навигация",
+        "поиск",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/OpponentDriver.cs:IsValidRoute",
+      "type": "function",
+      "name": "IsValidRoute",
+      "filePath": "Assets/Scripts/OpponentDriver.cs",
+      "lineRange": [
+        128,
+        138
+      ],
+      "summary": "Статическая проверка, что соседние точки маршрута не совпадают (расстояние по горизонтали не меньше 0.5 м).",
+      "tags": [
+        "static",
+        "валидация",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/TargetCar.cs:Awake",
+      "type": "function",
+      "name": "Awake",
+      "filePath": "Assets/Scripts/TargetCar.cs",
+      "lineRange": [
+        23,
+        53
+      ],
+      "summary": "Определяет наличие CarController; без него настраивает Rigidbody как у игрока и вызывает CarController.CreateWheelColliders/ApplyFrictionlessBodyMaterial. Запоминает стартовую позу, настраивает отображение полосы здоровья CarHealth и подписывается на OnRespawned.",
+      "tags": [
+        "lifecycle",
+        "инициализация",
+        "физика",
+        "event-handler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:Assets/Scripts/TargetCar.cs:FixedUpdate",
+      "type": "function",
+      "name": "FixedUpdate",
+      "filePath": "Assets/Scripts/TargetCar.cs",
+      "lineRange": [
+        55,
+        65
+      ],
+      "summary": "Для машины без контроллера применяет импульс сопротивления качению, чтобы сдвинутая мишень постепенно останавливалась.",
+      "tags": [
+        "физика",
+        "game-loop"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "class:Assets/Scripts/CarController.cs:CarController",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "class:Assets/Scripts/OpponentDriver.cs:OpponentDriver",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "class:Assets/Scripts/TargetCar.cs:TargetCar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:Awake",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:CreateWheelColliders",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ApplyFrictionlessBodyMaterial",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:Update",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:FixedUpdate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ReadInput",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:SetInput",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ApplyMotor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ApplySteering",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ApplyFriction",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:UpdateWheelVisuals",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ResetCar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:OnGUI",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:Awake",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:Update",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:BuildRoute",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:AdvancePassedWaypoints",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:FindNearestWaypoint",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "function:Assets/Scripts/OpponentDriver.cs:IsValidRoute",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "function:Assets/Scripts/TargetCar.cs:Awake",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "function:Assets/Scripts/TargetCar.cs:FixedUpdate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "class:Assets/Scripts/CarController.cs:CarController",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "class:Assets/Scripts/OpponentDriver.cs:OpponentDriver",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "class:Assets/Scripts/TargetCar.cs:TargetCar",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:CreateWheelColliders",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ApplyFrictionlessBodyMaterial",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:SetInput",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/CarController.cs",
+      "target": "function:Assets/Scripts/CarController.cs:ResetCar",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "file:Assets/Scripts/CarHealth.cs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:Assets/Scripts/OpponentDriver.cs:Update",
+      "target": "function:Assets/Scripts/CarController.cs:SetInput",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/OpponentDriver.cs:Update",
+      "target": "function:Assets/Scripts/CarController.cs:ResetCar",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/TargetCar.cs:Awake",
+      "target": "function:Assets/Scripts/CarController.cs:CreateWheelColliders",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:Assets/Scripts/TargetCar.cs:Awake",
+      "target": "function:Assets/Scripts/CarController.cs:ApplyFrictionlessBodyMaterial",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:Assets/Scripts/OpponentDriver.cs",
+      "target": "file:Assets/Scripts/CarController.cs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:Assets/Scripts/TargetCar.cs",
+      "target": "file:Assets/Scripts/CarHealth.cs",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}
