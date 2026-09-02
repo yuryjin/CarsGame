@@ -79,19 +79,9 @@
     "ast_hash": "",
     "semantic_hash": ""
   },
-  ".ua/tmp/ua-build-batch-2.py": {
-    "mtime": 1788344408.4382331,
-    "ast_hash": "ef5dacc32601c7087f7e07ccf8f4a772",
-    "semantic_hash": ""
-  },
-  ".ua/tmp/import-stderr.txt": {
-    "mtime": 1788344191.0444074,
-    "ast_hash": "12f3ea86bb6f34650a596e1b3ea36a92",
-    "semantic_hash": ""
-  },
-  ".ua/tmp/scan-stderr.txt": {
-    "mtime": 1788344175.9180675,
-    "ast_hash": "9f2789a86cce9de72ae2f88d43bb93e3",
+  "graphify-out/memory/query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md": {
+    "mtime": 1788345763.1011965,
+    "ast_hash": "12b1cfe0d7757693b2d3330331ae3161",
     "semantic_hash": ""
   }
 }

@@ -34,6 +34,44 @@
   },
   "nodes": [
     {
+      "label": "CarCameraFollow",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarCameraFollow.cs",
+      "source_location": "L5",
+      "metadata": {
+        "namespace": "RacingGame",
+        "scope_chain": [
+          "s20"
+        ]
+      },
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "assets_scripts_carcamerafollow_racinggame_carcamerafollow",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "carcamerafollow"
+    },
+    {
+      "label": "ExplosionFlash",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarHealth.cs",
+      "source_location": "L252",
+      "metadata": {
+        "namespace": "RacingGame",
+        "scope_chain": [
+          "s34"
+        ]
+      },
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "assets_scripts_carhealth_racinggame_explosionflash",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "explosionflash"
+    },
+    {
       "label": "Projectile",
       "file_type": "code",
       "source_file": "Assets/Scripts/Projectile.cs",
@@ -49,8 +87,27 @@
       "_origin": "ast",
       "id": "assets_scripts_projectile_racinggame_projectile",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": "projectile"
+    },
+    {
+      "label": "TargetCar",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/TargetCar.cs",
+      "source_location": "L11",
+      "metadata": {
+        "namespace": "RacingGame",
+        "scope_chain": [
+          "s20"
+        ]
+      },
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "assets_scripts_targetcar_racinggame_targetcar",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "targetcar"
     },
     {
       "label": "CarHealth",
@@ -70,25 +127,6 @@
       "community": 11,
       "community_name": "CarHealth",
       "norm_label": "carhealth"
-    },
-    {
-      "label": "ExplosionFlash",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/CarHealth.cs",
-      "source_location": "L252",
-      "metadata": {
-        "namespace": "RacingGame",
-        "scope_chain": [
-          "s34"
-        ]
-      },
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "assets_scripts_carhealth_racinggame_explosionflash",
-      "community": 11,
-      "community_name": "CarHealth",
-      "norm_label": "explosionflash"
     },
     {
       "label": "CarCannon",
@@ -167,44 +205,6 @@
       "norm_label": "opponentdriver"
     },
     {
-      "label": "CarCameraFollow",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/CarCameraFollow.cs",
-      "source_location": "L5",
-      "metadata": {
-        "namespace": "RacingGame",
-        "scope_chain": [
-          "s20"
-        ]
-      },
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "assets_scripts_carcamerafollow_racinggame_carcamerafollow",
-      "community": 24,
-      "community_name": "CarCameraFollow",
-      "norm_label": "carcamerafollow"
-    },
-    {
-      "label": "TargetCar",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/TargetCar.cs",
-      "source_location": "L11",
-      "metadata": {
-        "namespace": "RacingGame",
-        "scope_chain": [
-          "s20"
-        ]
-      },
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "assets_scripts_targetcar_racinggame_targetcar",
-      "community": 73,
-      "community_name": "TargetCar",
-      "norm_label": "targetcar"
-    },
-    {
       "label": "ReadmeEditor",
       "file_type": "code",
       "source_file": "Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
@@ -247,6 +247,96 @@
       "norm_label": "section"
     },
     {
+      "label": ".LateUpdate()",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarCameraFollow.cs",
+      "source_location": "L24",
+      "metadata": {
+        "namespace": "RacingGame",
+        "scope_chain": [
+          "s20"
+        ]
+      },
+      "_callable": true,
+      "_origin": "ast",
+      "id": "assets_scripts_carcamerafollow_racinggame_carcamerafollow_lateupdate",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": ".lateupdate()"
+    },
+    {
+      "label": ".Start()",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarCameraFollow.cs",
+      "source_location": "L18",
+      "metadata": {
+        "namespace": "RacingGame",
+        "scope_chain": [
+          "s20"
+        ]
+      },
+      "_callable": true,
+      "_origin": "ast",
+      "id": "assets_scripts_carcamerafollow_racinggame_carcamerafollow_start",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": ".start()"
+    },
+    {
+      "label": ".OnDestroy()",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarHealth.cs",
+      "source_location": "L297",
+      "metadata": {
+        "namespace": "RacingGame",
+        "scope_chain": [
+          "s34"
+        ]
+      },
+      "_callable": true,
+      "_origin": "ast",
+      "id": "assets_scripts_carhealth_racinggame_explosionflash_ondestroy",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": ".ondestroy()"
+    },
+    {
+      "label": ".Start()",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarHealth.cs",
+      "source_location": "L262",
+      "metadata": {
+        "namespace": "RacingGame",
+        "scope_chain": [
+          "s34"
+        ]
+      },
+      "_callable": true,
+      "_origin": "ast",
+      "id": "assets_scripts_carhealth_racinggame_explosionflash_start",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": ".start()"
+    },
+    {
+      "label": ".Update()",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarHealth.cs",
+      "source_location": "L280",
+      "metadata": {
+        "namespace": "RacingGame",
+        "scope_chain": [
+          "s34"
+        ]
+      },
+      "_callable": true,
+      "_origin": "ast",
+      "id": "assets_scripts_carhealth_racinggame_explosionflash_update",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": ".update()"
+    },
+    {
       "label": ".Awake()",
       "file_type": "code",
       "source_file": "Assets/Scripts/Projectile.cs",
@@ -261,7 +351,7 @@
       "_origin": "ast",
       "id": "assets_scripts_projectile_racinggame_projectile_awake",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": ".awake()"
     },
     {
@@ -279,7 +369,7 @@
       "_origin": "ast",
       "id": "assets_scripts_projectile_racinggame_projectile_oncollisionenter",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": ".oncollisionenter()"
     },
     {
@@ -297,8 +387,44 @@
       "_origin": "ast",
       "id": "assets_scripts_projectile_racinggame_projectile_spawn",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": ".spawn()"
+    },
+    {
+      "label": ".FixedUpdate()",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/TargetCar.cs",
+      "source_location": "L55",
+      "metadata": {
+        "namespace": "RacingGame",
+        "scope_chain": [
+          "s20"
+        ]
+      },
+      "_callable": true,
+      "_origin": "ast",
+      "id": "assets_scripts_targetcar_racinggame_targetcar_fixedupdate",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": ".fixedupdate()"
+    },
+    {
+      "label": ".ReturnToStart()",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/TargetCar.cs",
+      "source_location": "L67",
+      "metadata": {
+        "namespace": "RacingGame",
+        "scope_chain": [
+          "s20"
+        ]
+      },
+      "_callable": true,
+      "_origin": "ast",
+      "id": "assets_scripts_targetcar_racinggame_targetcar_returntostart",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": ".returntostart()"
     },
     {
       "label": ".Awake()",
@@ -548,60 +674,6 @@
       "_callable": true,
       "_origin": "ast",
       "id": "assets_scripts_carhealth_racinggame_carhealth_update",
-      "community": 11,
-      "community_name": "CarHealth",
-      "norm_label": ".update()"
-    },
-    {
-      "label": ".OnDestroy()",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/CarHealth.cs",
-      "source_location": "L297",
-      "metadata": {
-        "namespace": "RacingGame",
-        "scope_chain": [
-          "s34"
-        ]
-      },
-      "_callable": true,
-      "_origin": "ast",
-      "id": "assets_scripts_carhealth_racinggame_explosionflash_ondestroy",
-      "community": 11,
-      "community_name": "CarHealth",
-      "norm_label": ".ondestroy()"
-    },
-    {
-      "label": ".Start()",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/CarHealth.cs",
-      "source_location": "L262",
-      "metadata": {
-        "namespace": "RacingGame",
-        "scope_chain": [
-          "s34"
-        ]
-      },
-      "_callable": true,
-      "_origin": "ast",
-      "id": "assets_scripts_carhealth_racinggame_explosionflash_start",
-      "community": 11,
-      "community_name": "CarHealth",
-      "norm_label": ".start()"
-    },
-    {
-      "label": ".Update()",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/CarHealth.cs",
-      "source_location": "L280",
-      "metadata": {
-        "namespace": "RacingGame",
-        "scope_chain": [
-          "s34"
-        ]
-      },
-      "_callable": true,
-      "_origin": "ast",
-      "id": "assets_scripts_carhealth_racinggame_explosionflash_update",
       "community": 11,
       "community_name": "CarHealth",
       "norm_label": ".update()"
@@ -1345,102 +1417,6 @@
       "norm_label": ".awake()"
     },
     {
-      "label": ".LateUpdate()",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/CarCameraFollow.cs",
-      "source_location": "L24",
-      "metadata": {
-        "namespace": "RacingGame",
-        "scope_chain": [
-          "s20"
-        ]
-      },
-      "_callable": true,
-      "_origin": "ast",
-      "id": "assets_scripts_carcamerafollow_racinggame_carcamerafollow_lateupdate",
-      "community": 24,
-      "community_name": "CarCameraFollow",
-      "norm_label": ".lateupdate()"
-    },
-    {
-      "label": ".Start()",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/CarCameraFollow.cs",
-      "source_location": "L18",
-      "metadata": {
-        "namespace": "RacingGame",
-        "scope_chain": [
-          "s20"
-        ]
-      },
-      "_callable": true,
-      "_origin": "ast",
-      "id": "assets_scripts_carcamerafollow_racinggame_carcamerafollow_start",
-      "community": 24,
-      "community_name": "CarCameraFollow",
-      "norm_label": ".start()"
-    },
-    {
-      "label": ".FixedUpdate()",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/TargetCar.cs",
-      "source_location": "L55",
-      "metadata": {
-        "namespace": "RacingGame",
-        "scope_chain": [
-          "s20"
-        ]
-      },
-      "_callable": true,
-      "_origin": "ast",
-      "id": "assets_scripts_targetcar_racinggame_targetcar_fixedupdate",
-      "community": 73,
-      "community_name": "TargetCar",
-      "norm_label": ".fixedupdate()"
-    },
-    {
-      "label": ".ReturnToStart()",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/TargetCar.cs",
-      "source_location": "L67",
-      "metadata": {
-        "namespace": "RacingGame",
-        "scope_chain": [
-          "s20"
-        ]
-      },
-      "_callable": true,
-      "_origin": "ast",
-      "id": "assets_scripts_targetcar_racinggame_targetcar_returntostart",
-      "community": 73,
-      "community_name": "TargetCar",
-      "norm_label": ".returntostart()"
-    },
-    {
-      "label": "edge()",
-      "file_type": "code",
-      "source_file": ".ua/tmp/ua-build-batch-2.py",
-      "source_location": "L5",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "ua_tmp_ua_build_batch_2_edge",
-      "community": 75,
-      "community_name": "ua-build-batch-2.py",
-      "norm_label": "edge()"
-    },
-    {
-      "label": "node()",
-      "file_type": "code",
-      "source_file": ".ua/tmp/ua-build-batch-2.py",
-      "source_location": "L4",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "ua_tmp_ua_build_batch_2_node",
-      "community": 75,
-      "community_name": "ua-build-batch-2.py",
-      "norm_label": "node()"
-    },
-    {
       "label": ".Init()",
       "file_type": "code",
       "source_file": "Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
@@ -1867,6 +1843,160 @@
       "norm_label": "com.unity.modules.particlesystem"
     },
     {
+      "label": "CarCameraFollow.cs",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarCameraFollow.cs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "assets_scripts_carcamerafollow",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "carcamerafollow.cs"
+    },
+    {
+      "label": "float",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_carcamerafollow_cs_float",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "float"
+    },
+    {
+      "label": "Rigidbody",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_carcamerafollow_cs_rigidbody",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "rigidbody"
+    },
+    {
+      "label": "Transform",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_carcamerafollow_cs_transform",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "transform"
+    },
+    {
+      "label": "Vector3",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_carcamerafollow_cs_vector3",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "vector3"
+    },
+    {
+      "label": "CarCannon.cs",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarCannon.cs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "assets_scripts_carcannon",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "carcannon.cs"
+    },
+    {
+      "label": "CarController.cs",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarController.cs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "assets_scripts_carcontroller",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "carcontroller.cs"
+    },
+    {
+      "label": "CarHealth.cs",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarHealth.cs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "assets_scripts_carhealth",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "carhealth.cs"
+    },
+    {
+      "label": "float",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_carhealth_cs_float",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "float"
+    },
+    {
+      "label": "Light",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_carhealth_cs_light",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "light"
+    },
+    {
+      "label": "Material",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_carhealth_cs_material",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "material"
+    },
+    {
+      "label": "Transform",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_carhealth_cs_transform",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "transform"
+    },
+    {
+      "label": "ProceduralCarBuilder.cs",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/ProceduralCarBuilder.cs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "assets_scripts_proceduralcarbuilder",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "proceduralcarbuilder.cs"
+    },
+    {
+      "label": "Projectile.cs",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/Projectile.cs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "assets_scripts_projectile",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "projectile.cs"
+    },
+    {
       "label": "bool",
       "file_type": "code",
       "source_file": "",
@@ -1874,7 +2004,7 @@
       "_origin": "ast",
       "id": "assets_scripts_projectile_cs_bool",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": "bool"
     },
     {
@@ -1885,7 +2015,7 @@
       "_origin": "ast",
       "id": "assets_scripts_projectile_cs_collision",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": "collision"
     },
     {
@@ -1896,7 +2026,7 @@
       "_origin": "ast",
       "id": "assets_scripts_projectile_cs_float",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": "float"
     },
     {
@@ -1907,7 +2037,7 @@
       "_origin": "ast",
       "id": "assets_scripts_projectile_cs_gameobject",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": "gameobject"
     },
     {
@@ -1918,7 +2048,7 @@
       "_origin": "ast",
       "id": "assets_scripts_projectile_cs_material",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": "material"
     },
     {
@@ -1929,7 +2059,7 @@
       "_origin": "ast",
       "id": "assets_scripts_projectile_cs_rigidbody",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": "rigidbody"
     },
     {
@@ -1940,8 +2070,101 @@
       "_origin": "ast",
       "id": "assets_scripts_projectile_cs_vector3",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": "vector3"
+    },
+    {
+      "label": "TargetCar.cs",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/TargetCar.cs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "assets_scripts_targetcar",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "targetcar.cs"
+    },
+    {
+      "label": "bool",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_targetcar_cs_bool",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "bool"
+    },
+    {
+      "label": "float",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_targetcar_cs_float",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "float"
+    },
+    {
+      "label": "Quaternion",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_targetcar_cs_quaternion",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "quaternion"
+    },
+    {
+      "label": "Rigidbody",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_targetcar_cs_rigidbody",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "rigidbody"
+    },
+    {
+      "label": "Vector3",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "assets_scripts_targetcar_cs_vector3",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "vector3"
+    },
+    {
+      "label": "Camera",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "camera",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "camera"
+    },
+    {
+      "label": "RacingGame",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/CarCameraFollow.cs",
+      "source_location": "L3",
+      "type": "namespace",
+      "metadata": {
+        "kind": "csharp_namespace",
+        "namespace": "RacingGame"
+      },
+      "_origin": "ast",
+      "id": "csharp_namespace:9e3c093b654bfb3c",
+      "community": 1,
+      "community_name": "TargetCar",
+      "norm_label": "racinggame"
     },
     {
       "label": "MonoBehaviour",
@@ -1951,8 +2174,63 @@
       "_origin": "ast",
       "id": "monobehaviour",
       "community": 1,
-      "community_name": "Projectile",
+      "community_name": "TargetCar",
       "norm_label": "monobehaviour"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L113",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_inputsystem_dependencies",
+      "community": 10,
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L111",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_inputsystem_depth",
+      "community": 10,
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L112",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_inputsystem_source",
+      "community": 10,
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "source"
+    },
+    {
+      "label": "url",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L116",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_inputsystem_url",
+      "community": 10,
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "url"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L110",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_inputsystem_version",
+      "community": 10,
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "version"
     },
     {
       "label": "dependencies",
@@ -1962,7 +2240,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_hierarchycore_dependencies",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "dependencies"
     },
     {
@@ -1973,7 +2251,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_hierarchycore_depth",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "depth"
     },
     {
@@ -1984,7 +2262,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_hierarchycore_source",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "source"
     },
     {
@@ -1995,7 +2273,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_hierarchycore_version",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "version"
     },
     {
@@ -2006,7 +2284,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_imgui_dependencies",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "dependencies"
     },
     {
@@ -2017,7 +2295,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_imgui_depth",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "depth"
     },
     {
@@ -2028,7 +2306,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_imgui_source",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "source"
     },
     {
@@ -2039,51 +2317,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_imgui_version",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "version"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L415",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_ui_dependencies",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L413",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_ui_depth",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L414",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_ui_source",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "source"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L412",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_ui_version",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "version"
     },
     {
@@ -2094,8 +2328,41 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_uielements_dependencies",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L419",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_uielements_depth",
+      "community": 10,
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L420",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_uielements_source",
+      "community": 10,
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "source"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L418",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_uielements_version",
+      "community": 10,
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "version"
     },
     {
       "label": "dependencies",
@@ -2105,7 +2372,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_vectorgraphics_dependencies",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "dependencies"
     },
     {
@@ -2116,7 +2383,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_vectorgraphics_depth",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "depth"
     },
     {
@@ -2127,7 +2394,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_vectorgraphics_source",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "source"
     },
     {
@@ -2138,151 +2405,63 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_vectorgraphics_version",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "version"
     },
     {
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L513",
+      "source_location": "L128",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_video_dependencies",
+      "id": "packages_packages_lock_com_unity_multiplayer_center_dependencies",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "dependencies"
     },
     {
       "label": "depth",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L511",
+      "source_location": "L126",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_video_depth",
+      "id": "packages_packages_lock_com_unity_multiplayer_center_depth",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "depth"
     },
     {
       "label": "source",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L512",
+      "source_location": "L127",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_video_source",
+      "id": "packages_packages_lock_com_unity_multiplayer_center_source",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "source"
     },
     {
       "label": "version",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L510",
+      "source_location": "L125",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_video_version",
+      "id": "packages_packages_lock_com_unity_multiplayer_center_version",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "version"
     },
     {
-      "label": "dependencies",
+      "label": "com.unity.inputsystem",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L241",
+      "source_location": "L109",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ugui_dependencies",
+      "id": "packages_packages_lock_dependencies_com_unity_inputsystem",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L239",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ugui_depth",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L240",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ugui_source",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "source"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L238",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ugui_version",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "version"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L253",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_visualscripting_dependencies",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L251",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_visualscripting_depth",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L252",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_visualscripting_source",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "source"
-    },
-    {
-      "label": "url",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L257",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_visualscripting_url",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "url"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L250",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_visualscripting_version",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "version"
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "com.unity.inputsystem"
     },
     {
       "label": "com.unity.modules.hierarchycore",
@@ -2292,7 +2471,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_modules_hierarchycore",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "com.unity.modules.hierarchycore"
     },
     {
@@ -2303,19 +2482,19 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_modules_imgui",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "com.unity.modules.imgui"
     },
     {
-      "label": "com.unity.modules.ui",
+      "label": "com.unity.modules.uielements",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L242",
+      "source_location": "L17",
       "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_modules_ui",
+      "id": "packages_packages_lock_dependencies_com_unity_modules_uielements",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "com.unity.modules.ui"
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "com.unity.modules.uielements"
     },
     {
       "label": "com.unity.modules.vectorgraphics",
@@ -2325,41 +2504,19 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_modules_vectorgraphics",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "com.unity.modules.vectorgraphics"
     },
     {
-      "label": "com.unity.modules.video",
+      "label": "com.unity.multiplayer.center",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L509",
+      "source_location": "L124",
       "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_modules_video",
+      "id": "packages_packages_lock_dependencies_com_unity_multiplayer_center",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "com.unity.modules.video"
-    },
-    {
-      "label": "com.unity.ugui",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L237",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_ugui",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "com.unity.ugui"
-    },
-    {
-      "label": "com.unity.visualscripting",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L249",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_visualscripting",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "com.unity.visualscripting"
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "com.unity.multiplayer.center"
     },
     {
       "label": "com.unity.modules.hierarchycore",
@@ -2369,7 +2526,7 @@
       "_origin": "ast",
       "id": "com_unity_modules_hierarchycore",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "com.unity.modules.hierarchycore"
     },
     {
@@ -2380,41 +2537,19 @@
       "_origin": "ast",
       "id": "packages_packages_lock_json_com_unity_modules_imgui",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
+      "community_name": "com.unity.modules.uielements",
       "norm_label": "com.unity.modules.imgui"
     },
     {
-      "label": "com.unity.modules.ui",
+      "label": "com.unity.modules.uielements",
       "file_type": "concept",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L242",
+      "source_location": "L17",
       "_origin": "ast",
-      "id": "packages_packages_lock_json_com_unity_modules_ui",
+      "id": "packages_packages_lock_json_com_unity_modules_uielements",
       "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "com.unity.modules.ui"
-    },
-    {
-      "label": "com.unity.ugui",
-      "file_type": "concept",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L254",
-      "_origin": "ast",
-      "id": "packages_packages_lock_json_com_unity_ugui",
-      "community": 10,
-      "community_name": "com.unity.modules.imgui",
-      "norm_label": "com.unity.ugui"
-    },
-    {
-      "label": "CarHealth.cs",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/CarHealth.cs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "assets_scripts_carhealth",
-      "community": 11,
-      "community_name": "CarHealth",
-      "norm_label": "carhealth.cs"
+      "community_name": "com.unity.modules.uielements",
+      "norm_label": "com.unity.modules.uielements"
     },
     {
       "label": "bool",
@@ -2439,17 +2574,6 @@
       "norm_label": "collision"
     },
     {
-      "label": "float",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "assets_scripts_carhealth_cs_float",
-      "community": 11,
-      "community_name": "CarHealth",
-      "norm_label": "float"
-    },
-    {
       "label": "int",
       "file_type": "code",
       "source_file": "",
@@ -2461,28 +2585,6 @@
       "norm_label": "int"
     },
     {
-      "label": "Light",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "assets_scripts_carhealth_cs_light",
-      "community": 11,
-      "community_name": "CarHealth",
-      "norm_label": "light"
-    },
-    {
-      "label": "Material",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "assets_scripts_carhealth_cs_material",
-      "community": 11,
-      "community_name": "CarHealth",
-      "norm_label": "material"
-    },
-    {
       "label": "Rigidbody",
       "file_type": "code",
       "source_file": "",
@@ -2492,17 +2594,6 @@
       "community": 11,
       "community_name": "CarHealth",
       "norm_label": "rigidbody"
-    },
-    {
-      "label": "Transform",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "assets_scripts_carhealth_cs_transform",
-      "community": 11,
-      "community_name": "CarHealth",
-      "norm_label": "transform"
     },
     {
       "label": "MaterialPropertyBlock",
@@ -2673,6 +2764,50 @@
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
+      "source_location": "L440",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_unityanalytics_dependencies",
+      "community": 12,
+      "community_name": "com.unity.modules.jsonserialize",
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L438",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_unityanalytics_depth",
+      "community": 12,
+      "community_name": "com.unity.modules.jsonserialize",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L439",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_unityanalytics_source",
+      "community": 12,
+      "community_name": "com.unity.modules.jsonserialize",
+      "norm_label": "source"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L437",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_unityanalytics_version",
+      "community": 12,
+      "community_name": "com.unity.modules.jsonserialize",
+      "norm_label": "version"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
       "source_location": "L529",
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_xr_dependencies",
@@ -2747,6 +2882,17 @@
       "norm_label": "com.unity.modules.subsystems"
     },
     {
+      "label": "com.unity.modules.unityanalytics",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L436",
+      "_origin": "ast",
+      "id": "packages_packages_lock_dependencies_com_unity_modules_unityanalytics",
+      "community": 12,
+      "community_name": "com.unity.modules.jsonserialize",
+      "norm_label": "com.unity.modules.unityanalytics"
+    },
+    {
       "label": "com.unity.modules.xr",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
@@ -2783,397 +2929,67 @@
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L27",
+      "source_location": "L415",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ai_inference_dependencies",
+      "id": "packages_packages_lock_com_unity_modules_ui_dependencies",
       "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
+      "community_name": "com.unity.modules.ui",
       "norm_label": "dependencies"
     },
     {
       "label": "depth",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L25",
+      "source_location": "L413",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ai_inference_depth",
+      "id": "packages_packages_lock_com_unity_modules_ui_depth",
       "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
+      "community_name": "com.unity.modules.ui",
       "norm_label": "depth"
     },
     {
       "label": "source",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L26",
+      "source_location": "L414",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ai_inference_source",
+      "id": "packages_packages_lock_com_unity_modules_ui_source",
       "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "source"
-    },
-    {
-      "label": "url",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L34",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ai_inference_url",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "url"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L24",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ai_inference_version",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "version"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L77",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_dt_app_ui_dependencies",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L75",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_dt_app_ui_depth",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L76",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_dt_app_ui_source",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "source"
-    },
-    {
-      "label": "url",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L83",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_dt_app_ui_url",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "url"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L74",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_dt_app_ui_version",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "version"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L283",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_androidjni_dependencies",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L281",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_androidjni_depth",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L282",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_androidjni_source",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
+      "community_name": "com.unity.modules.ui",
       "norm_label": "source"
     },
     {
       "label": "version",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L280",
+      "source_location": "L412",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_androidjni_version",
+      "id": "packages_packages_lock_com_unity_modules_ui_version",
       "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
+      "community_name": "com.unity.modules.ui",
       "norm_label": "version"
     },
     {
-      "label": "dependencies",
+      "label": "com.unity.modules.ui",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L332",
+      "source_location": "L242",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_imageconversion_dependencies",
+      "id": "packages_packages_lock_dependencies_com_unity_modules_ui",
       "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "dependencies"
+      "community_name": "com.unity.modules.ui",
+      "norm_label": "com.unity.modules.ui"
     },
     {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L330",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_imageconversion_depth",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L331",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_imageconversion_source",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "source"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L329",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_imageconversion_version",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "version"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L376",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_screencapture_dependencies",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L374",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_screencapture_depth",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L375",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_screencapture_source",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "source"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L373",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_screencapture_version",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "version"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L473",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_unitywebrequesttexture_dependencies",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L471",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_unitywebrequesttexture_depth",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L472",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_unitywebrequesttexture_source",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "source"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L470",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_unitywebrequesttexture_version",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "version"
-    },
-    {
-      "label": "com.unity.ai.inference",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L23",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_ai_inference",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "com.unity.ai.inference"
-    },
-    {
-      "label": "com.unity.dt.app-ui",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L29",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_dt_app_ui",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "com.unity.dt.app-ui"
-    },
-    {
-      "label": "com.unity.modules.androidjni",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L79",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_modules_androidjni",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "com.unity.modules.androidjni"
-    },
-    {
-      "label": "com.unity.modules.imageconversion",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L32",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_modules_imageconversion",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "com.unity.modules.imageconversion"
-    },
-    {
-      "label": "com.unity.modules.screencapture",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L81",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_modules_screencapture",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "com.unity.modules.screencapture"
-    },
-    {
-      "label": "com.unity.modules.unitywebrequesttexture",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L469",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_modules_unitywebrequesttexture",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "com.unity.modules.unitywebrequesttexture"
-    },
-    {
-      "label": "com.unity.dt.app-ui",
+      "label": "com.unity.modules.ui",
       "file_type": "concept",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L29",
+      "source_location": "L242",
       "_origin": "ast",
-      "id": "com_unity_dt_app_ui",
+      "id": "packages_packages_lock_json_com_unity_modules_ui",
       "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "com.unity.dt.app-ui"
-    },
-    {
-      "label": "com.unity.modules.androidjni",
-      "file_type": "concept",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L79",
-      "_origin": "ast",
-      "id": "packages_packages_lock_json_com_unity_modules_androidjni",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "com.unity.modules.androidjni"
-    },
-    {
-      "label": "com.unity.modules.imageconversion",
-      "file_type": "concept",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L32",
-      "_origin": "ast",
-      "id": "packages_packages_lock_json_com_unity_modules_imageconversion",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "com.unity.modules.imageconversion"
-    },
-    {
-      "label": "com.unity.modules.screencapture",
-      "file_type": "concept",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L81",
-      "_origin": "ast",
-      "id": "packages_packages_lock_json_com_unity_modules_screencapture",
-      "community": 13,
-      "community_name": "com.unity.modules.imageconversion",
-      "norm_label": "com.unity.modules.screencapture"
+      "community_name": "com.unity.modules.ui",
+      "norm_label": "com.unity.modules.ui"
     },
     {
       "label": "bool",
@@ -3458,7 +3274,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ai_navigation_dependencies",
       "community": 18,
-      "community_name": "com.unity.ai.navigation",
+      "community_name": "com.unity.modules.ai",
       "norm_label": "dependencies"
     },
     {
@@ -3469,7 +3285,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ai_navigation_depth",
       "community": 18,
-      "community_name": "com.unity.ai.navigation",
+      "community_name": "com.unity.modules.ai",
       "norm_label": "depth"
     },
     {
@@ -3480,7 +3296,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ai_navigation_source",
       "community": 18,
-      "community_name": "com.unity.ai.navigation",
+      "community_name": "com.unity.modules.ai",
       "norm_label": "source"
     },
     {
@@ -3491,7 +3307,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ai_navigation_url",
       "community": 18,
-      "community_name": "com.unity.ai.navigation",
+      "community_name": "com.unity.modules.ai",
       "norm_label": "url"
     },
     {
@@ -3502,7 +3318,51 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ai_navigation_version",
       "community": 18,
-      "community_name": "com.unity.ai.navigation",
+      "community_name": "com.unity.modules.ai",
+      "norm_label": "version"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L277",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_ai_dependencies",
+      "community": 18,
+      "community_name": "com.unity.modules.ai",
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L275",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_ai_depth",
+      "community": 18,
+      "community_name": "com.unity.modules.ai",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L276",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_ai_source",
+      "community": 18,
+      "community_name": "com.unity.modules.ai",
+      "norm_label": "source"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L274",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_ai_version",
+      "community": 18,
+      "community_name": "com.unity.modules.ai",
       "norm_label": "version"
     },
     {
@@ -3513,19 +3373,30 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_ai_navigation",
       "community": 18,
-      "community_name": "com.unity.ai.navigation",
+      "community_name": "com.unity.modules.ai",
       "norm_label": "com.unity.ai.navigation"
     },
     {
-      "label": "packages-lock.json",
+      "label": "com.unity.modules.ai",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L1",
+      "source_location": "L41",
       "_origin": "ast",
-      "id": "packages_packages_lock",
-      "community": 19,
-      "community_name": "dependencies",
-      "norm_label": "packages-lock.json"
+      "id": "packages_packages_lock_dependencies_com_unity_modules_ai",
+      "community": 18,
+      "community_name": "com.unity.modules.ai",
+      "norm_label": "com.unity.modules.ai"
+    },
+    {
+      "label": "com.unity.modules.ai",
+      "file_type": "concept",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L41",
+      "_origin": "ast",
+      "id": "packages_packages_lock_json_com_unity_modules_ai",
+      "community": 18,
+      "community_name": "com.unity.modules.ai",
+      "norm_label": "com.unity.modules.ai"
     },
     {
       "label": "dependencies",
@@ -3535,7 +3406,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_umbra_dependencies",
       "community": 19,
-      "community_name": "dependencies",
+      "community_name": "com.unity.modules.umbra",
       "norm_label": "dependencies"
     },
     {
@@ -3546,7 +3417,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_umbra_depth",
       "community": 19,
-      "community_name": "dependencies",
+      "community_name": "com.unity.modules.umbra",
       "norm_label": "depth"
     },
     {
@@ -3557,7 +3428,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_umbra_source",
       "community": 19,
-      "community_name": "dependencies",
+      "community_name": "com.unity.modules.umbra",
       "norm_label": "source"
     },
     {
@@ -3568,19 +3439,8 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_umbra_version",
       "community": 19,
-      "community_name": "dependencies",
+      "community_name": "com.unity.modules.umbra",
       "norm_label": "version"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L2",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies",
-      "community": 19,
-      "community_name": "dependencies",
-      "norm_label": "dependencies"
     },
     {
       "label": "com.unity.modules.umbra",
@@ -3590,7 +3450,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_modules_umbra",
       "community": 19,
-      "community_name": "dependencies",
+      "community_name": "com.unity.modules.umbra",
       "norm_label": "com.unity.modules.umbra"
     },
     {
@@ -3669,6 +3529,17 @@
       "community": 2,
       "community_name": "CarController",
       "norm_label": "vector3"
+    },
+    {
+      "label": "OpponentDriver.cs",
+      "file_type": "code",
+      "source_file": "Assets/Scripts/OpponentDriver.cs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "assets_scripts_opponentdriver",
+      "community": 2,
+      "community_name": "CarController",
+      "norm_label": "opponentdriver.cs"
     },
     {
       "label": "float",
@@ -3924,152 +3795,147 @@
       "norm_label": "com.unity.modules.physicscore2d"
     },
     {
-      "label": "CarCameraFollow.cs",
+      "label": "dependencies",
       "file_type": "code",
-      "source_file": "Assets/Scripts/CarCameraFollow.cs",
-      "source_location": "L1",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L241",
       "_origin": "ast",
-      "id": "assets_scripts_carcamerafollow",
+      "id": "packages_packages_lock_com_unity_ugui_dependencies",
       "community": 23,
-      "community_name": "RacingGame",
-      "norm_label": "carcamerafollow.cs"
+      "community_name": "com.unity.ugui",
+      "norm_label": "dependencies"
     },
     {
-      "label": "CarCannon.cs",
+      "label": "depth",
       "file_type": "code",
-      "source_file": "Assets/Scripts/CarCannon.cs",
-      "source_location": "L1",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L239",
       "_origin": "ast",
-      "id": "assets_scripts_carcannon",
+      "id": "packages_packages_lock_com_unity_ugui_depth",
       "community": 23,
-      "community_name": "RacingGame",
-      "norm_label": "carcannon.cs"
+      "community_name": "com.unity.ugui",
+      "norm_label": "depth"
     },
     {
-      "label": "CarController.cs",
+      "label": "source",
       "file_type": "code",
-      "source_file": "Assets/Scripts/CarController.cs",
-      "source_location": "L1",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L240",
       "_origin": "ast",
-      "id": "assets_scripts_carcontroller",
+      "id": "packages_packages_lock_com_unity_ugui_source",
       "community": 23,
-      "community_name": "RacingGame",
-      "norm_label": "carcontroller.cs"
+      "community_name": "com.unity.ugui",
+      "norm_label": "source"
     },
     {
-      "label": "OpponentDriver.cs",
+      "label": "version",
       "file_type": "code",
-      "source_file": "Assets/Scripts/OpponentDriver.cs",
-      "source_location": "L1",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L238",
       "_origin": "ast",
-      "id": "assets_scripts_opponentdriver",
+      "id": "packages_packages_lock_com_unity_ugui_version",
       "community": 23,
-      "community_name": "RacingGame",
-      "norm_label": "opponentdriver.cs"
+      "community_name": "com.unity.ugui",
+      "norm_label": "version"
     },
     {
-      "label": "ProceduralCarBuilder.cs",
+      "label": "com.unity.ugui",
       "file_type": "code",
-      "source_file": "Assets/Scripts/ProceduralCarBuilder.cs",
-      "source_location": "L1",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L237",
       "_origin": "ast",
-      "id": "assets_scripts_proceduralcarbuilder",
+      "id": "packages_packages_lock_dependencies_com_unity_ugui",
       "community": 23,
-      "community_name": "RacingGame",
-      "norm_label": "proceduralcarbuilder.cs"
+      "community_name": "com.unity.ugui",
+      "norm_label": "com.unity.ugui"
     },
     {
-      "label": "Projectile.cs",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/Projectile.cs",
-      "source_location": "L1",
+      "label": "com.unity.ugui",
+      "file_type": "concept",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L254",
       "_origin": "ast",
-      "id": "assets_scripts_projectile",
+      "id": "packages_packages_lock_json_com_unity_ugui",
       "community": 23,
-      "community_name": "RacingGame",
-      "norm_label": "projectile.cs"
+      "community_name": "com.unity.ugui",
+      "norm_label": "com.unity.ugui"
     },
     {
-      "label": "TargetCar.cs",
+      "label": "dependencies",
       "file_type": "code",
-      "source_file": "Assets/Scripts/TargetCar.cs",
-      "source_location": "L1",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L253",
       "_origin": "ast",
-      "id": "assets_scripts_targetcar",
-      "community": 23,
-      "community_name": "RacingGame",
-      "norm_label": "targetcar.cs"
-    },
-    {
-      "label": "RacingGame",
-      "file_type": "code",
-      "source_file": "Assets/Scripts/CarCameraFollow.cs",
-      "source_location": "L3",
-      "type": "namespace",
-      "metadata": {
-        "kind": "csharp_namespace",
-        "namespace": "RacingGame"
-      },
-      "_origin": "ast",
-      "id": "csharp_namespace:9e3c093b654bfb3c",
-      "community": 23,
-      "community_name": "RacingGame",
-      "norm_label": "racinggame"
-    },
-    {
-      "label": "float",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "assets_scripts_carcamerafollow_cs_float",
+      "id": "packages_packages_lock_com_unity_visualscripting_dependencies",
       "community": 24,
-      "community_name": "CarCameraFollow",
-      "norm_label": "float"
+      "community_name": "com.unity.visualscripting",
+      "norm_label": "dependencies"
     },
     {
-      "label": "Rigidbody",
+      "label": "depth",
       "file_type": "code",
-      "source_file": "",
-      "source_location": "",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L251",
       "_origin": "ast",
-      "id": "assets_scripts_carcamerafollow_cs_rigidbody",
+      "id": "packages_packages_lock_com_unity_visualscripting_depth",
       "community": 24,
-      "community_name": "CarCameraFollow",
-      "norm_label": "rigidbody"
+      "community_name": "com.unity.visualscripting",
+      "norm_label": "depth"
     },
     {
-      "label": "Transform",
+      "label": "source",
       "file_type": "code",
-      "source_file": "",
-      "source_location": "",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L252",
       "_origin": "ast",
-      "id": "assets_scripts_carcamerafollow_cs_transform",
+      "id": "packages_packages_lock_com_unity_visualscripting_source",
       "community": 24,
-      "community_name": "CarCameraFollow",
-      "norm_label": "transform"
+      "community_name": "com.unity.visualscripting",
+      "norm_label": "source"
     },
     {
-      "label": "Vector3",
+      "label": "url",
       "file_type": "code",
-      "source_file": "",
-      "source_location": "",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L257",
       "_origin": "ast",
-      "id": "assets_scripts_carcamerafollow_cs_vector3",
+      "id": "packages_packages_lock_com_unity_visualscripting_url",
       "community": 24,
-      "community_name": "CarCameraFollow",
-      "norm_label": "vector3"
+      "community_name": "com.unity.visualscripting",
+      "norm_label": "url"
     },
     {
-      "label": "Camera",
+      "label": "version",
       "file_type": "code",
-      "source_file": "",
-      "source_location": "",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L250",
       "_origin": "ast",
-      "id": "camera",
+      "id": "packages_packages_lock_com_unity_visualscripting_version",
       "community": 24,
-      "community_name": "CarCameraFollow",
-      "norm_label": "camera"
+      "community_name": "com.unity.visualscripting",
+      "norm_label": "version"
+    },
+    {
+      "label": "com.unity.visualscripting",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L249",
+      "_origin": "ast",
+      "id": "packages_packages_lock_dependencies_com_unity_visualscripting",
+      "community": 24,
+      "community_name": "com.unity.visualscripting",
+      "norm_label": "com.unity.visualscripting"
+    },
+    {
+      "label": "packages-lock.json",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "packages_packages_lock",
+      "community": 26,
+      "community_name": "dependencies",
+      "norm_label": "packages-lock.json"
     },
     {
       "label": "dependencies",
@@ -4079,7 +3945,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_accessibility_dependencies",
       "community": 26,
-      "community_name": "com.unity.modules.accessibility",
+      "community_name": "dependencies",
       "norm_label": "dependencies"
     },
     {
@@ -4090,7 +3956,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_accessibility_depth",
       "community": 26,
-      "community_name": "com.unity.modules.accessibility",
+      "community_name": "dependencies",
       "norm_label": "depth"
     },
     {
@@ -4101,7 +3967,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_accessibility_source",
       "community": 26,
-      "community_name": "com.unity.modules.accessibility",
+      "community_name": "dependencies",
       "norm_label": "source"
     },
     {
@@ -4112,8 +3978,19 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_accessibility_version",
       "community": 26,
-      "community_name": "com.unity.modules.accessibility",
+      "community_name": "dependencies",
       "norm_label": "version"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "packages_packages_lock_dependencies",
+      "community": 26,
+      "community_name": "dependencies",
+      "norm_label": "dependencies"
     },
     {
       "label": "com.unity.modules.accessibility",
@@ -4123,7 +4000,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_modules_accessibility",
       "community": 26,
-      "community_name": "com.unity.modules.accessibility",
+      "community_name": "dependencies",
       "norm_label": "com.unity.modules.accessibility"
     },
     {
@@ -4244,7 +4121,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_2d_sprite_dependencies",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "dependencies"
     },
     {
@@ -4255,7 +4132,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_2d_sprite_depth",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "depth"
     },
     {
@@ -4266,7 +4143,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_2d_sprite_source",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "source"
     },
     {
@@ -4277,7 +4154,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_2d_sprite_version",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "version"
     },
     {
@@ -4288,7 +4165,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ai_assistant_dependencies",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "dependencies"
     },
     {
@@ -4299,7 +4176,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ai_assistant_depth",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "depth"
     },
     {
@@ -4310,7 +4187,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ai_assistant_source",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "source"
     },
     {
@@ -4321,7 +4198,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ai_assistant_url",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "url"
     },
     {
@@ -4332,139 +4209,62 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ai_assistant_version",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "version"
     },
     {
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L113",
+      "source_location": "L49",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_inputsystem_dependencies",
+      "id": "packages_packages_lock_com_unity_burst_dependencies",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "dependencies"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L111",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_inputsystem_depth",
-      "community": 3,
-      "community_name": "com.unity.modules.uielements",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L112",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_inputsystem_source",
-      "community": 3,
-      "community_name": "com.unity.modules.uielements",
-      "norm_label": "source"
-    },
-    {
-      "label": "url",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L116",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_inputsystem_url",
-      "community": 3,
-      "community_name": "com.unity.modules.uielements",
-      "norm_label": "url"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L110",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_inputsystem_version",
-      "community": 3,
-      "community_name": "com.unity.modules.uielements",
-      "norm_label": "version"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L419",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_uielements_depth",
-      "community": 3,
-      "community_name": "com.unity.modules.uielements",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L420",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_uielements_source",
-      "community": 3,
-      "community_name": "com.unity.modules.uielements",
-      "norm_label": "source"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L418",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_uielements_version",
-      "community": 3,
-      "community_name": "com.unity.modules.uielements",
-      "norm_label": "version"
     },
     {
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L128",
+      "source_location": "L122",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_multiplayer_center_dependencies",
+      "id": "packages_packages_lock_com_unity_mathematics_dependencies",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "dependencies"
     },
     {
       "label": "depth",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L126",
+      "source_location": "L120",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_multiplayer_center_depth",
+      "id": "packages_packages_lock_com_unity_mathematics_depth",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "depth"
     },
     {
       "label": "source",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L127",
+      "source_location": "L121",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_multiplayer_center_source",
+      "id": "packages_packages_lock_com_unity_mathematics_source",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "source"
     },
     {
       "label": "version",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L125",
+      "source_location": "L119",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_multiplayer_center_version",
+      "id": "packages_packages_lock_com_unity_mathematics_version",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "version"
     },
     {
@@ -4475,7 +4275,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_nuget_mono_cecil_dependencies",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "dependencies"
     },
     {
@@ -4486,7 +4286,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_nuget_mono_cecil_depth",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "depth"
     },
     {
@@ -4497,7 +4297,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_nuget_mono_cecil_source",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "source"
     },
     {
@@ -4508,7 +4308,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_nuget_mono_cecil_url",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "url"
     },
     {
@@ -4519,7 +4319,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_nuget_mono_cecil_version",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "version"
     },
     {
@@ -4530,7 +4330,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_nuget_newtonsoft_json_dependencies",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "dependencies"
     },
     {
@@ -4541,7 +4341,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_nuget_newtonsoft_json_depth",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "depth"
     },
     {
@@ -4552,7 +4352,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_nuget_newtonsoft_json_source",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "source"
     },
     {
@@ -4563,7 +4363,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_nuget_newtonsoft_json_url",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "url"
     },
     {
@@ -4574,7 +4374,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_nuget_newtonsoft_json_version",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "version"
     },
     {
@@ -4585,7 +4385,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_pipeline_dependencies",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "dependencies"
     },
     {
@@ -4596,7 +4396,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_pipeline_depth",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "depth"
     },
     {
@@ -4607,7 +4407,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_pipeline_source",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "source"
     },
     {
@@ -4618,7 +4418,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_pipeline_url",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "url"
     },
     {
@@ -4629,7 +4429,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_pipeline_version",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "version"
     },
     {
@@ -4640,7 +4440,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_2d_sprite",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "com.unity.2d.sprite"
     },
     {
@@ -4651,41 +4451,19 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_ai_assistant",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "com.unity.ai.assistant"
     },
     {
-      "label": "com.unity.inputsystem",
+      "label": "com.unity.mathematics",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L109",
+      "source_location": "L15",
       "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_inputsystem",
+      "id": "packages_packages_lock_dependencies_com_unity_mathematics",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
-      "norm_label": "com.unity.inputsystem"
-    },
-    {
-      "label": "com.unity.modules.uielements",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L17",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_modules_uielements",
-      "community": 3,
-      "community_name": "com.unity.modules.uielements",
-      "norm_label": "com.unity.modules.uielements"
-    },
-    {
-      "label": "com.unity.multiplayer.center",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L124",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_multiplayer_center",
-      "community": 3,
-      "community_name": "com.unity.modules.uielements",
-      "norm_label": "com.unity.multiplayer.center"
+      "community_name": "com.unity.nuget.mono-cecil",
+      "norm_label": "com.unity.mathematics"
     },
     {
       "label": "com.unity.nuget.mono-cecil",
@@ -4695,7 +4473,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_nuget_mono_cecil",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "com.unity.nuget.mono-cecil"
     },
     {
@@ -4706,7 +4484,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_nuget_newtonsoft_json",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "com.unity.nuget.newtonsoft-json"
     },
     {
@@ -4717,7 +4495,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_pipeline",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "com.unity.pipeline"
     },
     {
@@ -4728,8 +4506,19 @@
       "_origin": "ast",
       "id": "com_unity_2d_sprite",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "com.unity.2d.sprite"
+    },
+    {
+      "label": "com.unity.mathematics",
+      "file_type": "concept",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "com_unity_mathematics",
+      "community": 3,
+      "community_name": "com.unity.nuget.mono-cecil",
+      "norm_label": "com.unity.mathematics"
     },
     {
       "label": "com.unity.nuget.mono-cecil",
@@ -4739,7 +4528,7 @@
       "_origin": "ast",
       "id": "com_unity_nuget_mono_cecil",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "com.unity.nuget.mono-cecil"
     },
     {
@@ -4750,19 +4539,8 @@
       "_origin": "ast",
       "id": "com_unity_nuget_newtonsoft_json",
       "community": 3,
-      "community_name": "com.unity.modules.uielements",
+      "community_name": "com.unity.nuget.mono-cecil",
       "norm_label": "com.unity.nuget.newtonsoft-json"
-    },
-    {
-      "label": "com.unity.modules.uielements",
-      "file_type": "concept",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L17",
-      "_origin": "ast",
-      "id": "packages_packages_lock_json_com_unity_modules_uielements",
-      "community": 3,
-      "community_name": "com.unity.modules.uielements",
-      "norm_label": "com.unity.modules.uielements"
     },
     {
       "label": "com.unity.ai.assistant",
@@ -4988,110 +4766,143 @@
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L66",
+      "source_location": "L27",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_collections_dependencies",
+      "id": "packages_packages_lock_com_unity_ai_inference_dependencies",
       "community": 4,
-      "community_name": "com.unity.test-framework",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L89",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ext_nunit_dependencies",
-      "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "dependencies"
     },
     {
       "label": "depth",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L87",
+      "source_location": "L25",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ext_nunit_depth",
+      "id": "packages_packages_lock_com_unity_ai_inference_depth",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "depth"
     },
     {
       "label": "source",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L88",
+      "source_location": "L26",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ext_nunit_source",
+      "id": "packages_packages_lock_com_unity_ai_inference_source",
       "community": 4,
-      "community_name": "com.unity.test-framework",
-      "norm_label": "source"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L86",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ext_nunit_version",
-      "community": 4,
-      "community_name": "com.unity.test-framework",
-      "norm_label": "version"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L95",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ide_rider_dependencies",
-      "community": 4,
-      "community_name": "com.unity.test-framework",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L93",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ide_rider_depth",
-      "community": 4,
-      "community_name": "com.unity.test-framework",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L94",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ide_rider_source",
-      "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "source"
     },
     {
       "label": "url",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L98",
+      "source_location": "L34",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ide_rider_url",
+      "id": "packages_packages_lock_com_unity_ai_inference_url",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "url"
     },
     {
       "label": "version",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L92",
+      "source_location": "L24",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_ide_rider_version",
+      "id": "packages_packages_lock_com_unity_ai_inference_version",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
+      "norm_label": "version"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_burst_depth",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L48",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_burst_source",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "source"
+    },
+    {
+      "label": "url",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L53",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_burst_url",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "url"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L46",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_burst_version",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "version"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L66",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_collections_dependencies",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L64",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_collections_depth",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_collections_source",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "source"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L63",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_collections_version",
+      "community": 4,
+      "community_name": "com.unity.burst",
       "norm_label": "version"
     },
     {
@@ -5102,7 +4913,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ide_visualstudio_dependencies",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "dependencies"
     },
     {
@@ -5113,7 +4924,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ide_visualstudio_depth",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "depth"
     },
     {
@@ -5124,7 +4935,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ide_visualstudio_source",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "source"
     },
     {
@@ -5135,7 +4946,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ide_visualstudio_url",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "url"
     },
     {
@@ -5146,18 +4957,62 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_ide_visualstudio_version",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "version"
     },
     {
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L209",
+      "source_location": "L392",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_test_framework_dependencies",
+      "id": "packages_packages_lock_com_unity_modules_terrain_dependencies",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L390",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_terrain_depth",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L391",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_terrain_source",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "source"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L389",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_terrain_version",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "version"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L164",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_render_pipelines_core_dependencies",
+      "community": 4,
+      "community_name": "com.unity.burst",
       "norm_label": "dependencies"
     },
     {
@@ -5168,7 +5023,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_test_framework_depth",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "depth"
     },
     {
@@ -5179,7 +5034,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_test_framework_performance_dependencies",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "dependencies"
     },
     {
@@ -5190,7 +5045,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_test_framework_performance_depth",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "depth"
     },
     {
@@ -5201,7 +5056,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_test_framework_performance_source",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "source"
     },
     {
@@ -5212,7 +5067,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_test_framework_performance_url",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "url"
     },
     {
@@ -5223,7 +5078,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_test_framework_performance_version",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "version"
     },
     {
@@ -5234,7 +5089,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_test_framework_source",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "source"
     },
     {
@@ -5245,30 +5100,41 @@
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_test_framework_version",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "version"
     },
     {
-      "label": "com.unity.ext.nunit",
+      "label": "com.unity.ai.inference",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L85",
+      "source_location": "L23",
       "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_ext_nunit",
+      "id": "packages_packages_lock_dependencies_com_unity_ai_inference",
       "community": 4,
-      "community_name": "com.unity.test-framework",
-      "norm_label": "com.unity.ext.nunit"
+      "community_name": "com.unity.burst",
+      "norm_label": "com.unity.ai.inference"
     },
     {
-      "label": "com.unity.ide.rider",
+      "label": "com.unity.burst",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L91",
+      "source_location": "L28",
       "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_ide_rider",
+      "id": "packages_packages_lock_dependencies_com_unity_burst",
       "community": 4,
-      "community_name": "com.unity.test-framework",
-      "norm_label": "com.unity.ide.rider"
+      "community_name": "com.unity.burst",
+      "norm_label": "com.unity.burst"
+    },
+    {
+      "label": "com.unity.collections",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "packages_packages_lock_dependencies_com_unity_collections",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "com.unity.collections"
     },
     {
       "label": "com.unity.ide.visualstudio",
@@ -5278,8 +5144,19 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_ide_visualstudio",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "com.unity.ide.visualstudio"
+    },
+    {
+      "label": "com.unity.modules.terrain",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L167",
+      "_origin": "ast",
+      "id": "packages_packages_lock_dependencies_com_unity_modules_terrain",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "com.unity.modules.terrain"
     },
     {
       "label": "com.unity.test-framework",
@@ -5289,7 +5166,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_test_framework",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "com.unity.test-framework"
     },
     {
@@ -5300,19 +5177,30 @@
       "_origin": "ast",
       "id": "packages_packages_lock_dependencies_com_unity_test_framework_performance",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "com.unity.test-framework.performance"
     },
     {
-      "label": "com.unity.ext.nunit",
+      "label": "com.unity.burst",
       "file_type": "concept",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L96",
+      "source_location": "L28",
       "_origin": "ast",
-      "id": "com_unity_ext_nunit",
+      "id": "com_unity_burst",
       "community": 4,
-      "community_name": "com.unity.test-framework",
-      "norm_label": "com.unity.ext.nunit"
+      "community_name": "com.unity.burst",
+      "norm_label": "com.unity.burst"
+    },
+    {
+      "label": "com.unity.collections",
+      "file_type": "concept",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "com_unity_collections",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "com.unity.collections"
     },
     {
       "label": "com.unity.test-framework.performance",
@@ -5322,8 +5210,19 @@
       "_origin": "ast",
       "id": "com_unity_test_framework_performance",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "com.unity.test-framework.performance"
+    },
+    {
+      "label": "com.unity.modules.terrain",
+      "file_type": "concept",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L167",
+      "_origin": "ast",
+      "id": "packages_packages_lock_json_com_unity_modules_terrain",
+      "community": 4,
+      "community_name": "com.unity.burst",
+      "norm_label": "com.unity.modules.terrain"
     },
     {
       "label": "com.unity.test-framework",
@@ -5333,7 +5232,7 @@
       "_origin": "ast",
       "id": "packages_packages_lock_json_com_unity_test_framework",
       "community": 4,
-      "community_name": "com.unity.test-framework",
+      "community_name": "com.unity.burst",
       "norm_label": "com.unity.test-framework"
     },
     {
@@ -5604,9 +5503,9 @@
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L440",
+      "source_location": "L332",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_unityanalytics_dependencies",
+      "id": "packages_packages_lock_com_unity_modules_imageconversion_dependencies",
       "community": 5,
       "community_name": "com.unity.modules.unitywebrequest",
       "norm_label": "dependencies"
@@ -5615,9 +5514,9 @@
       "label": "depth",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L438",
+      "source_location": "L330",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_unityanalytics_depth",
+      "id": "packages_packages_lock_com_unity_modules_imageconversion_depth",
       "community": 5,
       "community_name": "com.unity.modules.unitywebrequest",
       "norm_label": "depth"
@@ -5626,9 +5525,9 @@
       "label": "source",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L439",
+      "source_location": "L331",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_unityanalytics_source",
+      "id": "packages_packages_lock_com_unity_modules_imageconversion_source",
       "community": 5,
       "community_name": "com.unity.modules.unitywebrequest",
       "norm_label": "source"
@@ -5637,9 +5536,53 @@
       "label": "version",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L437",
+      "source_location": "L329",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_unityanalytics_version",
+      "id": "packages_packages_lock_com_unity_modules_imageconversion_version",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "version"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L376",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_screencapture_dependencies",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L374",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_screencapture_depth",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L375",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_screencapture_source",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "source"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L373",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_screencapture_version",
       "community": 5,
       "community_name": "com.unity.modules.unitywebrequest",
       "norm_label": "version"
@@ -5780,6 +5723,50 @@
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
+      "source_location": "L473",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_unitywebrequesttexture_dependencies",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L471",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_unitywebrequesttexture_depth",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L472",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_unitywebrequesttexture_source",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "source"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L470",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_unitywebrequesttexture_version",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "version"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
       "source_location": "L482",
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_unitywebrequestwww_dependencies",
@@ -5832,15 +5819,26 @@
       "norm_label": "com.unity.modules.assetbundle"
     },
     {
-      "label": "com.unity.modules.unityanalytics",
+      "label": "com.unity.modules.imageconversion",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L436",
+      "source_location": "L32",
       "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_modules_unityanalytics",
+      "id": "packages_packages_lock_dependencies_com_unity_modules_imageconversion",
       "community": 5,
       "community_name": "com.unity.modules.unitywebrequest",
-      "norm_label": "com.unity.modules.unityanalytics"
+      "norm_label": "com.unity.modules.imageconversion"
+    },
+    {
+      "label": "com.unity.modules.screencapture",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L81",
+      "_origin": "ast",
+      "id": "packages_packages_lock_dependencies_com_unity_modules_screencapture",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "com.unity.modules.screencapture"
     },
     {
       "label": "com.unity.modules.unitywebrequest",
@@ -5876,6 +5874,17 @@
       "norm_label": "com.unity.modules.unitywebrequestaudio"
     },
     {
+      "label": "com.unity.modules.unitywebrequesttexture",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L469",
+      "_origin": "ast",
+      "id": "packages_packages_lock_dependencies_com_unity_modules_unitywebrequesttexture",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "com.unity.modules.unitywebrequesttexture"
+    },
+    {
       "label": "com.unity.modules.unitywebrequestwww",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
@@ -5896,6 +5905,28 @@
       "community": 5,
       "community_name": "com.unity.modules.unitywebrequest",
       "norm_label": "com.unity.modules.assetbundle"
+    },
+    {
+      "label": "com.unity.modules.imageconversion",
+      "file_type": "concept",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "packages_packages_lock_json_com_unity_modules_imageconversion",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "com.unity.modules.imageconversion"
+    },
+    {
+      "label": "com.unity.modules.screencapture",
+      "file_type": "concept",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L81",
+      "_origin": "ast",
+      "id": "packages_packages_lock_json_com_unity_modules_screencapture",
+      "community": 5,
+      "community_name": "com.unity.modules.unitywebrequest",
+      "norm_label": "com.unity.modules.screencapture"
     },
     {
       "label": "com.unity.modules.unitywebrequest",
@@ -6154,331 +6185,144 @@
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L49",
+      "source_location": "L89",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_burst_dependencies",
+      "id": "packages_packages_lock_com_unity_ext_nunit_dependencies",
       "community": 6,
-      "community_name": "com.unity.burst",
+      "community_name": "com.unity.ext.nunit",
       "norm_label": "dependencies"
     },
     {
       "label": "depth",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L47",
+      "source_location": "L87",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_burst_depth",
+      "id": "packages_packages_lock_com_unity_ext_nunit_depth",
       "community": 6,
-      "community_name": "com.unity.burst",
+      "community_name": "com.unity.ext.nunit",
       "norm_label": "depth"
     },
     {
       "label": "source",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L48",
+      "source_location": "L88",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_burst_source",
+      "id": "packages_packages_lock_com_unity_ext_nunit_source",
       "community": 6,
-      "community_name": "com.unity.burst",
+      "community_name": "com.unity.ext.nunit",
+      "norm_label": "source"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L86",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_ext_nunit_version",
+      "community": 6,
+      "community_name": "com.unity.ext.nunit",
+      "norm_label": "version"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L95",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_ide_rider_dependencies",
+      "community": 6,
+      "community_name": "com.unity.ext.nunit",
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L93",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_ide_rider_depth",
+      "community": 6,
+      "community_name": "com.unity.ext.nunit",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L94",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_ide_rider_source",
+      "community": 6,
+      "community_name": "com.unity.ext.nunit",
       "norm_label": "source"
     },
     {
       "label": "url",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L53",
+      "source_location": "L98",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_burst_url",
+      "id": "packages_packages_lock_com_unity_ide_rider_url",
       "community": 6,
-      "community_name": "com.unity.burst",
+      "community_name": "com.unity.ext.nunit",
       "norm_label": "url"
     },
     {
       "label": "version",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L46",
+      "source_location": "L92",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_burst_version",
+      "id": "packages_packages_lock_com_unity_ide_rider_version",
       "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "version"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L64",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_collections_depth",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L65",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_collections_source",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "source"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L63",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_collections_version",
-      "community": 6,
-      "community_name": "com.unity.burst",
+      "community_name": "com.unity.ext.nunit",
       "norm_label": "version"
     },
     {
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L122",
+      "source_location": "L209",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_mathematics_dependencies",
+      "id": "packages_packages_lock_com_unity_test_framework_dependencies",
       "community": 6,
-      "community_name": "com.unity.burst",
+      "community_name": "com.unity.ext.nunit",
       "norm_label": "dependencies"
     },
     {
-      "label": "depth",
+      "label": "com.unity.ext.nunit",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L120",
+      "source_location": "L85",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_mathematics_depth",
+      "id": "packages_packages_lock_dependencies_com_unity_ext_nunit",
       "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "depth"
+      "community_name": "com.unity.ext.nunit",
+      "norm_label": "com.unity.ext.nunit"
     },
     {
-      "label": "source",
+      "label": "com.unity.ide.rider",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L121",
+      "source_location": "L91",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_mathematics_source",
+      "id": "packages_packages_lock_dependencies_com_unity_ide_rider",
       "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "source"
+      "community_name": "com.unity.ext.nunit",
+      "norm_label": "com.unity.ide.rider"
     },
     {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L119",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_mathematics_version",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "version"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L392",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_terrain_dependencies",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L390",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_terrain_depth",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L391",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_terrain_source",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "source"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L389",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_terrain_version",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "version"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L398",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_terrainphysics_dependencies",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "depth",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L396",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_terrainphysics_depth",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "depth"
-    },
-    {
-      "label": "source",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L397",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_terrainphysics_source",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "source"
-    },
-    {
-      "label": "version",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L395",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_terrainphysics_version",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "version"
-    },
-    {
-      "label": "dependencies",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L164",
-      "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_render_pipelines_core_dependencies",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "dependencies"
-    },
-    {
-      "label": "com.unity.burst",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L28",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_burst",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "com.unity.burst"
-    },
-    {
-      "label": "com.unity.collections",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L30",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_collections",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "com.unity.collections"
-    },
-    {
-      "label": "com.unity.mathematics",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L15",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_mathematics",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "com.unity.mathematics"
-    },
-    {
-      "label": "com.unity.modules.terrain",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L167",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_modules_terrain",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "com.unity.modules.terrain"
-    },
-    {
-      "label": "com.unity.modules.terrainphysics",
-      "file_type": "code",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L394",
-      "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_modules_terrainphysics",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "com.unity.modules.terrainphysics"
-    },
-    {
-      "label": "com.unity.burst",
+      "label": "com.unity.ext.nunit",
       "file_type": "concept",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L28",
+      "source_location": "L96",
       "_origin": "ast",
-      "id": "com_unity_burst",
+      "id": "com_unity_ext_nunit",
       "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "com.unity.burst"
-    },
-    {
-      "label": "com.unity.collections",
-      "file_type": "concept",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L30",
-      "_origin": "ast",
-      "id": "com_unity_collections",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "com.unity.collections"
-    },
-    {
-      "label": "com.unity.mathematics",
-      "file_type": "concept",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L15",
-      "_origin": "ast",
-      "id": "com_unity_mathematics",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "com.unity.mathematics"
-    },
-    {
-      "label": "com.unity.modules.terrain",
-      "file_type": "concept",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L167",
-      "_origin": "ast",
-      "id": "packages_packages_lock_json_com_unity_modules_terrain",
-      "community": 6,
-      "community_name": "com.unity.burst",
-      "norm_label": "com.unity.modules.terrain"
+      "community_name": "com.unity.ext.nunit",
+      "norm_label": "com.unity.ext.nunit"
     },
     {
       "label": "com.unity.modules.jsonserialize",
@@ -7086,136 +6930,213 @@
       "norm_label": "com.unity.ugui"
     },
     {
-      "label": "bool",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
+      "label": "query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md",
+      "source_location": "L1",
       "_origin": "ast",
-      "id": "assets_scripts_targetcar_cs_bool",
+      "id": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
       "community": 73,
-      "community_name": "TargetCar",
-      "norm_label": "bool"
+      "community_name": "Q: \u041f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
+      "norm_label": "query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md"
     },
     {
-      "label": "float",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
+      "label": "Answer",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md",
+      "source_location": "L12",
       "_origin": "ast",
-      "id": "assets_scripts_targetcar_cs_float",
+      "id": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438_answer",
       "community": 73,
-      "community_name": "TargetCar",
-      "norm_label": "float"
+      "community_name": "Q: \u041f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
+      "norm_label": "answer"
     },
     {
-      "label": "Quaternion",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
+      "label": "Outcome",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md",
+      "source_location": "L16",
       "_origin": "ast",
-      "id": "assets_scripts_targetcar_cs_quaternion",
+      "id": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438_outcome",
       "community": 73,
-      "community_name": "TargetCar",
-      "norm_label": "quaternion"
+      "community_name": "Q: \u041f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
+      "norm_label": "outcome"
     },
     {
-      "label": "Rigidbody",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
+      "label": "Q: \u041f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md",
+      "source_location": "L10",
       "_origin": "ast",
-      "id": "assets_scripts_targetcar_cs_rigidbody",
+      "id": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438_q_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
       "community": 73,
-      "community_name": "TargetCar",
-      "norm_label": "rigidbody"
+      "community_name": "Q: \u041f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
+      "norm_label": "q: \u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438"
     },
     {
-      "label": "Vector3",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
+      "label": "Source Nodes",
+      "file_type": "document",
+      "source_file": "graphify-out/memory/query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md",
+      "source_location": "L20",
       "_origin": "ast",
-      "id": "assets_scripts_targetcar_cs_vector3",
+      "id": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438_source_nodes",
       "community": 73,
-      "community_name": "TargetCar",
-      "norm_label": "vector3"
+      "community_name": "Q: \u041f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
+      "norm_label": "source nodes"
     },
     {
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L277",
+      "source_location": "L513",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_ai_dependencies",
+      "id": "packages_packages_lock_com_unity_modules_video_dependencies",
       "community": 74,
-      "community_name": "com.unity.modules.ai",
+      "community_name": "com.unity.modules.video",
       "norm_label": "dependencies"
     },
     {
       "label": "depth",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L275",
+      "source_location": "L511",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_ai_depth",
+      "id": "packages_packages_lock_com_unity_modules_video_depth",
       "community": 74,
-      "community_name": "com.unity.modules.ai",
+      "community_name": "com.unity.modules.video",
       "norm_label": "depth"
     },
     {
       "label": "source",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L276",
+      "source_location": "L512",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_ai_source",
+      "id": "packages_packages_lock_com_unity_modules_video_source",
       "community": 74,
-      "community_name": "com.unity.modules.ai",
+      "community_name": "com.unity.modules.video",
       "norm_label": "source"
     },
     {
       "label": "version",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L274",
+      "source_location": "L510",
       "_origin": "ast",
-      "id": "packages_packages_lock_com_unity_modules_ai_version",
+      "id": "packages_packages_lock_com_unity_modules_video_version",
       "community": 74,
-      "community_name": "com.unity.modules.ai",
+      "community_name": "com.unity.modules.video",
       "norm_label": "version"
     },
     {
-      "label": "com.unity.modules.ai",
+      "label": "com.unity.modules.video",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
-      "source_location": "L41",
+      "source_location": "L509",
       "_origin": "ast",
-      "id": "packages_packages_lock_dependencies_com_unity_modules_ai",
+      "id": "packages_packages_lock_dependencies_com_unity_modules_video",
       "community": 74,
-      "community_name": "com.unity.modules.ai",
-      "norm_label": "com.unity.modules.ai"
+      "community_name": "com.unity.modules.video",
+      "norm_label": "com.unity.modules.video"
     },
     {
-      "label": "com.unity.modules.ai",
-      "file_type": "concept",
-      "source_file": "Packages/packages-lock.json",
-      "source_location": "L41",
-      "_origin": "ast",
-      "id": "packages_packages_lock_json_com_unity_modules_ai",
-      "community": 74,
-      "community_name": "com.unity.modules.ai",
-      "norm_label": "com.unity.modules.ai"
-    },
-    {
-      "label": "ua-build-batch-2.py",
+      "label": "dependencies",
       "file_type": "code",
-      "source_file": ".ua/tmp/ua-build-batch-2.py",
-      "source_location": "L1",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L77",
       "_origin": "ast",
-      "id": "ua_tmp_ua_build_batch_2",
-      "community": 75,
-      "community_name": "ua-build-batch-2.py",
-      "norm_label": "ua-build-batch-2.py"
+      "id": "packages_packages_lock_com_unity_dt_app_ui_dependencies",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L75",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_dt_app_ui_depth",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L76",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_dt_app_ui_source",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "source"
+    },
+    {
+      "label": "url",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L83",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_dt_app_ui_url",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "url"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L74",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_dt_app_ui_version",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "version"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L283",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_androidjni_dependencies",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L281",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_androidjni_depth",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L282",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_androidjni_source",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "source"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L280",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_androidjni_version",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "version"
     },
     {
       "label": "dependencies",
@@ -7309,6 +7230,50 @@
       "label": "dependencies",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
+      "source_location": "L398",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_terrainphysics_dependencies",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "depth",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L396",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_terrainphysics_depth",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "depth"
+    },
+    {
+      "label": "source",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L397",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_terrainphysics_source",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "source"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L395",
+      "_origin": "ast",
+      "id": "packages_packages_lock_com_unity_modules_terrainphysics_version",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "version"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
       "source_location": "L505",
       "_origin": "ast",
       "id": "packages_packages_lock_com_unity_modules_vehicles_dependencies",
@@ -7350,6 +7315,28 @@
       "norm_label": "version"
     },
     {
+      "label": "com.unity.dt.app-ui",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "packages_packages_lock_dependencies_com_unity_dt_app_ui",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "com.unity.dt.app-ui"
+    },
+    {
+      "label": "com.unity.modules.androidjni",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L79",
+      "_origin": "ast",
+      "id": "packages_packages_lock_dependencies_com_unity_modules_androidjni",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "com.unity.modules.androidjni"
+    },
+    {
       "label": "com.unity.modules.cloth",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
@@ -7372,6 +7359,17 @@
       "norm_label": "com.unity.modules.physics"
     },
     {
+      "label": "com.unity.modules.terrainphysics",
+      "file_type": "code",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L394",
+      "_origin": "ast",
+      "id": "packages_packages_lock_dependencies_com_unity_modules_terrainphysics",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "com.unity.modules.terrainphysics"
+    },
+    {
       "label": "com.unity.modules.vehicles",
       "file_type": "code",
       "source_file": "Packages/packages-lock.json",
@@ -7381,6 +7379,28 @@
       "community": 8,
       "community_name": "com.unity.modules.physics",
       "norm_label": "com.unity.modules.vehicles"
+    },
+    {
+      "label": "com.unity.dt.app-ui",
+      "file_type": "concept",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "com_unity_dt_app_ui",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "com.unity.dt.app-ui"
+    },
+    {
+      "label": "com.unity.modules.androidjni",
+      "file_type": "concept",
+      "source_file": "Packages/packages-lock.json",
+      "source_location": "L79",
+      "_origin": "ast",
+      "id": "packages_packages_lock_json_com_unity_modules_androidjni",
+      "community": 8,
+      "community_name": "com.unity.modules.physics",
+      "norm_label": "com.unity.modules.androidjni"
     },
     {
       "label": "com.unity.modules.physics",
@@ -7548,8 +7568,8 @@
       "community": 16,
       "norm_label": "unity ai navigation package",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_ai_navigation_package",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "docs_ai_unityprojectcontext_ai_navigation_package"
     },
     {
       "label": "CarsGame Project",
@@ -7563,8 +7583,8 @@
       "community": 16,
       "norm_label": "carsgame project",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_carsgame_project",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "docs_ai_unityprojectcontext_carsgame_project"
     },
     {
       "label": "Single-Scene Driving and Combat Prototype",
@@ -7578,8 +7598,8 @@
       "community": 16,
       "norm_label": "single-scene driving and combat prototype",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_driving_combat_prototype",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "docs_ai_unityprojectcontext_driving_combat_prototype"
     },
     {
       "label": "Unity Input System 1.20.0",
@@ -7593,8 +7613,8 @@
       "community": 16,
       "norm_label": "unity input system 1.20.0",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_input_system_1_20_0",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "docs_ai_unityprojectcontext_input_system_1_20_0"
     },
     {
       "label": "Official Unity AI/MCP Package",
@@ -7608,8 +7628,8 @@
       "community": 16,
       "norm_label": "official unity ai/mcp package",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_official_unity_ai_mcp",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "docs_ai_unityprojectcontext_official_unity_ai_mcp"
     },
     {
       "label": "Procedural Car Mesh Generation",
@@ -7623,8 +7643,8 @@
       "community": 16,
       "norm_label": "procedural car mesh generation",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_procedural_car_generation",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "docs_ai_unityprojectcontext_procedural_car_generation"
     },
     {
       "label": "Runtime and Play Mode Automation",
@@ -7638,8 +7658,8 @@
       "community": 16,
       "norm_label": "runtime and play mode automation",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_runtime_play_mode_automation",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "docs_ai_unityprojectcontext_runtime_play_mode_automation"
     },
     {
       "label": "Unity 6000.5.9f1",
@@ -7653,8 +7673,8 @@
       "community": 16,
       "norm_label": "unity 6000.5.9f1",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_unity_6000_5_9f1",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "docs_ai_unityprojectcontext_unity_6000_5_9f1"
     },
     {
       "label": "Unity Test Framework",
@@ -7668,8 +7688,8 @@
       "community": 16,
       "norm_label": "unity test framework",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_unity_test_framework",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "docs_ai_unityprojectcontext_unity_test_framework"
     },
     {
       "label": "Universal Render Pipeline 17.5.0",
@@ -7683,8 +7703,8 @@
       "community": 16,
       "norm_label": "universal render pipeline 17.5.0",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_urp_17_5_0",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "docs_ai_unityprojectcontext_urp_17_5_0"
     },
     {
       "label": "Unity 6000.5.9f1 Revision b57deb96f08d",
@@ -7698,8 +7718,8 @@
       "community": 16,
       "norm_label": "unity 6000.5.9f1 revision b57deb96f08d",
       "_origin": "semantic",
-      "id": "projectsettings_projectversion_unity_6000_5_9f1",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "projectsettings_projectversion_unity_6000_5_9f1"
     },
     {
       "label": "Unity Project Context",
@@ -7713,8 +7733,8 @@
       "community": 16,
       "norm_label": "unity project context",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_unity_project_context",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "docs_ai_unityprojectcontext_unity_project_context"
     },
     {
       "label": "Unity Project Version Record",
@@ -7728,8 +7748,8 @@
       "community": 16,
       "norm_label": "unity project version record",
       "_origin": "semantic",
-      "id": "projectsettings_projectversion_project_version",
-      "community_name": "Unity Project Context"
+      "community_name": "Unity Project Context",
+      "id": "projectsettings_projectversion_project_version"
     },
     {
       "label": "Assembly-CSharp",
@@ -7743,8 +7763,8 @@
       "community": 25,
       "norm_label": "assembly-csharp",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_assembly_csharp",
-      "community_name": "Rigidbody Vehicle Control"
+      "community_name": "Rigidbody Vehicle Control",
+      "id": "docs_ai_unityprojectcontext_assembly_csharp"
     },
     {
       "label": "Rigidbody Vehicle Control",
@@ -7758,8 +7778,8 @@
       "community": 25,
       "norm_label": "rigidbody vehicle control",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_rigidbody_vehicle_control",
-      "community_name": "Rigidbody Vehicle Control"
+      "community_name": "Rigidbody Vehicle Control",
+      "id": "docs_ai_unityprojectcontext_rigidbody_vehicle_control"
     },
     {
       "label": "SampleScene",
@@ -7773,8 +7793,8 @@
       "community": 25,
       "norm_label": "samplescene",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_samplescene",
-      "community_name": "Rigidbody Vehicle Control"
+      "community_name": "Rigidbody Vehicle Control",
+      "id": "docs_ai_unityprojectcontext_samplescene"
     },
     {
       "label": "MonoBehaviour Scene Composition",
@@ -7788,8 +7808,8 @@
       "community": 25,
       "norm_label": "monobehaviour scene composition",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_scene_composition",
-      "community_name": "Rigidbody Vehicle Control"
+      "community_name": "Rigidbody Vehicle Control",
+      "id": "docs_ai_unityprojectcontext_scene_composition"
     },
     {
       "label": "Track Markings Opponent Route",
@@ -7803,8 +7823,8 @@
       "community": 25,
       "norm_label": "track markings opponent route",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_track_markings_route",
-      "community_name": "Rigidbody Vehicle Control"
+      "community_name": "Rigidbody Vehicle Control",
+      "id": "docs_ai_unityprojectcontext_track_markings_route"
     },
     {
       "label": "Linux Standalone Editor Target",
@@ -7818,8 +7838,8 @@
       "community": 29,
       "norm_label": "linux standalone editor target",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_linux_standalone",
-      "community_name": "Target Platforms"
+      "community_name": "Target Platforms",
+      "id": "docs_ai_unityprojectcontext_linux_standalone"
     },
     {
       "label": "Mobile Platform Settings",
@@ -7833,8 +7853,8 @@
       "community": 29,
       "norm_label": "mobile platform settings",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_mobile_settings",
-      "community_name": "Target Platforms"
+      "community_name": "Target Platforms",
+      "id": "docs_ai_unityprojectcontext_mobile_settings"
     },
     {
       "label": "Target Platforms",
@@ -7848,8 +7868,8 @@
       "community": 29,
       "norm_label": "target platforms",
       "_origin": "semantic",
-      "id": "docs_ai_unityprojectcontext_target_platforms",
-      "community_name": "Target Platforms"
+      "community_name": "Target Platforms",
+      "id": "docs_ai_unityprojectcontext_target_platforms"
     }
   ],
   "links": [
@@ -11073,6 +11093,50 @@
       "_origin": "ast",
       "source": "assets_tutorialinfo_scripts_readme_readme",
       "target": "assets_tutorialinfo_scripts_readme_section",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
+      "target": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438_q_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438_q_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
+      "target": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438_answer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438_q_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
+      "target": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438_outcome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "graphify-out/memory/query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438_q_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438",
+      "target": "graphify_out_memory_query_20260902_104243_\u043f\u0440\u043e\u0441\u043b\u0435\u0434\u0438_source_nodes",
       "confidence_score": 1.0
     },
     {
@@ -16356,28 +16420,6 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": ".ua/tmp/ua-build-batch-2.py",
-      "source_location": "L4",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "ua_tmp_ua_build_batch_2",
-      "target": "ua_tmp_ua_build_batch_2_node",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": ".ua/tmp/ua-build-batch-2.py",
-      "source_location": "L5",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "ua_tmp_ua_build_batch_2",
-      "target": "ua_tmp_ua_build_batch_2_edge",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "Assets/Scripts/CarCameraFollow.cs",
@@ -17444,5 +17486,5 @@
       "source_file": "Docs/AI/UnityProjectContext.md"
     }
   ],
-  "built_at_commit": "1e49f9978b1a83a88dd964080c61268ae7a7e662"
+  "built_at_commit": "955e4fb4cf445785f5c0ffb8ea8e07f5bdd97539"
 }
