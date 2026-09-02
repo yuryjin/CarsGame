@@ -11,6 +11,7 @@ namespace RacingGame
         public Transform frontRightWheel;
         public Transform rearLeftWheel;
         public Transform rearRightWheel;
+        public float wheelRadius = 0.34f;
 
         [Header("Vehicle Dynamics")]
         public float motorTorque = 7500f;
@@ -26,6 +27,9 @@ namespace RacingGame
 
         [Header("Audio (Optional)")]
         public AudioSource engineAudio;
+
+        [Header("Control")]
+        public bool playerControlled = true;
 
         [Header("State")]
         [SerializeField] private float currentSpeedKmh;
@@ -51,17 +55,48 @@ namespace RacingGame
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
 
+            CreateWheelColliders();
             ApplyFrictionlessBodyMaterial();
 
             lastGroundedPos = transform.position + Vector3.up * 0.5f;
             lastGroundedRot = transform.rotation;
         }
 
-        // Tyre grip is simulated by this script (ApplyFriction / ApplyDownforce), so the body
-        // colliders themselves must be frictionless. With Unity's default physics material the
-        // static friction between the box collider and the road (~0.6 * m * g, about 7 kN) is
+        // The car is carried by frictionless spheres at the wheel positions instead of the flat
+        // body box: a sphere rolls over kerbs and the road/grass step (about 8 cm on this track),
+        // while a box edge rams straight into them and the car gets stuck off the track.
+        private void CreateWheelColliders()
+        {
+            CreateWheelColliders(transform, new[] { frontLeftWheel, frontRightWheel, rearLeftWheel, rearRightWheel }, wheelRadius);
+        }
+
+        // Shared with TargetCar so that every car in the scene stands on the same kind of wheels.
+        public static void CreateWheelColliders(Transform root, Transform[] wheels, float radius)
+        {
+            foreach (var wheel in wheels)
+            {
+                if (wheel == null) continue;
+
+                var wheelCollider = new GameObject(wheel.name + "_Collider");
+                wheelCollider.layer = root.gameObject.layer;
+                wheelCollider.transform.SetParent(root, false);
+                wheelCollider.transform.localPosition = root.InverseTransformPoint(wheel.position);
+
+                var sphere = wheelCollider.AddComponent<SphereCollider>();
+                sphere.radius = radius;
+            }
+        }
+
+        // Tyre grip is simulated by this script (ApplyFriction / ApplyDownforce), so the body and
+        // wheel colliders themselves must be frictionless. With Unity's default physics material
+        // the static friction between the colliders and the road (~0.6 * m * g, about 7 kN) is
         // larger than the motor force, and the car never starts moving.
         private void ApplyFrictionlessBodyMaterial()
+        {
+            ApplyFrictionlessBodyMaterial(gameObject);
+        }
+
+        public static void ApplyFrictionlessBodyMaterial(GameObject car)
         {
             var bodyMaterial = new PhysicsMaterial("CarBody_NoFriction")
             {
@@ -72,7 +107,7 @@ namespace RacingGame
                 bounceCombine = PhysicsMaterialCombine.Minimum
             };
 
-            foreach (var bodyCollider in GetComponentsInChildren<Collider>())
+            foreach (var bodyCollider in car.GetComponentsInChildren<Collider>())
             {
                 bodyCollider.sharedMaterial = bodyMaterial;
             }
@@ -80,12 +115,13 @@ namespace RacingGame
 
         private void Update()
         {
-            ReadInput();
+            if (playerControlled) ReadInput();
             UpdateWheelVisuals();
             UpdateAudio();
 
             // Reset car if flipped or fallen
-            if (transform.position.y < -10f || (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame))
+            if (transform.position.y < -10f ||
+                (playerControlled && Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame))
             {
                 ResetCar();
             }
@@ -137,6 +173,13 @@ namespace RacingGame
                 }
                 if (g.buttonSouth.isPressed) isBraking = true;
             }
+        }
+
+        public void SetInput(float throttle, float steering, bool braking)
+        {
+            moveInput = Mathf.Clamp(throttle, -1f, 1f);
+            steerInput = Mathf.Clamp(steering, -1f, 1f);
+            isBraking = braking;
         }
 
         private void CheckGrounded()
@@ -296,6 +339,8 @@ namespace RacingGame
 
         private void OnGUI()
         {
+            if (!playerControlled) return;
+
             // Speedometer & Controls overlay
             GUIStyle boxStyle = new GUIStyle(GUI.skin.box);
             boxStyle.fontSize = 16;
@@ -311,11 +356,12 @@ namespace RacingGame
             hintStyle.fontSize = 14;
             hintStyle.normal.textColor = new Color(0.9f, 0.9f, 0.9f);
 
-            GUILayout.BeginArea(new Rect(20, Screen.height - 150, 320, 130), GUI.skin.box);
+            GUILayout.BeginArea(new Rect(20, Screen.height - 175, 320, 155), GUI.skin.box);
             GUILayout.Label($"{Mathf.RoundToInt(Mathf.Abs(currentSpeedKmh))} KM/H", titleStyle);
             GUILayout.Label($"Управление: [W/A/S/D] или [Стрелки]", hintStyle);
             GUILayout.Label($"Тормоз / Ручник: [Пробел]", hintStyle);
             GUILayout.Label($"Восстановление машины: [R]", hintStyle);
+            GUILayout.Label($"Выстрел из пушки: [ЛКМ] / [Ctrl]", hintStyle);
             GUILayout.EndArea();
         }
     }
