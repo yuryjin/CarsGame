@@ -141,6 +141,10 @@ namespace RacingGame
             groundMask = Physics.DefaultRaycastLayers;
             if (carLayer >= 0) groundMask &= ~(1 << carLayer);
             if (projLayer >= 0) groundMask &= ~(1 << projLayer);
+            // Decorative colliders (tire stacks, trees) must not count as ground: standing on them would
+            // classify as Other and suppress the off-track reset timer.
+            int decoLayer = LayerMask.NameToLayer("Decoration");
+            if (decoLayer >= 0) groundMask &= ~(1 << decoLayer);
         }
 
         // The car is carried by frictionless spheres at the wheel positions instead of the flat

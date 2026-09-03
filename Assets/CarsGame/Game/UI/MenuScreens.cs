@@ -90,7 +90,8 @@ namespace RacingGame
             panels.Clear();
             current = name;
             if (string.IsNullOrEmpty(name)) return;
-            var root = UiFactory.Panel(canvas.transform, "Panel_" + name, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.03f, 0.04f, 0.07f, name == "results" ? 0.78f : 0.92f));
+            // Light veil only: the menu camera dolly behind the UI is part of the look. Cards sit behind the controls.
+            var root = UiFactory.Panel(canvas.transform, "Panel_" + name, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.02f, 0.03f, 0.06f, name == "results" ? 0.45f : 0.22f), roundedCorners: false);
             panels[name] = root;
             switch (name)
             {
@@ -107,8 +108,12 @@ namespace RacingGame
 
         private void Title(RectTransform root, string key)
         {
+            UiFactory.Text(root, "TitleShadow", Loc.Get(key), 72f, TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-596f, -154f), new Vector2(604f, -44f), new Color(0f, 0f, 0f, 0.55f));
             UiFactory.Text(root, "Title", Loc.Get(key), 72f, TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-600f, -150f), new Vector2(600f, -40f), new Color(1f, 0.85f, 0.2f));
         }
+
+        private static readonly Vector2 Centre = new Vector2(0.5f, 0.5f);
+        private static void CentreCard(RectTransform root, float xHalf, float yMin, float yMax) => UiFactory.Card(root, "Card", Centre, Centre, new Vector2(-xHalf, yMin), new Vector2(xHalf, yMax));
 
         private void BackButton(RectTransform root, string target = "main")
         {
@@ -126,6 +131,7 @@ namespace RacingGame
                 return;
             }
             UiFactory.Text(root, "Coins", Coins(), 32f, TextAlignmentOptions.TopRight, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-500f, -100f), new Vector2(-30f, -40f));
+            CentreCard(root, 310f, -320f, 110f);
             float y = 40f;
             foreach (var (key, target) in new[] { ("menu.play", "events"), ("menu.garage", "garage"), ("menu.leaderboard", "leaders"), ("menu.settings", "settings") })
             {
@@ -153,6 +159,7 @@ namespace RacingGame
             var events = new List<RaceEventDefinition>(flow.events ?? new RaceEventDefinition[0]);
             events.RemoveAll(e => e == null);
             events.Sort((a, b) => a.order.CompareTo(b.order));
+            CentreCard(root, 560f, 260f - events.Count * 100f + 30f, 330f);
             float y = 260f;
             var save = PlatformGlue.Save;
             foreach (var ev in events)
@@ -178,6 +185,7 @@ namespace RacingGame
             BackButton(root);
             var save = PlatformGlue.Save;
             UiFactory.Text(root, "Coins", Coins(), 32f, TextAlignmentOptions.TopRight, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-500f, -100f), new Vector2(-30f, -40f));
+            CentreCard(root, 560f, -160f, 280f);
             float y = 200f;
             foreach (var kind in new[] { UpgradeKind.Engine, UpgradeKind.Armor, UpgradeKind.Cannon })
             {
@@ -217,6 +225,7 @@ namespace RacingGame
             var save = PlatformGlue.Save;
             string lang = save != null ? save.Data.settings.lang : "";
             string langLabel = string.IsNullOrEmpty(lang) ? Loc.Get("settings.language.system") + $" ({Loc.Language})" : lang.ToUpperInvariant();
+            CentreCard(root, 560f, -140f, 230f);
             Row(root, 160f, Loc.Get("settings.language"), langLabel, () =>
             {
                 int i = System.Array.IndexOf(LanguageCycle, lang); i = (i + 1) % LanguageCycle.Length;
@@ -265,6 +274,7 @@ namespace RacingGame
                     sb.AppendLine($"{Loc.Get(ev.nameKey),-16} {UiFactory.FormatTime(b.bestTimeMs / 1000.0)}");
                 }
             if (!any) sb.AppendLine(Loc.Get("lb.empty"));
+            CentreCard(root, 560f, -290f, 290f);
             var text = UiFactory.Text(root, "Board", sb.ToString(), 30f, TextAlignmentOptions.TopLeft, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-520f, -260f), new Vector2(520f, 260f));
 
             var p = PlatformGlue.Platform;
@@ -299,6 +309,7 @@ namespace RacingGame
             var results = race.Results;
             if (results == null) { Show("main"); return; }
             Title(root, "results.title");
+            CentreCard(root, 560f, -290f, 280f);
             sb.Clear();
             foreach (var e in results.Entries)
             {

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using RacingGame.Core.Economy;
 using RacingGame.Core.Platform;
+using RacingGame.World;
 
 namespace RacingGame
 {
@@ -17,8 +18,6 @@ namespace RacingGame
     {
         public RaceEventDefinition[] events;
         public DifficultyTier[] tiers;
-        public Light sunLight;
-        public float nightIntensity = 0.12f;
 
         public FlowState State { get; private set; } = FlowState.Menu;
         public RaceEventDefinition CurrentEvent => RaceSetup.Event;
@@ -30,10 +29,7 @@ namespace RacingGame
         private InputAction pauseAction;
         private CarController playerCar;
         private AudioSource playerEngine;
-        private float dayIntensity = -1f;
-        private Color dayAmbient;
-        private UnityEngine.Rendering.AmbientMode dayAmbientMode;
-        private float dayAmbientIntensity;
+        private SkyDirector sky;
         private TrackPath track;
         private PickupSpawner pickups;
         private HudScreen hud;
@@ -55,8 +51,7 @@ namespace RacingGame
             var map = InputSystem.actions != null ? InputSystem.actions.FindActionMap("Driving") : null;
             pauseAction = map != null ? map.FindAction("Pause") : null;
             if (map != null && !map.enabled) map.Enable();
-            if (sunLight == null) { foreach (var l in FindObjectsByType<Light>(FindObjectsSortMode.None)) if (l.type == LightType.Directional) { sunLight = l; break; } }
-            if (sunLight != null) { dayIntensity = sunLight.intensity; dayAmbient = RenderSettings.ambientLight; dayAmbientMode = RenderSettings.ambientMode; dayAmbientIntensity = RenderSettings.ambientIntensity; }
+            sky = GetComponent<SkyDirector>() ?? FindFirstObjectByType<SkyDirector>();
             if (RaceSetup.Tier == null && tiers != null && tiers.Length > 0) RaceSetup.Tier = tiers[Mathf.Min(1, tiers.Length - 1)];
             if (RaceSetup.Event == null && events != null && events.Length > 0) RaceSetup.Event = events[0];
         }
@@ -91,7 +86,7 @@ namespace RacingGame
             ClearGhosts();
             if (race != null && race.State != RaceState.Idle) race.AbortRace();
             if (pickups != null) pickups.Clear();
-            RestoreDay();
+            if (sky != null) sky.ApplyDefault();
             CarHealth.GlobalDamageMultiplier = 1f;
             if (track != null && track.reversed) { track.reversed = false; track.Build(); }
         }
@@ -127,9 +122,11 @@ namespace RacingGame
             race.aiCountOverride = ev != null ? ev.aiCountOverride : -1;
             if (track != null) { track.reversed = ev != null && ev.reversed; track.Build(); }
             CarHealth.GlobalDamageMultiplier = ev != null ? ev.damageMultiplier : 1f;
-            if (ev != null && ev.night) SetNight(); else RestoreDay();
+            // Look before the field spawns so the first frame of the countdown is already correct.
+            if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
 
             LastReward = 0; LastRewardDoubled = false;
+            if (MenuCameraDirector.Instance != null) MenuCameraDirector.Instance.Activate(false);   // camera hand-over before cars exist
             race.StartRace();
             if (race.State == RaceState.Idle) { EnterMenu(); return; }
             if (pickups != null) pickups.Spawn(ev != null ? ev.pickupCount : 9);
@@ -202,24 +199,6 @@ namespace RacingGame
 
         private void SetState(FlowState s) { State = s; StateChanged?.Invoke(s); }
 
-        private void SetNight()
-        {
-            if (sunLight == null) return;
-            sunLight.intensity = nightIntensity;
-            // Assigning ambientLight flips the mode to Flat; do it explicitly and undo it in RestoreDay.
-            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.08f, 0.09f, 0.14f);
-        }
-
-        private void RestoreDay()
-        {
-            if (sunLight == null || dayIntensity < 0f) return;
-            sunLight.intensity = dayIntensity;
-            RenderSettings.ambientMode = dayAmbientMode;
-            RenderSettings.ambientIntensity = dayAmbientIntensity;
-            if (dayAmbientMode == UnityEngine.Rendering.AmbientMode.Flat) RenderSettings.ambientLight = dayAmbient;
-        }
-
         // ---------- race events ----------
         private void OnFieldSpawned()
         {
@@ -229,6 +208,7 @@ namespace RacingGame
             var save = PlatformGlue.Save;
             if (save != null) PlayerProgression.ApplyTo(playerCar, player.Health, playerCar.GetComponent<CarCannon>(), save.Data.progress.upgrades);
 
+            if (playerCar.GetComponent<PlayerEffects>() == null) playerCar.gameObject.AddComponent<PlayerEffects>();
             if (playerCar.engineAudio == null)
             {
                 playerEngine = playerCar.gameObject.AddComponent<AudioSource>();

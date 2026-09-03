@@ -11,7 +11,11 @@
         "Unity.Addressables.Editor",
         "Unity.ResourceManager",
         "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Editor",
+        "Unity.RenderPipelines.Core.Editor"
     ],
     "includePlatforms": [
         "Editor"

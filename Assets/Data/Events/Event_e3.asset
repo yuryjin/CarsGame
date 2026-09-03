@@ -18,6 +18,7 @@ MonoBehaviour:
   aiCountOverride: -1
   reversed: 0
   night: 0
+  sky: {fileID: 11400000, guid: ed31c2cf4ce213d7b9c521d9fd395721, type: 2}
   damageMultiplier: 1.2
   pickupCount: 16
   unlockAfterEventId: e2
