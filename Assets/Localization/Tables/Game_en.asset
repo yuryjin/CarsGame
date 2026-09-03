@@ -1,0 +1,342 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Game_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: c3621e2f7097df9ee8b958d247928190, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 3989123072
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900288
+    m_Localized: Back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900289
+    m_Localized: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900290
+    m_Localized: Yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094592
+    m_Localized: No
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094593
+    m_Localized: "Loading\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094594
+    m_Localized: CARS GAME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094595
+    m_Localized: RACE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094596
+    m_Localized: GARAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094597
+    m_Localized: LEADERS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094598
+    m_Localized: SETTINGS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094599
+    m_Localized: 'Coins: {n}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094600
+    m_Localized: CHOOSE RACE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094601
+    m_Localized: '{n} laps'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094602
+    m_Localized: '{n} rivals'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094603
+    m_Localized: Finish top 3 in the previous race to unlock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094604
+    m_Localized: 'Best: {t}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094605
+    m_Localized: Sprint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094606
+    m_Localized: Reverse Cup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094607
+    m_Localized: Chaos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094608
+    m_Localized: Night Brawl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094609
+    m_Localized: Endurance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094610
+    m_Localized: Easy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094611
+    m_Localized: Normal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094612
+    m_Localized: Hard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094613
+    m_Localized: LAP {cur}/{total}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094614
+    m_Localized: P{pos}/{n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094615
+    m_Localized: km/h
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094616
+    m_Localized: NITRO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094617
+    m_Localized: RELOAD {p}%
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094618
+    m_Localized: HP {hp}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094619
+    m_Localized: WRECKED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094620
+    m_Localized: WRONG WAY!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094621
+    m_Localized: GO!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094622
+    m_Localized: FINISH
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094623
+    m_Localized: 'Throttle: W or Up    Steer: A/D or arrows
+
+      Brake: Space   
+      Fire: Ctrl or LMB
+
+      Reset to track: R    Pause: Esc'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094624
+    m_Localized: Steer with the arrows, FIRE and BRAKE on the right. The car accelerates
+      by itself.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094625
+    m_Localized: PAUSED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094626
+    m_Localized: Resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288896
+    m_Localized: Restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288897
+    m_Localized: Main menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288898
+    m_Localized: "Esc \u2014 resume"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288899
+    m_Localized: RESULTS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288900
+    m_Localized: DNF
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288901
+    m_Localized: best {t}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288902
+    m_Localized: +{n} coins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288903
+    m_Localized: Double it (ad)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288904
+    m_Localized: Reward doubled!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288905
+    m_Localized: Next race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288906
+    m_Localized: Retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288907
+    m_Localized: K{k}/D{d}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288908
+    m_Localized: GARAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288909
+    m_Localized: Engine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288910
+    m_Localized: "+ top speed, \u2212 grip in corners"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288911
+    m_Localized: Armor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288912
+    m_Localized: "+ hit points, \u2212 acceleration"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288913
+    m_Localized: Cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288914
+    m_Localized: "+ damage, \u2212 rate of fire"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288915
+    m_Localized: Lv {lvl}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288916
+    m_Localized: "Buy \xB7 {cost}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288917
+    m_Localized: MAX
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288918
+    m_Localized: Not enough coins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288919
+    m_Localized: SETTINGS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288920
+    m_Localized: Language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288921
+    m_Localized: As on platform
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288922
+    m_Localized: Sound
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288923
+    m_Localized: Auto throttle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288924
+    m_Localized: On
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288925
+    m_Localized: Off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288926
+    m_Localized: LEADERS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288927
+    m_Localized: No results yet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288928
+    m_Localized: Your records
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288929
+    m_Localized: Sign in
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288930
+    m_Localized: Signing in keeps your progress on every device and puts your time
+      on the board.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288931
+    m_Localized: Ad unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288932
+    m_Localized: Watch to the end to get the reward
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478667
+    m_Localized: FIRE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478668
+    m_Localized: BRAKE
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

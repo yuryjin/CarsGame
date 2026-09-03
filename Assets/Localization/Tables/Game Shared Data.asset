@@ -1,0 +1,649 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: Game Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: Game
+  m_TableCollectionNameGuidString: c3621e2f7097df9ee8b958d247928190
+  m_Entries:
+  - m_Id: 3989123072
+    m_Key: common.ok
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900288
+    m_Key: common.back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900289
+    m_Key: common.continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900290
+    m_Key: common.yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094592
+    m_Key: common.no
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094593
+    m_Key: common.loading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094594
+    m_Key: menu.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094595
+    m_Key: menu.play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094596
+    m_Key: menu.garage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094597
+    m_Key: menu.leaderboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094598
+    m_Key: menu.settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094599
+    m_Key: menu.coins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094600
+    m_Key: events.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094601
+    m_Key: events.laps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094602
+    m_Key: events.rivals
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094603
+    m_Key: events.locked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094604
+    m_Key: events.best
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094605
+    m_Key: events.e1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094606
+    m_Key: events.e2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094607
+    m_Key: events.e3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094608
+    m_Key: events.e4.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094609
+    m_Key: events.e5.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094610
+    m_Key: difficulty.easy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094611
+    m_Key: difficulty.normal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094612
+    m_Key: difficulty.hard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094613
+    m_Key: hud.lap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094614
+    m_Key: hud.position
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094615
+    m_Key: hud.speed_unit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094616
+    m_Key: hud.nitro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094617
+    m_Key: hud.reload
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094618
+    m_Key: hud.hp
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094619
+    m_Key: hud.wrecked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094620
+    m_Key: hud.wrong_way
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094621
+    m_Key: hud.go
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094622
+    m_Key: hud.finish
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094623
+    m_Key: hud.hint.keys
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094624
+    m_Key: hud.hint.touch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094625
+    m_Key: pause.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094626
+    m_Key: pause.resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288896
+    m_Key: pause.restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288897
+    m_Key: pause.menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288898
+    m_Key: pause.hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288899
+    m_Key: results.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288900
+    m_Key: results.dnf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288901
+    m_Key: results.best_lap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288902
+    m_Key: results.reward
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288903
+    m_Key: results.double
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288904
+    m_Key: results.doubled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288905
+    m_Key: results.next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288906
+    m_Key: results.retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288907
+    m_Key: results.kills
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288908
+    m_Key: garage.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288909
+    m_Key: garage.engine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288910
+    m_Key: garage.engine.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288911
+    m_Key: garage.armor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288912
+    m_Key: garage.armor.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288913
+    m_Key: garage.cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288914
+    m_Key: garage.cannon.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288915
+    m_Key: garage.level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288916
+    m_Key: garage.buy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288917
+    m_Key: garage.max
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288918
+    m_Key: garage.not_enough
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288919
+    m_Key: settings.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288920
+    m_Key: settings.language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288921
+    m_Key: settings.language.system
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288922
+    m_Key: settings.sound
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288923
+    m_Key: settings.auto_throttle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288924
+    m_Key: settings.on
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288925
+    m_Key: settings.off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288926
+    m_Key: lb.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288927
+    m_Key: lb.empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288928
+    m_Key: lb.local
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288929
+    m_Key: lb.sign_in
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288930
+    m_Key: lb.sign_in.hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288931
+    m_Key: ads.unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288932
+    m_Key: ads.no_reward
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968758284288
+    m_Key: common.ok 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478592
+    m_Key: common.back 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478593
+    m_Key: common.continue 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478594
+    m_Key: common.yes 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478595
+    m_Key: common.no 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478596
+    m_Key: common.loading 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478597
+    m_Key: menu.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478598
+    m_Key: menu.play 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478599
+    m_Key: menu.garage 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478600
+    m_Key: menu.leaderboard 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478601
+    m_Key: menu.settings 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478602
+    m_Key: menu.coins 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478603
+    m_Key: events.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478604
+    m_Key: events.laps 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478605
+    m_Key: events.rivals 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478606
+    m_Key: events.locked 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478607
+    m_Key: events.best 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478608
+    m_Key: events.e1.name 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478609
+    m_Key: events.e2.name 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478610
+    m_Key: events.e3.name 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478611
+    m_Key: events.e4.name 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478612
+    m_Key: events.e5.name 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478613
+    m_Key: difficulty.easy 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478614
+    m_Key: difficulty.normal 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478615
+    m_Key: difficulty.hard 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478616
+    m_Key: hud.lap 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478617
+    m_Key: hud.position 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478618
+    m_Key: hud.speed_unit 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478619
+    m_Key: hud.nitro 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478620
+    m_Key: hud.reload 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478621
+    m_Key: hud.hp 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478622
+    m_Key: hud.wrecked 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478623
+    m_Key: hud.wrong_way 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478624
+    m_Key: hud.go 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478625
+    m_Key: hud.finish 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478626
+    m_Key: hud.hint.keys 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478627
+    m_Key: hud.hint.touch 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478628
+    m_Key: pause.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478629
+    m_Key: pause.resume 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478630
+    m_Key: pause.restart 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478631
+    m_Key: pause.menu 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478632
+    m_Key: pause.hint 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478633
+    m_Key: results.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478634
+    m_Key: results.dnf 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478635
+    m_Key: results.best_lap 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478636
+    m_Key: results.reward 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478637
+    m_Key: results.double 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478638
+    m_Key: results.doubled 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478639
+    m_Key: results.next 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478640
+    m_Key: results.retry 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478641
+    m_Key: results.kills 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478642
+    m_Key: garage.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478643
+    m_Key: garage.engine 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478644
+    m_Key: garage.engine.desc 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478645
+    m_Key: garage.armor 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478646
+    m_Key: garage.armor.desc 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478647
+    m_Key: garage.cannon 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478648
+    m_Key: garage.cannon.desc 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478649
+    m_Key: garage.level 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478650
+    m_Key: garage.buy 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478651
+    m_Key: garage.max 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478652
+    m_Key: garage.not_enough 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478653
+    m_Key: settings.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478654
+    m_Key: settings.language 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478655
+    m_Key: settings.language.system 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478656
+    m_Key: settings.sound 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478657
+    m_Key: settings.auto_throttle 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478658
+    m_Key: settings.on 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478659
+    m_Key: settings.off 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478660
+    m_Key: lb.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478661
+    m_Key: lb.empty 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478662
+    m_Key: lb.local 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478663
+    m_Key: lb.sign_in 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478664
+    m_Key: lb.sign_in.hint 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478665
+    m_Key: ads.unavailable 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478666
+    m_Key: ads.no_reward 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478667
+    m_Key: touch.fire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478668
+    m_Key: touch.brake
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items:
+    - rid: 4771536372321223228
+  m_KeyGenerator:
+    rid: 4771536372321223227
+  references:
+    version: 2
+    RefIds:
+    - rid: 4771536372321223227
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1788376718195
+    - rid: 4771536372321223228
+      type: {class: PreloadAssetTableMetadata, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_PreloadBehaviour: 1

@@ -1,0 +1,14 @@
+{
+    "name": "RacingGame.Platform",
+    "rootNamespace": "RacingGame.Platform",
+    "references": [ "RacingGame.Core" ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1be111e0f94e47e49fe3d793de37f32, type: 3}
+  m_Name: Difficulty_normal
+  m_EditorClassIdentifier: RacingGame.Game::RacingGame.DifficultyTier
+  tierId: normal
+  aiCount: 4
+  profiles:
+  - {fileID: 11400000, guid: d07918aff6541579f8658e8b45dd11b4, type: 2}
+  - {fileID: 11400000, guid: 401f2c6bc4805cc2794d6620169fc63d, type: 2}
+  - {fileID: 11400000, guid: 930748c3952cb6345a44345b411334b2, type: 2}
+  - {fileID: 11400000, guid: 4e9a2ada091b04b09a53be7cc571a99f, type: 2}
+  rubberBandStrength: 0.6
+  aiFireCooldown: 1.5
+  aiHealthMultiplier: 1
+  rewardMultiplier: 1

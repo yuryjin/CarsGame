@@ -1,0 +1,342 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Game_es
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: es
+  m_SharedData: {fileID: 11400000, guid: c3621e2f7097df9ee8b958d247928190, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 3989123072
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900288
+    m_Localized: "Atr\xE1s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900289
+    m_Localized: Continuar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900290
+    m_Localized: "S\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094592
+    m_Localized: No
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094593
+    m_Localized: "Cargando\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094594
+    m_Localized: CARS GAME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094595
+    m_Localized: CARRERA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094596
+    m_Localized: GARAJE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094597
+    m_Localized: "L\xCDDERES"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094598
+    m_Localized: AJUSTES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094599
+    m_Localized: 'Monedas: {n}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094600
+    m_Localized: ELIGE CARRERA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094601
+    m_Localized: '{n} vueltas'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094602
+    m_Localized: '{n} rivales'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094603
+    m_Localized: Termina top 3 en la carrera anterior para desbloquear
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094604
+    m_Localized: 'Mejor: {t}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094605
+    m_Localized: Sprint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094606
+    m_Localized: Copa Inversa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094607
+    m_Localized: Caos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094608
+    m_Localized: Pelea Nocturna
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094609
+    m_Localized: Resistencia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094610
+    m_Localized: "F\xE1cil"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094611
+    m_Localized: Normal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094612
+    m_Localized: "Dif\xEDcil"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094613
+    m_Localized: VUELTA {cur}/{total}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094614
+    m_Localized: P{pos}/{n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094615
+    m_Localized: km/h
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094616
+    m_Localized: NITRO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094617
+    m_Localized: RECARGA {p}%
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094618
+    m_Localized: HP {hp}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094619
+    m_Localized: DESTROZADO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094620
+    m_Localized: "\xA1DIRECCI\xD3N INCORRECTA!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094621
+    m_Localized: "\xA1YA!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094622
+    m_Localized: META
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094623
+    m_Localized: 'Acelerar: W o Arriba    Girar: A/D o flechas
+
+      Freno: Espacio   
+      Disparo: Ctrl o clic izq.
+
+      Volver a pista: R    Pausa: Esc'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094624
+    m_Localized: Gira con las flechas, DISPARO y FRENO a la derecha. El coche acelera
+      solo.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094625
+    m_Localized: PAUSA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094626
+    m_Localized: Reanudar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288896
+    m_Localized: Reiniciar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288897
+    m_Localized: "Men\xFA principal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288898
+    m_Localized: 'Esc: reanudar'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288899
+    m_Localized: RESULTADOS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288900
+    m_Localized: DNF
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288901
+    m_Localized: mejor {t}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288902
+    m_Localized: +{n} monedas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288903
+    m_Localized: Duplicar (anuncio)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288904
+    m_Localized: "\xA1Recompensa duplicada!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288905
+    m_Localized: Siguiente
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288906
+    m_Localized: Reintentar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288907
+    m_Localized: M{k}/D{d}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288908
+    m_Localized: GARAJE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288909
+    m_Localized: Motor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288910
+    m_Localized: "+ velocidad m\xE1x., \u2212 agarre en curvas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288911
+    m_Localized: Blindaje
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288912
+    m_Localized: "+ resistencia, \u2212 aceleraci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288913
+    m_Localized: "Ca\xF1\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288914
+    m_Localized: "+ da\xF1o, \u2212 cadencia"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288915
+    m_Localized: Nv {lvl}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288916
+    m_Localized: "Comprar \xB7 {cost}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288917
+    m_Localized: "M\xC1X"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288918
+    m_Localized: Monedas insuficientes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288919
+    m_Localized: AJUSTES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288920
+    m_Localized: Idioma
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288921
+    m_Localized: Como la plataforma
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288922
+    m_Localized: Sonido
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288923
+    m_Localized: Acelerador auto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288924
+    m_Localized: "S\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288925
+    m_Localized: No
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288926
+    m_Localized: "L\xCDDERES"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288927
+    m_Localized: "A\xFAn no hay resultados"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288928
+    m_Localized: "Tus r\xE9cords"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288929
+    m_Localized: "Iniciar sesi\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288930
+    m_Localized: "Iniciar sesi\xF3n guarda tu progreso en todos tus dispositivos
+      y publica tu tiempo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288931
+    m_Localized: Anuncio no disponible
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288932
+    m_Localized: Mira hasta el final para recibir la recompensa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478667
+    m_Localized: FUEGO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478668
+    m_Localized: FRENO
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

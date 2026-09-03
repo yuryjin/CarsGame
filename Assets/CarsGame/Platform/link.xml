@@ -1,0 +1,8 @@
+<linker>
+  <!-- SendMessage targets and the platform contracts must survive managed code stripping (High). -->
+  <assembly fullname="RacingGame.Platform" preserve="all" />
+  <assembly fullname="RacingGame.Core">
+    <namespace fullname="RacingGame.Core.Save" preserve="all" />
+    <namespace fullname="RacingGame.Core.Platform" preserve="all" />
+  </assembly>
+</linker>

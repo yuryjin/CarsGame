@@ -1,0 +1,97 @@
+key,context,max_chars,en,ru,tr,zh,de,es,fr,pt,uk
+common.ok,button,12,OK,ОК,Tamam,确定,OK,OK,OK,OK,ОК
+common.back,button,12,Back,Назад,Geri,返回,Zurück,Atrás,Retour,Voltar,Назад
+common.continue,button,14,Continue,Продолжить,Devam,继续,Weiter,Continuar,Continuer,Continuar,Продовжити
+common.yes,button,8,Yes,Да,Evet,是,Ja,Sí,Oui,Sim,Так
+common.no,button,8,No,Нет,Hayır,否,Nein,No,Non,Não,Ні
+common.loading,status,16,Loading…,Загрузка…,Yükleniyor…,加载中…,Laden…,Cargando…,Chargement…,Carregando…,Завантаження…
+menu.title,game title,24,CARS GAME,CARS GAME,CARS GAME,CARS GAME,CARS GAME,CARS GAME,CARS GAME,CARS GAME,CARS GAME
+menu.play,main menu button,12,RACE,ГОНКА,YARIŞ,比赛,RENNEN,CARRERA,COURSE,CORRIDA,ГОНКА
+menu.garage,main menu button,12,GARAGE,ГАРАЖ,GARAJ,车库,GARAGE,GARAJE,GARAGE,GARAGEM,ГАРАЖ
+menu.leaderboard,main menu button,14,LEADERS,ЛИДЕРЫ,LİDERLER,排行榜,BESTENLISTE,LÍDERES,CLASSEMENT,LÍDERES,ЛІДЕРИ
+menu.settings,main menu button,12,SETTINGS,НАСТРОЙКИ,AYARLAR,设置,EINSTELLUNGEN,AJUSTES,OPTIONS,OPÇÕES,НАЛАШТУВАННЯ
+menu.coins,currency label {n},16,Coins: {n},Монеты: {n},Para: {n},金币：{n},Münzen: {n},Monedas: {n},Pièces : {n},Moedas: {n},Монети: {n}
+events.title,screen title,16,CHOOSE RACE,ВЫБОР ГОНКИ,YARIŞ SEÇ,选择比赛,RENNEN WÄHLEN,ELIGE CARRERA,CHOISIR COURSE,ESCOLHER CORRIDA,ВИБІР ГОНКИ
+events.laps,{n} laps,12,{n} laps,{n} кругов,{n} tur,{n} 圈,{n} Runden,{n} vueltas,{n} tours,{n} voltas,{n} кіл
+events.rivals,{n} rivals,12,{n} rivals,{n} соперников,{n} rakip,{n} 对手,{n} Gegner,{n} rivales,{n} rivaux,{n} rivais,{n} суперників
+events.locked,locked event hint,60,Finish top 3 in the previous race to unlock,"Займите топ-3 в прошлой гонке, чтобы открыть",Açmak için önceki yarışta ilk 3'e gir,在上一场比赛中进入前三名即可解锁,"Werde Top 3 im vorherigen Rennen, um freizuschalten",Termina top 3 en la carrera anterior para desbloquear,Finis dans le top 3 de la course précédente pour débloquer,Termine no top 3 da corrida anterior para desbloquear,"Посядьте топ-3 у попередній гонці, щоб відкрити"
+events.best,best time label,16,Best: {t},Рекорд: {t},En iyi: {t},最佳：{t},Beste: {t},Mejor: {t},Record : {t},Melhor: {t},Рекорд: {t}
+events.e1.name,event name,16,Sprint,Спринт,Sprint,冲刺赛,Sprint,Sprint,Sprint,Sprint,Спринт
+events.e2.name,event name,16,Reverse Cup,Кубок наоборот,Ters Kupa,逆向杯,Rückwärts-Cup,Copa Inversa,Coupe Inversée,Copa Reversa,Кубок навпаки
+events.e3.name,event name,16,Chaos,Хаос,Kaos,混乱赛,Chaos,Caos,Chaos,Caos,Хаос
+events.e4.name,event name,16,Night Brawl,Ночная драка,Gece Kavgası,夜间混战,Nachtkampf,Pelea Nocturna,Bagarre Nocturne,Briga Noturna,Нічна бійка
+events.e5.name,event name,16,Endurance,Выносливость,Dayanıklılık,耐力赛,Ausdauer,Resistencia,Endurance,Resistência,Витривалість
+difficulty.easy,tier,10,Easy,Легко,Kolay,简单,Leicht,Fácil,Facile,Fácil,Легко
+difficulty.normal,tier,10,Normal,Нормально,Normal,普通,Normal,Normal,Normal,Normal,Нормально
+difficulty.hard,tier,10,Hard,Сложно,Zor,困难,Schwer,Difícil,Difficile,Difícil,Складно
+hud.lap,{cur}/{total},22,LAP {cur}/{total},КРУГ {cur}/{total},TUR {cur}/{total},第 {cur}/{total} 圈,RUNDE {cur}/{total},VUELTA {cur}/{total},TOUR {cur}/{total},VOLTA {cur}/{total},КОЛО {cur}/{total}
+hud.position,P{pos}/{n},14,P{pos}/{n},П{pos}/{n},S{pos}/{n},第{pos}/{n}名,P{pos}/{n},P{pos}/{n},P{pos}/{n},P{pos}/{n},П{pos}/{n}
+hud.speed_unit,,6,km/h,км/ч,km/sa,公里/时,km/h,km/h,km/h,km/h,км/год
+hud.nitro,boost flag,8,NITRO,НИТРО,NİTRO,氮气,NITRO,NITRO,NITRO,NITRO,НІТРО
+hud.reload,{p} percent,12,RELOAD {p}%,ПЕРЕЗАРЯДКА {p}%,DOLDUR {p}%,装填 {p}%,NACHLADEN {p}%,RECARGA {p}%,RECHARGE {p}%,RECARGA {p}%,ПЕРЕЗАРЯДКА {p}%
+hud.hp,{hp},8,HP {hp},HP {hp},HP {hp},生命 {hp},HP {hp},HP {hp},PV {hp},HP {hp},HP {hp}
+hud.wrecked,,12,WRECKED,РАЗБИТА,HURDA,已报废,ZERSTÖRT,DESTROZADO,DÉTRUITE,DESTRUÍDO,РОЗБИТА
+hud.wrong_way,,24,WRONG WAY!,НЕ ТУДА!,YANLIŞ YÖN!,方向错误！,FALSCHE RICHTUNG!,¡DIRECCIÓN INCORRECTA!,MAUVAIS SENS !,SENTIDO ERRADO!,НЕ ТУДИ!
+hud.go,countdown end,4,GO!,СТАРТ!,BAŞLA!,出发！,LOS!,¡YA!,GO !,VAI!,СТАРТ!
+hud.finish,,8,FINISH,ФИНИШ,BİTİŞ,冲线,ZIEL,META,ARRIVÉE,CHEGADA,ФІНІШ
+hud.hint.keys,"onboarding, keyboard",140,"Throttle: W or Up    Steer: A/D or arrows
+Brake: Space    Fire: Ctrl or LMB
+Reset to track: R    Pause: Esc","Газ: W или стрелка вверх    Руль: A/D или стрелки
+Тормоз: Пробел    Огонь: Ctrl или ЛКМ
+Сброс на трассу: R    Пауза: Esc","Gaz: W veya Yukarı    Direksiyon: A/D veya oklar
+Fren: Boşluk    Ateş: Ctrl veya sol tık
+Piste dön: R    Duraklat: Esc","油门：W 或上键    转向：A/D 或方向键
+刹车：空格    开火：Ctrl 或鼠标左键
+回到赛道：R    暂停：Esc","Gas: W oder Pfeil hoch    Lenken: A/D oder Pfeile
+Bremse: Leertaste    Feuer: Strg oder LMT
+Zurück auf die Strecke: R    Pause: Esc","Acelerar: W o Arriba    Girar: A/D o flechas
+Freno: Espacio    Disparo: Ctrl o clic izq.
+Volver a pista: R    Pausa: Esc","Accélérer : W ou Haut    Diriger : A/D ou flèches
+Frein : Espace    Tir : Ctrl ou clic gauche
+Retour piste : R    Pause : Échap","Acelerar: W ou Cima    Virar: A/D ou setas
+Freio: Espaço    Atirar: Ctrl ou botão esq.
+Voltar à pista: R    Pausa: Esc","Газ: W або стрілка вгору    Кермо: A/D або стрілки
+Гальмо: Пробіл    Вогонь: Ctrl або ЛКМ
+Скидання на трасу: R    Пауза: Esc"
+hud.hint.touch,"onboarding, touch",100,"Steer with the arrows, FIRE and BRAKE on the right. The car accelerates by itself.","Руль — стрелки слева, ОГОНЬ и ТОРМОЗ справа. Машина едет сама.","Oklarla yön ver, sağda ATEŞ ve FREN. Araç kendi hızlanır.",左侧箭头转向，右侧开火和刹车。车辆自动加速。,"Lenken mit den Pfeilen, FEUER und BREMSE rechts. Das Auto beschleunigt selbst.","Gira con las flechas, DISPARO y FRENO a la derecha. El coche acelera solo.","Dirigez avec les flèches, TIR et FREIN à droite. La voiture accélère seule.","Vire com as setas, ATIRAR e FREIO à direita. O carro acelera sozinho.","Кермо — стрілки ліворуч, ВОГОНЬ і ГАЛЬМО праворуч. Машина їде сама."
+pause.title,,8,PAUSED,ПАУЗА,DURAKLATILDI,已暂停,PAUSE,PAUSA,PAUSE,PAUSA,ПАУЗА
+pause.resume,button,12,Resume,Продолжить,Devam,继续,Weiter,Reanudar,Reprendre,Continuar,Продовжити
+pause.restart,button,12,Restart,Заново,Yeniden,重新开始,Neustart,Reiniciar,Recommencer,Reiniciar,Спочатку
+pause.menu,button,12,Main menu,В меню,Ana menü,主菜单,Hauptmenü,Menú principal,Menu principal,Menu principal,У меню
+pause.hint,,30,Esc — resume,Esc — продолжить,Esc — devam,Esc — 继续,Esc – weiter,Esc: reanudar,Échap — reprendre,Esc — continuar,Esc — продовжити
+results.title,,12,RESULTS,РЕЗУЛЬТАТЫ,SONUÇLAR,比赛结果,ERGEBNIS,RESULTADOS,RÉSULTATS,RESULTADOS,РЕЗУЛЬТАТИ
+results.dnf,did not finish,10,DNF,Сход,Bitiremedi,未完赛,DNF,DNF,Abandon,DNF,Схід
+results.best_lap,,12,best {t},круг {t},tur {t},最快 {t},beste {t},mejor {t},meilleur {t},melhor {t},коло {t}
+results.reward,{n} coins,16,+{n} coins,+{n} монет,+{n} para,+{n} 金币,+{n} Münzen,+{n} monedas,+{n} pièces,+{n} moedas,+{n} монет
+results.double,rewarded ad button,22,Double it (ad),Удвоить (реклама),İkiye katla (reklam),翻倍（广告）,Verdoppeln (Werbung),Duplicar (anuncio),Doubler (pub),Dobrar (anúncio),Подвоїти (реклама)
+results.doubled,,16,Reward doubled!,Награда удвоена!,Ödül ikiye katlandı!,奖励已翻倍！,Belohnung verdoppelt!,¡Recompensa duplicada!,Récompense doublée !,Recompensa dobrada!,Нагороду подвоєно!
+results.next,button,12,Next race,Следующая,Sonraki yarış,下一场,Nächstes Rennen,Siguiente,Course suivante,Próxima corrida,Наступна
+results.retry,button,12,Retry,Ещё раз,Tekrar,再试一次,Nochmal,Reintentar,Réessayer,Tentar de novo,Ще раз
+results.kills,{k}/{d},8,K{k}/D{d},У{k}/С{d},Ö{k}/L{d},击杀{k}/被杀{d},K{k}/T{d},M{k}/D{d},V{k}/M{d},A{k}/M{d},В{k}/С{d}
+garage.title,,8,GARAGE,ГАРАЖ,GARAJ,车库,GARAGE,GARAJE,GARAGE,GARAGEM,ГАРАЖ
+garage.engine,upgrade,10,Engine,Двигатель,Motor,引擎,Motor,Motor,Moteur,Motor,Двигун
+garage.engine.desc,,60,"+ top speed, − grip in corners","+ макс. скорость, − сцепление в поворотах","+ azami hız, − virajlarda tutuş",+ 最高速度，− 弯道抓地力,"+ Höchstgeschwindigkeit, − Kurvengrip","+ velocidad máx., − agarre en curvas","+ vitesse max, − adhérence en virage","+ velocidade máx., − aderência nas curvas","+ макс. швидкість, − зчеплення в поворотах"
+garage.armor,upgrade,10,Armor,Броня,Zırh,装甲,Panzerung,Blindaje,Blindage,Blindagem,Броня
+garage.armor.desc,,60,"+ hit points, − acceleration","+ прочность, − разгон","+ dayanıklılık, − hızlanma",+ 生命值，− 加速,"+ Lebenspunkte, − Beschleunigung","+ resistencia, − aceleración","+ points de vie, − accélération","+ resistência, − aceleração","+ міцність, − розгін"
+garage.cannon,upgrade,10,Cannon,Пушка,Top,火炮,Kanone,Cañón,Canon,Canhão,Гармата
+garage.cannon.desc,,60,"+ damage, − rate of fire","+ урон, − скорострельность","+ hasar, − atış hızı",+ 伤害，− 射速,"+ Schaden, − Feuerrate","+ daño, − cadencia","+ dégâts, − cadence","+ dano, − cadência","+ шкода, − скорострільність"
+garage.level,{lvl}/{max},16,Lv {lvl}/{max},Ур. {lvl}/{max},Sv {lvl}/{max},等级 {lvl}/{max},St. {lvl}/{max},Nv {lvl}/{max},Niv. {lvl}/{max},Nv {lvl}/{max},Рів. {lvl}/{max}
+garage.buy,{cost},12,Buy · {cost},Купить · {cost},Satın al · {cost},购买 · {cost},Kaufen · {cost},Comprar · {cost},Acheter · {cost},Comprar · {cost},Купити · {cost}
+garage.max,,8,MAX,МАКС,MAKS,已满级,MAX,MÁX,MAX,MÁX,МАКС
+garage.not_enough,,20,Not enough coins,Не хватает монет,Yeterli para yok,金币不足,Nicht genug Münzen,Monedas insuficientes,Pas assez de pièces,Moedas insuficientes,Не вистачає монет
+settings.title,,10,SETTINGS,НАСТРОЙКИ,AYARLAR,设置,EINSTELLUNGEN,AJUSTES,OPTIONS,OPÇÕES,НАЛАШТУВАННЯ
+settings.language,,12,Language,Язык,Dil,语言,Sprache,Idioma,Langue,Idioma,Мова
+settings.language.system,follow platform,20,As on platform,Как на платформе,Platformdaki gibi,跟随平台,Wie Plattform,Como la plataforma,Comme la plateforme,Como a plataforma,Як на платформі
+settings.sound,,10,Sound,Звук,Ses,声音,Ton,Sonido,Son,Som,Звук
+settings.auto_throttle,,16,Auto throttle,Автогаз,Otomatik gaz,自动油门,Auto-Gas,Acelerador auto,Accélération auto,Acelerador auto,Автогаз
+settings.on,,4,On,Вкл,Açık,开,An,Sí,Oui,Lig.,Увім
+settings.off,,4,Off,Выкл,Kapalı,关,Aus,No,Non,Desl.,Вимк
+lb.title,,12,LEADERS,ЛИДЕРЫ,LİDERLER,排行榜,BESTENLISTE,LÍDERES,CLASSEMENT,LÍDERES,ЛІДЕРИ
+lb.empty,,24,No results yet,Пока нет результатов,Henüz sonuç yok,暂无成绩,Noch keine Ergebnisse,Aún no hay resultados,Pas encore de résultats,Ainda sem resultados,Поки немає результатів
+lb.local,guest records header,20,Your records,Ваши рекорды,Rekorların,你的纪录,Deine Rekorde,Tus récords,Vos records,Seus recordes,Ваші рекорди
+lb.sign_in,auth button,22,Sign in,Войти,Giriş yap,登录,Anmelden,Iniciar sesión,Se connecter,Entrar,Увійти
+lb.sign_in.hint,,90,Signing in keeps your progress on every device and puts your time on the board.,Вход сохранит прогресс на всех устройствах и отправит время в таблицу.,Giriş yapmak ilerlemeni tüm cihazlarda saklar ve süreni tabloya ekler.,登录后可在所有设备保留进度并上榜。,Die Anmeldung sichert deinen Fortschritt auf allen Geräten und trägt deine Zeit ein.,Iniciar sesión guarda tu progreso en todos tus dispositivos y publica tu tiempo.,La connexion conserve votre progression sur tous vos appareils et publie votre temps.,Entrar mantém seu progresso em todos os dispositivos e publica seu tempo.,Вхід збереже прогрес на всіх пристроях і надішле час у таблицю.
+ads.unavailable,toast,20,Ad unavailable,Реклама недоступна,Reklam yok,广告不可用,Werbung nicht verfügbar,Anuncio no disponible,Pub indisponible,Anúncio indisponível,Реклама недоступна
+ads.no_reward,toast,50,Watch to the end to get the reward,"Досмотрите до конца, чтобы получить награду",Ödül için sonuna kadar izle,看完广告即可获得奖励,"Bis zum Ende ansehen, um die Belohnung zu erhalten",Mira hasta el final para recibir la recompensa,Regardez jusqu'à la fin pour la récompense,Assista até o fim para receber a recompensa,"Додивіться до кінця, щоб отримати нагороду"
+touch.fire,touch button,8,FIRE,ОГОНЬ,ATEŞ,开火,FEUER,FUEGO,TIR,FOGO,ВОГОНЬ
+touch.brake,touch button,8,BRAKE,ТОРМОЗ,FREN,刹车,BREMSE,FRENO,FREIN,FREIO,ГАЛЬМО

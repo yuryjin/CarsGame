@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>{{{ PRODUCT_NAME }}}</title>
+  <link rel="stylesheet" href="TemplateData/style.css">
+  <!-- Yandex serves /sdk.js on the game origin. Locally it 404s and the mock takes over (see cars-platform.js). -->
+  <script src="/sdk.js" onerror="window.__ysdkMissing = true;"></script>
+  <script src="TemplateData/cars-platform.js"></script>
+</head>
+<body>
+  <div id="cars-root">
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="cars-loading"><div id="cars-loading-bar"><div id="cars-loading-fill"></div></div></div>
+  </div>
+  <script src="Build/{{{ LOADER_FILENAME }}}"></script>
+  <script>
+    (function () {
+      var canvas = document.querySelector('#unity-canvas');
+      var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      var config = {
+        arguments: [],
+        dataUrl: 'Build/{{{ DATA_FILENAME }}}',
+        frameworkUrl: 'Build/{{{ FRAMEWORK_FILENAME }}}',
+#if USE_THREADS
+        workerUrl: 'Build/{{{ WORKER_FILENAME }}}',
+#endif
+#if USE_WASM
+        codeUrl: 'Build/{{{ CODE_FILENAME }}}',
+#endif
+#if MEMORY_FILENAME
+        memoryUrl: 'Build/{{{ MEMORY_FILENAME }}}',
+#endif
+#if SYMBOLS_FILENAME
+        symbolsUrl: 'Build/{{{ SYMBOLS_FILENAME }}}',
+#endif
+        streamingAssetsUrl: 'StreamingAssets',
+        autoSyncPersistentDataPath: true,   // PlayerPrefs/IDBFS sync without the deprecated manual JS_FileSystem_Sync
+        companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+        productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+        productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+        // Yandex forbids the default Unity warning banner; problems go to the console instead.
+        showBanner: function (msg, type) { console.warn('[unity]', type, msg); },
+        // Biggest mobile perf lever: do not render at native DPR on phones.
+        devicePixelRatio: Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.5)
+      };
+      document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+      var fill = document.querySelector('#cars-loading-fill');
+      // Init the host SDK (or mock) first so game_api_pause is buffered before Unity boots.
+      window.CarsPlatform.boot().then(function () {
+        return createUnityInstance(canvas, config, function (p) { fill.style.width = (100 * p) + '%'; });
+      }).then(function (instance) {
+        document.querySelector('#cars-loading').style.display = 'none';
+        window.CarsPlatform.attach(instance);
+      }).catch(function (err) { console.error('[cars] boot failed', err); });
+    })();
+  </script>
+</body>
+</html>

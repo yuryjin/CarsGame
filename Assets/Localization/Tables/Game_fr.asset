@@ -1,0 +1,338 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Game_fr
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: fr
+  m_SharedData: {fileID: 11400000, guid: c3621e2f7097df9ee8b958d247928190, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 3989123072
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900288
+    m_Localized: Retour
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900289
+    m_Localized: Continuer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4005900290
+    m_Localized: Oui
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094592
+    m_Localized: Non
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094593
+    m_Localized: "Chargement\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094594
+    m_Localized: CARS GAME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094595
+    m_Localized: COURSE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094596
+    m_Localized: GARAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094597
+    m_Localized: CLASSEMENT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094598
+    m_Localized: OPTIONS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094599
+    m_Localized: "Pi\xE8ces : {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094600
+    m_Localized: CHOISIR COURSE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094601
+    m_Localized: '{n} tours'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094602
+    m_Localized: '{n} rivaux'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094603
+    m_Localized: "Finis dans le top 3 de la course pr\xE9c\xE9dente pour d\xE9bloquer"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094604
+    m_Localized: 'Record : {t}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094605
+    m_Localized: Sprint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094606
+    m_Localized: "Coupe Invers\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094607
+    m_Localized: Chaos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094608
+    m_Localized: Bagarre Nocturne
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094609
+    m_Localized: Endurance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094610
+    m_Localized: Facile
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094611
+    m_Localized: Normal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094612
+    m_Localized: Difficile
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094613
+    m_Localized: TOUR {cur}/{total}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094614
+    m_Localized: P{pos}/{n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094615
+    m_Localized: km/h
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094616
+    m_Localized: NITRO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094617
+    m_Localized: RECHARGE {p}%
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094618
+    m_Localized: PV {hp}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094619
+    m_Localized: "D\xC9TRUITE"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094620
+    m_Localized: MAUVAIS SENS !
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094621
+    m_Localized: GO !
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094622
+    m_Localized: "ARRIV\xC9E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094623
+    m_Localized: "Acc\xE9l\xE9rer : W ou Haut    Diriger : A/D ou fl\xE8ches\nFrein
+      : Espace    Tir : Ctrl ou clic gauche\nRetour piste : R    Pause : \xC9chap"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094624
+    m_Localized: "Dirigez avec les fl\xE8ches, TIR et FREIN \xE0 droite. La voiture
+      acc\xE9l\xE8re seule."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094625
+    m_Localized: PAUSE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4010094626
+    m_Localized: Reprendre
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288896
+    m_Localized: Recommencer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288897
+    m_Localized: Menu principal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288898
+    m_Localized: "\xC9chap \u2014 reprendre"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288899
+    m_Localized: "R\xC9SULTATS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288900
+    m_Localized: Abandon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288901
+    m_Localized: meilleur {t}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288902
+    m_Localized: "+{n} pi\xE8ces"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288903
+    m_Localized: Doubler (pub)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288904
+    m_Localized: "R\xE9compense doubl\xE9e !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288905
+    m_Localized: Course suivante
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288906
+    m_Localized: "R\xE9essayer"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288907
+    m_Localized: V{k}/M{d}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288908
+    m_Localized: GARAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288909
+    m_Localized: Moteur
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288910
+    m_Localized: "+ vitesse max, \u2212 adh\xE9rence en virage"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288911
+    m_Localized: Blindage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288912
+    m_Localized: "+ points de vie, \u2212 acc\xE9l\xE9ration"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288913
+    m_Localized: Canon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288914
+    m_Localized: "+ d\xE9g\xE2ts, \u2212 cadence"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288915
+    m_Localized: Niv. {lvl}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288916
+    m_Localized: "Acheter \xB7 {cost}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288917
+    m_Localized: MAX
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288918
+    m_Localized: "Pas assez de pi\xE8ces"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288919
+    m_Localized: OPTIONS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288920
+    m_Localized: Langue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288921
+    m_Localized: Comme la plateforme
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288922
+    m_Localized: Son
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288923
+    m_Localized: "Acc\xE9l\xE9ration auto"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288924
+    m_Localized: Oui
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288925
+    m_Localized: Non
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288926
+    m_Localized: CLASSEMENT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288927
+    m_Localized: "Pas encore de r\xE9sultats"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288928
+    m_Localized: Vos records
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288929
+    m_Localized: Se connecter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288930
+    m_Localized: La connexion conserve votre progression sur tous vos appareils et
+      publie votre temps.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288931
+    m_Localized: Pub indisponible
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4014288932
+    m_Localized: "Regardez jusqu'\xE0 la fin pour la r\xE9compense"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478667
+    m_Localized: TIR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14968762478668
+    m_Localized: FREIN
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []
