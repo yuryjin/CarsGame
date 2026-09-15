@@ -56,3 +56,4 @@ sysinfo.txt
 # ---- Plastic SCM / Unity Version Control (not used, git is the VCS here) ----
 .plastic/
 /[Aa]ssets/Plugins/PlasticSCM*
+graphify-out

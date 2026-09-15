@@ -84,3 +84,9 @@
 4. Play-mode M3: `m3_verify.cs` на 10 с и 75 с (все AI `laps ≥ 1`, `minPairDist > 4`, `resets == 0`).
 5. Codex `adversarial-review` по диффу (запущен, результат в scratchpad `codex-m1-m3-review.md`) — применить находки.
 6. Далее M4 (RaceManager, HUD, звук, онбординг).
+
+## 2026-09-10 — мидкор-план и адверсариальная проверка
+- `Docs/AI/MidcoreDesign.md`: черновик v1 (статусы, слоты оружия, 9 видов оружия, опасности трассы, режимы, 5 слоёв меты) → проверка пятью внешними моделями (Codex gpt-6-astra max, Grok 4.6 через Cursor CLI, MiMo / big-pickle / Nemotron через OpenCode; Unity AI Assistant запущен headless через `AssistantApi.RunHeadless`, ответ не получен) → план v2: MVP P0–P4 на 4–6 недель, очередь после MVP, условия возврата моста. Отзывы: `Docs/AI/reviews/midcore-2026-09-10/`.
+- Найдено по коду в ходе проверки (не исправлено, в P0): респаун/неуязвимость/кулдаун столкновений на `Time.time` (`CarHealth`), пул снарядов без потолка и не чистится в `Teardown`, `KillsPerVictim` передаёт общее число килов (43 монеты вместо 75 за трёх жертв), `RaceRanking.Rank` аллоцирует ~10 раз/с, Ctrl уже занят под Fire, `TrackSpline.Position` интерполирует высоту, но проекция/кривизна плоские.
+- Kimi/GLM/DeepSeek/Qwen в OpenCode не настроены. Hunyuan3D-2 с весами найден в `~/projects8/3d2/Hunyuan3D-2` (RTX 4070 Ti работает).
+- `Docs/AI/MidcorePrompts.md`: план v2 разбит на 12 этапов (0–11) с готовыми промптами для агента и общей преамбулой; плюс короткие промпты после MVP (Арена, шипы/сюрикены, образец кузова, ракета, мост).
