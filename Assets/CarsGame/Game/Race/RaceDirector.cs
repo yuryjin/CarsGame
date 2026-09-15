@@ -14,8 +14,10 @@ namespace RacingGame
     {
         [Tooltip("0 = pick a seed at start. Set for reproducible AI behaviour.")]
         public int raceSeed;
-        [Tooltip("Shells kept ready in the pool. Grows on demand.")]
+        [Tooltip("Shells created up front (prewarmed before the race starts).")]
         public int projectilePoolSize = 24;
+        [Tooltip("Hard cap on shells in flight. When it is reached the oldest shell is recycled, so the pool never grows past this.")]
+        public int maxLiveProjectiles = 48;
 
         public static RaceDirector Instance
         {
@@ -63,28 +65,40 @@ namespace RacingGame
 
         public void UnregisterCar(CarController car) { cars.Remove(car); }
 
+        public int LiveProjectiles => liveShells.Count;
+        private int MaxLive => Mathf.Max(1, maxLiveProjectiles);
+        public int PooledProjectiles => pooledShells.Count;
+
         public Projectile RequestProjectile(in ProjectileSpawn spawn)
         {
-            Projectile shell;
-            if (pooledShells.Count > 0)
-            {
-                shell = pooledShells[pooledShells.Count - 1];
-                pooledShells.RemoveAt(pooledShells.Count - 1);
-            }
-            else
-            {
-                shell = Projectile.CreatePooled(ShellRoot);
-            }
+            var root = ShellRoot;   // prewarms the pool on first use
+            // Hard cap on shells in flight, checked before any pooled shell is used (the prewarm or a
+            // lowered cap must not bypass it): the oldest shells are recycled first.
+            int cap = MaxLive;
+            while (liveShells.Count >= cap) { int before = liveShells.Count; liveShells[0].Deactivate(); if (liveShells.Count == before) liveShells.RemoveAt(0); }
+            if (pooledShells.Count == 0) pooledShells.Add(Projectile.CreatePooled(root));
+            var shell = pooledShells[pooledShells.Count - 1];
+            pooledShells.RemoveAt(pooledShells.Count - 1);
             liveShells.Add(shell);
             shell.Activate(this, spawn);
             ShotsFired++;
             return shell;
         }
 
+        // Projectile.Deactivate guards on its live flag, so a shell comes back at most once.
         internal void ReturnToPool(Projectile shell)
         {
             liveShells.Remove(shell);
-            if (!pooledShells.Contains(shell)) pooledShells.Add(shell);
+            pooledShells.Add(shell);
+        }
+
+        /// <summary>Between races: recall every shell in flight, zero the counters and make sure the pool is warm.</summary>
+        public void ResetRace()
+        {
+            for (int i = liveShells.Count - 1; i >= 0; i--) liveShells[i].Deactivate();
+            ShotsFired = 0;
+            ShellHits = 0;
+            _ = ShellRoot;
         }
 
         public void SimulationStep(int tick)
@@ -101,7 +115,8 @@ namespace RacingGame
                 {
                     shellRoot = new GameObject("Shells").transform;
                     shellRoot.SetParent(transform, false);
-                    for (int i = 0; i < projectilePoolSize; i++) pooledShells.Add(Projectile.CreatePooled(shellRoot));
+                    int prewarm = Mathf.Min(projectilePoolSize, MaxLive);
+                    for (int i = 0; i < prewarm; i++) pooledShells.Add(Projectile.CreatePooled(shellRoot));
                 }
                 return shellRoot;
             }

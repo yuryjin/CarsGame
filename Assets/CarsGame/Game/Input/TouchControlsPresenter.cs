@@ -16,6 +16,11 @@ namespace RacingGame
         public RaceManager race;
         public bool forceShow;
 
+        /// <summary>True while the on-screen buttons are visible; the HUD moves its corner widgets out of their way.</summary>
+        public static bool IsShown { get; private set; }
+        public static event System.Action<bool> ShownChanged;
+        private static void Publish(bool value) { if (IsShown == value) return; IsShown = value; ShownChanged?.Invoke(value); }
+
         private Canvas canvas;
         private bool built;
         private bool shown;
@@ -37,6 +42,7 @@ namespace RacingGame
             if (hooked != null) { hooked.autoThrottle = previousAutoThrottle; hooked = null; }
             if (canvas != null) canvas.gameObject.SetActive(false);
             shown = false;
+            Publish(false);
         }
 
         // Labels are baked at build time: rebuild the canvas on language change.
@@ -44,6 +50,7 @@ namespace RacingGame
         {
             if (!built) return;
             Destroy(canvas.gameObject); canvas = null; built = false; shown = false;
+            Publish(false);
         }
 
         private void Update()
@@ -56,6 +63,7 @@ namespace RacingGame
             bool wantShow = forceShow || (inRace && !keyboardChosen && (Application.isMobilePlatform || touchSeen));
             if (wantShow && !built) Build();
             if (built && shown != wantShow) { shown = wantShow; canvas.gameObject.SetActive(wantShow); }
+            Publish(built && shown);
 
             var input = race != null && race.Player != null ? race.Player.GetComponent<PlayerDriverInput>() : null;
             if (shown && input != null && hooked != input) { hooked = input; previousAutoThrottle = input.autoThrottle; input.autoThrottle = true; }

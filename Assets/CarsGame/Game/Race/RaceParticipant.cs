@@ -1,4 +1,5 @@
 using UnityEngine;
+using RacingGame.Core.Sim;
 
 namespace RacingGame
 {
@@ -19,7 +20,9 @@ namespace RacingGame
         public CarController Car { get; private set; }
         public CarHealth Health { get; private set; }
         public RaceProgress Progress { get; private set; }
-        public int Kills { get; set; }
+        /// <summary>Kills this race, per victim (the payout shrinks for repeat kills of the same rival).</summary>
+        public KillTally KillTally { get; } = new KillTally();
+        public int Kills => KillTally.Total;
         public int Deaths { get; set; }
         [Tooltip("Seconds off the asphalt before the car is put back on the track automatically.")]
         public float offTrackResetSeconds = 5f;
@@ -75,7 +78,7 @@ namespace RacingGame
             if (attacker != null)
             {
                 var other = attacker.GetComponent<RaceParticipant>();
-                if (other != null && other != this) other.Kills++;
+                if (other != null && other != this) other.KillTally.Record(Car != null ? Car.CarId : 0);   // RequireComponent(CarController): Car is always set
             }
         }
 

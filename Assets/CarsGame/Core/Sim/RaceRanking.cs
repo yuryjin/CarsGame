@@ -31,15 +31,32 @@ namespace RacingGame.Core.Sim
             return c != 0 ? c : a.CarId.CompareTo(b.CarId);
         }
 
-        /// <summary>Sorts in place and returns 1-based positions indexed by the entry's original index.</summary>
+        /// <summary>Returns 1-based positions indexed by the entry's original index. Allocates; tests and tools only.</summary>
         public static int[] Rank(List<RankEntry> entries)
         {
             var order = new List<int>(entries.Count);
-            for (int i = 0; i < entries.Count; i++) order.Add(i);
-            order.Sort((x, y) => Instance.Compare(entries[x], entries[y]));
             var positions = new int[entries.Count];
-            for (int p = 0; p < order.Count; p++) positions[order[p]] = p + 1;
+            Rank(entries, order, positions);
             return positions;
+        }
+
+        /// <summary>
+        /// Allocation-free ranking for the race loop: <paramref name="order"/> is scratch space,
+        /// <paramref name="positions"/> (length ≥ entries.Count) receives 1-based positions by original index.
+        /// Insertion sort: the field is at most 8 cars and nearly sorted between calls.
+        /// </summary>
+        public static void Rank(List<RankEntry> entries, List<int> order, int[] positions)
+        {
+            order.Clear();
+            for (int i = 0; i < entries.Count; i++) order.Add(i);
+            for (int i = 1; i < order.Count; i++)
+            {
+                int key = order[i];
+                int j = i - 1;
+                while (j >= 0 && Instance.Compare(entries[order[j]], entries[key]) > 0) { order[j + 1] = order[j]; j--; }
+                order[j + 1] = key;
+            }
+            for (int p = 0; p < order.Count; p++) positions[order[p]] = p + 1;
         }
     }
 }

@@ -49,7 +49,9 @@ namespace RacingGame
         private readonly List<RaceParticipant> participants = new List<RaceParticipant>();
         private readonly Dictionary<RaceParticipant, double> finishTimes = new Dictionary<RaceParticipant, double>();
         private readonly Dictionary<RaceParticipant, int> positions = new Dictionary<RaceParticipant, int>();
-        private readonly List<RankEntry> rankBuffer = new List<RankEntry>();
+        private readonly List<RankEntry> rankBuffer = new List<RankEntry>(8);
+        private readonly List<int> rankOrder = new List<int>(8);
+        private int[] rankPositions = new int[8];
         private double countdownStart;
         private int lastCountdownValue = -1;
         private double playerFinishTime;
@@ -219,12 +221,13 @@ namespace RacingGame
                 bool finished = finishTimes.TryGetValue(p, out double t);
                 rankBuffer.Add(new RankEntry { CarId = p.Car != null ? p.Car.CarId : i, Finished = finished, FinishTime = t, TotalProgress = p.Progress.TotalProgress });
             }
-            var ranked = RaceRanking.Rank(rankBuffer);
+            if (rankPositions.Length < rankBuffer.Count) rankPositions = new int[rankBuffer.Count];
+            RaceRanking.Rank(rankBuffer, rankOrder, rankPositions);
             bool changed = false;
             for (int i = 0; i < participants.Count; i++)
             {
-                if (!positions.TryGetValue(participants[i], out int old) || old != ranked[i]) changed = true;
-                positions[participants[i]] = ranked[i];
+                if (!positions.TryGetValue(participants[i], out int old) || old != rankPositions[i]) changed = true;
+                positions[participants[i]] = rankPositions[i];
             }
             if (changed) OnPositionsChanged?.Invoke();
         }

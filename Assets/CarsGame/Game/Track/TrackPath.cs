@@ -17,7 +17,11 @@ namespace RacingGame
         [Tooltip("Distance along the loop where the start/finish line sits.")]
         public float startLineDistance = 40f;
 
+        [Tooltip("Corner-speed profile and racing line for the AI (rebuilt with the spline).")]
+        public TrackProfile.Settings profileSettings = TrackProfile.Settings.Default;
+
         private TrackSpline spline;
+        private TrackProfile profile;
         private static TrackPath instance;
 
         public static TrackPath Instance
@@ -51,7 +55,11 @@ namespace RacingGame
             for (int i = 0; i < n; i++) pts[i] = transform.GetChild(i).position;
             var s = new TrackSpline(pts);
             spline = reversed ? s.Reversed() : s;
+            profile = new TrackProfile(spline, profileSettings);
         }
+
+        /// <summary>Target speed and racing line along the current direction.</summary>
+        public TrackProfile Profile { get { if (profile == null) Build(); return profile; } }
 
         public float Project(Vector3 worldPos, ref int hint) => Spline.Project(worldPos, ref hint);
         public Vector3 Position(float d) => Spline.Position(d);

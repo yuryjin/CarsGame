@@ -20,6 +20,10 @@ namespace RacingGame
         public float speedMultiplier = 1f;
         [Tooltip("Comfortable braking deceleration used to plan corner entry (m/s^2).")]
         public float plannedDeceleration = 6f;
+        [Tooltip("Use TrackPath.Profile (local curvature + braking pass) for speed and the racing line instead of the averaged-curvature estimate.")]
+        public bool useSpeedProfile = false;
+        [Tooltip("How far the racing line pulls the driver (0 = keep the spawn lane).")]
+        [Range(0f, 1f)] public float racingLineWeight = 1f;
 
         [Header("Telemetry")]
         [SerializeField] private float offTrackTime;
@@ -45,6 +49,7 @@ namespace RacingGame
         private RngStreams rng;
         private int carMask;
         private float targetLane;
+        private float homeLane;
         private float clearTime;
         private int passDirection;      // -1 left, +1 right, 0 none (latched until the pass resolves)
         private bool boxedIn;           // blocked ahead with no free side: hold the lane and brake
@@ -93,7 +98,7 @@ namespace RacingGame
         {
             path = TrackPath.Instance;
             rng = RaceDirector.Instance.Rng;
-            targetLane = currentLane = baseLaneOffset;
+            targetLane = currentLane = homeLane = baseLaneOffset;
             passDirection = 0; boxedIn = false; clearTime = 0f;
             ticksSinceEnable = 0;
             reversing = false; stuckTime = reverseTime = overturnedTime = 0f;
@@ -134,6 +139,16 @@ namespace RacingGame
 
             // --- Steering: heading error towards a lookahead point on the lane.
             float lookahead = Mathf.Clamp(speedMs * 0.6f, 8f, 18f);
+            var profile = useSpeedProfile ? path.Profile : null;
+            float top = car.maxSpeed * P.topSpeedFactor * speedMultiplier;
+            if (profile != null)
+            {
+                // Tight bends: look closer so the aim point does not cut across the next apex.
+                float cornerness = Mathf.Clamp01(1f - profile.SpeedAt(d + lookahead) * 3.6f / Mathf.Max(1f, top));
+                lookahead *= Mathf.Lerp(1f, 0.55f, cornerness);
+                homeLane = Mathf.Lerp(baseLaneOffset, profile.LaneAt(d + lookahead) + baseLaneOffset * 0.5f, racingLineWeight);
+            }
+            else homeLane = baseLaneOffset;
             float ahead = path.Wrap(d + lookahead);
             Vector3 target = path.Position(ahead) + path.Right(ahead) * currentLane;
             Vector3 toTarget = target - transform.position; toTarget.y = 0f;
@@ -146,12 +161,21 @@ namespace RacingGame
             float yawRate = car.Body.angularVelocity.y * Mathf.Rad2Deg;   // deg/s, +right
             float steer = Mathf.Clamp(turnAngle / 35f * gain - yawRate / 180f * 0.6f + noise * P.steerNoise, -1f, 1f);
 
-            // --- Corner speed from curvature within the braking distance.
-            float top = car.maxSpeed * P.topSpeedFactor * speedMultiplier;
-            float brakeWindow = speedMs * speedMs / (2f * plannedDeceleration) + 10f;
-            float curvature = path.CurvatureAhead(d, brakeWindow);           // deg per metre
-            float corner = Mathf.InverseLerp(0.6f, 3.5f, curvature);
-            float desired = Mathf.Lerp(top, top * 0.45f, corner) * P.corneringConfidence;
+            // --- Corner speed: the braking-aware profile, or the legacy averaged-curvature estimate.
+            float desired, curvature;
+            if (profile != null)
+            {
+                float lead = speedMs * (P.reactionDelay + 0.15f) + 2f;   // react to what arrives before the command lands
+                curvature = Mathf.Abs(profile.CurvatureAt(d + lead));
+                desired = Mathf.Min(top, profile.SpeedAt(d + lead) * 3.6f * P.corneringConfidence);
+            }
+            else
+            {
+                float brakeWindow = speedMs * speedMs / (2f * plannedDeceleration) + 10f;
+                curvature = path.CurvatureAhead(d, brakeWindow);           // deg per metre
+                float corner = Mathf.InverseLerp(0.6f, 3.5f, curvature);
+                desired = Mathf.Lerp(top, top * 0.45f, corner) * P.corneringConfidence;
+            }
             // Sharp heading error right now also means slow down.
             float immediate = Mathf.InverseLerp(25f, 75f, Mathf.Abs(turnAngle));
             desired = Mathf.Min(desired, Mathf.Lerp(top, top * 0.4f, immediate));
@@ -257,7 +281,7 @@ namespace RacingGame
                 clearTime += dt;
                 // Hysteresis: keep the pass lane a moment after the road clears, then drift home.
                 if (clearTime > 0.5f) passDirection = 0;
-                if (clearTime > 3f) targetLane = Mathf.Clamp(baseLaneOffset, -limit, limit);
+                if (clearTime > 3f) targetLane = Mathf.Clamp(homeLane, -limit, limit);
             }
 
             currentLane = Mathf.MoveTowards(currentLane, targetLane, 3f * dt);

@@ -93,6 +93,26 @@ namespace RacingGame
             dust.Play();
         }
 
+        // Scraping a barrier or prop: sparks at the contact, a light shake. Throttled; mostly-vertical
+        // contacts (the road itself, kerbs under the wheels) are ignored.
+        [Tooltip("Relative speed (m/s) above which a side contact throws sparks.")]
+        public float scrapeMinSpeed = 3f;
+        private int nextSparkFrame;
+        public int SparkBursts { get; private set; }
+
+        private void OnCollisionStay(Collision collision)
+        {
+            if (Time.frameCount < nextSparkFrame || collision.contactCount == 0) return;
+            if (collision.rigidbody != null) return;                      // cars bump, barriers scrape
+            var contact = collision.GetContact(0);
+            if (Mathf.Abs(Vector3.Dot(contact.normal, Vector3.up)) > 0.6f) return;
+            if (collision.relativeVelocity.magnitude < scrapeMinSpeed) return;
+            nextSparkFrame = Time.frameCount + 6;
+            SparkBursts++;
+            EffectPool.Instance.PlaySparks(contact.point);
+            if (impulse != null) impulse.AddImpulse(0.04f);
+        }
+
         private void Update()
         {
             if (car == null) return;

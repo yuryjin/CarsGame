@@ -28,7 +28,6 @@ namespace RacingGame
         private AiDriverProfile profile;
         private int nextShotTick;
         private int enabledTick = -1;
-        private int obstacleMask;
         private RaceDirector director;
 
         private void Awake()
@@ -36,8 +35,6 @@ namespace RacingGame
             car = GetComponent<CarController>();
             cannon = GetComponent<CarCannon>();
             health = GetComponent<CarHealth>();
-            int track = LayerMask.NameToLayer("Track"), ground = LayerMask.NameToLayer("Ground");
-            obstacleMask = (track >= 0 ? 1 << track : 0) | (ground >= 0 ? 1 << ground : 0);
         }
 
         public void Initialize(AiDriverProfile driverProfile, float cooldown)
@@ -71,25 +68,7 @@ namespace RacingGame
         private CarController FindTarget()
         {
             var muzzle = cannon.muzzle != null ? cannon.muzzle : transform;
-            Vector3 origin = muzzle.position;
-            Vector3 forward = muzzle.forward;
-            float cosCone = Mathf.Cos(coneDegrees * Mathf.Deg2Rad);
-            CarController best = null; float bestDist = float.MaxValue;
-            var cars = director.Cars;
-            for (int i = 0; i < cars.Count; i++)
-            {
-                var other = cars[i];
-                if (other == null || other == car) continue;
-                var h = other.GetComponent<CarHealth>();
-                if (h != null && (h.IsDead || h.IsInvulnerable)) continue;
-                Vector3 to = other.transform.position + Vector3.up * 0.5f - origin;
-                float dist = to.magnitude;
-                if (dist < minRange || dist > maxRange) continue;
-                if (Vector3.Dot(to / dist, forward) < cosCone) continue;
-                if (obstacleMask != 0 && Physics.Linecast(origin, other.transform.position + Vector3.up * 0.5f, obstacleMask, QueryTriggerInteraction.Ignore)) continue;
-                if (dist < bestDist) { bestDist = dist; best = other; }
-            }
-            return best;
+            return TargetFinder.Find(car, muzzle.position, muzzle.forward, coneDegrees, minRange, maxRange);
         }
     }
 }

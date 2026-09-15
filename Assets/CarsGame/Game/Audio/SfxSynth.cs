@@ -48,6 +48,52 @@ namespace RacingGame
             return Mathf.Sin(2f * Mathf.PI * notes[i] * lt) * Mathf.Exp(-lt * 8f) * 0.7f;
         });
 
+        // ---------- combat feedback ----------
+        private static AudioClip[] hits;
+        private static AudioClip hitMetal, killSting, heartbeat;
+
+        /// <summary>Three thuds with different body resonance, so a burst of hits does not sound like a loop.</summary>
+        public static AudioClip HitVariant(int i)
+        {
+            if (hits == null)
+            {
+                float[] body = { 60f, 90f, 140f };
+                hits = new AudioClip[body.Length];
+                for (int k = 0; k < body.Length; k++)
+                {
+                    float f = body[k];
+                    hits[k] = OneShot("sfx_hit_" + k, 0.2f, t => (Noise() * 0.45f + Mathf.Sin(2f * Mathf.PI * f * t) * 0.85f) * Mathf.Exp(-t * 17f));
+                }
+            }
+            return hits[((i % hits.Length) + hits.Length) % hits.Length];
+        }
+
+        /// <summary>Hit on the player's own car: a bright metallic clank on top of the thud.</summary>
+        public static AudioClip HitMetal => hitMetal ??= OneShot("sfx_hit_metal", 0.3f, t =>
+        {
+            float ring = Mathf.Sin(2f * Mathf.PI * 820f * t) * 0.35f + Mathf.Sin(2f * Mathf.PI * 1310f * t) * 0.25f;
+            return (ring * Mathf.Exp(-t * 11f) + (Noise() * 0.4f + Mathf.Sin(2f * Mathf.PI * 75f * t) * 0.7f) * Mathf.Exp(-t * 22f)) * 0.9f;
+        });
+
+        /// <summary>Kill confirmation: three quick rising notes.</summary>
+        public static AudioClip KillSting => killSting ??= OneShot("sfx_kill", 0.42f, t =>
+        {
+            float[] notes = { 660f, 880f, 1320f };
+            int i = Mathf.Min(2, (int)(t / 0.09f));
+            float lt = t - i * 0.09f;
+            float tone = Mathf.Sin(2f * Mathf.PI * notes[i] * lt) + 0.3f * Saw(notes[i], lt);
+            return tone * Mathf.Exp(-lt * (i == 2 ? 7f : 14f)) * 0.55f;
+        });
+
+        /// <summary>Low HP: a double "lub-dub" at 55 Hz.</summary>
+        public static AudioClip Heartbeat => heartbeat ??= OneShot("sfx_heartbeat", 0.45f, t =>
+        {
+            float a = Mathf.Sin(2f * Mathf.PI * 55f * t) * Mathf.Exp(-t * 22f);
+            float lt = t - 0.18f;
+            float b = lt > 0f ? Mathf.Sin(2f * Mathf.PI * 48f * lt) * Mathf.Exp(-lt * 26f) * 0.7f : 0f;
+            return (a + b) * 0.9f;
+        });
+
         private static float Saw(float f, float t) { float p = (t * f) % 1f; return p * 2f - 1f; }
         private static readonly System.Random rng = new System.Random(1234);
         private static float Noise() => (float)(rng.NextDouble() * 2.0 - 1.0);

@@ -86,6 +86,7 @@ namespace RacingGame
             ClearGhosts();
             if (race != null && race.State != RaceState.Idle) race.AbortRace();
             if (pickups != null) pickups.Clear();
+            var director = RaceDirector.Current; if (director != null) director.ResetRace();   // no shell survives into the next race
             if (sky != null) sky.ApplyDefault();
             CarHealth.GlobalDamageMultiplier = 1f;
             if (track != null && track.reversed) { track.reversed = false; track.Build(); }
@@ -219,9 +220,42 @@ namespace RacingGame
             {
                 var health = p.Health; var participant = p;
                 if (health == null) continue;
-                health.OnHealthChanged += (cur, max) => { if (cur < max) SfxPlayer.Instance.Play(SfxSynth.Hit, participant.transform.position, 0.7f); };
-                health.OnDied += _ => SfxPlayer.Instance.Play(SfxSynth.Wreck, participant.transform.position, 1f);
+                float lastHp = health.Health;
+                int hitIndex = 0;
+                health.OnHealthChanged += (cur, max) =>
+                {
+                    // Only real HP loss sounds like a hit (heals and max-HP changes also raise this event).
+                    if (cur < lastHp - 0.01f)
+                    {
+                        hitIndex++;
+                        var clip = participant.isPlayer ? SfxSynth.HitMetal : SfxSynth.HitVariant(hitIndex);
+                        SfxPlayer.Instance.Play(clip, participant.transform.position, participant.isPlayer ? 0.85f : 0.7f, 0.92f + 0.08f * (hitIndex % 3));
+                    }
+                    lastHp = cur;
+                };
+                health.OnDied += attacker => { SfxPlayer.Instance.Play(SfxSynth.Wreck, participant.transform.position, 1f); OnWreck(participant, attacker); };
                 p.Progress.LapCompleted += (lap, t) => { if (participant.isPlayer) SfxPlayer.Instance.PlayUi(SfxSynth.LapDing); };
+            }
+        }
+
+        private static readonly Color KillColor = new Color(1f, 0.85f, 0.25f), DeathColor = new Color(1f, 0.35f, 0.25f);
+
+        // Kill confirmation for the player's own kills, and who got the player.
+        private void OnWreck(RaceParticipant victim, GameObject attacker)
+        {
+            if (hud == null || race.Player == null) return;
+            var player = race.Player;
+            if (!victim.isPlayer && attacker != null && attacker == player.gameObject)
+            {
+                hud.ShowEvent(Loc.Format("hud.kill", "name", victim.displayName), KillColor);
+                SfxPlayer.Instance.PlayUi(SfxSynth.KillSting, 0.8f);
+                var impulse = Camera.main != null ? Camera.main.GetComponent<CameraImpulse>() : null;
+                if (impulse != null) impulse.AddImpulse(0.2f);
+            }
+            else if (victim.isPlayer)
+            {
+                var killer = attacker != null ? attacker.GetComponent<RaceParticipant>() : null;
+                hud.ShowEvent(killer != null ? Loc.Format("hud.killed_by", "name", killer.displayName) : Loc.Get("hud.wrecked"), DeathColor);
             }
         }
 
@@ -288,12 +322,7 @@ namespace RacingGame
 
         public bool LastRewardFinished { get; private set; }
 
-        private static int[] KillsPerVictim(RaceParticipant player)
-        {
-            // Kills are counted per participant; RaceParticipant tracks totals only, so spread evenly
-            // across rivals killed (an upper bound on the diminishing bonus).
-            return player != null && player.Kills > 0 ? new[] { player.Kills } : null;
-        }
+        private static int[] KillsPerVictim(RaceParticipant player) => player != null ? player.KillTally.ToPerVictimCounts() : null;
 
         private void UnlockNext(RaceEventDefinition finished, Core.Save.SaveService save)
         {

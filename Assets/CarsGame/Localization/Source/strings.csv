@@ -34,6 +34,8 @@ hud.wrecked,,12,WRECKED,РАЗБИТА,HURDA,已报废,ZERSTÖRT,DESTROZADO,DÉT
 hud.wrong_way,,24,WRONG WAY!,НЕ ТУДА!,YANLIŞ YÖN!,方向错误！,FALSCHE RICHTUNG!,¡DIRECCIÓN INCORRECTA!,MAUVAIS SENS !,SENTIDO ERRADO!,НЕ ТУДИ!
 hud.go,countdown end,4,GO!,СТАРТ!,BAŞLA!,出发！,LOS!,¡YA!,GO !,VAI!,СТАРТ!
 hud.finish,,8,FINISH,ФИНИШ,BİTİŞ,冲线,ZIEL,META,ARRIVÉE,CHEGADA,ФІНІШ
+hud.kill,"kill toast, {name} = rival",32,Wrecked {name}!,{name} разбит!,{name} hurdaya döndü!,{name} 已报废！,{name} zerlegt!,¡{name} destrozado!,{name} détruit !,{name} destruído!,{name} розбито!
+hud.killed_by,"death toast, {name} = rival",32,Wrecked by {name},Вас разбил {name},{name} seni vurdu,被 {name} 报废,Zerlegt von {name},Te destrozó {name},Détruit par {name},Destruído por {name},Вас розбив {name}
 hud.hint.keys,"onboarding, keyboard",140,"Throttle: W or Up    Steer: A/D or arrows
 Brake: Space    Fire: Ctrl or LMB
 Reset to track: R    Pause: Esc","Газ: W или стрелка вверх    Руль: A/D или стрелки

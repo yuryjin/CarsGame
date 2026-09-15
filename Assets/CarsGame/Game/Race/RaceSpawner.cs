@@ -94,6 +94,7 @@ namespace RacingGame
                     aiIndex++;
                 }
 
+                if (go.GetComponent<CarDamageSmoke>() == null && go.GetComponent<CarHealth>() != null) go.AddComponent<CarDamageSmoke>();
                 participants.Add(participant);
             }
 

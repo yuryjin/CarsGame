@@ -6,10 +6,11 @@ namespace RacingGame
     /// <summary>
     /// Hit points of a car. Damage comes from hard collisions (walls, trees, other cars) and
     /// from projectiles (see <see cref="Projectile"/>). When HP reaches zero the car is wrecked
-    /// for a few seconds and then respawns with full HP.
+    /// for a few seconds and then respawns with full HP. Every timer (respawn, invulnerability,
+    /// collision cooldown) counts simulation ticks, so pauses and frame hitches cannot desync it.
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
-    public class CarHealth : MonoBehaviour
+    public class CarHealth : MonoBehaviour, ISimulated
     {
         [Header("Health")]
         public float maxHealth = 100f;
@@ -46,12 +47,21 @@ namespace RacingGame
         public float Health => currentHealth;
         public bool IsDead { get; private set; }
         public GameObject LastAttacker { get; private set; }
-        public bool IsInvulnerable => Time.time < invulnerableUntil;
-        private float invulnerableUntil = -1f;
+        public bool IsInvulnerable => NowTick < invulnerableUntilTick;
+        /// <summary>After the car controllers (1..n) and before the race director.</summary>
+        public int SimulationOrder => 1000 + (controller != null ? controller.CarId : 0);
+
+        private int invulnerableUntilTick = -1;
+        private int lastCollisionDamageTick = -1000000;   // far past, no overflow in (now - last)
+        private int respawnAtTick = int.MaxValue;
+        private static int NowTick => SimulationDriver.Instance.Tick;
 
         private Rigidbody rb;
-        private float lastCollisionDamageTime = -10f;
-        private float respawnTimer;
+        private CarController controller;
+        private CarPaint paint;
+        [Tooltip("Body blink on every hit that costs HP.")]
+        public float hitFlashSeconds = 0.09f;
+        public Color hitFlashColor = new Color(1f, 0.95f, 0.85f);
         private Renderer[] renderers;
         private MaterialPropertyBlock propertyBlock;
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
@@ -60,16 +70,18 @@ namespace RacingGame
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
+            controller = GetComponent<CarController>();
+            paint = GetComponent<CarPaint>();
             currentHealth = maxHealth;
             propertyBlock = new MaterialPropertyBlock();
         }
 
-        private void Update()
-        {
-            if (!IsDead || !respawnOnDeath) return;
+        private void OnEnable() { SimulationDriver.Instance.Register(this); }
+        private void OnDisable() { var d = SimulationDriver.Current; if (d != null) d.Unregister(this); }
 
-            respawnTimer -= Time.deltaTime;
-            if (respawnTimer <= 0f) Respawn();
+        public void SimulationStep(int tick)
+        {
+            if (IsDead && respawnOnDeath && tick >= respawnAtTick) Respawn();
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -86,7 +98,8 @@ namespace RacingGame
 
             // impulse / mass = change of velocity caused by this impact
             float impactSpeed = collision.impulse.magnitude / rb.mass;
-            bool onCooldown = Time.time - lastCollisionDamageTime < collisionDamageCooldown;
+            int now = NowTick;
+            bool onCooldown = now - lastCollisionDamageTick < SimulationDriver.SecondsToTicks(collisionDamageCooldown);
             float damage = vertical || onCooldown ? 0f
                 : Mathf.Clamp((impactSpeed - minImpactSpeed) * damagePerImpactSpeed, 0f, maxCollisionDamage);
 
@@ -99,7 +112,7 @@ namespace RacingGame
 
             if (damage <= 0f) return;
 
-            lastCollisionDamageTime = Time.time;
+            lastCollisionDamageTick = now;
             // Ramming counts: the other car (if it is a car) gets the credit.
             GameObject attacker = collision.rigidbody != null && collision.rigidbody.GetComponent<CarHealth>() != null
                 ? collision.rigidbody.gameObject : null;
@@ -119,6 +132,11 @@ namespace RacingGame
 
             LastAttacker = attacker;   // credit goes to whoever dealt the fatal blow; walls (null) get no kill
             currentHealth = Mathf.Max(0f, currentHealth - amount);
+            if (currentHealth > 0f)
+            {
+                if (paint == null) paint = GetComponent<CarPaint>();   // the spawner may add it after Awake
+                if (paint != null) paint.Flash(hitFlashSeconds, hitFlashColor);
+            }
             OnHealthChanged?.Invoke(currentHealth, maxHealth);
 
             if (currentHealth <= 0f) Die(attacker);
@@ -143,9 +161,11 @@ namespace RacingGame
         private void Die(GameObject attacker)
         {
             IsDead = true;
-            respawnTimer = respawnDelay;
+            respawnAtTick = NowTick + SimulationDriver.SecondsToTicks(respawnDelay);
 
             SetControlsEnabled(false);
+            if (paint == null) paint = GetComponent<CarPaint>();
+            if (paint != null) paint.CancelFlash();
             TintWreck(true);
             SpawnExplosion();
 
@@ -159,6 +179,7 @@ namespace RacingGame
         private void Respawn()
         {
             IsDead = false;
+            respawnAtTick = int.MaxValue;
             LastAttacker = null;
             currentHealth = maxHealth;
 
@@ -167,7 +188,6 @@ namespace RacingGame
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
 
-            var controller = GetComponent<CarController>();
             if (controller != null) controller.ResetCar();
 
             TintWreck(false);
@@ -180,12 +200,11 @@ namespace RacingGame
 
         public void SetInvulnerable(float seconds)
         {
-            invulnerableUntil = Mathf.Max(invulnerableUntil, Time.time + seconds);
+            invulnerableUntilTick = Mathf.Max(invulnerableUntilTick, NowTick + SimulationDriver.SecondsToTicks(seconds));
         }
 
         private void SetControlsEnabled(bool enabled)
         {
-            var controller = GetComponent<CarController>();
             if (controller != null) controller.enabled = enabled;
 
             var cannon = GetComponent<CarCannon>();
