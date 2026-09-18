@@ -57,3 +57,6 @@ sysinfo.txt
 .plastic/
 /[Aa]ssets/Plugins/PlasticSCM*
 graphify-out
+# ---- Unity AI Assistant scratch files (chat image references etc.) ----
+/[Aa]ssets/AI Toolkit/
+/[Aa]ssets/AI Toolkit.meta
