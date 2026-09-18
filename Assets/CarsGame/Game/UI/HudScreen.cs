@@ -23,7 +23,14 @@ namespace RacingGame
         private TextMeshProUGUI speedText, lapText, positionText, timerText, centerText, hintText, hpText, pauseText, ammoText, hitMarker;
         private CarCannon playerCannon;
         private float hitMarkerUntil;
-        private Image hpFill, hpBar;
+        private Image hpFill, hpTrail, hpIcon;
+        private Sprite healthFillSprite;
+        private RectTransform speedPanel, healthPanel;
+        private SpeedometerGraphic speedDial;
+        private TextMeshProUGUI speedUnit, nitroText;
+        private float shownSpeed, damageTrailUntil;
+        private static readonly Color HealthyColor = new Color(0.22f, 0.9f, 0.68f);
+        private static readonly Color CriticalColor = new Color(1f, 0.3f, 0.28f);
 
         [Header("Reticle")]
         [Tooltip("Where the reticle points: this far ahead of the muzzle along the shell's flight (m).")]
@@ -58,7 +65,7 @@ namespace RacingGame
         private float hintUntil;
         private readonly StringBuilder sb = new StringBuilder(256);
         // Per-frame labels go through TMP_Text.SetText(format, number): no string garbage while racing.
-        private string speedFormat = "{0:0} km/h", speedFormatBoost = "{0:0} km/h  NITRO", reloadFormat = "{0:0}%";
+        private string reloadFormat = "{0:0}%";
         private const string TimerFormat = "{0:0}:{1:00}.{2:000}";
         private int lastSpeed = -1, lastReloadPct = -1;
         private bool lastBoost;
@@ -108,13 +115,10 @@ namespace RacingGame
             var root = canvas.transform;
             hudRoot = (RectTransform)root;
 
-            // Bottom-left: speed + hints
-            speedText = UiFactory.Text(root, "Speed", "0 km/h", 56f, TextAlignmentOptions.BottomLeft, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(30f, 24f), new Vector2(430f, 104f), new Color(1f, 0.85f, 0.2f));
+            BuildSpeedometer(root);
             hintText = UiFactory.Text(root, "Hints", "", 24f, TextAlignmentOptions.BottomLeft, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(30f, 110f), new Vector2(640f, 260f), new Color(0.9f, 0.9f, 0.9f));
 
-            // Bottom-right: HP bar
-            hpBar = UiFactory.Bar(root, "HpBar", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-330f, 30f), new Vector2(-30f, 62f), new Color(0.2f, 0.85f, 0.25f), out hpFill);
-            hpText = UiFactory.Text(root, "HpText", "HP 100", 22f, TextAlignmentOptions.Center, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-330f, 30f), new Vector2(-30f, 62f));
+            BuildHealthBar(root);
             ammoText = UiFactory.Text(root, "Ammo", "", 30f, TextAlignmentOptions.BottomRight, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-330f, 70f), new Vector2(-30f, 120f), new Color(1f, 0.85f, 0.3f));
             BuildReticle(root);
             eventText = UiFactory.Text(root, "Event", "", 46f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.7f), new Vector2(0.5f, 0.7f), new Vector2(-640f, -40f), new Vector2(640f, 40f), new Color(1f, 0.9f, 0.3f));
@@ -149,12 +153,64 @@ namespace RacingGame
             ApplyStaticTexts();
         }
 
+        private void BuildSpeedometer(Transform root)
+        {
+            speedPanel = UiFactory.Card(root, "Speedometer", Vector2.zero, Vector2.zero, new Vector2(30f, 30f), new Vector2(274f, 254f), 0.86f);
+            var dial = UiFactory.Panel(speedPanel, "Dial", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            speedDial = dial.gameObject.AddComponent<SpeedometerGraphic>();
+            speedDial.raycastTarget = false;
+            speedDial.SetSpeed(0f, false);
+            for (int i = 0; i <= 4; i++)
+            {
+                float angle = Mathf.Lerp(200f, -20f, i / 4f) * Mathf.Deg2Rad;
+                Vector2 p = new Vector2(122f, 92f) + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 71f;
+                var label = UiFactory.Text(speedPanel, "Scale" + i, (i * SpeedometerGraphic.MaxSpeed / 4f).ToString("0"), 16f,
+                    TextAlignmentOptions.Center, Vector2.zero, Vector2.zero, p - new Vector2(20f, 11f), p + new Vector2(20f, 11f), new Color(0.68f, 0.76f, 0.85f));
+                label.outlineWidth = 0f;
+            }
+            speedText = UiFactory.Text(speedPanel, "Speed", "0", 46f, TextAlignmentOptions.Center,
+                Vector2.zero, Vector2.zero, new Vector2(74f, 32f), new Vector2(170f, 80f));
+            speedText.fontStyle = FontStyles.Bold;
+            speedText.outlineWidth = 0f;
+            speedUnit = UiFactory.Text(speedPanel, "Unit", "", 16f, TextAlignmentOptions.Center,
+                Vector2.zero, Vector2.zero, new Vector2(62f, 12f), new Vector2(182f, 35f), new Color(0.68f, 0.76f, 0.85f));
+            nitroText = UiFactory.Text(speedPanel, "Nitro", "", 16f, TextAlignmentOptions.Center,
+                Vector2.zero, Vector2.zero, new Vector2(52f, 199f), new Vector2(192f, 222f), SpeedometerGraphic.BoostColor);
+            nitroText.gameObject.SetActive(false);
+        }
+
+        private void BuildHealthBar(Transform root)
+        {
+            healthPanel = UiFactory.Card(root, "Health", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 30f), new Vector2(-30f, 130f), 0.86f);
+            var icon = UiFactory.Panel(healthPanel, "HealthIcon", Vector2.zero, Vector2.zero, new Vector2(18f, 53f), new Vector2(48f, 83f), HealthyColor);
+            hpIcon = icon.GetComponent<Image>();
+            var ink = new Color(0.03f, 0.12f, 0.14f);
+            UiFactory.Panel(icon, "CrossH", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-9f, -2f), new Vector2(9f, 2f), ink, false);
+            UiFactory.Panel(icon, "CrossV", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-2f, -9f), new Vector2(2f, 9f), ink, false);
+            hpText = UiFactory.Text(healthPanel, "HpText", "", 26f, TextAlignmentOptions.MidlineRight,
+                Vector2.zero, Vector2.one, new Vector2(60f, 48f), new Vector2(-18f, -12f));
+            hpText.fontStyle = FontStyles.Bold;
+            hpText.outlineWidth = 0f;
+            hpText.enableAutoSizing = true; hpText.fontSizeMin = 16f; hpText.fontSizeMax = 26f;
+            var track = UiFactory.Panel(healthPanel, "HpBar", Vector2.zero, new Vector2(1f, 0f), new Vector2(18f, 20f), new Vector2(-18f, 40f), new Color(0.14f, 0.2f, 0.27f), false);
+            // Filled Images need a sprite; a white texel keeps this thin bar rectangular.
+            healthFillSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f));
+            hpTrail = UiFactory.Panel(track, "DamageTrail", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(1f, 0.72f, 0.3f), false).GetComponent<Image>();
+            hpTrail.sprite = healthFillSprite;
+            hpTrail.type = Image.Type.Filled; hpTrail.fillMethod = Image.FillMethod.Horizontal;
+            hpFill = UiFactory.Panel(track, "Fill", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, HealthyColor, false).GetComponent<Image>();
+            hpFill.sprite = healthFillSprite;
+            hpFill.type = Image.Type.Filled; hpFill.fillMethod = Image.FillMethod.Horizontal;
+            for (int i = 1; i < 10; i++)
+                UiFactory.Panel(track, "Divider" + i, new Vector2(i / 10f, 0f), new Vector2(i / 10f, 1f), new Vector2(-1f, 0f), new Vector2(1f, 0f), new Color(0.03f, 0.05f, 0.09f, 0.85f), false);
+        }
+
         private void ApplyStaticTexts()
         {
             ApplyLayout(touchLayout);
             pauseText.text = Loc.Get("pause.title") + "\n<size=40%>" + Loc.Get("pause.hint") + "</size>";
-            speedFormat = "{0:0} " + Loc.Get("hud.speed_unit");
-            speedFormatBoost = speedFormat + "  " + Loc.Get("hud.nitro");
+            speedUnit.text = Loc.Get("hud.speed_unit");
+            nitroText.text = Loc.Get("hud.nitro");
             reloadFormat = Loc.Get("hud.reload").Replace("{p}", "{0:0}");
             lastSpeed = -1; lastReloadPct = -1; lastTimerMs = -1;
             RefreshPosition();
@@ -277,32 +333,27 @@ namespace RacingGame
             if (speedText == null) return;
             hintText.text = Loc.Get(touch ? "hud.hint.touch" : "hud.hint.keys");
             var hintRt = hintText.rectTransform;
-            var hpRt = hpBar.rectTransform;
             layoutWidth = hudRoot != null ? hudRoot.rect.width : 1920f;
             // Portrait phones give the canvas ~1000 reference units of width: the timer (±200 around the
             // centre) would collide with a top-right HP bar, so HP/ammo drop to a row below it.
             bool narrow = layoutWidth < 1400f;
             if (touch)
             {
-                Place(speedText.rectTransform, Vector2.zero, new Vector2(40f, 216f), new Vector2(460f, 296f));
-                speedText.fontSize = 44f;
+                Place(speedPanel, Vector2.zero, new Vector2(40f, 224f), new Vector2(284f, 448f));
                 float row = narrow ? -90f : 0f;
-                Place(hpRt, Vector2.one, new Vector2(-500f, -94f + row), new Vector2(-170f, -58f + row));
-                Place(hpText.rectTransform, Vector2.one, new Vector2(-500f, -94f + row), new Vector2(-170f, -58f + row));
-                Place(ammoText.rectTransform, Vector2.one, new Vector2(-500f, -150f + row), new Vector2(-170f, -98f + row));
+                Place(healthPanel, Vector2.one, new Vector2(-494f, -134f + row), new Vector2(-170f, -34f + row));
+                Place(ammoText.rectTransform, Vector2.one, new Vector2(-494f, -186f + row), new Vector2(-170f, -138f + row));
                 ammoText.alignment = TextAlignmentOptions.TopRight;
-                Place(hintRt, new Vector2(0.5f, 1f), new Vector2(-460f, -230f + row * 1.4f), new Vector2(420f, -110f + row * 1.4f));
+                Place(hintRt, new Vector2(0.5f, 1f), new Vector2(-460f, -322f + row), new Vector2(420f, -202f + row));
                 hintText.alignment = TextAlignmentOptions.Top;
             }
             else
             {
-                Place(speedText.rectTransform, Vector2.zero, new Vector2(30f, 24f), new Vector2(430f, 104f));
-                speedText.fontSize = 56f;
-                Place(hpRt, new Vector2(1f, 0f), new Vector2(-330f, 30f), new Vector2(-30f, 62f));
-                Place(hpText.rectTransform, new Vector2(1f, 0f), new Vector2(-330f, 30f), new Vector2(-30f, 62f));
-                Place(ammoText.rectTransform, new Vector2(1f, 0f), new Vector2(-330f, 70f), new Vector2(-30f, 120f));
+                Place(speedPanel, Vector2.zero, new Vector2(30f, 30f), new Vector2(274f, 254f));
+                Place(healthPanel, new Vector2(1f, 0f), new Vector2(-354f, 30f), new Vector2(-30f, 130f));
+                Place(ammoText.rectTransform, new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 186f));
                 ammoText.alignment = TextAlignmentOptions.BottomRight;
-                Place(hintRt, Vector2.zero, new Vector2(30f, 110f), new Vector2(640f, 260f));
+                Place(hintRt, Vector2.zero, new Vector2(30f, 272f), new Vector2(640f, 422f));
                 hintText.alignment = TextAlignmentOptions.BottomLeft;
             }
         }
@@ -333,8 +384,13 @@ namespace RacingGame
             {
                 int speed = Mathf.RoundToInt(Mathf.Abs(playerCar.SpeedKmh));
                 bool boost = playerCar.IsBoosting;
-                if (speed != lastSpeed || boost != lastBoost) { lastSpeed = speed; lastBoost = boost; speedText.SetText(boost ? speedFormatBoost : speedFormat, speed); }
+                if (speed != lastSpeed) { lastSpeed = speed; speedText.SetText("{0:0}", speed); }
+                if (boost != lastBoost) { lastBoost = boost; nitroText.gameObject.SetActive(boost); }
+                shownSpeed = Mathf.Lerp(shownSpeed, Mathf.Abs(playerCar.SpeedKmh), 1f - Mathf.Exp(-12f * Time.unscaledDeltaTime));
+                speedDial.SetSpeed(shownSpeed, boost);
             }
+            if (Time.unscaledTime >= damageTrailUntil && hpTrail.fillAmount > hpFill.fillAmount)
+                hpTrail.fillAmount = Mathf.MoveTowards(hpTrail.fillAmount, hpFill.fillAmount, Time.unscaledDeltaTime * 0.6f);
             if (playerCannon != null && playerCannon.IsReloading)
             {
                 int pct = Mathf.RoundToInt(playerCannon.ReloadProgress(SimulationDriver.Instance.Tick) * 100f);
@@ -422,10 +478,13 @@ namespace RacingGame
 
         private void OnHealth(float current, float max)
         {
-            float t = max > 0f ? current / max : 0f;
+            float t = max > 0f ? Mathf.Clamp01(current / max) : 0f;
+            if (t < hpFill.fillAmount) damageTrailUntil = Time.unscaledTime + 0.35f;
+            else if (t > hpFill.fillAmount) hpTrail.fillAmount = t;
             hpFill.fillAmount = t;
-            hpFill.color = Color.Lerp(new Color(0.9f, 0.15f, 0.1f), new Color(0.2f, 0.85f, 0.25f), t);
-            hpText.text = playerHealth != null && playerHealth.IsDead ? Loc.Get("hud.wrecked") : Loc.Format("hud.hp", "hp", Mathf.CeilToInt(current));
+            hpFill.color = t <= lowHealthFraction ? CriticalColor : Color.Lerp(SpeedometerGraphic.Accent, HealthyColor, Mathf.InverseLerp(lowHealthFraction, 1f, t));
+            hpIcon.color = hpFill.color;
+            hpText.text = current <= 0f ? Loc.Get("hud.wrecked") : Loc.Format("hud.hp", "hp", Mathf.CeilToInt(current));
         }
 
         private void RefreshPosition()
@@ -460,5 +519,12 @@ namespace RacingGame
         }
 
         private void OnPaused(bool paused) { pausePanel.gameObject.SetActive(paused); }
+
+        private void OnDestroy()
+        {
+            if (playerHealth != null) playerHealth.OnHealthChanged -= OnHealth;
+            if (playerCannon != null) playerCannon.AmmoChanged -= OnAmmo;
+            if (healthFillSprite != null) Destroy(healthFillSprite);
+        }
     }
 }

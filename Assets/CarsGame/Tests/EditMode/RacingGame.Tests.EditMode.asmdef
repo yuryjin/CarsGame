@@ -1,7 +1,7 @@
 {
     "name": "RacingGame.Tests.EditMode",
     "rootNamespace": "RacingGame.Tests",
-    "references": [ "RacingGame.Core", "RacingGame.Platform", "RacingGame.Game", "UnityEngine.TestRunner", "UnityEditor.TestRunner" ],
+    "references": [ "RacingGame.Core", "RacingGame.Platform", "RacingGame.Game", "UnityEngine.UI", "Unity.TextMeshPro", "UnityEngine.TestRunner", "UnityEditor.TestRunner" ],
     "includePlatforms": [ "Editor" ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

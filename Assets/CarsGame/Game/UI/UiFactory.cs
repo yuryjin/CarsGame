@@ -69,10 +69,11 @@ namespace RacingGame
             Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, Color? color = null)
         {
             var go = new GameObject(name, typeof(RectTransform));
+            // Initialize TMP before parenting: an inactive HUD parent defers Awake and outline setup fails.
+            var tmp = go.AddComponent<TextMeshProUGUI>();
             var rt = go.GetComponent<RectTransform>();
             rt.SetParent(parent, false);
             rt.anchorMin = anchorMin; rt.anchorMax = anchorMax; rt.offsetMin = offsetMin; rt.offsetMax = offsetMax;
-            var tmp = go.AddComponent<TextMeshProUGUI>();
             tmp.text = text; tmp.fontSize = size; tmp.alignment = align; tmp.color = color ?? Color.white;
             tmp.raycastTarget = false; tmp.enableWordWrapping = true; tmp.overflowMode = TextOverflowModes.Overflow;
             tmp.outlineWidth = 0.15f; tmp.outlineColor = new Color(0f, 0f, 0f, 0.8f);
