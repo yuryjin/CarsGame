@@ -1,0 +1,210 @@
+using System;
+using UnityEngine;
+using RacingGame.Core.Economy;
+using RacingGame.Platform;
+
+namespace RacingGame
+{
+    /// <summary>
+    /// QA and profiling channel between the web page and the game. The page sends
+    /// {"cmd":"...","args":[...]} through window.CarsPlatform.cmd (only on local hosts or with ?debug=1);
+    /// the game answers with a JSON snapshot posted to window.CarsPlatform.debug.state. Frame statistics
+    /// are collected only after "perf on", so a normal session pays nothing. Editor eval scripts can call
+    /// <see cref="Execute"/> directly and read <see cref="PlatformRuntime.LastDebug"/>.
+    /// </summary>
+    [RequireComponent(typeof(GameFlow))]
+    public sealed class DebugBus : MonoBehaviour
+    {
+        [Serializable] private class Command { public string cmd; public string[] args; }
+
+        [Serializable]
+        public class Snapshot
+        {
+            public string flow, race, evt, tier, screen, lastCommand, error;
+            public int coins, lastReward, position, lap, laps, races, liveShells;
+            public int[] upgrades;
+            public bool touch, autopilot;
+            public Perf perf;
+        }
+
+        [Serializable]
+        public class Perf
+        {
+            public float p50, p95, p99, max, fps;
+            public int frames, gc0, gcDelta, liveShells, cars;
+            public long monoUsed, totalAllocated;
+            public float sinceStartup;
+        }
+
+        private GameFlow flow;
+        private RaceManager race;
+        private MenuScreens menus;
+        private TouchControlsPresenter touch;
+        private bool perfOn, autopilot;
+        private readonly float[] frameTimes = new float[600];
+        private readonly float[] sorted = new float[600];
+        private int frameCount, frameHead, gcAtWindowStart;
+        private float nextReport;
+        private Perf lastPerf;
+        private string lastCommand = "", lastError = "";
+
+        /// <summary>
+        /// Commands are accepted in the Editor, in mock/standalone builds (there is no store session to
+        /// protect) and on a Yandex page that declared itself a debug host (local or ?debug=1).
+        /// </summary>
+        public static bool ChannelOpen =>
+            Application.isEditor || PlatformRuntime.DebugChannelEnabled ||
+            (PlatformRuntime.Current != null && PlatformRuntime.Current.Kind != Core.Platform.PlatformKind.Yandex);
+
+        private void Awake()
+        {
+            flow = GetComponent<GameFlow>();
+            race = GetComponent<RaceManager>();
+            menus = GetComponent<MenuScreens>();
+            touch = GetComponent<TouchControlsPresenter>() ?? FindAnyObjectByType<TouchControlsPresenter>();
+        }
+
+        private void OnEnable() { var rt = PlatformRuntime.Instance; if (rt != null) rt.JsMessage += OnJsMessage; }
+        private void OnDisable() { var rt = PlatformRuntime.Instance; if (rt != null) rt.JsMessage -= OnJsMessage; }
+
+        private void Start()
+        {
+            // PlatformRuntime may be created after this component: subscribe once it exists.
+            var rt = PlatformRuntime.Instance;
+            if (rt != null) { rt.JsMessage -= OnJsMessage; rt.JsMessage += OnJsMessage; }
+        }
+
+        private void OnJsMessage(string channel, string json)
+        {
+            if (!ChannelOpen) return;   // production Yandex session: ignore commands entirely
+            if (string.IsNullOrEmpty(json) || json.IndexOf("\"cmd\"", StringComparison.Ordinal) < 0) return;
+            Command c;
+            try { c = JsonUtility.FromJson<Command>(json); } catch (Exception) { return; }
+            if (c == null || string.IsNullOrEmpty(c.cmd)) return;
+            Execute(c.cmd, c.args ?? Array.Empty<string>());
+        }
+
+        /// <summary>Run one command and post the resulting snapshot. Unknown commands report an error.</summary>
+        public string Execute(string cmd, params string[] args)
+        {
+            lastCommand = cmd; lastError = "";
+            try
+            {
+                switch (cmd)
+                {
+                    case "state": break;
+                    case "startRace": StartRace(Arg(args, 0), Arg(args, 1)); break;
+                    case "autopilot": SetAutopilot(Arg(args, 0) != "off"); break;
+                    case "goto": if (menus != null) { if (flow.State == FlowState.Menu) menus.Show(Arg(args, 0) ?? "main"); else menus.GoTo(Arg(args, 0) ?? "main"); } break;
+                    case "buy":
+                        if (menus == null || !Enum.TryParse(Arg(args, 0) ?? "", true, out UpgradeKind kind)) lastError = "bad kind";
+                        else if (!menus.Buy(kind)) lastError = "not bought";
+                        break;
+                    case "touch": if (touch != null) touch.forceShow = Arg(args, 0) != "off"; break;
+                    case "perf": perfOn = Arg(args, 0) != "off"; ResetPerf(); break;
+                    default: lastError = "unknown command"; break;
+                }
+            }
+            catch (Exception e) { lastError = e.GetType().Name + ": " + e.Message; }
+            return Post();
+        }
+
+        private static string Arg(string[] args, int i) => args != null && i < args.Length ? args[i] : null;
+
+        private void StartRace(string eventId, string tierId)
+        {
+            RaceEventDefinition ev = null; DifficultyTier tier = null;
+            if (flow.events != null) foreach (var e in flow.events) if (e != null && e.eventId == eventId) ev = e;
+            if (flow.tiers != null) foreach (var t in flow.tiers) if (t != null && t.tierId == tierId) tier = t;
+            if (ev == null && !string.IsNullOrEmpty(eventId)) lastError = "unknown event";
+            autopilot = false;
+            flow.StartRace(ev, tier);
+        }
+
+        // An AI driver in the player's seat: finishes races unattended for smoke tests and profiling.
+        private void SetAutopilot(bool on)
+        {
+            var p = race != null ? race.Player : null;
+            if (p == null) { lastError = "no race"; return; }
+            var input = p.GetComponent<PlayerDriverInput>();
+            var ai = p.GetComponent<AiDriver>();
+            if (on)
+            {
+                if (ai == null) { ai = p.gameObject.AddComponent<AiDriver>(); ai.Initialize(null, 0f); }
+                ai.enabled = true;
+                p.Car.SetInputSource(ai);
+                if (input != null) input.enabled = false;
+            }
+            else
+            {
+                if (ai != null) ai.enabled = false;
+                if (input != null) { input.enabled = true; p.Car.SetInputSource(input); }
+            }
+            autopilot = on;
+        }
+
+        private void ResetPerf() { frameCount = 0; frameHead = 0; gcAtWindowStart = GC.CollectionCount(0); nextReport = Time.unscaledTime + 1f; }
+
+        private void Update()
+        {
+            if (!perfOn) return;
+            frameTimes[frameHead] = Time.unscaledDeltaTime;
+            frameHead = (frameHead + 1) % frameTimes.Length;
+            if (frameCount < frameTimes.Length) frameCount++;
+            if (Time.unscaledTime >= nextReport)
+            {
+                nextReport = Time.unscaledTime + 1f;
+                lastPerf = ComputePerf();
+                Post();
+            }
+        }
+
+        private Perf ComputePerf()
+        {
+            int n = frameCount;
+            Array.Copy(frameTimes, sorted, n);
+            Array.Sort(sorted, 0, n);
+            float P(float q) => n == 0 ? 0f : sorted[Mathf.Clamp((int)(q * (n - 1)), 0, n - 1)] * 1000f;
+            float sum = 0f; for (int i = 0; i < n; i++) sum += sorted[i];
+            int gc = GC.CollectionCount(0);
+            var director = RaceDirector.Current;
+            var perf = new Perf
+            {
+                p50 = P(0.5f), p95 = P(0.95f), p99 = P(0.99f), max = P(1f), fps = sum > 0f ? n / sum : 0f, frames = n,
+                gc0 = gc, gcDelta = gc - gcAtWindowStart,
+                liveShells = director != null ? director.LiveProjectiles : 0, cars = director != null ? director.Cars.Count : 0,
+                monoUsed = UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong(),
+                totalAllocated = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong(),
+                sinceStartup = Time.realtimeSinceStartup
+            };
+            return perf;
+        }
+
+        /// <summary>Current snapshot (also posted to the page).</summary>
+        public Snapshot Capture()
+        {
+            var save = PlatformGlue.Save;
+            var p = race != null ? race.Player : null;
+            var director = RaceDirector.Current;
+            return new Snapshot
+            {
+                flow = flow.State.ToString(), race = race != null ? race.State.ToString() : "", screen = menus != null ? menus.Current : "",
+                evt = RaceSetup.Event != null ? RaceSetup.Event.eventId : "", tier = RaceSetup.Tier != null ? RaceSetup.Tier.tierId : "",
+                coins = save != null ? (int)save.Data.Coins : 0, races = save != null ? save.Data.Races : 0,
+                upgrades = save != null ? save.Data.progress.upgrades : null,
+                lastReward = flow.LastReward, position = p != null ? race.PositionOf(p) : 0,
+                lap = p != null && p.Progress != null ? p.Progress.LapsCompleted : 0, laps = race != null ? race.laps : 0,
+                liveShells = director != null ? director.LiveProjectiles : 0,
+                touch = TouchControlsPresenter.IsShown, autopilot = autopilot,
+                lastCommand = lastCommand, error = lastError, perf = perfOn ? lastPerf : null
+            };
+        }
+
+        private string Post()
+        {
+            string json = JsonUtility.ToJson(Capture());
+            PlatformRuntime.PostDebug(json);
+            return json;
+        }
+    }
+}

@@ -90,6 +90,27 @@ namespace RacingGame.Platform
             if (id > 0) Complete(id, json); else JsMessage?.Invoke("js", json);
         }
 
+        /// <summary>
+        /// True when the page opened the QA channel (local host or ?debug=1). Off on a normal
+        /// Yandex session, so a hand-crafted SendMessage cannot drive the game there.
+        /// </summary>
+        public static bool DebugChannelEnabled { get; set; }
+#if UNITY_EDITOR
+            = true;
+#endif
+
+        /// <summary>QA/debug channel: hand a JSON snapshot to the page (window.CarsPlatform.debug.state). No-op outside WebGL players.</summary>
+        public static void PostDebug(string json)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            try { if (Yandex.YandexNative.CarsYa_Available() != 0) Yandex.YandexNative.CarsYa_Debug(json); } catch (Exception) { }
+#endif
+            LastDebug = json;
+        }
+
+        /// <summary>Last snapshot posted through <see cref="PostDebug"/> (readable from Editor eval scripts).</summary>
+        public static string LastDebug { get; private set; }
+
         [Preserve] public void OnHostPause(string flag) { HostPauseChanged?.Invoke(flag == "1" || flag == "true"); }
         [Preserve] public void OnAdOpen(string _) { AdOpened?.Invoke(); }
         [Preserve] public void OnAdClose(string _) { AdClosed?.Invoke(); }

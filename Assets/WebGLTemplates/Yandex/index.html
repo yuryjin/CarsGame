@@ -53,6 +53,7 @@
         return createUnityInstance(canvas, config, function (p) { fill.style.width = (100 * p) + '%'; });
       }).then(function (instance) {
         document.querySelector('#cars-loading').style.display = 'none';
+        window.unityInstance = instance;                 // QA/debug tooling reads Module.HEAPU8 through this
         window.CarsPlatform.attach(instance);
       }).catch(function (err) { console.error('[cars] boot failed', err); });
     })();

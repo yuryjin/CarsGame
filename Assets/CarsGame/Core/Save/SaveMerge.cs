@@ -74,6 +74,10 @@ namespace RacingGame.Core.Save
             if (e == null || string.IsNullOrEmpty(e.eventId) || e.bestTimeMs <= 0) return;
             if (!d.TryGetValue(e.eventId, out long cur) || e.bestTimeMs < cur) d[e.eventId] = e.bestTimeMs;
         }
-        private static SettingsData Clone(SettingsData s) => new SettingsData { lang = s.lang, sfx = s.sfx, music = s.music, quality = s.quality, autoThrottle = s.autoThrottle };
+        private static SettingsData Clone(SettingsData s) => new SettingsData
+        {
+            lang = s.lang, sfx = s.sfx, music = s.music, quality = s.quality, qualityAuto = s.qualityAuto,
+            autoThrottle = s.autoThrottle, cameraShake = s.cameraShake, tier = s.tier
+        };
     }
 }

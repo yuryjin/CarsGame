@@ -3,7 +3,23 @@ using System.Collections.Generic;
 
 namespace RacingGame.Core.Save
 {
-    [Serializable] public class SettingsData { public string lang = ""; public float sfx = 1f; public float music = 0.8f; public int quality = 1; public bool autoThrottle = false; }
+    /// <summary>
+    /// Player settings. <c>qualityAuto</c> stays true until the player picks a graphics level, so
+    /// phones get the Mobile tier and desktops the PC one without a stored choice getting in the way.
+    /// New fields default for old saves (JsonUtility leaves missing fields at their initial value).
+    /// </summary>
+    [Serializable] public class SettingsData
+    {
+        public string lang = "";
+        public float sfx = 1f;
+        public float music = 0.8f;
+        public int quality = 1;
+        public bool qualityAuto = true;
+        public bool autoThrottle = false;
+        public bool cameraShake = true;
+        /// <summary>Last difficulty the player raced ("" = pick by experience).</summary>
+        public string tier = "";
+    }
     [Serializable] public class EventBest { public string eventId; public long bestTimeMs; }
     /// <summary>
     /// Monotonic counters written by ONE device. Every device owns its own row; totals are the

@@ -74,6 +74,8 @@ namespace RacingGame
         public void ApplyBoost(float seconds) { boostUntilTick = SimulationDriver.Instance.Tick + SimulationDriver.SecondsToTicks(seconds); }
 
         public float SpeedKmh => currentSpeedKmh;
+        /// <summary>Sideways speed (m/s) of the body: the slide the tyres are fighting. Read by audio and effects.</summary>
+        public float SideSlipSpeed { get; private set; }
         public bool IsGrounded => isGrounded;
         public GroundSurface Surface => groundSurface;
         public int CarId { get; private set; }
@@ -215,6 +217,7 @@ namespace RacingGame
 
             GroundQuery();
             CalculateSpeed();
+            SideSlipSpeed = Mathf.Abs(Vector3.Dot(rb.linearVelocity, transform.right));
             ApplyMotor();
             ApplySteering();
             ApplyFriction();

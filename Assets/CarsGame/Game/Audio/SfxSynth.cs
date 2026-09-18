@@ -48,6 +48,60 @@ namespace RacingGame
             return Mathf.Sin(2f * Mathf.PI * notes[i] * lt) * Mathf.Exp(-lt * 8f) * 0.7f;
         });
 
+        // ---------- player car loops (built on first race, not at menu load) ----------
+        private static AudioClip engineRich, screech, wind, nitroHiss;
+
+        /// <summary>55 Hz firing note with six harmonics, a slightly detuned second voice and exhaust pulses.</summary>
+        public static AudioClip EngineRich => engineRich ??= Loop("sfx_engine_rich", 1f, t =>
+        {
+            const float f = 55f;
+            float v = 0f;
+            float[] amp = { 1f, 0.6f, 0.4f, 0.25f, 0.15f, 0.1f };
+            for (int h = 0; h < amp.Length; h++) v += Mathf.Sin(2f * Mathf.PI * f * (h + 1) * t) * amp[h];
+            v += Saw(f * 1.003f, t) * 0.25f;
+            float pulse = Mathf.Pow(Mathf.Abs(Mathf.Sin(Mathf.PI * f * 2f * t)), 12f);
+            v += pulse * 0.9f + Noise() * 0.04f;
+            return v * 0.22f;
+        });
+
+        /// <summary>Tyre squeal: band-limited noise (running average) plus a wavering 1.1 kHz tone.</summary>
+        public static AudioClip Screech
+        {
+            get
+            {
+                if (screech != null) return screech;
+                float a = 0f, b = 0f;
+                screech = Loop("sfx_screech", 0.6f, t =>
+                {
+                    float w = Noise();
+                    float lp = (w + a + b) / 3f; b = a; a = w;
+                    float tone = Mathf.Sin(2f * Mathf.PI * (1100f + 40f * Mathf.Sin(2f * Mathf.PI * 7f * t)) * t);
+                    return (lp - w * 0.2f) * 0.5f + tone * 0.3f;
+                });
+                return screech;
+            }
+        }
+
+        /// <summary>Wind: leaky-integrated ("brown") noise.</summary>
+        public static AudioClip Wind
+        {
+            get
+            {
+                if (wind != null) return wind;
+                float brown = 0f;
+                wind = Loop("sfx_wind", 1f, t => { brown = (brown + 0.04f * Noise()) / 1.02f; return brown * 3.5f; });
+                return wind;
+            }
+        }
+
+        /// <summary>Nitro kick: a noise burst over a rising sweep.</summary>
+        public static AudioClip NitroHiss => nitroHiss ??= OneShot("sfx_nitro", 1.2f, t =>
+        {
+            float env = Mathf.Min(1f, t / 0.05f) * Mathf.Exp(-t * 2.2f);
+            float sweep = Mathf.Sin(2f * Mathf.PI * (300f * t + 250f * t * t));
+            return (Noise() * 0.55f + sweep * 0.3f) * env;
+        });
+
         // ---------- combat feedback ----------
         private static AudioClip[] hits;
         private static AudioClip hitMetal, killSting, heartbeat;

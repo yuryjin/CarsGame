@@ -196,16 +196,17 @@ namespace RacingGame
                     new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-520f, y - 55f), new Vector2(160f, y + 55f));
                 var kk = kind;
                 bool maxed = lvl >= UpgradeCatalog.MaxLevel;
-                UiFactory.Button(root, "Buy_" + k, maxed ? Loc.Get("garage.max") : Loc.Format("garage.buy", "cost", cost), maxed ? null : () => Buy(kk),
+                UiFactory.Button(root, "Buy_" + k, maxed ? Loc.Get("garage.max") : Loc.Format("garage.buy", "cost", cost), maxed ? null : () => { Buy(kk); },
                     new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(200f, y - 38f), new Vector2(520f, y + 38f), 30f, maxed ? new Color(0.3f, 0.3f, 0.32f, 0.9f) : (Color?)null);
                 y -= 140f;
             }
         }
 
-        private void Buy(UpgradeKind kind)
+        /// <summary>Garage purchase (button handler; also used by QA automation). Returns true when bought.</summary>
+        public bool Buy(UpgradeKind kind)
         {
             var save = PlatformGlue.Save;
-            if (save == null) return;
+            if (save == null) return false;
             if (save.Data.progress.upgrades == null || save.Data.progress.upgrades.Length < 3) save.Data.progress.upgrades = new int[3];
             if (UpgradeCatalog.TryBuy(save.Data.progress.upgrades, kind, save.Data.Coins, out int cost))
             {
@@ -213,8 +214,10 @@ namespace RacingGame
                 save.MarkDirty();
                 SfxPlayer.Instance.PlayUi(SfxSynth.LapDing);
                 Show("garage");
+                return true;
             }
-            else Toast(Loc.Get("garage.not_enough"));
+            Toast(Loc.Get("garage.not_enough"));
+            return false;
         }
 
         // ---------- settings ----------
@@ -225,7 +228,7 @@ namespace RacingGame
             var save = PlatformGlue.Save;
             string lang = save != null ? save.Data.settings.lang : "";
             string langLabel = string.IsNullOrEmpty(lang) ? Loc.Get("settings.language.system") + $" ({Loc.Language})" : lang.ToUpperInvariant();
-            CentreCard(root, 560f, -140f, 230f);
+            CentreCard(root, 560f, -380f, 230f);
             Row(root, 160f, Loc.Get("settings.language"), langLabel, () =>
             {
                 int i = System.Array.IndexOf(LanguageCycle, lang); i = (i + 1) % LanguageCycle.Length;
@@ -246,6 +249,23 @@ namespace RacingGame
             {
                 if (save == null) return;
                 save.Data.settings.autoThrottle = !auto; save.MarkDirty(); Show("settings");
+            });
+            // Graphics cycles Auto → Low → High; Auto follows the device (phones get the Mobile tier).
+            var st = PlatformGlue.HasQualityChoice && save != null ? save.Data.settings : null;
+            string gfx = st == null || st.qualityAuto ? "settings.graphics.auto" : (st.quality <= 0 ? "settings.graphics.low" : "settings.graphics.high");
+            if (st != null) Row(root, -200f, Loc.Get("settings.graphics"), Loc.Get(gfx), () =>
+            {
+                if (st == null) return;
+                if (st.qualityAuto) { st.qualityAuto = false; st.quality = 0; }
+                else if (st.quality <= 0) st.quality = 1;
+                else st.qualityAuto = true;
+                save.MarkDirty(); PlatformGlue.ApplyQuality(); Show("settings");
+            });
+            bool shake = save == null || save.Data.settings.cameraShake;
+            Row(root, -320f, Loc.Get("settings.shake"), Loc.Get(shake ? "settings.on" : "settings.off"), () =>
+            {
+                if (save == null) return;
+                save.Data.settings.cameraShake = !shake; save.MarkDirty(); Show("settings");
             });
         }
 

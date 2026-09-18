@@ -51,6 +51,7 @@ namespace RacingGame
         /// <summary>True while a rival is inside the lock cone with a clear line of fire.</summary>
         public bool ReticleLocked { get; private set; }
         private bool touchLayout;
+        private float layoutWidth = -1f;
         private RectTransform pausePanel;
         private CarController playerCar;
         private CarHealth playerHealth;
@@ -196,6 +197,12 @@ namespace RacingGame
             }
         }
 
+        private void ClearLock()
+        {
+            if (ReticleLocked) { ReticleLocked = false; SetReticleColor(ReticleIdle); }
+            reticlePunch = 0f;
+        }
+
         private void SetReticleColor(Color c)
         {
             for (int i = 0; i < reticleArms.Length; i++) if (reticleArms[i] != null) reticleArms[i].color = c;
@@ -207,14 +214,14 @@ namespace RacingGame
             bool show = playerCar != null && playerCannon != null && playerCannon.muzzle != null && race.State >= RaceState.Countdown && race.State < RaceState.Finished
                         && (playerHealth == null || !playerHealth.IsDead);
             var cam = Camera.main;
-            if (!show || cam == null) { if (reticle.gameObject.activeSelf) reticle.gameObject.SetActive(false); ReticleLocked = false; return; }
+            if (!show || cam == null) { if (reticle.gameObject.activeSelf) reticle.gameObject.SetActive(false); ClearLock(); return; }
 
             var muzzle = playerCannon.muzzle;
             Vector3 velocity = muzzle.forward * playerCannon.shellSpeed + playerCar.Body.linearVelocity;
             float t = aimDistance / Mathf.Max(1f, playerCannon.shellSpeed);
             Vector3 aim = muzzle.position + velocity * t + 0.5f * t * t * Physics.gravity;
             Vector3 sp = cam.WorldToScreenPoint(aim);
-            if (sp.z <= 0f) { reticle.gameObject.SetActive(false); return; }
+            if (sp.z <= 0f) { reticle.gameObject.SetActive(false); ClearLock(); return; }
             if (!reticle.gameObject.activeSelf) reticle.gameObject.SetActive(true);
             RectTransformUtility.ScreenPointToLocalPointInRectangle(hudRoot, sp, null, out Vector2 local);
             reticle.anchoredPosition = local;
@@ -271,15 +278,20 @@ namespace RacingGame
             hintText.text = Loc.Get(touch ? "hud.hint.touch" : "hud.hint.keys");
             var hintRt = hintText.rectTransform;
             var hpRt = hpBar.rectTransform;
+            layoutWidth = hudRoot != null ? hudRoot.rect.width : 1920f;
+            // Portrait phones give the canvas ~1000 reference units of width: the timer (±200 around the
+            // centre) would collide with a top-right HP bar, so HP/ammo drop to a row below it.
+            bool narrow = layoutWidth < 1400f;
             if (touch)
             {
                 Place(speedText.rectTransform, Vector2.zero, new Vector2(40f, 216f), new Vector2(460f, 296f));
                 speedText.fontSize = 44f;
-                Place(hpRt, Vector2.one, new Vector2(-500f, -94f), new Vector2(-170f, -58f));
-                Place(hpText.rectTransform, Vector2.one, new Vector2(-500f, -94f), new Vector2(-170f, -58f));
-                Place(ammoText.rectTransform, Vector2.one, new Vector2(-500f, -150f), new Vector2(-170f, -98f));
+                float row = narrow ? -90f : 0f;
+                Place(hpRt, Vector2.one, new Vector2(-500f, -94f + row), new Vector2(-170f, -58f + row));
+                Place(hpText.rectTransform, Vector2.one, new Vector2(-500f, -94f + row), new Vector2(-170f, -58f + row));
+                Place(ammoText.rectTransform, Vector2.one, new Vector2(-500f, -150f + row), new Vector2(-170f, -98f + row));
                 ammoText.alignment = TextAlignmentOptions.TopRight;
-                Place(hintRt, new Vector2(0.5f, 1f), new Vector2(-460f, -230f), new Vector2(420f, -110f));
+                Place(hintRt, new Vector2(0.5f, 1f), new Vector2(-460f, -230f + row * 1.4f), new Vector2(420f, -110f + row * 1.4f));
                 hintText.alignment = TextAlignmentOptions.Top;
             }
             else
@@ -301,6 +313,7 @@ namespace RacingGame
         private void Update()
         {
             if (race == null) return;
+            if (hudRoot != null && Mathf.Abs(hudRoot.rect.width - layoutWidth) > 1f) ApplyLayout(touchLayout);   // rotation / resize
             if (playerCar == null && race.Player != null)
             {
                 playerCar = race.Player.Car;

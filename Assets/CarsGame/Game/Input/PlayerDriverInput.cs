@@ -21,6 +21,8 @@ namespace RacingGame
         private readonly EdgeLatch resetLatch = new EdgeLatch();
 
         public bool UsingActionMap => map != null;
+        /// <summary>Current throttle level (0..1 forward) even while the car ignores commands (countdown revving).</summary>
+        public float ThrottleLevel => Mathf.Max(0f, throttle);
 
         private void OnEnable()
         {

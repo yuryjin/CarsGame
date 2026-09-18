@@ -14,6 +14,10 @@
     getData: function (keys) { var out = {}; (keys || Object.keys(data)).forEach(function (k) { if (k in data) out[k] = data[k]; }); return Promise.resolve(out); },
     setData: function (obj) { Object.keys(obj).forEach(function (k) { data[k] = obj[k]; }); persist(); return Promise.resolve(); }
   };
+  // Leaderboards: v2 (ysdk.leaderboards) unless ?lb=legacy, so both code paths can be exercised.
+  var boards = {}; try { boards = JSON.parse(localStorage.getItem('cars.mock.lb') || '{}'); } catch (e) {}
+  function mockSetScore(b, s) { if (!(b in boards) || s < boards[b]) boards[b] = s; try { localStorage.setItem('cars.mock.lb', JSON.stringify(boards)); } catch (e) {} return Promise.resolve(); }
+  function mockGetEntries(b) { return Promise.resolve({ entries: b in boards ? [{ rank: 1, score: boards[b], player: { uniqueID: 'mock-user', publicName: 'Mock Player' } }] : [] }); }
   var sdk = {
     environment: { i18n: { lang: params.get('lang') || 'ru' }, app: { id: 'mock' } },
     deviceInfo: { isMobile: function () { return params.get('device') === 'mobile'; }, isTablet: function () { return false; }, isTV: function () { return params.get('device') === 'tv'; } },
@@ -26,13 +30,8 @@
     },
     auth: { openAuthDialog: function () { params.set('auth', '1'); return Promise.resolve(); } },
     getPlayer: function () { return Promise.resolve(player); },
-    getLeaderboards: function () {
-      var boards = {}; try { boards = JSON.parse(localStorage.getItem('cars.mock.lb') || '{}'); } catch (e) {}
-      return Promise.resolve({
-        setLeaderboardScore: function (b, s) { if (!(b in boards) || s < boards[b]) boards[b] = s; try { localStorage.setItem('cars.mock.lb', JSON.stringify(boards)); } catch (e) {} return Promise.resolve(); },
-        getLeaderboardEntries: function (b) { return Promise.resolve({ entries: b in boards ? [{ rank: 1, score: boards[b], player: { uniqueID: 'mock-user', publicName: 'Mock Player' } }] : [] }); }
-      });
-    },
+    getLeaderboards: function () { return Promise.resolve({ setLeaderboardScore: mockSetScore, getLeaderboardEntries: mockGetEntries }); },
+    leaderboards: params.get('lb') === 'legacy' ? undefined : { setScore: mockSetScore, getEntries: mockGetEntries },
     multiplayer: { sessions: { init: function () { return Promise.resolve([]); }, commit: function () {}, push: function () {} } }
   };
   // Simulate the host pause from the DevTools console: CarsMockSdk.fire('game_api_pause')

@@ -1,4 +1,5 @@
 using UnityEngine;
+using RacingGame.Core.Platform;
 
 namespace RacingGame
 {
@@ -14,7 +15,16 @@ namespace RacingGame
         private Vector3 lastOffset;
         private Quaternion lastRoll = Quaternion.identity;
 
-        public void AddImpulse(float strength) { energy = Mathf.Clamp01(energy + strength); seed = Random.value * 100f; }
+        [Tooltip("Shake scale while the on-screen touch controls are shown (small screens need less).")]
+        public float touchScale = 0.6f;
+
+        public void AddImpulse(float strength)
+        {
+            var save = PlatformGlue.Save;
+            if (save != null && !save.Data.settings.cameraShake) return;   // accessibility setting
+            if (TouchControlsPresenter.IsShown) strength *= touchScale;
+            energy = Mathf.Clamp01(energy + strength); seed = Random.value * 100f;
+        }
 
         private void LateUpdate()
         {

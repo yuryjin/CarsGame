@@ -68,6 +68,7 @@ namespace RacingGame
             Loc.Initialize(p != null ? p.LanguageCode : "", Save.Data.settings.lang);
             SfxPlayer.Instance.volume = Save.Data.settings.sfx * 0.8f;
             AudioListener.volume = Save.Data.settings.sfx > 0f ? 1f : 0f;
+            ApplyQuality();
         }
 
         /// <summary>Send every local best to the cloud boards (after sign-in, and after each finish).</summary>
@@ -80,6 +81,46 @@ namespace RacingGame
 
         // Sign-in swapped the account: no cloud write until the new account's save is fetched and merged.
         private void OnIdentityChanged() { Save?.OnIdentityChanged(); }
+
+        /// <summary>
+        /// Graphics tier: the player's choice, or by device (WebGL defaults every platform to the Mobile
+        /// tier, which would leave desktops on 0.8 render scale and short shadows).
+        /// </summary>
+        public static void ApplyQuality()
+        {
+            if (Save == null) return;
+            var s = Save.Data.settings;
+            bool wantHigh = s.qualityAuto ? !IsMobileDevice : s.quality > 0;
+            int level = QualityLevel(wantHigh);
+            if (level >= 0 && QualitySettings.GetQualityLevel() != level) QualitySettings.SetQualityLevel(level, true);
+        }
+
+        /// <summary>
+        /// Index of the Mobile or PC tier by name. Unity drops quality levels excluded for the build
+        /// target and renumbers the rest, so indices are resolved at runtime; -1 = only one tier shipped.
+        /// </summary>
+        public static int QualityLevel(bool high)
+        {
+            var names = QualitySettings.names;
+            if (names == null || names.Length < 2) return -1;
+            string wanted = high ? "PC" : "Mobile";
+            for (int i = 0; i < names.Length; i++) if (string.Equals(names[i], wanted, StringComparison.OrdinalIgnoreCase)) return i;
+            return high ? names.Length - 1 : 0;
+        }
+
+        /// <summary>True when the build ships more than one quality tier (the settings row is hidden otherwise).</summary>
+        public static bool HasQualityChoice => QualitySettings.names != null && QualitySettings.names.Length > 1;
+
+        /// <summary>Phone or tablet according to the platform (falls back to Unity's own check).</summary>
+        public static bool IsMobileDevice
+        {
+            get
+            {
+                var p = Platform;
+                if (p != null && p.IsInitialized) return p.Device == DeviceKind.Mobile || p.Device == DeviceKind.Tablet;
+                return Application.isMobilePlatform || SystemInfo.deviceType == DeviceType.Handheld;
+            }
+        }
 
         /// <summary>Settings screen: "" = follow the platform.</summary>
         public static void SetLanguageOverride(string code)

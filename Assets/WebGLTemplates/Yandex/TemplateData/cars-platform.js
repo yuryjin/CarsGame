@@ -18,7 +18,7 @@
   var inGameplay = false, hostPaused = false, adOpen = false, readyCalled = false;
   var saveCache = null, saveTimer = null, savePending = false, lastSaveAt = 0;
   var SAVE_KEY = 'cars.save.mirror';
-  var debug = { gameplayStarts: 0, gameplayStops: 0, adOpens: 0, adCloses: 0, setDataCalls: 0, log: [] };
+  var debug = { gameplayStarts: 0, gameplayStops: 0, adOpens: 0, adCloses: 0, setDataCalls: 0, log: [], state: null, perf: null, bootMs: {} };
   // The mock is a developer tool only: never on a real host. In production a missing or failing SDK
   // keeps the loading screen up with a retry, because gameplay must not start without the SDK.
   var devHost = /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/.test(location.hostname) || location.protocol === 'file:';
@@ -104,13 +104,45 @@
 
   function attach(instance) {
     unity = instance;
+    debug.bootMs.attach = Math.round(performance.now());
     while (queued.length) { var q = queued.shift(); send(q[0], q[1]); }
     if (hostPaused) send('OnHostPause', '1');   // replay a startup pause that arrived before Unity was up
     log('attached');
+    // Dev/QA only: ?perf=1 turns on the in-game frame statistics (see DebugBus.cs).
+    if (debugEnabled && /[?&]perf=1/.test(location.search)) cmd('perf', 'on');
+  }
+
+  // ---- QA / debug channel (local hosts or ?debug=1 only) ----
+  // cmd('startRace','e1','easy'), cmd('autopilot'), cmd('goto','garage'), cmd('buy','engine'), cmd('touch','on'),
+  // cmd('perf','on'), cmd('state'). The game answers through debugState(); read window.CarsPlatform.debug.state.
+  var debugEnabled = devHost || /[?&]debug=1/.test(location.search);
+  function cmd(name) {
+    if (!debugEnabled) return false;
+    var args = Array.prototype.slice.call(arguments, 1).map(String);
+    send('OnJs', JSON.stringify({ cmd: String(name), args: args }));
+    return true;
+  }
+  // Size of the wasm heap, read from the instance attach() was given (the page has no other handle on it).
+  // null means "unknown" so a memory check cannot silently pass on a zero.
+  function heapBytes() {
+    try {
+      var m = unity && unity.Module;
+      if (m && m.HEAPU8 && typeof m.HEAPU8.length === 'number') return m.HEAPU8.length;
+      if (m && m.asm && m.asm.memory && m.asm.memory.buffer) return m.asm.memory.buffer.byteLength;
+    } catch (e) {}
+    return null;
+  }
+
+  function debugState(json) {
+    try {
+      var st = JSON.parse(json);
+      if (st.perf) { st.perf.heapBytes = heapBytes(); debug.perf = st.perf; }
+      debug.state = st;
+    } catch (e) { log('bad debug state ' + e); }
   }
 
   function env() {
-    return { lang: lang, device: device, authorized: authorized, playerId: playerId, playerName: playerName, avatar: avatar, adv: !!(ysdk && ysdk.adv) };
+    return { lang: lang, device: device, authorized: authorized, playerId: playerId, playerName: playerName, avatar: avatar, adv: !!(ysdk && ysdk.adv), debug: debugEnabled };
   }
 
   function init(id) {
@@ -131,6 +163,7 @@
   }
   function ready() {
     if (readyCalled) return; readyCalled = true;
+    debug.bootMs.ready = Math.round(performance.now());
     try { ysdk && ysdk.features && ysdk.features.LoadingAPI && ysdk.features.LoadingAPI.ready(); } catch (e) {}
     log('LoadingAPI.ready()');
   }
@@ -253,17 +286,27 @@
   }
 
   // ---- leaderboards ----
-  function getLb() { return lb ? Promise.resolve(lb) : ysdk.getLeaderboards().then(function (l) { lb = l; return l; }); }
+  // Current SDK: ysdk.leaderboards.setScore/getEntries. Older SDK builds only have the deprecated
+  // ysdk.getLeaderboards() object with setLeaderboardScore/getLeaderboardEntries — kept as a fallback.
+  function getLb() {
+    if (lb) return Promise.resolve(lb);
+    if (ysdk.leaderboards && typeof ysdk.leaderboards.setScore === 'function') {
+      var v2 = ysdk.leaderboards;
+      lb = { setLeaderboardScore: function (b, s, x) { return v2.setScore(b, s, x); }, getLeaderboardEntries: function (b, o) { return v2.getEntries(b, o); }, v2: true };
+      return Promise.resolve(lb);
+    }
+    return ysdk.getLeaderboards().then(function (l) { lb = l; return l; });
+  }
   function submitScore(id, board, score, extra) {
     var done = once(id);
     if (!ysdk) { done({ ok: false, error: 'unavailable' }); return; }
-    getLb().then(function (l) { return l.setLeaderboardScore(board, Number(score), extra || undefined); })
+    getLb().then(function (l) { debug.lbApi = l.v2 ? 'v2' : 'legacy'; return l.setLeaderboardScore(board, Number(score), extra || undefined); })
       .then(function () { done({ ok: true }); }).catch(function (e) { done({ ok: false, error: String(e) }); });
   }
   function getLeaderboard(id, board, top, includeUser, around) {
     var done = once(id);
     if (!ysdk) { done({ ok: false, error: 'unavailable' }); return; }
-    getLb().then(function (l) { return l.getLeaderboardEntries(board, { quantityTop: top, includeUser: !!includeUser, quantityAround: around }); })
+    getLb().then(function (l) { debug.lbApi = l.v2 ? 'v2' : 'legacy'; return l.getLeaderboardEntries(board, { quantityTop: top, includeUser: !!includeUser, quantityAround: around }); })
       .then(function (res) {
         var items = (res.entries || []).map(function (e) { return { rank: e.rank, id: e.player && e.player.uniqueID, name: e.player && e.player.publicName, score: e.score, extra: e.extraData || '' }; });
         done({ ok: true, entries: JSON.stringify(items) });
@@ -307,7 +350,7 @@
   }
 
   window.CarsPlatform = {
-    boot: boot, attach: attach, env: env, init: init, debug: debug,
+    boot: boot, attach: attach, env: env, init: init, debug: debug, cmd: cmd, debugState: debugState, heapBytes: heapBytes,
     gameplayStart: gameplayStart, gameplayStop: gameplayStop, ready: ready,
     interstitial: interstitial, rewarded: rewarded,
     loadSave: loadSave, queueSave: queueSave, flushSave: flushSave,

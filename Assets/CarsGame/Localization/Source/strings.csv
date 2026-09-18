@@ -88,6 +88,11 @@ settings.sound,,10,Sound,Звук,Ses,声音,Ton,Sonido,Son,Som,Звук
 settings.auto_throttle,,16,Auto throttle,Автогаз,Otomatik gaz,自动油门,Auto-Gas,Acelerador auto,Accélération auto,Acelerador auto,Автогаз
 settings.on,,4,On,Вкл,Açık,开,An,Sí,Oui,Lig.,Увім
 settings.off,,4,Off,Выкл,Kapalı,关,Aus,No,Non,Desl.,Вимк
+settings.graphics,,14,Graphics,Графика,Grafik,画面,Grafik,Gráficos,Graphismes,Gráficos,Графіка
+settings.graphics.auto,follow device,16,Auto,Авто,Otomatik,自动,Auto,Auto,Auto,Auto,Авто
+settings.graphics.low,,10,Low,Низкая,Düşük,低,Niedrig,Baja,Basse,Baixa,Низька
+settings.graphics.high,,10,High,Высокая,Yüksek,高,Hoch,Alta,Haute,Alta,Висока
+settings.shake,camera shake,18,Camera shake,Тряска камеры,Kamera sarsıntısı,镜头震动,Kamerawackeln,Vibración de cámara,Secousses caméra,Tremor da câmera,Тряска камери
 lb.title,,12,LEADERS,ЛИДЕРЫ,LİDERLER,排行榜,BESTENLISTE,LÍDERES,CLASSEMENT,LÍDERES,ЛІДЕРИ
 lb.empty,,24,No results yet,Пока нет результатов,Henüz sonuç yok,暂无成绩,Noch keine Ergebnisse,Aún no hay resultados,Pas encore de résultats,Ainda sem resultados,Поки немає результатів
 lb.local,guest records header,20,Your records,Ваши рекорды,Rekorların,你的纪录,Deine Rekorde,Tus récords,Vos records,Seus recordes,Ваші рекорди

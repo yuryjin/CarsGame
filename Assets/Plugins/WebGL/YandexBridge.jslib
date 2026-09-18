@@ -21,5 +21,6 @@ mergeInto(LibraryManager.library, {
   CarsYa_GetLeaderboard: function (reqId, boardPtr, top, includeUser, around) { window.CarsPlatform.getLeaderboard(reqId, UTF8ToString(boardPtr), top, includeUser, around); },
   CarsYa_SessionsLoad: function (reqId, count, metaPtr) { window.CarsPlatform.sessionsLoad(reqId, count, UTF8ToString(metaPtr)); },
   CarsYa_SessionsCommit: function (payloadPtr) { window.CarsPlatform.sessionsCommit(UTF8ToString(payloadPtr)); },
-  CarsYa_SessionsPush: function (reqId, metaPtr) { window.CarsPlatform.sessionsPush(reqId, UTF8ToString(metaPtr)); }
+  CarsYa_SessionsPush: function (reqId, metaPtr) { window.CarsPlatform.sessionsPush(reqId, UTF8ToString(metaPtr)); },
+  CarsYa_Debug: function (jsonPtr) { if (window.CarsPlatform && window.CarsPlatform.debugState) window.CarsPlatform.debugState(UTF8ToString(jsonPtr)); }
 });

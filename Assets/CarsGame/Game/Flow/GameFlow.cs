@@ -28,7 +28,7 @@ namespace RacingGame
         private RaceManager race;
         private InputAction pauseAction;
         private CarController playerCar;
-        private AudioSource playerEngine;
+        private EngineAudio playerEngine;
         private SkyDirector sky;
         private TrackPath track;
         private PickupSpawner pickups;
@@ -47,6 +47,7 @@ namespace RacingGame
             hud = GetComponent<HudScreen>();
             pickups = GetComponent<PickupSpawner>();
             recorder = GetComponent<GhostRecorder>() ?? gameObject.AddComponent<GhostRecorder>();
+            if (GetComponent<DebugBus>() == null) gameObject.AddComponent<DebugBus>();   // QA channel; idle until the page sends a command
             track = TrackPath.Instance;
             var map = InputSystem.actions != null ? InputSystem.actions.FindActionMap("Driving") : null;
             pauseAction = map != null ? map.FindAction("Pause") : null;
@@ -210,12 +211,9 @@ namespace RacingGame
             if (save != null) PlayerProgression.ApplyTo(playerCar, player.Health, playerCar.GetComponent<CarCannon>(), save.Data.progress.upgrades);
 
             if (playerCar.GetComponent<PlayerEffects>() == null) playerCar.gameObject.AddComponent<PlayerEffects>();
-            if (playerCar.engineAudio == null)
-            {
-                playerEngine = playerCar.gameObject.AddComponent<AudioSource>();
-                playerEngine.clip = SfxSynth.Engine; playerEngine.loop = true; playerEngine.volume = 0.35f * SfxPlayer.Instance.volume; playerEngine.spatialBlend = 0f; playerEngine.playOnAwake = false;
-                playerCar.engineAudio = playerEngine;
-            }
+            // Engine, tyres and wind for the player; revs with the pedal during the countdown.
+            playerEngine = playerCar.GetComponent<EngineAudio>() ?? playerCar.gameObject.AddComponent<EngineAudio>();
+            playerEngine.SetRunning(true);
             foreach (var p in race.Participants)
             {
                 var health = p.Health; var participant = p;
@@ -262,7 +260,7 @@ namespace RacingGame
         private void OnCountdown(int value) { SfxPlayer.Instance.PlayUi(value > 0 ? SfxSynth.Beep : SfxSynth.Go); }
         private void OnStarted()
         {
-            if (playerEngine != null && !playerEngine.isPlaying) playerEngine.Play();
+            if (playerEngine != null) playerEngine.SetRunning(true);
             foreach (var g in ghosts) if (g != null) g.Begin(race.RaceStartTime);
             if (race.Player != null) recorder.Begin(race.Player, TrackHash(RaceSetup.Event), UiFactory.Escape(PlatformGlue.Platform != null ? PlatformGlue.Platform.Player.Name : "You"));
         }
@@ -288,7 +286,7 @@ namespace RacingGame
 
         private void OnFinished(RaceResults results)
         {
-            if (playerEngine != null) playerEngine.Stop();
+            if (playerEngine != null) playerEngine.SetRunning(false);
             recorder.Stop();                                   // DNF path never reached OnParticipantFinished
             var me = results.Player;
             var save = PlatformGlue.Save;
