@@ -23,6 +23,8 @@ namespace RacingGame.EditorTools
         {
             var font = AssetDatabase.LoadAssetAtPath<Font>(FontsDir + "/NotoSansSC-Subset.ttf");
             if (font == null) return "NotoSansSC-Subset.ttf missing";
+            // FontEngine caches faces natively; after the TTF is reimported the stale face yields no glyphs.
+            FontEngine.UnloadAllFontFaces();
 
             // Characters: every non-Latin/Cyrillic char from all translations + digits/punctuation.
             var chars = new StringBuilder("0123456789:%/.,!?()+-—·…");
@@ -62,6 +64,9 @@ namespace RacingGame.EditorTools
                 var list = so.FindProperty("m_fallbackFontAssets");
                 if (list != null)
                 {
+                    // The asset is deleted and recreated above, so older entries dangle as null.
+                    for (int i = list.arraySize - 1; i >= 0; i--)
+                        if (list.GetArrayElementAtIndex(i).objectReferenceValue == null) list.DeleteArrayElementAtIndex(i);
                     bool present = false;
                     for (int i = 0; i < list.arraySize; i++) if (list.GetArrayElementAtIndex(i).objectReferenceValue == asset) present = true;
                     if (!present) { list.arraySize++; list.GetArrayElementAtIndex(list.arraySize - 1).objectReferenceValue = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(path); }
