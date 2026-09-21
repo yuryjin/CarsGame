@@ -10,13 +10,13 @@
     "semantic_hash": "927655e7fd40aab43030236dee149080"
   },
   "Packages/manifest.json": {
-    "mtime": 1788955579.8027465,
-    "ast_hash": "e10cfc044e047a4ed1f806940fdc04c6",
+    "mtime": 1789512524.7145119,
+    "ast_hash": "049195608e273bdd4d145e7fe085860d",
     "semantic_hash": ""
   },
   "Packages/packages-lock.json": {
-    "mtime": 1788955579.8127468,
-    "ast_hash": "fbf75586cb0326f301def5caf1b8d7d7",
+    "mtime": 1789750767.240401,
+    "ast_hash": "e61c6b51825694241de820489cafbdb6",
     "semantic_hash": ""
   },
   "Docs/AI/UnityProjectContext.md": {
@@ -70,13 +70,13 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Core/Save/SaveData.cs": {
-    "mtime": 1788373568.9638193,
-    "ast_hash": "e35ec812b6ebb05135c62ea36d545de2",
+    "mtime": 1789514528.8847456,
+    "ast_hash": "845872e62ae903766a4985babb02ee21",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Core/Save/SaveMerge.cs": {
-    "mtime": 1788373568.9638193,
-    "ast_hash": "efeaeab45454ae84c8fd331afe896388",
+    "mtime": 1789514528.8857455,
+    "ast_hash": "ee1b62f0078e2cb12f10a186f08923c0",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Core/Save/SaveMigrator.cs": {
@@ -105,8 +105,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Core/Sim/RaceRanking.cs": {
-    "mtime": 1788350910.6651654,
-    "ast_hash": "2dba4f5ecd7ab371d244ad9835916f58",
+    "mtime": 1789512834.36745,
+    "ast_hash": "9647dccb0f915e2489d1fc0d0df8ab40",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Core/Sim/RngStreams.cs": {
@@ -135,8 +135,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Editor/Environment/BarrierTools.cs": {
-    "mtime": 1789042184.2799313,
-    "ast_hash": "1078f70c635a19373cb4c1dbcd3773fc",
+    "mtime": 1789759819.4175997,
+    "ast_hash": "9da9b717b3cbb23481c9d8cf2550f249",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Editor/Environment/EnvironmentBaker.cs": {
@@ -170,8 +170,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Editor/Localization/LocImporter.cs": {
-    "mtime": 1788382576.298458,
-    "ast_hash": "75af0dfa92c0ee6e3d2b3ac541fe9e3d",
+    "mtime": 1789760401.229319,
+    "ast_hash": "31a745cc54182e634cd01655aa085974",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Editor/RaceCarPrefabBaker.cs": {
@@ -180,8 +180,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/AI/AiDriver.cs": {
-    "mtime": 1788382576.297458,
-    "ast_hash": "2e7cc24c24ef75bf7a32666455414525",
+    "mtime": 1789513415.3385518,
+    "ast_hash": "e64619fe69645e0e3879041c31edbfe5",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/AI/AiDriverProfile.cs": {
@@ -190,8 +190,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/AI/AiGunner.cs": {
-    "mtime": 1788373085.2113965,
-    "ast_hash": "d929dcfad042798df7782e8fa0c329d9",
+    "mtime": 1789513527.222812,
+    "ast_hash": "c7eb680838feb797bab72e9bd38cb7ba",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/AI/OpponentDriver.cs": {
@@ -205,18 +205,18 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Audio/SfxSynth.cs": {
-    "mtime": 1788371711.6528986,
-    "ast_hash": "d3a9b773a9b2e4075db7de4a9d5f884b",
+    "mtime": 1789514265.416498,
+    "ast_hash": "6305441a400f8d1e8b698ca83108fb57",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Camera/CameraImpulse.cs": {
-    "mtime": 1788422266.369292,
-    "ast_hash": "0ec1b85bb8c683576576f6c18eae12fb",
+    "mtime": 1789514646.1160822,
+    "ast_hash": "9fbe8468402f2d581b3dd0734a7862e7",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Camera/CarCameraFollow.cs": {
-    "mtime": 1788217277.1455486,
-    "ast_hash": "3fab0b5c58c7f56abaca39da2669b1f2",
+    "mtime": 1789514121.996664,
+    "ast_hash": "27ac089989fd8f86372604c452cc6e4c",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Camera/MenuCameraDirector.cs": {
@@ -240,8 +240,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Environment/Gen/PropLayout.cs": {
-    "mtime": 1788421509.1499481,
-    "ast_hash": "3ae04f8de0381915c1721fe34fee4fdd",
+    "mtime": 1789759869.1908514,
+    "ast_hash": "dc008b12ce94b6bb227eb1126e97f78b",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Environment/Gen/PropNoise.cs": {
@@ -250,8 +250,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Environment/Gen/TerrainMeshGen.cs": {
-    "mtime": 1788421293.1256862,
-    "ast_hash": "bc20d4a7b147554519832d52e798b0fb",
+    "mtime": 1789760433.4001396,
+    "ast_hash": "7b2831b3c89c5f240f95fbb091aa3fb3",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Environment/SkyDirector.cs": {
@@ -275,8 +275,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Flow/GameFlow.cs": {
-    "mtime": 1788422266.3792922,
-    "ast_hash": "37c4ee901ade9fa829c7d8937ba6917a",
+    "mtime": 1789760198.226276,
+    "ast_hash": "5670981450360ac0603d94f9a21c84c1",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Flow/PauseController.cs": {
@@ -285,8 +285,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Flow/PlatformGlue.cs": {
-    "mtime": 1788382576.296458,
-    "ast_hash": "5c29a5d4146ca94dba4434e49859c5e4",
+    "mtime": 1789515044.033974,
+    "ast_hash": "f6f877f24624da7b796861c66aaa0b3a",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Ghost/GhostCar.cs": {
@@ -300,8 +300,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Input/PlayerDriverInput.cs": {
-    "mtime": 1788351214.7333972,
-    "ast_hash": "440bafcea69d340971b2501f5865ff6a",
+    "mtime": 1789514303.2082438,
+    "ast_hash": "7ab9e8250e6ff275f9b2b775d2d554a5",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Input/ScriptedDriverInput.cs": {
@@ -310,8 +310,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Input/TouchControlsPresenter.cs": {
-    "mtime": 1788382576.298458,
-    "ast_hash": "b56f30d1a8693e3c689dfe4bf14ffcc8",
+    "mtime": 1789760289.7860954,
+    "ast_hash": "ea87df09c6b2ed5d72f9319e70979010",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Localization/Loc.cs": {
@@ -360,28 +360,28 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/RaceDirector.cs": {
-    "mtime": 1788373085.2073963,
-    "ast_hash": "fb2a59d43894449574fc36f3e96e4b2f",
+    "mtime": 1789513299.6871984,
+    "ast_hash": "db133d077715c1ef790edf838a388d56",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/RaceEventDefinition.cs": {
-    "mtime": 1788420647.6640637,
-    "ast_hash": "59b2f0ebf9d07d8e6ab25fdcb92f1540",
+    "mtime": 1789760477.299842,
+    "ast_hash": "620757e26c5062624f156cd1a3678b86",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/RaceManager.cs": {
-    "mtime": 1788382576.298458,
-    "ast_hash": "4a538df550cfe050bd7b4df6458fc4b0",
+    "mtime": 1789512851.5288208,
+    "ast_hash": "16ea79129de06d56c13de315c6ed36d9",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/RaceParticipant.cs": {
-    "mtime": 1788381776.4021819,
-    "ast_hash": "093433694b4c1af127172ee9084634a2",
+    "mtime": 1789760477.5238464,
+    "ast_hash": "bde237cf5ae4142affa8a630a5a85dde",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/RaceResults.cs": {
-    "mtime": 1788371634.8984525,
-    "ast_hash": "1ffa225c83d747dacd14ff0ab1181cb4",
+    "mtime": 1789760477.409844,
+    "ast_hash": "534d7d4194a1b13d69394924e2177b21",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/RaceSetup.cs": {
@@ -390,8 +390,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/RaceSpawner.cs": {
-    "mtime": 1788373085.2273967,
-    "ast_hash": "d053f87878d1b342933faf9a2b64e909",
+    "mtime": 1789760477.9248543,
+    "ast_hash": "82b9d5ecd97c9bc3357e833f447fdf2d",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/SimulationDriver.cs": {
@@ -405,38 +405,38 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Track/RaceProgress.cs": {
-    "mtime": 1788353208.551328,
-    "ast_hash": "1b8d6228bd3cdedce402f066197b271c",
+    "mtime": 1789760477.6468487,
+    "ast_hash": "c69efa904d1626c9320f3b79716d1184",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Track/TrackPath.cs": {
-    "mtime": 1788352825.878757,
-    "ast_hash": "f42a91c141ff88d45b7a7b9cc23c5246",
+    "mtime": 1789513415.3385518,
+    "ast_hash": "b7b892eafb8110cdecf8b38bef5888ab",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/UI/HudScreen.cs": {
-    "mtime": 1788381527.1250079,
-    "ast_hash": "9dd77977c31051fe4c81db7cd7bc58d5",
+    "mtime": 1789760275.1228034,
+    "ast_hash": "83645400321c6bfd35959d393e06e464",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/UI/MenuScreens.cs": {
-    "mtime": 1788422386.436542,
-    "ast_hash": "f59fced2c89891102ed0c361da0d66f5",
+    "mtime": 1789760274.9078088,
+    "ast_hash": "2f232de0f287ce719e32ccf5bd44f5b6",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/UI/UiFactory.cs": {
-    "mtime": 1788422386.436542,
-    "ast_hash": "57c1c2de4a56087333e70b774bf6b87e",
+    "mtime": 1789760030.332963,
+    "ast_hash": "ca8b4b7d57bacd1ee313e9dbba4a8413",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/UI/WorldHealthBars.cs": {
-    "mtime": 1788371800.029572,
-    "ast_hash": "9c97b2227d419dbe34b85002df0e1f93",
+    "mtime": 1789760488.0470572,
+    "ast_hash": "56ddb0825682f055abdbf83ced9a511f",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/VFX/EffectPool.cs": {
-    "mtime": 1788351214.732397,
-    "ast_hash": "99f64b90c9fae171e9093c9a1954f14b",
+    "mtime": 1789513721.404706,
+    "ast_hash": "6cce2987dddd16680a64f7822a160bd2",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Vehicle/CarCannon.cs": {
@@ -445,23 +445,23 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Vehicle/CarController.cs": {
-    "mtime": 1788421668.4770973,
-    "ast_hash": "947b2cd5682d488ec24d1d61cb870535",
+    "mtime": 1789760477.799852,
+    "ast_hash": "c60cdefe4bc45d2a9296b978e89ae9c8",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Vehicle/CarHealth.cs": {
-    "mtime": 1788377149.7943754,
-    "ast_hash": "63a8df4af0921ef9dcf0e8a26a52e834",
+    "mtime": 1789513673.4227467,
+    "ast_hash": "1f1a008fca0e98040df5b4d0d9221ba6",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Vehicle/CarPaint.cs": {
-    "mtime": 1788353208.555328,
-    "ast_hash": "ab3b43c3ea704bf93880668d83c38626",
+    "mtime": 1789513673.4227467,
+    "ast_hash": "b471b72221ad8c4ec4936210f7224316",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Vehicle/PlayerEffects.cs": {
-    "mtime": 1788422266.368292,
-    "ast_hash": "0cd8089fa10b8d455f15b04a5a50a564",
+    "mtime": 1789513912.5155122,
+    "ast_hash": "20039a0c6e00192021314bee75716f00",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Vehicle/ProceduralCarBuilder.cs": {
@@ -500,8 +500,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Platform/PlatformRuntime.cs": {
-    "mtime": 1788372483.3967059,
-    "ast_hash": "3103417ebf6002be1b45b87f3ecaf4cc",
+    "mtime": 1789514836.0428553,
+    "ast_hash": "e2289b57bf7104260b15bbd339abc69e",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Platform/PlayerPrefsSaveStore.cs": {
@@ -510,13 +510,13 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Platform/Yandex/YandexNative.cs": {
-    "mtime": 1788380574.230008,
-    "ast_hash": "bf21e4bfca422137c2c75a8782f0a71f",
+    "mtime": 1789514420.8055842,
+    "ast_hash": "c0cb91eb343ff755b6c668d02c930f6a",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Platform/Yandex/YandexPlatform.cs": {
-    "mtime": 1788382576.296458,
-    "ast_hash": "28c0c11486fc14df60ab545c004df986",
+    "mtime": 1789514836.0428553,
+    "ast_hash": "79ea5638cf742e194f2aa5285a13870b",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Tests/EditMode/AdPacerTests.cs": {
@@ -555,13 +555,13 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Tests/EditMode/RaceRankingTests.cs": {
-    "mtime": 1788350910.6731656,
-    "ast_hash": "396c5c7672344d97eb2f3be5935e6763",
+    "mtime": 1789513077.2796075,
+    "ast_hash": "908cef76b3899f7168a582f1cd7af9f3",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Tests/EditMode/SaveMergeTests.cs": {
-    "mtime": 1788373568.9648194,
-    "ast_hash": "ac629f6681fa87b9d8bc71152e241efb",
+    "mtime": 1789514528.8857455,
+    "ast_hash": "3498a4ba2858dee7dfc326891676e02a",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Tests/EditMode/TrackSplineTests.cs": {
@@ -570,13 +570,13 @@
     "semantic_hash": ""
   },
   "Assets/WebGLTemplates/Yandex/TemplateData/cars-platform.js": {
-    "mtime": 1788382576.3254585,
-    "ast_hash": "d285ce3ef0654b21e89979c00c599f1c",
+    "mtime": 1789515044.0329738,
+    "ast_hash": "c631ea50a3c7082a243ca0a25cb4d433",
     "semantic_hash": ""
   },
   "Assets/WebGLTemplates/Yandex/TemplateData/ysdk-mock.js": {
-    "mtime": 1788372652.0429757,
-    "ast_hash": "29f085e85cdbc830604a693a97a2ac15",
+    "mtime": 1789514383.0208266,
+    "ast_hash": "c734bfb41146194c11774cd0deb38eb4",
     "semantic_hash": ""
   },
   "Data/Plugins/lib_burst_generated.cpp": {
@@ -605,18 +605,18 @@
     "semantic_hash": ""
   },
   "Assets/WebGLTemplates/Yandex/index.html": {
-    "mtime": 1788381433.00503,
-    "ast_hash": "4e8a60a75e0731dfde9e9ae31e0751da",
+    "mtime": 1789515044.033974,
+    "ast_hash": "9d85462d5d78d1ac9061e52c1321d28c",
     "semantic_hash": ""
   },
   "Docs/AI/ProgressLog.md": {
-    "mtime": 1789045464.6796741,
-    "ast_hash": "3fadf43a1e3a76dd467996ca9c6e8cae",
+    "mtime": 1789515082.8507414,
+    "ast_hash": "9a87885bd620905f24e683eda8a5d95e",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/UI/UiButtonFx.cs": {
-    "mtime": 1788957662.4711387,
-    "ast_hash": "741bc6c5de2c879025c8cae9633cb4d9",
+    "mtime": 1789760030.5099664,
+    "ast_hash": "40c52815a31616abdbd0e2d62baa78f3",
     "semantic_hash": ""
   },
   "Docs/AI/MidcoreDesign.md": {
@@ -657,6 +657,81 @@
   "Docs/AI/reviews/midcore-2026-09-10/prompt.md": {
     "mtime": 1789042950.2185864,
     "ast_hash": "8be8e4ebdb138cd68ade1ae6feb6c87f",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Core/Sim/KillTally.cs": {
+    "mtime": 1789512881.7194705,
+    "ast_hash": "a8a47b6ce6a574fd7d50d011965d13aa",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Core/Track/TrackProfile.cs": {
+    "mtime": 1789513377.6747873,
+    "ast_hash": "c8e061f9e5f5eb52b4c1aeb2622f0de7",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Game/AI/TargetFinder.cs": {
+    "mtime": 1789513527.216812,
+    "ast_hash": "16de7ea44cbc162d617ac1718ee363ef",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Game/Audio/EngineAudio.cs": {
+    "mtime": 1789514303.215244,
+    "ast_hash": "caf2624e6d243f1006acb44a4a9c690e",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Game/Debug/DebugBus.cs": {
+    "mtime": 1789515044.033974,
+    "ast_hash": "51aeea48576ba1c6abe41d3f8ada2ca2",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Game/Environment/Gen/ChasmLayout.cs": {
+    "mtime": 1789760347.1669745,
+    "ast_hash": "df5b20afe74359948fdcead356460ba4",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Game/Environment/Gen/CliffMeshGen.cs": {
+    "mtime": 1789760410.6727169,
+    "ast_hash": "e23c3423e9900cdfd736b9c5e8b29103",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Game/UI/SpeedometerGraphic.cs": {
+    "mtime": 1789751561.0834491,
+    "ast_hash": "0b6b23be754efcb4eca4bf6a15d1d267",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Game/VFX/CarDamageSmoke.cs": {
+    "mtime": 1789513902.1623065,
+    "ast_hash": "e8e2e541cc336352b9e43841425440c1",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Tests/EditMode/KillTallyTests.cs": {
+    "mtime": 1789513063.4453185,
+    "ast_hash": "7edf89cbbeed9cc8879d14d35eaaf94b",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Tests/EditMode/SpeedometerTests.cs": {
+    "mtime": 1789751851.847774,
+    "ast_hash": "37ddf561e95daafe9a829f474cec8826",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Tests/EditMode/TrackProfileTests.cs": {
+    "mtime": 1789513377.6797874,
+    "ast_hash": "15bea2b84e1c313171cf0c29ed40e165",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Tests/EditMode/UiInteractionTests.cs": {
+    "mtime": 1789760308.3554652,
+    "ast_hash": "2b760c9f417fdd4ce69cd4316f902e03",
+    "semantic_hash": ""
+  },
+  "Docs/Release/Yandex/checklist.md": {
+    "mtime": 1789515082.8497415,
+    "ast_hash": "23c1e26ade96349893d3650491db86a4",
+    "semantic_hash": ""
+  },
+  "Docs/Release/Yandex/metadata.md": {
+    "mtime": 1789514708.5263236,
+    "ast_hash": "c83f45f43574db415ea811efc76e95d4",
     "semantic_hash": ""
   }
 }
