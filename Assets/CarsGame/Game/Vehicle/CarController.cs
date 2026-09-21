@@ -432,6 +432,7 @@ namespace RacingGame
         /// <summary>Back onto the track: the respawn provider decides where, else the last grounded pose.</summary>
         public void ResetCar()
         {
+            if (respawnProvider == null) respawnProvider = GetComponent<IRespawnPoseProvider>();
             if (respawnProvider != null && respawnProvider.TryGetRespawnPose(out var pos, out var rot))
                 Teleport(pos, rot);
             else

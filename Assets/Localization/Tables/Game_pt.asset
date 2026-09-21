@@ -333,6 +333,42 @@ MonoBehaviour:
     m_Localized: FREIO
     m_Metadata:
       m_Items: []
+  - m_Id: 5803307084099617
+    m_Localized: "{name} destru\xEDdo!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099618
+    m_Localized: "Destru\xEDdo por {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099653
+    m_Localized: "Gr\xE1ficos"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099654
+    m_Localized: Auto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099655
+    m_Localized: Baixa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099656
+    m_Localized: Alta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099657
+    m_Localized: "Tremor da c\xE2mera"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099667
+    m_Localized: "Indispon\xEDvel no momento. Tente novamente."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099668
+    m_Localized: "Muni\xE7\xE3o {cur}/{max}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

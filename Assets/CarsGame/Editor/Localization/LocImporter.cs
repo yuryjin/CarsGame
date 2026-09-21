@@ -115,7 +115,8 @@ namespace RacingGame.EditorTools
                 var row = rows[r];
                 if (row.Count < 4 || string.IsNullOrWhiteSpace(row[0])) continue;
                 string key = row[0].Trim();
-                collection.SharedData.AddKey(key);
+                // AddKey uniquifies existing names ("key 1"); imports must reuse their stable IDs.
+                if (collection.SharedData.GetEntry(key) == null) collection.SharedData.AddKey(key);
                 for (int c = 3; c < header.Count; c++)
                 {
                     string code = langs[c - 3];

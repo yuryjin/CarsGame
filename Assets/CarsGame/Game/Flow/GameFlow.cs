@@ -23,6 +23,7 @@ namespace RacingGame
         public RaceEventDefinition CurrentEvent => RaceSetup.Event;
         public int LastReward { get; private set; }
         public bool LastRewardDoubled { get; private set; }
+        public bool IsDoublingReward => doubling;
         public event System.Action<FlowState> StateChanged;
 
         private RaceManager race;

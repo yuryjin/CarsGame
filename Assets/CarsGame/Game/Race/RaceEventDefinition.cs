@@ -2,11 +2,14 @@ using UnityEngine;
 
 namespace RacingGame
 {
+    public enum EventMode { Race, Arena }
+
     /// <summary>One entry of the race-select screen. Rules vary per event so the single track stays fresh.</summary>
     [CreateAssetMenu(menuName = "Racing/Race Event", fileName = "Event")]
     public sealed class RaceEventDefinition : ScriptableObject
     {
         public string eventId = "e1";
+        public EventMode mode;
         [Tooltip("Localization key of the display name.")]
         public string nameKey = "events.e1.name";
         [Range(1, 20)] public int laps = 3;

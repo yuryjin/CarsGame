@@ -10,8 +10,8 @@ namespace RacingGame
     /// </summary>
     public sealed class UiButtonFx : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, ISelectHandler, IDeselectHandler
     {
-        [SerializeField] private float hoverScale = 1.045f;
-        [SerializeField] private float pressScale = 0.96f;
+        [SerializeField] private float hoverScale = 1.008f;
+        [SerializeField] private float pressScale = 0.985f;
         [SerializeField] private float smoothSpeed = 16f;
         [SerializeField] private bool playSound = true;
 
@@ -81,6 +81,15 @@ namespace RacingGame
             if (button != null && !button.interactable) return;
             isHovered = true;
             UpdateTarget();
+            // Keep keyboard/gamepad focus visible inside the native scrolling lists.
+            var scroll = GetComponentInParent<ScrollRect>();
+            if (scroll == null) return;
+            Canvas.ForceUpdateCanvases();
+            var bounds = RectTransformUtility.CalculateRelativeRectTransformBounds(scroll.viewport, (RectTransform)transform);
+            var view = scroll.viewport.rect;
+            float delta = bounds.min.y < view.yMin ? view.yMin - bounds.min.y : bounds.max.y > view.yMax ? view.yMax - bounds.max.y : 0f;
+            float range = scroll.content.rect.height - view.height;
+            if (range > 0f) scroll.verticalNormalizedPosition = Mathf.Clamp01(scroll.verticalNormalizedPosition - delta / range);
         }
 
         public void OnDeselect(BaseEventData eventData)

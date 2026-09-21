@@ -333,6 +333,42 @@ MonoBehaviour:
     m_Localized: FREIN
     m_Metadata:
       m_Items: []
+  - m_Id: 5803307084099617
+    m_Localized: "{name} d\xE9truit !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099618
+    m_Localized: "D\xE9truit par {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099653
+    m_Localized: Graphismes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099654
+    m_Localized: Auto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099655
+    m_Localized: Basse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099656
+    m_Localized: Haute
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099657
+    m_Localized: "Secousses cam\xE9ra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099667
+    m_Localized: "Indisponible pour le moment. R\xE9essayez."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099668
+    m_Localized: Munitions {cur}/{max}
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using RacingGame.World.Gen;
+using RacingGame.Core.Track;
 
 namespace RacingGame.EditorTools
 {
@@ -77,6 +78,107 @@ namespace RacingGame.EditorTools
                 n++;
             }
 
+            string cleared = ClearGantry(barriers, spline);
+            RebuildMesh(barriers);
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+            return $"moved {n} barriers to |lateral|={offset}, {cleared} sceneSaved=" + UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+        }
+
+        [MenuItem("Racing/Environment/Clear Barriers Off Start Gantry")]
+        public static void ClearGantryMenu()
+        {
+            var spline = Object.FindFirstObjectByType<RacingGame.TrackPath>().Spline;
+            var barriers = GameObject.Find("RaceTrack").transform.Find("Barriers");
+            string log = ClearGantry(barriers, spline);
+            RebuildMesh(barriers);
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+            Debug.Log(log + " sceneSaved=" + UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene));
+        }
+
+        /// <summary>
+        /// The loop seam sits under the start gantry, where the inner-corner barriers collapse onto the left leg and cross each other.
+        /// Each barrier touching a leg slides along the track to the nearest free spot; if there is none it is hidden.
+        /// </summary>
+        public static string ClearGantry(Transform barriers, TrackSpline spline)
+        {
+            var gantry = GameObject.Find("RaceTrack").transform.Find("StartFinish_Gantry");
+            if (gantry == null) return "no gantry";
+            var legs = new List<(Vector2 c, float r)>();
+            foreach (var col in gantry.GetComponentsInChildren<Collider>(true))
+            {
+                var b = col.bounds;
+                if (b.size.y > 4f && b.size.x < 2f && b.size.z < 2f) legs.Add((new Vector2(b.center.x, b.center.z), Mathf.Max(b.extents.x, b.extents.z)));
+            }
+
+            (Vector2 a, Vector2 b) Seg(Vector3 pos, Quaternion rot, Transform t)
+            {
+                Vector3 half = rot * Vector3.forward * (t.lossyScale.z * 0.5f);
+                return (new Vector2(pos.x - half.x, pos.z - half.z), new Vector2(pos.x + half.x, pos.z + half.z));
+            }
+            bool HitsLeg((Vector2 a, Vector2 b) s, Transform t)
+            {
+                foreach (var l in legs) if (PointSeg(l.c, s.a, s.b) < l.r + t.lossyScale.x * 0.5f + 0.35f) return true;
+                return false;
+            }
+            bool NearLeg(Vector3 p)
+            {
+                foreach (var l in legs) if (Vector2.Distance(l.c, new Vector2(p.x, p.z)) < 10f) return true;
+                return false;
+            }
+            bool HitsAny((Vector2 a, Vector2 b) s, Transform self, List<Transform> others)
+            {
+                foreach (var o in others)
+                    if (o != self && SegSeg(s.a, s.b, Seg(o.position, o.rotation, o).a, Seg(o.position, o.rotation, o).b) < 1.0f) return true;
+                return false;
+            }
+
+            // Near the legs: anything touching a leg, crooked against the track or overlapping a neighbour is re-placed from scratch
+            // (hidden ones too, so re-running is stable). Everything else stays put and blocks.
+            var fixedOnes = new List<Transform>(); var near = new List<Transform>();
+            foreach (Transform ch in barriers)
+            {
+                if (ch.GetComponent<BoxCollider>() == null) continue;
+                if (NearLeg(ch.position)) near.Add(ch); else if (ch.gameObject.activeSelf) fixedOnes.Add(ch);
+            }
+            var todo = new List<Transform>();
+            foreach (var ch in near)
+            {
+                int hint = -1; float d = spline.Project(ch.position, ref hint);
+                float ang = Vector3.Angle(ch.forward, spline.Tangent(d)); bool crooked = ang > 20f && ang < 160f;
+                var others = new List<Transform>(fixedOnes); foreach (var o in near) if (o.gameObject.activeSelf) others.Add(o);
+                if (!ch.gameObject.activeSelf || crooked || HitsLeg(Seg(ch.position, ch.rotation, ch), ch) || HitsAny(Seg(ch.position, ch.rotation, ch), ch, others)) todo.Add(ch);
+                else fixedOnes.Add(ch);
+            }
+
+            int moved = 0, hidden = 0;
+            foreach (var ch in todo)
+            {
+                int hint = -1; float d0 = spline.Project(ch.position, ref hint);
+                float side = ch.name.StartsWith("Barrier_L_") ? -1f : ch.name.StartsWith("Barrier_R_") ? 1f : Mathf.Sign(spline.LateralOffset(ch.position, d0));
+                bool done = false;
+                for (float step = 0f; step <= 10f && !done; step += 0.5f)
+                    foreach (float dd in new[] { d0 + step, d0 - step })
+                    {
+                        Vector3 pos = spline.Position(dd) + spline.Right(dd) * (side * 5.8f) + Vector3.up * 0.55f;
+                        var rot = Quaternion.LookRotation(spline.Tangent(dd), Vector3.up);
+                        var s = Seg(pos, rot, ch);
+                        int h = -1; float dp = spline.Project(pos, ref h);       // inside a hairpin the spot can belong to another stretch of track
+                        if (Vector3.Angle(rot * Vector3.forward, spline.Tangent(dp)) > 20f) continue;
+                        if (HitsLeg(s, ch) || HitsAny(s, ch, fixedOnes)) continue;
+                        Undo.RecordObject(ch, "clear gantry"); ch.position = pos; ch.rotation = rot;
+                        Undo.RecordObject(ch.gameObject, "clear gantry"); ch.gameObject.SetActive(true);
+                        fixedOnes.Add(ch); moved++; done = true; break;
+                    }
+                if (!done) { Undo.RecordObject(ch.gameObject, "clear gantry"); ch.gameObject.SetActive(false); hidden++; }
+            }
+            return $"gantry legs={legs.Count}: barriers moved={moved} hidden={hidden}";
+        }
+
+        /// <summary>Rebuild the combined red/white mesh from the active barrier colliders.</summary>
+        public static void RebuildMesh(Transform barriers)
+        {
             var old = barriers.Find("Barriers_Mesh"); if (old != null) Undo.DestroyObjectImmediate(old.gameObject);
             var litMat = AssetDatabase.LoadAssetAtPath<Material>(EnvironmentBaker.MatDir + "/M_Env_Lit.mat");
             var w = new MeshChunkWriter("Barriers");
@@ -86,7 +188,7 @@ namespace RacingGame.EditorTools
             var rightList = new List<Transform>();
             foreach (Transform ch in barriers)
             {
-                if (ch.GetComponent<BoxCollider>() == null) continue;
+                if (ch.GetComponent<BoxCollider>() == null || !ch.gameObject.activeSelf) continue;
                 if (ch.name.StartsWith("Barrier_L_")) leftList.Add(ch);
                 else rightList.Add(ch);
             }
@@ -112,9 +214,20 @@ namespace RacingGame.EditorTools
             }
 
             foreach (var mesh in w.Finish()) { var go = EnvironmentBaker.Place(barriers, EnvironmentBaker.SaveMesh(mesh, "Barriers_0"), litMat, true, true, barriers.gameObject.layer); go.name = "Barriers_Mesh"; }
-            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
-            return $"moved {n} barriers to |lateral|={offset} sceneSaved=" + UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+        }
+
+        private static float PointSeg(Vector2 p, Vector2 a, Vector2 b)
+        {
+            Vector2 ab = b - a; float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / Mathf.Max(ab.sqrMagnitude, 1e-6f));
+            return Vector2.Distance(p, a + ab * t);
+        }
+
+        private static float SegSeg(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+        {
+            float Cross(Vector2 u, Vector2 v) => u.x * v.y - u.y * v.x;
+            float d1 = Cross(b - a, c - a), d2 = Cross(b - a, d - a), d3 = Cross(d - c, a - c), d4 = Cross(d - c, b - c);
+            if (d1 * d2 < 0f && d3 * d4 < 0f) return 0f;
+            return Mathf.Min(Mathf.Min(PointSeg(a, c, d), PointSeg(b, c, d)), Mathf.Min(PointSeg(c, a, b), PointSeg(d, a, b)));
         }
 
         public static string SetColliders(bool enabled)

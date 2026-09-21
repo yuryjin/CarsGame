@@ -20,17 +20,21 @@ namespace RacingGame
         public RaceManager race;
         public float hintSeconds = 30f;
 
-        private TextMeshProUGUI speedText, lapText, positionText, timerText, centerText, hintText, hpText, pauseText, ammoText, hitMarker;
+        private TextMeshProUGUI speedText, lapText, positionText, timerText, centerText, hintText, hpText, pauseText, pauseHint, ammoText, hitMarker;
         private CarCannon playerCannon;
         private float hitMarkerUntil;
         private Image hpFill, hpTrail, hpIcon;
         private Sprite healthFillSprite;
-        private RectTransform speedPanel, healthPanel;
+        private RectTransform speedPanel, healthPanel, hintPanel, ammoPanel, eventPanel, centerPanel, pauseButton;
+        private Button resumeButton, restartButton, menuButton;
+        private CanvasGroup pauseControls;
+        private string shownCenter;
         private SpeedometerGraphic speedDial;
         private TextMeshProUGUI speedUnit, nitroText;
         private float shownSpeed, damageTrailUntil;
         private static readonly Color HealthyColor = new Color(0.22f, 0.9f, 0.68f);
         private static readonly Color CriticalColor = new Color(1f, 0.3f, 0.28f);
+        private const float HudPanelAlpha = 0.96f;
 
         [Header("Reticle")]
         [Tooltip("Where the reticle points: this far ahead of the muzzle along the shell's flight (m).")]
@@ -116,13 +120,18 @@ namespace RacingGame
             hudRoot = (RectTransform)root;
 
             BuildSpeedometer(root);
-            hintText = UiFactory.Text(root, "Hints", "", 24f, TextAlignmentOptions.BottomLeft, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(30f, 110f), new Vector2(640f, 260f), new Color(0.9f, 0.9f, 0.9f));
+            hintPanel = UiFactory.Card(root, "HintsPanel", Vector2.zero, Vector2.zero, new Vector2(30f, 272f), new Vector2(680f, 422f), HudPanelAlpha);
+            hintText = UiFactory.Text(hintPanel, "Hints", "", 24f, TextAlignmentOptions.MidlineLeft, Vector2.zero, Vector2.one, new Vector2(18f, 14f), new Vector2(-18f, -14f));
 
             BuildHealthBar(root);
-            ammoText = UiFactory.Text(root, "Ammo", "", 30f, TextAlignmentOptions.BottomRight, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-330f, 70f), new Vector2(-30f, 120f), new Color(1f, 0.85f, 0.3f));
+            ammoPanel = UiFactory.Card(root, "AmmoPanel", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 186f), HudPanelAlpha);
+            ammoText = UiFactory.Text(ammoPanel, "Ammo", "", 30f, TextAlignmentOptions.MidlineRight, Vector2.zero, Vector2.one, new Vector2(18f, 4f), new Vector2(-18f, -4f), new Color(1f, 0.85f, 0.3f));
+            ammoText.enableAutoSizing = true; ammoText.fontSizeMin = 18f; ammoText.fontSizeMax = 30f;
             BuildReticle(root);
-            eventText = UiFactory.Text(root, "Event", "", 46f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.7f), new Vector2(0.5f, 0.7f), new Vector2(-640f, -40f), new Vector2(640f, 40f), new Color(1f, 0.9f, 0.3f));
-            eventText.gameObject.SetActive(false);
+            eventPanel = UiFactory.Card(root, "EventPanel", new Vector2(0.5f, 0.7f), new Vector2(0.5f, 0.7f), new Vector2(-340f, -40f), new Vector2(340f, 40f));
+            eventText = UiFactory.Text(eventPanel, "Event", "", 36f, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, new Vector2(24f, 10f), new Vector2(-24f, -10f), UiFactory.Accent);
+            eventText.enableAutoSizing = true; eventText.fontSizeMin = 22f; eventText.fontSizeMax = 36f;
+            eventPanel.gameObject.SetActive(false);
             // Four thin strips on the screen edges instead of a full-screen vignette (no extra overdraw).
             var red = new Color(0.9f, 0.05f, 0.05f, 0f);
             lowHpEdges[0] = UiFactory.Panel(root, "LowHpL", new Vector2(0f, 0f), new Vector2(0f, 1f), Vector2.zero, new Vector2(16f, 0f), red, roundedCorners: false).GetComponent<Image>();
@@ -134,28 +143,60 @@ namespace RacingGame
             hitMarker.gameObject.SetActive(false);
 
             // Top-left: lap + position
-            lapText = UiFactory.Text(root, "Lap", "LAP 1/3", 36f, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -110f), new Vector2(400f, -30f));
-            positionText = UiFactory.Text(root, "Position", "P1/4", 36f, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -170f), new Vector2(400f, -110f));
+            var racePanel = UiFactory.Card(root, "RaceStatus", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -174f), new Vector2(310f, -24f), HudPanelAlpha);
+            UiFactory.Panel(racePanel, "Accent", Vector2.zero, new Vector2(0f, 1f), new Vector2(0f, 18f), new Vector2(3f, -18f), UiFactory.Accent, false);
+            lapText = UiFactory.Text(racePanel, "Lap", "LAP 1/3", 36f, TextAlignmentOptions.MidlineLeft, new Vector2(0f, 1f), Vector2.one, new Vector2(18f, -70f), new Vector2(-18f, -12f));
+            positionText = UiFactory.Text(racePanel, "Position", "P1/4", 36f, TextAlignmentOptions.MidlineLeft, new Vector2(0f, 1f), Vector2.one, new Vector2(18f, -138f), new Vector2(-18f, -80f));
+            lapText.fontSize = 28f; lapText.color = UiFactory.Muted;
+            positionText.fontStyle = FontStyles.Bold;
+            lapText.enableAutoSizing = positionText.enableAutoSizing = true;
+            lapText.fontSizeMin = positionText.fontSizeMin = 20f;
+            lapText.fontSizeMax = 28f; positionText.fontSizeMax = 36f;
 
             // Top-centre: timer
-            timerText = UiFactory.Text(root, "Timer", "0:00.000", 40f, TextAlignmentOptions.Top, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-200f, -90f), new Vector2(200f, -30f));
+            var timerPanel = UiFactory.Card(root, "TimerPanel", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-140f, -94f), new Vector2(140f, -24f), HudPanelAlpha);
+            timerText = UiFactory.Text(timerPanel, "Timer", "0:00.000", 40f, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, new Vector2(16f, 10f), new Vector2(-16f, -10f));
 
             // Centre: countdown / wrong way / messages
-            centerText = UiFactory.Text(root, "Center", "", 120f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-500f, -120f), new Vector2(500f, 120f), new Color(1f, 0.9f, 0.3f));
+            centerPanel = UiFactory.Card(root, "CenterPanel", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-120f, -100f), new Vector2(120f, 100f));
+            centerText = UiFactory.Text(centerPanel, "Center", "", 120f, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, new Vector2(24f, 8f), new Vector2(-24f, -8f), UiFactory.Accent);
+            centerText.fontStyle = FontStyles.Bold;
+            centerText.enableAutoSizing = true; centerText.fontSizeMin = 38f; centerText.fontSizeMax = 140f;
+            centerPanel.gameObject.SetActive(false);
 
-            // Pause overlay (hidden)
-            pausePanel = UiFactory.Panel(root, "Pause", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0f, 0f, 0f, 0.55f));
-            pauseText = UiFactory.Text(pausePanel, "PauseText", "", 90f, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            pausePanel.gameObject.SetActive(false);
+            BuildPause(root);
 
             hintUntil = Time.unscaledTime + hintSeconds;
             Loc.LanguageChanged += ApplyStaticTexts;
             ApplyStaticTexts();
         }
 
+        private void BuildPause(Transform root)
+        {
+            pauseButton = (RectTransform)UiFactory.Button(root, "PauseButton", "", () => PauseController.Set(PauseReason.User, true), Vector2.one, Vector2.one, new Vector2(-106f, -100f), new Vector2(-30f, -24f), 28f, UiFactory.Surface).transform;
+            for (int i = 0; i < 2; i++) UiFactory.Panel(pauseButton, "Bar" + i, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-14f + 19f * i, -16f), new Vector2(-5f + 19f * i, 16f), UiFactory.Accent, false);
+            pausePanel = UiFactory.Panel(root, "Pause", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.01f, 0.02f, 0.04f, 0.8f), false);
+            pausePanel.GetComponent<Image>().raycastTarget = true;
+            // Above the touch-control canvas, including its raycaster.
+            var overlay = pausePanel.gameObject.AddComponent<Canvas>(); overlay.overrideSorting = true; overlay.sortingOrder = 20;
+            pausePanel.gameObject.AddComponent<GraphicRaycaster>();
+            var card = UiFactory.Card(pausePanel, "PauseCard", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-300f, -300f), new Vector2(300f, 300f));
+            pauseControls = card.gameObject.AddComponent<CanvasGroup>();
+            UiFactory.Panel(card, "Accent", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -40f), new Vector2(112f, -36f), UiFactory.Accent, false);
+            pauseText = UiFactory.Text(card, "PauseText", "", 56f, TextAlignmentOptions.MidlineLeft, new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -140f), new Vector2(-40f, -58f));
+            pauseText.fontStyle = FontStyles.Bold;
+            pauseText.enableAutoSizing = true; pauseText.fontSizeMin = 32f; pauseText.fontSizeMax = 56f;
+            var flow = GetComponent<GameFlow>();
+            resumeButton = UiFactory.Button(card, "Resume", "", () => PauseController.Set(PauseReason.User, false), new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -266f), new Vector2(-40f, -180f), 32f);
+            restartButton = UiFactory.Button(card, "Restart", "", () => flow.RetryRace(), new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -366f), new Vector2(-40f, -286f), 30f, UiFactory.Raised);
+            menuButton = UiFactory.Button(card, "MainMenu", "", () => flow.EnterMenu(), new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -466f), new Vector2(-40f, -386f), 30f, UiFactory.Raised);
+            pauseHint = UiFactory.Text(card, "Hint", "", 23f, TextAlignmentOptions.Center, Vector2.zero, new Vector2(1f, 0f), new Vector2(40f, 40f), new Vector2(-40f, 90f), UiFactory.Muted);
+            pausePanel.gameObject.SetActive(false);
+        }
+
         private void BuildSpeedometer(Transform root)
         {
-            speedPanel = UiFactory.Card(root, "Speedometer", Vector2.zero, Vector2.zero, new Vector2(30f, 30f), new Vector2(274f, 254f), 0.86f);
+            speedPanel = UiFactory.Card(root, "Speedometer", Vector2.zero, Vector2.zero, new Vector2(30f, 30f), new Vector2(274f, 254f), HudPanelAlpha);
             var dial = UiFactory.Panel(speedPanel, "Dial", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             speedDial = dial.gameObject.AddComponent<SpeedometerGraphic>();
             speedDial.raycastTarget = false;
@@ -165,7 +206,7 @@ namespace RacingGame
                 float angle = Mathf.Lerp(200f, -20f, i / 4f) * Mathf.Deg2Rad;
                 Vector2 p = new Vector2(122f, 92f) + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 71f;
                 var label = UiFactory.Text(speedPanel, "Scale" + i, (i * SpeedometerGraphic.MaxSpeed / 4f).ToString("0"), 16f,
-                    TextAlignmentOptions.Center, Vector2.zero, Vector2.zero, p - new Vector2(20f, 11f), p + new Vector2(20f, 11f), new Color(0.68f, 0.76f, 0.85f));
+                    TextAlignmentOptions.Center, Vector2.zero, Vector2.zero, p - new Vector2(20f, 11f), p + new Vector2(20f, 11f), new Color(0.82f, 0.88f, 0.94f));
                 label.outlineWidth = 0f;
             }
             speedText = UiFactory.Text(speedPanel, "Speed", "0", 46f, TextAlignmentOptions.Center,
@@ -173,7 +214,7 @@ namespace RacingGame
             speedText.fontStyle = FontStyles.Bold;
             speedText.outlineWidth = 0f;
             speedUnit = UiFactory.Text(speedPanel, "Unit", "", 16f, TextAlignmentOptions.Center,
-                Vector2.zero, Vector2.zero, new Vector2(62f, 12f), new Vector2(182f, 35f), new Color(0.68f, 0.76f, 0.85f));
+                Vector2.zero, Vector2.zero, new Vector2(62f, 12f), new Vector2(182f, 35f), new Color(0.82f, 0.88f, 0.94f));
             nitroText = UiFactory.Text(speedPanel, "Nitro", "", 16f, TextAlignmentOptions.Center,
                 Vector2.zero, Vector2.zero, new Vector2(52f, 199f), new Vector2(192f, 222f), SpeedometerGraphic.BoostColor);
             nitroText.gameObject.SetActive(false);
@@ -181,7 +222,7 @@ namespace RacingGame
 
         private void BuildHealthBar(Transform root)
         {
-            healthPanel = UiFactory.Card(root, "Health", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 30f), new Vector2(-30f, 130f), 0.86f);
+            healthPanel = UiFactory.Card(root, "Health", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 30f), new Vector2(-30f, 130f), HudPanelAlpha);
             var icon = UiFactory.Panel(healthPanel, "HealthIcon", Vector2.zero, Vector2.zero, new Vector2(18f, 53f), new Vector2(48f, 83f), HealthyColor);
             hpIcon = icon.GetComponent<Image>();
             var ink = new Color(0.03f, 0.12f, 0.14f);
@@ -208,13 +249,17 @@ namespace RacingGame
         private void ApplyStaticTexts()
         {
             ApplyLayout(touchLayout);
-            pauseText.text = Loc.Get("pause.title") + "\n<size=40%>" + Loc.Get("pause.hint") + "</size>";
+            pauseText.text = Loc.Get("pause.title"); pauseHint.text = Loc.Get("pause.hint");
+            resumeButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.resume");
+            restartButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.restart");
+            menuButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.menu");
             speedUnit.text = Loc.Get("hud.speed_unit");
             nitroText.text = Loc.Get("hud.nitro");
             reloadFormat = Loc.Get("hud.reload").Replace("{p}", "{0:0}");
             lastSpeed = -1; lastReloadPct = -1; lastTimerMs = -1;
             RefreshPosition();
             if (playerHealth != null) OnHealth(playerHealth.Health, playerHealth.maxHealth);
+            if (playerCannon != null) OnAmmo(playerCannon.Ammo, playerCannon.AmmoMax);
         }
 
         // Four corner brackets around the aim point; ammo pips underneath. Plain images, no glyphs.
@@ -332,30 +377,30 @@ namespace RacingGame
         {
             if (speedText == null) return;
             hintText.text = Loc.Get(touch ? "hud.hint.touch" : "hud.hint.keys");
-            var hintRt = hintText.rectTransform;
             layoutWidth = hudRoot != null ? hudRoot.rect.width : 1920f;
             // Portrait phones give the canvas ~1000 reference units of width: the timer (±200 around the
             // centre) would collide with a top-right HP bar, so HP/ammo drop to a row below it.
             bool narrow = layoutWidth < 1400f;
             if (touch)
             {
+                Place(pauseButton, Vector2.one, new Vector2(-140f, -254f), new Vector2(-40f, -154f));
                 Place(speedPanel, Vector2.zero, new Vector2(40f, 224f), new Vector2(284f, 448f));
                 float row = narrow ? -90f : 0f;
                 Place(healthPanel, Vector2.one, new Vector2(-494f, -134f + row), new Vector2(-170f, -34f + row));
-                Place(ammoText.rectTransform, Vector2.one, new Vector2(-494f, -186f + row), new Vector2(-170f, -138f + row));
-                ammoText.alignment = TextAlignmentOptions.TopRight;
-                Place(hintRt, new Vector2(0.5f, 1f), new Vector2(-460f, -322f + row), new Vector2(420f, -202f + row));
-                hintText.alignment = TextAlignmentOptions.Top;
+                Place(ammoPanel, Vector2.one, new Vector2(-494f, -186f + row), new Vector2(-170f, -138f + row));
+                Place(hintPanel, new Vector2(0.5f, 1f), new Vector2(-460f, -322f + row), new Vector2(420f, -202f + row));
+                hintText.alignment = TextAlignmentOptions.Center;
             }
             else
             {
+                Place(pauseButton, Vector2.one, new Vector2(-106f, -100f), new Vector2(-30f, -24f));
                 Place(speedPanel, Vector2.zero, new Vector2(30f, 30f), new Vector2(274f, 254f));
                 Place(healthPanel, new Vector2(1f, 0f), new Vector2(-354f, 30f), new Vector2(-30f, 130f));
-                Place(ammoText.rectTransform, new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 186f));
-                ammoText.alignment = TextAlignmentOptions.BottomRight;
-                Place(hintRt, Vector2.zero, new Vector2(30f, 272f), new Vector2(640f, 422f));
-                hintText.alignment = TextAlignmentOptions.BottomLeft;
+                Place(ammoPanel, new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 186f));
+                Place(hintPanel, Vector2.zero, new Vector2(30f, 272f), new Vector2(680f, 422f));
+                hintText.alignment = TextAlignmentOptions.MidlineLeft;
             }
+            pauseHint.gameObject.SetActive(!touch);
         }
 
         /// <summary>Test hook: current layout mode.</summary>
@@ -399,7 +444,7 @@ namespace RacingGame
             if (hitMarker.gameObject.activeSelf && Time.unscaledTime > hitMarkerUntil) hitMarker.gameObject.SetActive(false);
             if (race.State >= RaceState.Racing) SetTimer(race.RaceTime);
 
-            if (hintText.gameObject.activeSelf && Time.unscaledTime > hintUntil) hintText.gameObject.SetActive(false);
+            if (hintPanel.gameObject.activeSelf && Time.unscaledTime > hintUntil) hintPanel.gameObject.SetActive(false);
 
             if (race.State == RaceState.Racing && race.Player != null && race.Player.Progress != null)
             {
@@ -427,19 +472,19 @@ namespace RacingGame
             LastEvent = text;
             eventText.text = text;
             eventText.color = color;
-            eventText.gameObject.SetActive(true);
+            eventPanel.gameObject.SetActive(true);
             eventUntil = Time.unscaledTime + toastSeconds;
             eventPunch = 1f;
         }
 
         private void UpdateToastAndWarnings()
         {
-            if (eventText.gameObject.activeSelf)
+            if (eventPanel.gameObject.activeSelf)
             {
-                if (Time.unscaledTime > eventUntil) eventText.gameObject.SetActive(false);
+                if (Time.unscaledTime > eventUntil) eventPanel.gameObject.SetActive(false);
                 eventPunch = Mathf.MoveTowards(eventPunch, 0f, Time.unscaledDeltaTime * 5f);
-                float sc = 1f + 0.35f * eventPunch * eventPunch;
-                eventText.rectTransform.localScale = new Vector3(sc, sc, 1f);
+                float sc = 1f + 0.06f * eventPunch * eventPunch;
+                eventPanel.localScale = new Vector3(sc, sc, 1f);
             }
 
             bool low = playerHealth != null && !playerHealth.IsDead && race.State >= RaceState.Racing && race.State < RaceState.Finished
@@ -460,13 +505,25 @@ namespace RacingGame
         }
 
         // After CarCameraFollow.LateUpdate (execution order below), so the reticle matches this frame's camera.
-        private void LateUpdate() { if (race != null) { UpdateReticle(); UpdateToastAndWarnings(); } }
+        private void LateUpdate()
+        {
+            if (race != null) { UpdateReticle(); UpdateToastAndWarnings(); }
+            if (shownCenter != centerText.text)
+            {
+                shownCenter = centerText.text;
+                centerPanel.gameObject.SetActive(!string.IsNullOrEmpty(shownCenter));
+                centerPanel.sizeDelta = new Vector2(Mathf.Clamp(centerText.preferredWidth + 64f, 200f, Mathf.Min(900f, hudRoot.rect.width - 80f)), 190f);
+            }
+            if (pausePanel.gameObject.activeSelf)
+                pauseControls.interactable = (PauseController.Reasons & ~PauseReason.User) == PauseReason.None;
+        }
 
         private void OnAmmo(int ammo, int max)
         {
             lastReloadPct = -1;
+            ammoPanel.gameObject.SetActive(max > 0);
             if (max <= 0) { ammoText.text = ""; return; }
-            ammoText.text = ammo > 0 ? new string('|', ammo) + new string('.', max - ammo) : Loc.Format("hud.reload", "p", 0);
+            ammoText.text = ammo > 0 ? Loc.Format("hud.ammo", "cur", ammo, "max", max) : Loc.Format("hud.reload", "p", 0);
         }
 
         private void OnShellHit(GameObject shooter, GameObject victim)
@@ -512,13 +569,18 @@ namespace RacingGame
         /// <summary>Menu screens hide the HUD; the race shows it.</summary>
         public void SetVisible(bool visible)
         {
-            var canvas = GetComponentInChildren<Canvas>(true);
             foreach (var c in GetComponentsInChildren<Canvas>(true)) if (c.name == "HUD") c.gameObject.SetActive(visible);
-            if (visible) { hintUntil = Time.unscaledTime + hintSeconds; hintText.gameObject.SetActive(true); playerCar = null; }
-            if (eventText != null) eventText.gameObject.SetActive(false);
+            pausePanel.gameObject.SetActive(visible && PauseController.IsPaused);
+            if (visible) { hintUntil = Time.unscaledTime + hintSeconds; hintPanel.gameObject.SetActive(true); playerCar = null; }
+            if (eventPanel != null) eventPanel.gameObject.SetActive(false);
         }
 
-        private void OnPaused(bool paused) { pausePanel.gameObject.SetActive(paused); }
+        private void OnPaused(bool paused)
+        {
+            pausePanel.gameObject.SetActive(paused);
+            if (paused) EventSystem.current?.SetSelectedGameObject(resumeButton.gameObject);
+            else EventSystem.current?.SetSelectedGameObject(null);
+        }
 
         private void OnDestroy()
         {

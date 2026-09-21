@@ -77,7 +77,7 @@ namespace RacingGame
         /// <summary>Called from the car's simulation step.</summary>
         public void SimulationStep(int tick)
         {
-            if (Path == null || Counter == null) return;
+            if (!enabled || Path == null || Counter == null) return;
 
             Distance = Path.Project(transform.position, ref hint);
             float delta = Counter.Step(Distance);

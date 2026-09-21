@@ -22,7 +22,7 @@ namespace RacingGame.World.Gen
 
     /// <summary>
     /// Low-poly terrain: flat corridor around the track spline, noise hills further out, coarse outer
-    /// ring. Pure mesh generation (no colliders) — the physics ground stays the original flat plane.
+    /// ring. Pure mesh generation; with a chasm the baker also uses these meshes as the ground colliders.
     /// </summary>
     public static class TerrainMeshGen
     {
@@ -84,14 +84,18 @@ namespace RacingGame.World.Gen
             return Vector3.Distance(c, p);
         }
 
-        /// <summary>Builds the terrain around <paramref name="centre"/> as four quadrant chunks (each may split further).</summary>
-        public static List<Mesh> Build(TrackSpline spline, TerrainSettings s, Vector2 centre)
+        /// <summary>
+        /// Builds the terrain around <paramref name="centre"/> as four quadrant chunks (each may split further).
+        /// With a <paramref name="chasm"/> the ground stops at its zero line and drops as a cliff into the abyss.
+        /// </summary>
+        public static List<Mesh> Build(TrackSpline spline, TerrainSettings s, Vector2 centre, ChasmLayout chasm = null)
         {
             var noise = new PropNoise(s.seed);
             var ax = Axis(s);
             int n = ax.Length;
             var pos = new Vector3[n, n];
             var hill = new float[n, n];
+            var solid = new float[n, n];
             for (int i = 0; i < n; i++)
                 for (int j = 0; j < n; j++)
                 {
@@ -101,16 +105,21 @@ namespace RacingGame.World.Gen
                     float h = Height(ax[i], ax[j], dist, inside, s, noise, out float hl);
                     pos[i, j] = new Vector3(wx, h, wz);
                     hill[i, j] = hl;
+                    solid[i, j] = chasm != null ? chasm.Terrain(wx, wz, dist) : 1f;
                 }
 
             var writers = new MeshChunkWriter[4];
             for (int q = 0; q < 4; q++) writers[q] = new MeshChunkWriter("Terrain_Q" + q);
+            float floorY = chasm != null ? -chasm.Settings.depth : 0f;
             for (int i = 0; i < n - 1; i++)
                 for (int j = 0; j < n - 1; j++)
                 {
                     Vector3 a = pos[i, j], b = pos[i + 1, j], c = pos[i + 1, j + 1], d = pos[i, j + 1];
                     int q = (ax[i] >= 0f ? 1 : 0) + (ax[j] >= 0f ? 2 : 0);
                     var w = writers[q];
+                    if (chasm != null && CliffMeshGen.Cell(a, b, c, d, solid[i, j], solid[i + 1, j], solid[i + 1, j + 1], solid[i, j + 1],
+                            (p0, p1, p2) => w.AddTriangle(p0, p1, p2, FaceColour(p0, p1, p2, noise, s)), w, floorY))
+                        continue;
                     bool diag = ((i + j) & 1) == 0;
                     if (diag) { AddFace(w, a, c, b, noise, s); AddFace(w, a, d, c, noise, s); }
                     else { AddFace(w, a, d, b, noise, s); AddFace(w, b, d, c, noise, s); }
@@ -121,6 +130,12 @@ namespace RacingGame.World.Gen
         }
 
         private static void AddFace(MeshChunkWriter w, Vector3 a, Vector3 b, Vector3 c, PropNoise noise, TerrainSettings s)
+        {
+            w.AddTriangle(a, b, c, FaceColour(a, b, c, noise, s));
+        }
+
+        /// <summary>Grass, dry grass on heights, dirt and rock on slopes; face-constant with a small jitter.</summary>
+        public static Color32 FaceColour(Vector3 a, Vector3 b, Vector3 c, PropNoise noise, TerrainSettings s)
         {
             Vector3 centroid = (a + b + c) / 3f;
             Vector3 nrm = Vector3.Cross(b - a, c - a).normalized;
@@ -134,7 +149,7 @@ namespace RacingGame.World.Gen
             if (slope > 0.55f) col = MeshChunkWriter.Lerp(col, Rock, Mathf.Clamp01((slope - 0.55f) / 0.15f));
             // Face-constant colour (split vertices) with a tiny per-face jitter for the low-poly look.
             float jitter = 0.94f + 0.12f * noise.Hash(Mathf.RoundToInt(centroid.x * 3f), Mathf.RoundToInt(centroid.z * 3f), 5);
-            w.AddTriangle(a, b, c, MeshChunkWriter.Scale(col, jitter));
+            return MeshChunkWriter.Scale(col, jitter);
         }
     }
 }

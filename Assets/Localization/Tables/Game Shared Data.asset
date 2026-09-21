@@ -319,316 +319,360 @@ MonoBehaviour:
     m_Key: ads.no_reward
     m_Metadata:
       m_Items: []
-  - m_Id: 14968758284288
-    m_Key: common.ok 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478592
-    m_Key: common.back 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478593
-    m_Key: common.continue 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478594
-    m_Key: common.yes 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478595
-    m_Key: common.no 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478596
-    m_Key: common.loading 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478597
-    m_Key: menu.title 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478598
-    m_Key: menu.play 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478599
-    m_Key: menu.garage 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478600
-    m_Key: menu.leaderboard 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478601
-    m_Key: menu.settings 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478602
-    m_Key: menu.coins 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478603
-    m_Key: events.title 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478604
-    m_Key: events.laps 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478605
-    m_Key: events.rivals 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478606
-    m_Key: events.locked 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478607
-    m_Key: events.best 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478608
-    m_Key: events.e1.name 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478609
-    m_Key: events.e2.name 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478610
-    m_Key: events.e3.name 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478611
-    m_Key: events.e4.name 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478612
-    m_Key: events.e5.name 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478613
-    m_Key: difficulty.easy 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478614
-    m_Key: difficulty.normal 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478615
-    m_Key: difficulty.hard 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478616
-    m_Key: hud.lap 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478617
-    m_Key: hud.position 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478618
-    m_Key: hud.speed_unit 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478619
-    m_Key: hud.nitro 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478620
-    m_Key: hud.reload 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478621
-    m_Key: hud.hp 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478622
-    m_Key: hud.wrecked 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478623
-    m_Key: hud.wrong_way 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478624
-    m_Key: hud.go 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478625
-    m_Key: hud.finish 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478626
-    m_Key: hud.hint.keys 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478627
-    m_Key: hud.hint.touch 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478628
-    m_Key: pause.title 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478629
-    m_Key: pause.resume 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478630
-    m_Key: pause.restart 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478631
-    m_Key: pause.menu 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478632
-    m_Key: pause.hint 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478633
-    m_Key: results.title 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478634
-    m_Key: results.dnf 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478635
-    m_Key: results.best_lap 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478636
-    m_Key: results.reward 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478637
-    m_Key: results.double 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478638
-    m_Key: results.doubled 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478639
-    m_Key: results.next 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478640
-    m_Key: results.retry 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478641
-    m_Key: results.kills 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478642
-    m_Key: garage.title 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478643
-    m_Key: garage.engine 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478644
-    m_Key: garage.engine.desc 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478645
-    m_Key: garage.armor 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478646
-    m_Key: garage.armor.desc 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478647
-    m_Key: garage.cannon 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478648
-    m_Key: garage.cannon.desc 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478649
-    m_Key: garage.level 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478650
-    m_Key: garage.buy 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478651
-    m_Key: garage.max 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478652
-    m_Key: garage.not_enough 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478653
-    m_Key: settings.title 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478654
-    m_Key: settings.language 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478655
-    m_Key: settings.language.system 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478656
-    m_Key: settings.sound 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478657
-    m_Key: settings.auto_throttle 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478658
-    m_Key: settings.on 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478659
-    m_Key: settings.off 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478660
-    m_Key: lb.title 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478661
-    m_Key: lb.empty 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478662
-    m_Key: lb.local 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478663
-    m_Key: lb.sign_in 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478664
-    m_Key: lb.sign_in.hint 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478665
-    m_Key: ads.unavailable 1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 14968762478666
-    m_Key: ads.no_reward 1
-    m_Metadata:
-      m_Items: []
   - m_Id: 14968762478667
     m_Key: touch.fire
     m_Metadata:
       m_Items: []
   - m_Id: 14968762478668
     m_Key: touch.brake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307075710976
+    m_Key: common.ok 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307079905280
+    m_Key: common.back 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099584
+    m_Key: common.continue 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099585
+    m_Key: common.yes 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099586
+    m_Key: common.no 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099587
+    m_Key: common.loading 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099588
+    m_Key: menu.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099589
+    m_Key: menu.play 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099590
+    m_Key: menu.garage 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099591
+    m_Key: menu.leaderboard 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099592
+    m_Key: menu.settings 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099593
+    m_Key: menu.coins 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099594
+    m_Key: events.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099595
+    m_Key: events.laps 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099596
+    m_Key: events.rivals 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099597
+    m_Key: events.locked 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099598
+    m_Key: events.best 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099599
+    m_Key: events.e1.name 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099600
+    m_Key: events.e2.name 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099601
+    m_Key: events.e3.name 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099602
+    m_Key: events.e4.name 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099603
+    m_Key: events.e5.name 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099604
+    m_Key: difficulty.easy 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099605
+    m_Key: difficulty.normal 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099606
+    m_Key: difficulty.hard 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099607
+    m_Key: hud.lap 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099608
+    m_Key: hud.position 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099609
+    m_Key: hud.speed_unit 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099610
+    m_Key: hud.nitro 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099611
+    m_Key: hud.reload 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099612
+    m_Key: hud.hp 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099613
+    m_Key: hud.wrecked 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099614
+    m_Key: hud.wrong_way 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099615
+    m_Key: hud.go 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099616
+    m_Key: hud.finish 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099617
+    m_Key: hud.kill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099618
+    m_Key: hud.killed_by
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099619
+    m_Key: hud.hint.keys 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099620
+    m_Key: hud.hint.touch 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099621
+    m_Key: pause.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099622
+    m_Key: pause.resume 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099623
+    m_Key: pause.restart 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099624
+    m_Key: pause.menu 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099625
+    m_Key: pause.hint 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099626
+    m_Key: results.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099627
+    m_Key: results.dnf 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099628
+    m_Key: results.best_lap 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099629
+    m_Key: results.reward 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099630
+    m_Key: results.double 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099631
+    m_Key: results.doubled 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099632
+    m_Key: results.next 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099633
+    m_Key: results.retry 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099634
+    m_Key: results.kills 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099635
+    m_Key: garage.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099636
+    m_Key: garage.engine 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099637
+    m_Key: garage.engine.desc 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099638
+    m_Key: garage.armor 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099639
+    m_Key: garage.armor.desc 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099640
+    m_Key: garage.cannon 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099641
+    m_Key: garage.cannon.desc 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099642
+    m_Key: garage.level 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099643
+    m_Key: garage.buy 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099644
+    m_Key: garage.max 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099645
+    m_Key: garage.not_enough 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099646
+    m_Key: settings.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099647
+    m_Key: settings.language 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099648
+    m_Key: settings.language.system 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099649
+    m_Key: settings.sound 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099650
+    m_Key: settings.auto_throttle 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099651
+    m_Key: settings.on 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099652
+    m_Key: settings.off 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099653
+    m_Key: settings.graphics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099654
+    m_Key: settings.graphics.auto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099655
+    m_Key: settings.graphics.low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099656
+    m_Key: settings.graphics.high
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099657
+    m_Key: settings.shake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099658
+    m_Key: lb.title 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099659
+    m_Key: lb.empty 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099660
+    m_Key: lb.local 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099661
+    m_Key: lb.sign_in 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099662
+    m_Key: lb.sign_in.hint 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099663
+    m_Key: ads.unavailable 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099664
+    m_Key: ads.no_reward 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099665
+    m_Key: touch.fire 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099666
+    m_Key: touch.brake 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099667
+    m_Key: common.unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099668
+    m_Key: hud.ammo
     m_Metadata:
       m_Items: []
   m_Metadata:

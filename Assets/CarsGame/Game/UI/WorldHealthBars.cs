@@ -35,14 +35,14 @@ namespace RacingGame
                 if (e.P == null) continue;
                 Vector3 world = e.P.transform.position + Vector3.up * heightAboveCar;
                 Vector3 sp = cam.WorldToScreenPoint(world);
-                bool visible = sp.z > 0f && sp.z < 120f;
+                bool visible = sp.z > 0f && sp.z < 120f && race.State >= RaceState.Countdown && race.State < RaceState.Finished && !PauseController.IsPaused;
                 e.Rt.gameObject.SetActive(visible);
                 if (!visible) continue;
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRt, sp, null, out Vector2 local);
                 e.Rt.anchoredPosition = local;
                 float t = e.P.Health != null && e.P.Health.maxHealth > 0f ? e.P.Health.Health / e.P.Health.maxHealth : 0f;
                 e.Fill.fillAmount = t;
-                e.Fill.color = Color.Lerp(new Color(0.9f, 0.15f, 0.1f), new Color(0.2f, 0.85f, 0.25f), t);
+                e.Fill.color = Color.Lerp(new Color(1f, 0.3f, 0.28f), UiFactory.Positive, t);
             }
         }
 

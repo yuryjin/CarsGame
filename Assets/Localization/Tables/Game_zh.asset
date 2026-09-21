@@ -332,6 +332,42 @@ MonoBehaviour:
     m_Localized: "\u5239\u8F66"
     m_Metadata:
       m_Items: []
+  - m_Id: 5803307084099617
+    m_Localized: "{name} \u5DF2\u62A5\u5E9F\uFF01"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099618
+    m_Localized: "\u88AB {name} \u62A5\u5E9F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099653
+    m_Localized: "\u753B\u9762"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099654
+    m_Localized: "\u81EA\u52A8"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099655
+    m_Localized: "\u4F4E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099656
+    m_Localized: "\u9AD8"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099657
+    m_Localized: "\u955C\u5934\u9707\u52A8"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099667
+    m_Localized: "\u6682\u65F6\u4E0D\u53EF\u7528\u3002\u8BF7\u91CD\u8BD5\u3002"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099668
+    m_Localized: "\u5F39\u836F {cur}/{max}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

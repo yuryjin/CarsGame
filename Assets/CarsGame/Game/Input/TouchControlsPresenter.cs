@@ -49,7 +49,7 @@ namespace RacingGame
         private void OnLanguageChanged()
         {
             if (!built) return;
-            Destroy(canvas.gameObject); canvas = null; built = false; shown = false;
+            canvas.gameObject.SetActive(false); Destroy(canvas.gameObject); canvas = null; built = false; shown = false;
             Publish(false);
         }
 
@@ -60,9 +60,10 @@ namespace RacingGame
             bool inRace = flow == null || flow.State == FlowState.Racing;
             // Browsers report a Touchscreen device even on mouse-only desktops: on desktop wait for a real touch.
             if (!touchSeen && Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed) touchSeen = true;
-            bool wantShow = forceShow || (inRace && !keyboardChosen && (Application.isMobilePlatform || touchSeen));
+            bool wantShow = inRace && (forceShow || (!keyboardChosen && (Application.isMobilePlatform || touchSeen)));
             if (wantShow && !built) Build();
-            if (built && shown != wantShow) { shown = wantShow; canvas.gameObject.SetActive(wantShow); }
+            shown = wantShow;
+            if (built && canvas.gameObject.activeSelf != (wantShow && !PauseController.IsPaused)) canvas.gameObject.SetActive(wantShow && !PauseController.IsPaused);
             Publish(built && shown);
 
             var input = race != null && race.Player != null ? race.Player.GetComponent<PlayerDriverInput>() : null;
@@ -86,11 +87,11 @@ namespace RacingGame
 
         private static void Button(Transform parent, string name, string label, string controlPath, Vector2 anchor, Vector2 offsetMin, Vector2 offsetMax)
         {
-            var rt = UiFactory.Panel(parent, name, anchor, anchor, offsetMin, offsetMax, new Color(1f, 1f, 1f, 0.22f));
-            rt.GetComponent<Image>().raycastTarget = true;
-            var btn = rt.gameObject.AddComponent<OnScreenButton>();
+            var face = UiFactory.Button(parent, name, label, null, anchor, anchor, offsetMin, offsetMax, 34f, name == "Fire" ? UiFactory.Accent : UiFactory.Surface);
+            // OnScreenButton owns press/release; the uGUI button supplies visual feedback only.
+            face.interactable = true; face.navigation = new Navigation { mode = Navigation.Mode.None };
+            var btn = face.gameObject.AddComponent<OnScreenButton>();
             btn.controlPath = controlPath;
-            UiFactory.Text(rt, "Label", label, 40f, TMPro.TextAlignmentOptions.Center, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         }
     }
 }

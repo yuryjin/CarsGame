@@ -33,6 +33,7 @@ namespace RacingGame
 
         public RaceParticipant Player { get; private set; }
         public IReadOnlyList<RaceParticipant> Participants => participants;
+        public ArenaLayout Arena { get; private set; }
         private readonly List<RaceParticipant> participants = new List<RaceParticipant>();
 
         private void Start()
@@ -41,11 +42,11 @@ namespace RacingGame
         }
 
         /// <summary>Spawns the field. Returns false (and leaves nothing behind) when the setup is incomplete.</summary>
-        public bool Spawn()
+        public bool Spawn(bool arena = false)
         {
             if (track == null) track = TrackPath.Instance;
             if (grid == null) grid = FindAnyObjectByType<StartGrid>();
-            if (raceCarPrefab == null || track == null || grid == null)
+            if (raceCarPrefab == null || (!arena && (track == null || grid == null)))
             {
                 Debug.LogError("[RaceSpawner] prefab, TrackPath and StartGrid are required.", this);
                 Clear();
@@ -53,13 +54,20 @@ namespace RacingGame
             }
 
             Clear();
+            if (arena)
+            {
+                var renderer = raceCarPrefab.GetComponentInChildren<Renderer>();
+                Arena = ArenaLayout.Create(renderer != null ? renderer.sharedMaterial : null);
+            }
             int total = aiCount + 1;
             int playerSlot = playerGridSlot < 0 ? total - 1 : Mathf.Clamp(playerGridSlot, 0, total - 1);
             int aiIndex = 0;
             for (int slot = 0; slot < total; slot++)
             {
                 bool isPlayer = slot == playerSlot;
-                grid.GetSlot(slot, track, out var pos, out var rot, out float lane);
+                Vector3 pos; Quaternion rot; float lane = 0f;
+                if (arena) Arena.GetSpawnPose(slot, total, out pos, out rot);
+                else grid.GetSlot(slot, track, out pos, out rot, out lane);
                 var go = Instantiate(raceCarPrefab, pos, rot);
                 go.name = isPlayer ? "Player_Car" : $"AI_Car_{aiIndex + 1}";
                 var car = go.GetComponent<CarController>();
@@ -67,6 +75,9 @@ namespace RacingGame
                 var paint = go.GetComponent<CarPaint>() ?? go.AddComponent<CarPaint>();
                 participant.isPlayer = isPlayer;
                 participant.laneOffset = lane;
+                participant.Arena = Arena;
+                participant.Progress.enabled = !arena;
+                if (participant.Health != null) participant.Health.respawnOnDeath = !arena;
 
                 if (isPlayer)
                 {
@@ -86,9 +97,18 @@ namespace RacingGame
                     var profile = profiles != null && profiles.Length > 0 ? profiles[aiIndex % profiles.Length] : null;
                     var gunner = go.GetComponent<AiGunner>() ?? go.AddComponent<AiGunner>();
                     gunner.Initialize(profile, aiFireCooldown);
-                    var ai = go.GetComponent<AiDriver>() ?? go.AddComponent<AiDriver>();
-                    ai.Initialize(profile, lane * 0.4f);   // after AddComponent: OnEnable already ran with defaults
-                    car.SetInputSource(ai);
+                    if (arena)
+                    {
+                        var ai = go.AddComponent<ArenaDriver>();
+                        ai.Initialize(Arena, profile);
+                        car.SetInputSource(ai);
+                    }
+                    else
+                    {
+                        var ai = go.GetComponent<AiDriver>() ?? go.AddComponent<AiDriver>();
+                        ai.Initialize(profile, lane * 0.4f);
+                        car.SetInputSource(ai);
+                    }
                     var health = go.GetComponent<CarHealth>();
                     if (health != null) { health.showScreenBar = false; health.showWorldBar = true; }
                     aiIndex++;
@@ -105,9 +125,10 @@ namespace RacingGame
 
         public void Clear()
         {
-            foreach (var p in participants) if (p != null) Destroy(p.gameObject);
+            foreach (var p in participants) if (p != null) { p.gameObject.SetActive(false); Destroy(p.gameObject); }
             participants.Clear();
             Player = null;
+            if (Arena != null) { Arena.gameObject.SetActive(false); Destroy(Arena.gameObject); Arena = null; }
         }
 
         private void AttachCamera(GameObject playerCar)
@@ -116,6 +137,8 @@ namespace RacingGame
             if (follow == null) return;
             follow.target = playerCar.transform;
             follow.targetRigidbody = playerCar.GetComponent<Rigidbody>();
+            follow.transform.position = playerCar.transform.TransformPoint(follow.offset);
+            follow.transform.LookAt(playerCar.transform.position + Vector3.up * follow.lookAtHeightOffset);
         }
     }
 }

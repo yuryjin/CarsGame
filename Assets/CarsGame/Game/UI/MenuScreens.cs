@@ -1,208 +1,267 @@
+using System;
 using System.Collections.Generic;
-using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using RacingGame.Core.Economy;
-using RacingGame.Core.Localization;
 using RacingGame.Core.Platform;
 
 namespace RacingGame
 {
-    /// <summary>
-    /// Runtime-built menu stack: main menu, race select (events × difficulty), garage, settings,
-    /// leaderboard, results. One overlay canvas, one visible panel at a time; every label is a
-    /// localization key and re-renders on language change.
-    /// </summary>
+    /// <summary>Localized runtime menus. Views derive progression and rewards from GameFlow and SaveService.</summary>
     [RequireComponent(typeof(GameFlow))]
     public sealed class MenuScreens : MonoBehaviour
     {
         private GameFlow flow;
         private RaceManager race;
         private Canvas canvas;
-        private readonly Dictionary<string, RectTransform> panels = new Dictionary<string, RectTransform>();
-        private string current = "";
+        private RectTransform panel;
+        private CanvasGroup transition;
+        private string current = "", pendingScreen;
         private static TextMeshProUGUI toastText;
+        private static RectTransform toastPanel;
         private static float toastUntil;
         private int tierIndex = 1;
-        private readonly StringBuilder sb = new StringBuilder(512);
+        private bool authInFlight;
+        private float layoutWidth, layoutHeight;
+        private Button rewardButton;
+        private static readonly Vector2 Top = new Vector2(0f, 1f);
         private static readonly string[] LanguageCycle = { "", "ru", "en", "tr", "zh", "de", "es", "fr", "pt", "uk" };
-
+        private static readonly string[] LanguageNames = { "", "Русский", "English", "Türkçe", "中文", "Deutsch", "Español", "Français", "Português", "Українська" };
         public string Current => current;
+        private bool Narrow => layoutWidth < 1100f;
 
         private void Awake()
         {
-            flow = GetComponent<GameFlow>();
-            race = GetComponent<RaceManager>();
+            flow = GetComponent<GameFlow>(); race = GetComponent<RaceManager>();
             canvas = UiFactory.CreateOverlayCanvas("Menus", 10);
             canvas.transform.SetParent(transform, false);
-            toastText = UiFactory.Text(canvas.transform, "Toast", "", 30f, TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-500f, -220f), new Vector2(500f, -160f), new Color(1f, 0.9f, 0.4f));
+            toastPanel = UiFactory.Card(canvas.transform, "Toast", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(-400f, 24f), new Vector2(400f, 104f));
+            toastText = Label(toastPanel, "Message", "", 26f, Vector2.zero, Vector2.one, new Vector2(24f, 12f), new Vector2(-24f, -12f), UiFactory.Accent, TextAlignmentOptions.Center);
+            toastPanel.gameObject.SetActive(false);
         }
 
         private void OnEnable()
         {
-            flow.StateChanged += OnFlowState;
-            Loc.LanguageChanged += Rebuild;
-            PlatformGlue.Ready += Rebuild;
+            flow.StateChanged += OnFlowState; Loc.LanguageChanged += Rebuild; PlatformGlue.Ready += Rebuild;
         }
 
         private void OnDisable()
         {
-            flow.StateChanged -= OnFlowState;
-            Loc.LanguageChanged -= Rebuild;
-            PlatformGlue.Ready -= Rebuild;
+            flow.StateChanged -= OnFlowState; Loc.LanguageChanged -= Rebuild; PlatformGlue.Ready -= Rebuild;
         }
-
-        private bool authInFlight;
 
         private void Update()
         {
-            if (toastText != null && toastText.gameObject.activeSelf && Time.unscaledTime > toastUntil) toastText.gameObject.SetActive(false);
+            if (toastPanel != null && toastPanel.gameObject.activeSelf && Time.unscaledTime > toastUntil) toastPanel.gameObject.SetActive(false);
+            if (transition != null) transition.alpha = Mathf.MoveTowards(transition.alpha, 1f, Time.unscaledDeltaTime * 7f);
+            if (string.IsNullOrEmpty(current)) return;
+            var rect = ((RectTransform)canvas.transform).rect;
+            if (Mathf.Abs(rect.width - layoutWidth) > 1f || Mathf.Abs(rect.height - layoutHeight) > 1f) { Rebuild(); return; }
+            if (current != "main" && (Keyboard.current?.escapeKey.wasPressedThisFrame == true || Gamepad.current?.buttonEast.wasPressedThisFrame == true))
+            {
+                if (current == "results") GoTo("main"); else Show("main");
+            }
+            if (rewardButton != null)
+            {
+                rewardButton.interactable = !flow.IsDoublingReward;
+                rewardButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get(flow.IsDoublingReward ? "common.loading" : "results.double");
+            }
         }
 
         public static void Toast(string text)
         {
-            if (toastText == null) return;
-            toastText.text = text; toastText.gameObject.SetActive(true); toastUntil = Time.unscaledTime + 2.5f;
+            if (toastText == null || toastPanel == null) return;
+            toastText.text = text; toastPanel.SetAsLastSibling(); toastPanel.gameObject.SetActive(true); toastUntil = Time.unscaledTime + 3.5f;
         }
 
-        private string pendingScreen;
-
-        /// <summary>Leave the race and open one menu screen directly (no intermediate main-menu build).</summary>
         public void GoTo(string screen) { pendingScreen = screen; flow.EnterMenu(); }
-
-        private void OnFlowState(FlowState s)
+        private void OnFlowState(FlowState state)
         {
-            switch (s)
+            switch (state)
             {
-                case FlowState.Menu: { string target = pendingScreen ?? "main"; pendingScreen = null; Show(target); break; }
+                case FlowState.Menu: string target = pendingScreen ?? "main"; pendingScreen = null; Show(target); break;
                 case FlowState.Racing: Show(""); break;
                 case FlowState.Results: Show("results"); break;
             }
         }
+        private void Rebuild() => Show(current);
 
-        private void Rebuild() { string c = current; Show(""); Show(c); }
-
-        /// <summary>Panels are rebuilt from scratch each time they open: cheap, and always current.</summary>
         public void Show(string name)
         {
-            foreach (var kv in panels) if (kv.Value != null) Destroy(kv.Value.gameObject);
-            panels.Clear();
-            current = name;
-            if (string.IsNullOrEmpty(name)) return;
-            // Light veil only: the menu camera dolly behind the UI is part of the look. Cards sit behind the controls.
-            var root = UiFactory.Panel(canvas.transform, "Panel_" + name, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.02f, 0.03f, 0.06f, name == "results" ? 0.45f : 0.22f), roundedCorners: false);
-            panels[name] = root;
+            string selected = current == name ? EventSystem.current?.currentSelectedGameObject?.name : null;
+            float scrollPosition = 1f;
+            if (current == name && panel != null)
+            {
+                var oldScroll = panel.GetComponentInChildren<ScrollRect>();
+                if (oldScroll != null) scrollPosition = oldScroll.verticalNormalizedPosition;
+            }
+            if (panel != null) { panel.gameObject.SetActive(false); Destroy(panel.gameObject); }
+            rewardButton = null; current = name;
+            if (string.IsNullOrEmpty(name)) { EventSystem.current?.SetSelectedGameObject(null); return; }
+            var canvasRect = ((RectTransform)canvas.transform).rect;
+            layoutWidth = canvasRect.width; layoutHeight = canvasRect.height;
+            panel = UiFactory.Panel(canvas.transform, "Panel_" + name, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.015f, 0.025f, 0.045f, 0.68f), false);
+            panel.GetComponent<Image>().raycastTarget = true;
+            transition = panel.gameObject.AddComponent<CanvasGroup>(); transition.alpha = 0f;
+            float width = Mathf.Min(1360f, layoutWidth - 80f);
+            var frame = UiFactory.Panel(panel, "Frame", new Vector2(0.5f, 0f), new Vector2(0.5f, 1f), new Vector2(-width * 0.5f, 40f), new Vector2(width * 0.5f, -40f));
             switch (name)
             {
-                case "main": BuildMain(root); break;
-                case "events": BuildEvents(root); break;
-                case "garage": BuildGarage(root); break;
-                case "settings": BuildSettings(root); break;
-                case "leaders": BuildLeaders(root); break;
-                case "results": BuildResults(root); break;
+                case "main": BuildMain(frame); break;
+                case "events": BuildEvents(frame); break;
+                case "garage": BuildGarage(frame); break;
+                case "settings": BuildSettings(frame); break;
+                case "leaders": BuildLeaders(frame); break;
+                case "results": BuildResults(frame); break;
             }
+            if (toastPanel != null) toastPanel.SetAsLastSibling();
+            Canvas.ForceUpdateCanvases();
+            if (panel == null) return;
+            var scroll = panel.GetComponentInChildren<ScrollRect>();
+            if (scroll != null) scroll.verticalNormalizedPosition = scrollPosition;
+            var buttons = panel.GetComponentsInChildren<Button>();
+            Button focus = Array.Find(buttons, b => b.interactable && b.name == selected)
+                ?? Array.Find(buttons, b => b.interactable && b.name != "Back");
+            if (focus != null) EventSystem.current?.SetSelectedGameObject(focus.gameObject);
         }
 
         private string Coins() => Loc.Format("menu.coins", "n", PlatformGlue.Save != null ? PlatformGlue.Save.Data.Coins : 0);
-
-        private void Title(RectTransform root, string key)
+        private static TextMeshProUGUI Label(Transform parent, string name, string value, float size, Vector2 min, Vector2 max, Vector2 lo, Vector2 hi, Color? color = null, TextAlignmentOptions alignment = TextAlignmentOptions.MidlineLeft)
         {
-            UiFactory.Text(root, "TitleShadow", Loc.Get(key), 72f, TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-596f, -154f), new Vector2(604f, -44f), new Color(0f, 0f, 0f, 0.55f));
-            UiFactory.Text(root, "Title", Loc.Get(key), 72f, TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-600f, -150f), new Vector2(600f, -40f), new Color(1f, 0.85f, 0.2f));
+            var text = UiFactory.Text(parent, name, value, size, alignment, min, max, lo, hi, color);
+            text.outlineWidth = 0f; text.enableAutoSizing = true; text.fontSizeMin = Mathf.Max(18f, size * 0.7f); text.fontSizeMax = size;
+            text.overflowMode = TextOverflowModes.Ellipsis;
+            return text;
         }
 
-        private static readonly Vector2 Centre = new Vector2(0.5f, 0.5f);
-        private static void CentreCard(RectTransform root, float xHalf, float yMin, float yMax) => UiFactory.Card(root, "Card", Centre, Centre, new Vector2(-xHalf, yMin), new Vector2(xHalf, yMax));
-
-        private void BackButton(RectTransform root, string target = "main")
+        private RectTransform Header(RectTransform root, string key, bool back = true)
         {
-            UiFactory.Button(root, "Back", Loc.Get("common.back"), () => Show(target), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -110f), new Vector2(230f, -40f), 30f, new Color(0.35f, 0.38f, 0.45f, 0.95f));
+            if (back) UiFactory.Button(root, "Back", "‹  " + Loc.Get("common.back"), () => { if (current == "results") GoTo("main"); else Show("main"); }, Top, Top, new Vector2(0f, -74f), new Vector2(164f, -6f), 26f, UiFactory.Raised);
+            else
+                for (int i = 0; i < 3; i++)
+                {
+                    var stripe = UiFactory.Panel(root, "Mark" + i, Top, Top, new Vector2(6f + i * 22f, -66f), new Vector2(18f + i * 22f, -12f), UiFactory.Accent, false);
+                    stripe.localRotation = Quaternion.Euler(0f, 0f, -15f);
+                }
+            var title = Label(root, "Title", Loc.Get(key), back ? 46f : 60f, Top, Vector2.one, new Vector2(back ? 190f : 94f, -82f), new Vector2(-300f, 0f));
+            title.fontStyle = FontStyles.Bold;
+            var wallet = UiFactory.Card(root, "Wallet", Vector2.one, Vector2.one, new Vector2(-276f, -74f), new Vector2(0f, -6f));
+            Label(wallet, "Coins", Coins(), 26f, Vector2.zero, Vector2.one, new Vector2(22f, 8f), new Vector2(-22f, -8f), UiFactory.Accent, TextAlignmentOptions.Center);
+            UiFactory.Panel(root, "Rule", Top, Vector2.one, new Vector2(0f, -111f), new Vector2(0f, -110f), new Color(0.4f, 0.5f, 0.65f, 0.3f), false);
+            UiFactory.Panel(root, "Accent", Top, Top, new Vector2(0f, -113f), new Vector2(90f, -109f), UiFactory.Accent, false);
+            var player = PlatformGlue.Platform?.Player;
+            Label(root, "Player", player != null ? UiFactory.Escape(player.Value.Name) : "", 20f, Vector2.zero, new Vector2(1f, 0f), Vector2.zero, new Vector2(0f, 30f), UiFactory.Muted, TextAlignmentOptions.BottomRight);
+            return UiFactory.Panel(root, "Body", Vector2.zero, Vector2.one, new Vector2(0f, 54f), new Vector2(0f, -144f));
         }
 
-        // ---------- main ----------
+        private static RectTransform Item(Transform content, string name, float height, bool card = true)
+        {
+            var row = card ? UiFactory.Card(content, name, Top, Vector2.one, Vector2.zero, Vector2.zero)
+                : UiFactory.Panel(content, name, Top, Vector2.one, Vector2.zero, Vector2.zero);
+            row.gameObject.AddComponent<LayoutElement>().preferredHeight = height;
+            return row;
+        }
+
+        private List<RaceEventDefinition> Events()
+        {
+            var list = new List<RaceEventDefinition>(flow.events ?? Array.Empty<RaceEventDefinition>());
+            list.RemoveAll(e => e == null); list.Sort((a, b) => a.order.CompareTo(b.order)); return list;
+        }
+
         private void BuildMain(RectTransform root)
         {
-            Title(root, "menu.title");
+            var body = Header(root, "menu.title", false);
             if (!PlatformGlue.IsReady)
             {
-                // Save/strings still loading: no race can start before the real progression is in.
-                UiFactory.Text(root, "Loading", Loc.Ready ? Loc.Get("common.loading") : "…", 40f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-300f, -40f), new Vector2(300f, 40f));
-                return;
+                Label(body, "Loading", Loc.Ready ? Loc.Get("common.loading") : "…", 36f, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, UiFactory.Muted, TextAlignmentOptions.Center); return;
             }
-            UiFactory.Text(root, "Coins", Coins(), 32f, TextAlignmentOptions.TopRight, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-500f, -100f), new Vector2(-30f, -40f));
-            CentreCard(root, 310f, -320f, 110f);
-            float y = 40f;
-            foreach (var (key, target) in new[] { ("menu.play", "events"), ("menu.garage", "garage"), ("menu.leaderboard", "leaders"), ("menu.settings", "settings") })
+            var content = UiFactory.Scroll(body, "MainScroll", Vector2.zero, Vector2.zero);
+            var row = Item(content, "Home", Narrow ? 430f : 580f, false);
+            var hero = UiFactory.Card(row, "RaceCard", Vector2.zero, new Vector2(Narrow ? 1f : 0.58f, 1f), Vector2.zero, new Vector2(Narrow ? 0f : -12f, 0f));
+            var list = Events();
+            var ev = list.FindLast(e => flow.IsUnlocked(e));
+            Label(hero, "Eyebrow", Loc.Get("events.title"), 24f, Top, Vector2.one, new Vector2(36f, -76f), new Vector2(-36f, -28f), UiFactory.Accent);
+            var title = Label(hero, "EventName", ev != null ? Loc.Get(ev.nameKey) : Loc.Get("menu.play"), 64f, Top, Vector2.one, new Vector2(36f, -226f), new Vector2(-36f, -98f));
+            title.fontStyle = FontStyles.Bold;
+            string detail = ev != null ? Loc.Format("events.laps", "n", ev.laps) + "  /  " + Loc.Format("events.rivals", "n", ev.aiCountOverride >= 0 ? ev.aiCountOverride : 3) : "";
+            Label(hero, "Details", detail, 26f, Top, Vector2.one, new Vector2(38f, -282f), new Vector2(-36f, -230f), UiFactory.Muted);
+            if (!Narrow)
             {
-                string t = target;
-                UiFactory.Button(root, key, Loc.Get(key), () => Show(t), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-260f, y - 40f), new Vector2(260f, y + 40f), 40f);
-                y -= 100f;
+                Label(hero, "Progress", list.FindAll(e => flow.IsUnlocked(e)).Count.ToString("00") + " <color=#8B9AAD>/ " + list.Count.ToString("00") + "</color>", 64f, Vector2.zero, new Vector2(1f, 0f), new Vector2(38f, 162f), new Vector2(-38f, 248f));
+                for (int i = 0; i < list.Count; i++) UiFactory.Panel(hero, "EventProgress" + i, new Vector2(i / (float)list.Count, 0f), new Vector2((i + 1f) / list.Count, 0f), new Vector2(i == 0 ? 38f : 5f, 148f), new Vector2(i == list.Count - 1 ? -38f : -5f, 152f), flow.IsUnlocked(list[i]) ? UiFactory.Accent : UiFactory.Raised, false);
             }
-            var p = PlatformGlue.Platform;
-            UiFactory.Text(root, "Player", p != null ? UiFactory.Escape(p.Player.Name) : "", 24f, TextAlignmentOptions.BottomRight, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-500f, 20f), new Vector2(-30f, 60f), new Color(0.7f, 0.7f, 0.7f));
+            UiFactory.Button(hero, "Play", Loc.Get("menu.play") + "   ›", () => Show("events"), Vector2.zero, new Vector2(1f, 0f), new Vector2(36f, 32f), new Vector2(-36f, 116f), 34f);
+            var links = Narrow ? content : UiFactory.Panel(row, "Links", new Vector2(0.58f, 0f), Vector2.one, new Vector2(12f, 0f), Vector2.zero);
+            var keys = new[] { "menu.garage", "menu.leaderboard", "menu.settings" };
+            var targets = new[] { "garage", "leaders", "settings" };
+            var captions = new[] { "garage.engine.desc", "lb.local", "settings.language" };
+            for (int i = 0; i < keys.Length; i++)
+            {
+                var slot = Narrow ? Item(links, targets[i] + "Slot", 136f, false) : UiFactory.Panel(links, targets[i] + "Slot", new Vector2(0f, 1f - (i + 1f) / 3f), new Vector2(1f, 1f - i / 3f), new Vector2(0f, i == 2 ? 0f : 10f), new Vector2(0f, i == 0 ? 0f : -10f));
+                string target = targets[i];
+                var button = UiFactory.Button(slot, target, "", () => Show(target), Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 32f, UiFactory.Surface);
+                Label(button.transform, "Index", (i + 1).ToString("00"), 24f, Vector2.zero, Vector2.one, new Vector2(28f, 20f), new Vector2(-20f, -20f), UiFactory.Accent, TextAlignmentOptions.TopLeft);
+                Label(button.transform, "Name", Loc.Get(keys[i]), 32f, Vector2.zero, Vector2.one, new Vector2(82f, 48f), new Vector2(-42f, -22f)).fontStyle = FontStyles.Bold;
+                Label(button.transform, "Detail", Loc.Get(captions[i]), 22f, Vector2.zero, Vector2.one, new Vector2(82f, 18f), new Vector2(-42f, -82f), UiFactory.Muted);
+                Label(button.transform, "Arrow", "›", 42f, new Vector2(1f, 0f), Vector2.one, new Vector2(-40f, 0f), new Vector2(-14f, 0f), UiFactory.Muted);
+            }
         }
 
-        // ---------- events ----------
         private void BuildEvents(RectTransform root)
         {
-            Title(root, "events.title");
-            BackButton(root);
-            var tiers = flow.tiers ?? new DifficultyTier[0];
+            var body = Header(root, "events.title");
+            var tiers = Array.FindAll(flow.tiers ?? Array.Empty<DifficultyTier>(), t => t != null);
             if (tiers.Length > 0)
             {
                 tierIndex = Mathf.Clamp(tierIndex, 0, tiers.Length - 1);
-                var tier = tiers[tierIndex];
-                UiFactory.Button(root, "Tier", Loc.Get("difficulty." + tier.tierId), () => { tierIndex = (tierIndex + 1) % tiers.Length; Show("events"); },
-                    new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-330f, -110f), new Vector2(-30f, -40f), 30f, new Color(0.35f, 0.55f, 0.85f, 0.95f));
+                for (int i = 0; i < tiers.Length; i++)
+                {
+                    int index = i;
+                    UiFactory.Button(body, "Tier" + i, Loc.Get("difficulty." + tiers[i].tierId), () => { tierIndex = index; Show("events"); }, new Vector2(i / (float)tiers.Length, 1f), new Vector2((i + 1f) / tiers.Length, 1f), new Vector2(4f, -68f), new Vector2(-8f, 0f), 27f, i == tierIndex ? UiFactory.Accent : UiFactory.Raised);
+                }
             }
-            var events = new List<RaceEventDefinition>(flow.events ?? new RaceEventDefinition[0]);
-            events.RemoveAll(e => e == null);
-            events.Sort((a, b) => a.order.CompareTo(b.order));
-            CentreCard(root, 560f, 260f - events.Count * 100f + 30f, 330f);
-            float y = 260f;
-            var save = PlatformGlue.Save;
-            foreach (var ev in events)
+            var content = UiFactory.Scroll(body, "EventsScroll", Vector2.zero, new Vector2(0f, tiers.Length > 0 ? -90f : 0f));
+            var list = Events();
+            for (int i = 0; i < list.Count; i++)
             {
-                bool unlocked = flow.IsUnlocked(ev);
-                var e = ev;
-                int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : (tiers.Length > 0 ? tiers[tierIndex].aiCount : 3);
-                string best = "";
-                var b = save?.Data.progress.bests.Find(x => x.eventId == ev.eventId);
-                if (b != null) best = "   " + Loc.Format("events.best", "t", UiFactory.FormatTime(b.bestTimeMs / 1000.0));
-                string label = $"{Loc.Get(ev.nameKey)}   <size=60%>{Loc.Format("events.laps", "n", ev.laps)} · {Loc.Format("events.rivals", "n", rivals)}{best}</size>";
-                var btn = UiFactory.Button(root, ev.eventId, label, unlocked ? () => flow.StartRace(e, tiers.Length > 0 ? tiers[tierIndex] : null) : null,
-                    new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-520f, y - 42f), new Vector2(520f, y + 42f), 34f, unlocked ? null : new Color(0.3f, 0.3f, 0.32f, 0.9f));
-                if (!unlocked) UiFactory.Text(btn.transform, "Lock", Loc.Get("events.locked"), 20f, TextAlignmentOptions.BottomRight, Vector2.zero, Vector2.one, new Vector2(8f, 2f), new Vector2(-12f, -2f), new Color(1f, 0.8f, 0.5f));
-                y -= 100f;
+                var ev = list[i]; bool unlocked = flow.IsUnlocked(ev);
+                var row = Item(content, ev.eventId, Narrow ? 188f : 154f);
+                Label(row, "Number", (i + 1).ToString("00"), 52f, Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(116f, -24f), unlocked ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
+                Label(row, "Name", Loc.Get(ev.nameKey), 34f, Top, Vector2.one, new Vector2(144f, -64f), new Vector2(-236f, -16f)).fontStyle = FontStyles.Bold;
+                int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[tierIndex].aiCount : 3;
+                string detail = Loc.Format("events.laps", "n", ev.laps) + "   /   " + Loc.Format("events.rivals", "n", rivals);
+                Label(row, "Stats", detail, 23f, Top, Vector2.one, new Vector2(144f, -103f), new Vector2(-236f, -62f), UiFactory.Muted);
+                var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
+                string status = unlocked ? best != null ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) : "" : Loc.Get("events.locked");
+                Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 77f : 46f), unlocked ? UiFactory.Positive : UiFactory.Muted);
+                UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—", unlocked ? () => flow.StartRace(ev, tiers.Length > 0 ? tiers[tierIndex] : null) : null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-216f, -36f), new Vector2(-24f, 36f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
             }
         }
 
-        // ---------- garage ----------
         private void BuildGarage(RectTransform root)
         {
-            Title(root, "garage.title");
-            BackButton(root);
+            var content = UiFactory.Scroll(Header(root, "garage.title"), "GarageScroll", Vector2.zero, Vector2.zero);
             var save = PlatformGlue.Save;
-            UiFactory.Text(root, "Coins", Coins(), 32f, TextAlignmentOptions.TopRight, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-500f, -100f), new Vector2(-30f, -40f));
-            CentreCard(root, 560f, -160f, 280f);
-            float y = 200f;
             foreach (var kind in new[] { UpgradeKind.Engine, UpgradeKind.Armor, UpgradeKind.Cannon })
             {
-                string k = kind.ToString().ToLowerInvariant();
-                int lvl = UpgradeCatalog.Level(save?.Data.progress.upgrades, (int)kind);
-                int cost = UpgradeCatalog.Cost(lvl);
-                UiFactory.Text(root, k, $"<b>{Loc.Get("garage." + k)}</b>   <size=70%>{Loc.Format("garage.level", "lvl", lvl, "max", UpgradeCatalog.MaxLevel)}</size>\n<size=60%>{Loc.Get("garage." + k + ".desc")}</size>", 34f, TextAlignmentOptions.MidlineLeft,
-                    new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-520f, y - 55f), new Vector2(160f, y + 55f));
-                var kk = kind;
-                bool maxed = lvl >= UpgradeCatalog.MaxLevel;
-                UiFactory.Button(root, "Buy_" + k, maxed ? Loc.Get("garage.max") : Loc.Format("garage.buy", "cost", cost), maxed ? null : () => { Buy(kk); },
-                    new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(200f, y - 38f), new Vector2(520f, y + 38f), 30f, maxed ? new Color(0.3f, 0.3f, 0.32f, 0.9f) : (Color?)null);
-                y -= 140f;
+                string key = kind.ToString().ToLowerInvariant();
+                int level = UpgradeCatalog.Level(save?.Data.progress.upgrades, (int)kind), cost = UpgradeCatalog.Cost(level);
+                bool maxed = level >= UpgradeCatalog.MaxLevel;
+                bool affordable = save != null && save.Data.Coins >= cost;
+                var row = Item(content, key, Narrow ? 260f : 214f);
+                Label(row, "Name", Loc.Get("garage." + key), 36f, Top, Vector2.one, new Vector2(30f, -66f), new Vector2(-330f, -20f)).fontStyle = FontStyles.Bold;
+                Label(row, "Description", Loc.Get("garage." + key + ".desc"), 24f, Top, Vector2.one, new Vector2(30f, -118f), new Vector2(-330f, -70f), UiFactory.Muted);
+                Label(row, "Level", Loc.Format("garage.level", "lvl", level, "max", UpgradeCatalog.MaxLevel), 23f, Top, Vector2.one, new Vector2(30f, -162f), new Vector2(-330f, -120f), UiFactory.Accent);
+                var progress = UiFactory.Panel(row, "Progress", Vector2.zero, new Vector2(1f, 0f), new Vector2(30f, 30f), new Vector2(-330f, 44f));
+                for (int i = 0; i < UpgradeCatalog.MaxLevel; i++) UiFactory.Panel(progress, "Level" + i, new Vector2(i / (float)UpgradeCatalog.MaxLevel, 0f), new Vector2((i + 1f) / UpgradeCatalog.MaxLevel, 1f), Vector2.zero, new Vector2(-6f, 0f), i < level ? UiFactory.Accent : UiFactory.Raised, false);
+                UiFactory.Button(row, "Buy_" + key, maxed ? Loc.Get("garage.max") : Loc.Format("garage.buy", "cost", cost), maxed || !affordable ? null : () => Buy(kind), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-296f, -25f), new Vector2(-30f, 55f), 28f, maxed ? UiFactory.Raised : affordable ? UiFactory.Accent : UiFactory.Raised);
+                if (!maxed && !affordable) Label(row, "Reason", Loc.Get("garage.not_enough"), 22f, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-296f, -82f), new Vector2(-30f, -32f), UiFactory.Muted, TextAlignmentOptions.Center);
             }
         }
 
-        /// <summary>Garage purchase (button handler; also used by QA automation). Returns true when bought.</summary>
         public bool Buy(UpgradeKind kind)
         {
             var save = PlatformGlue.Save;
@@ -210,148 +269,154 @@ namespace RacingGame
             if (save.Data.progress.upgrades == null || save.Data.progress.upgrades.Length < 3) save.Data.progress.upgrades = new int[3];
             if (UpgradeCatalog.TryBuy(save.Data.progress.upgrades, kind, save.Data.Coins, out int cost))
             {
-                save.Local.coinsSpent += cost;
-                save.MarkDirty();
-                SfxPlayer.Instance.PlayUi(SfxSynth.LapDing);
-                Show("garage");
-                return true;
+                save.Local.coinsSpent += cost; save.MarkDirty(); SfxPlayer.Instance.PlayUi(SfxSynth.LapDing); Show("garage"); return true;
             }
-            Toast(Loc.Get("garage.not_enough"));
-            return false;
+            Toast(Loc.Get("garage.not_enough")); return false;
         }
 
-        // ---------- settings ----------
         private void BuildSettings(RectTransform root)
         {
-            Title(root, "settings.title");
-            BackButton(root);
+            var content = UiFactory.Scroll(Header(root, "settings.title"), "SettingsScroll", Vector2.zero, Vector2.zero);
             var save = PlatformGlue.Save;
             string lang = save != null ? save.Data.settings.lang : "";
-            string langLabel = string.IsNullOrEmpty(lang) ? Loc.Get("settings.language.system") + $" ({Loc.Language})" : lang.ToUpperInvariant();
-            CentreCard(root, 560f, -380f, 230f);
-            Row(root, 160f, Loc.Get("settings.language"), langLabel, () =>
-            {
-                int i = System.Array.IndexOf(LanguageCycle, lang); i = (i + 1) % LanguageCycle.Length;
-                PlatformGlue.SetLanguageOverride(LanguageCycle[i]);
-                Show("settings");
-            });
-            bool sound = save == null || save.Data.settings.sfx > 0f;
-            Row(root, 40f, Loc.Get("settings.sound"), Loc.Get(sound ? "settings.on" : "settings.off"), () =>
+            int index = Array.IndexOf(LanguageCycle, lang);
+            string language = index <= 0 ? Loc.Get("settings.language.system") + " (" + Loc.Language + ")" : LanguageNames[index];
+            var row = SettingRow(content, "Language", "settings.language");
+            var value = SettingValue(row);
+            UiFactory.Button(value, "LanguagePrevious", "‹", () => PlatformGlue.SetLanguageOverride(LanguageCycle[(Mathf.Max(0, index) + LanguageCycle.Length - 1) % LanguageCycle.Length]), Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(64f, 0f), 36f, UiFactory.Raised);
+            Label(value, "LanguageName", language, 25f, Vector2.zero, Vector2.one, new Vector2(74f, 4f), new Vector2(-74f, -4f), Color.white, TextAlignmentOptions.Center);
+            UiFactory.Button(value, "LanguageNext", "›", () => PlatformGlue.SetLanguageOverride(LanguageCycle[(Mathf.Max(0, index) + 1) % LanguageCycle.Length]), new Vector2(1f, 0f), Vector2.one, new Vector2(-64f, 0f), Vector2.zero, 36f, UiFactory.Raised);
+            ToggleRow(content, "Sound", "settings.sound", save == null || save.Data.settings.sfx > 0f, enabled =>
             {
                 if (save == null) return;
-                save.Data.settings.sfx = sound ? 0f : 1f; save.MarkDirty();
-                SfxPlayer.Instance.volume = save.Data.settings.sfx * 0.8f;
-                AudioListener.volume = save.Data.settings.sfx > 0f ? 1f : 0f;
-                Show("settings");
+                save.Data.settings.sfx = enabled ? 1f : 0f; save.MarkDirty();
+                SfxPlayer.Instance.volume = save.Data.settings.sfx * 0.8f; AudioListener.volume = enabled ? 1f : 0f; Show("settings");
             });
-            bool auto = save != null && save.Data.settings.autoThrottle;
-            Row(root, -80f, Loc.Get("settings.auto_throttle"), Loc.Get(auto ? "settings.on" : "settings.off"), () =>
+            ToggleRow(content, "AutoThrottle", "settings.auto_throttle", save != null && save.Data.settings.autoThrottle, enabled =>
+            { if (save == null) return; save.Data.settings.autoThrottle = enabled; save.MarkDirty(); Show("settings"); });
+            if (PlatformGlue.HasQualityChoice && save != null)
             {
-                if (save == null) return;
-                save.Data.settings.autoThrottle = !auto; save.MarkDirty(); Show("settings");
-            });
-            // Graphics cycles Auto → Low → High; Auto follows the device (phones get the Mobile tier).
-            var st = PlatformGlue.HasQualityChoice && save != null ? save.Data.settings : null;
-            string gfx = st == null || st.qualityAuto ? "settings.graphics.auto" : (st.quality <= 0 ? "settings.graphics.low" : "settings.graphics.high");
-            if (st != null) Row(root, -200f, Loc.Get("settings.graphics"), Loc.Get(gfx), () =>
-            {
-                if (st == null) return;
-                if (st.qualityAuto) { st.qualityAuto = false; st.quality = 0; }
-                else if (st.quality <= 0) st.quality = 1;
-                else st.qualityAuto = true;
-                save.MarkDirty(); PlatformGlue.ApplyQuality(); Show("settings");
-            });
-            bool shake = save == null || save.Data.settings.cameraShake;
-            Row(root, -320f, Loc.Get("settings.shake"), Loc.Get(shake ? "settings.on" : "settings.off"), () =>
-            {
-                if (save == null) return;
-                save.Data.settings.cameraShake = !shake; save.MarkDirty(); Show("settings");
-            });
+                var settings = save.Data.settings;
+                var options = SettingValue(SettingRow(content, "Graphics", "settings.graphics"));
+                var keys = new[] { "settings.graphics.auto", "settings.graphics.low", "settings.graphics.high" };
+                int selected = settings.qualityAuto ? 0 : settings.quality <= 0 ? 1 : 2;
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    int quality = i;
+                    UiFactory.Button(options, "Quality" + i, Loc.Get(keys[i]), () => { settings.qualityAuto = quality == 0; settings.quality = quality == 2 ? 1 : 0; save.MarkDirty(); PlatformGlue.ApplyQuality(); Show("settings"); }, new Vector2(i / 3f, 0f), new Vector2((i + 1f) / 3f, 1f), new Vector2(3f, 0f), new Vector2(-3f, 0f), 24f, selected == i ? UiFactory.Accent : UiFactory.Raised);
+                }
+            }
+            ToggleRow(content, "Shake", "settings.shake", save == null || save.Data.settings.cameraShake, enabled =>
+            { if (save == null) return; save.Data.settings.cameraShake = enabled; save.MarkDirty(); Show("settings"); });
         }
-
-        private void Row(RectTransform root, float y, string label, string value, System.Action onClick)
+        private RectTransform SettingRow(Transform content, string name, string key)
         {
-            UiFactory.Text(root, "L_" + label, label, 34f, TextAlignmentOptions.MidlineLeft, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-520f, y - 40f), new Vector2(100f, y + 40f));
-            UiFactory.Button(root, "V_" + label, value, onClick, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(140f, y - 36f), new Vector2(520f, y + 36f), 28f);
+            var row = Item(content, name, Narrow ? 170f : 122f);
+            Label(row, "Name", Loc.Get(key), 30f, Narrow ? Top : Vector2.zero, Vector2.one, new Vector2(28f, Narrow ? -64f : 16f), new Vector2(Narrow ? -28f : -550f, -16f));
+            return row;
+        }
+        private RectTransform SettingValue(RectTransform row) => UiFactory.Panel(row, "Value", Narrow ? Vector2.zero : new Vector2(1f, 0.5f), Narrow ? new Vector2(1f, 0f) : new Vector2(1f, 0.5f), Narrow ? new Vector2(26f, 22f) : new Vector2(-528f, -34f), Narrow ? new Vector2(-26f, 88f) : new Vector2(-26f, 34f));
+        private void ToggleRow(Transform content, string name, string key, bool enabled, Action<bool> change)
+        {
+            var value = SettingValue(SettingRow(content, name, key));
+            for (int i = 0; i < 2; i++)
+            {
+                bool state = i == 1;
+                UiFactory.Button(value, name + (state ? "On" : "Off"), Loc.Get(state ? "settings.on" : "settings.off"), () => change(state), new Vector2(i * 0.5f, 0f), new Vector2((i + 1) * 0.5f, 1f), new Vector2(3f, 0f), new Vector2(-3f, 0f), 25f, state == enabled ? UiFactory.Accent : UiFactory.Raised);
+            }
         }
 
-        // ---------- leaderboard ----------
         private void BuildLeaders(RectTransform root)
         {
-            Title(root, "lb.title");
-            BackButton(root);
-            var save = PlatformGlue.Save;
-            sb.Clear();
-            sb.AppendLine("<b>" + Loc.Get("lb.local") + "</b>");
-            bool any = false;
-            if (save != null && flow.events != null)
-                foreach (var ev in flow.events)
-                {
-                    if (ev == null) continue;
-                    var b = save.Data.progress.bests.Find(x => x.eventId == ev.eventId);
-                    if (b == null) continue;
-                    any = true;
-                    sb.AppendLine($"{Loc.Get(ev.nameKey),-16} {UiFactory.FormatTime(b.bestTimeMs / 1000.0)}");
-                }
-            if (!any) sb.AppendLine(Loc.Get("lb.empty"));
-            CentreCard(root, 560f, -290f, 290f);
-            var text = UiFactory.Text(root, "Board", sb.ToString(), 30f, TextAlignmentOptions.TopLeft, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-520f, -260f), new Vector2(520f, 260f));
-
-            var p = PlatformGlue.Platform;
-            if (p != null && p.HasFeature(PlatformFeature.Auth) && !p.Player.IsAuthorized)
+            var content = UiFactory.Scroll(Header(root, "lb.title"), "LeadersScroll", Vector2.zero, Vector2.zero);
+            Section(content, "LocalTitle", Loc.Get("lb.local"));
+            int count = 0;
+            foreach (var ev in Events())
             {
-                UiFactory.Text(root, "Hint", Loc.Get("lb.sign_in.hint"), 22f, TextAlignmentOptions.Center, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(-520f, 120f), new Vector2(520f, 180f), new Color(0.8f, 0.8f, 0.8f));
-                UiFactory.Button(root, "SignIn", Loc.Get("lb.sign_in"), async () =>
-                    {
-                        if (authInFlight) return;
-                        authInFlight = true;
-                        try { var r = await p.RequestAuthAsync(); if (this == null) return; if (r.Ok && r.Value) { await PlatformGlue.SubmitAllBestsAsync(); if (this != null && current == "leaders") Show("leaders"); } }
-                        finally { if (this != null) authInFlight = false; }
-                    },
-                    new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(-320f, 40f), new Vector2(320f, 110f), 28f);
+                var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
+                if (best == null) continue;
+                BoardRow(content, "Local_" + ev.eventId, (++count).ToString("00"), Loc.Get(ev.nameKey), UiFactory.FormatTime(best.bestTimeMs / 1000.0), true);
             }
-            else if (p != null && p.Leaderboards != null) FillCloudBoard(text, p.Leaderboards);
+            if (count == 0)
+            {
+                var empty = Item(content, "Empty", 194f);
+                Label(empty, "Message", Loc.Get("lb.empty"), 32f, Top, Vector2.one, new Vector2(28f, -78f), new Vector2(-28f, -20f), UiFactory.Muted, TextAlignmentOptions.Center);
+                UiFactory.Button(empty, "FirstRace", Loc.Get("menu.play") + " ›", () => Show("events"), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(-200f, 26f), new Vector2(200f, 94f), 28f);
+            }
+            var platform = PlatformGlue.Platform;
+            if (platform != null && platform.HasFeature(PlatformFeature.Auth) && !platform.Player.IsAuthorized)
+            {
+                var auth = Item(content, "Account", Narrow ? 220f : 176f);
+                Label(auth, "Hint", Loc.Get("lb.sign_in.hint"), 24f, Top, Vector2.one, new Vector2(28f, -90f), new Vector2(-28f, -18f), UiFactory.Muted);
+                UiFactory.Button(auth, "SignIn", Loc.Get(authInFlight ? "common.loading" : "lb.sign_in"), authInFlight ? null : async () =>
+                {
+                    if (authInFlight) return; authInFlight = true; Show("leaders");
+                    try
+                    {
+                        var result = await platform.RequestAuthAsync();
+                        if (this == null) return;
+                        if (result.Ok && result.Value) await PlatformGlue.SubmitAllBestsAsync();
+                        else Toast(Loc.Get("common.unavailable"));
+                    }
+                    finally { if (this != null) { authInFlight = false; if (current == "leaders") Show("leaders"); } }
+                }, Vector2.zero, new Vector2(1f, 0f), new Vector2(28f, 22f), new Vector2(-28f, 88f), 26f, UiFactory.Raised);
+            }
+            else if (platform?.Leaderboards != null) FillCloudBoard(content, platform.Leaderboards);
         }
-
-        private async void FillCloudBoard(TextMeshProUGUI text, ILeaderboards boards)
+        private static void Section(Transform content, string name, string title)
         {
-            var r = await boards.GetAsync(RaceSetup.BoardName, 10, true, 3);
-            if (!r.Ok || text == null) return;
-            var s = new StringBuilder(text.text);
-            s.AppendLine().AppendLine("<b>" + Loc.Get("lb.title") + "</b>");
-            foreach (var e in r.Value) s.AppendLine($"{e.Rank,3}. {UiFactory.Escape(e.Name),-16} {UiFactory.FormatTime(e.Score / 1000.0)}");
-            text.text = s.ToString();
+            var row = Item(content, name, 52f, false);
+            Label(row, "Title", title, 26f, Vector2.zero, Vector2.one, new Vector2(4f, 0f), Vector2.zero, UiFactory.Accent).fontStyle = FontStyles.Bold;
+        }
+        private static void BoardRow(Transform content, string id, string rank, string name, string time, bool highlight)
+        {
+            var row = Item(content, id, 90f);
+            Label(row, "Rank", rank, 30f, Vector2.zero, new Vector2(0f, 1f), new Vector2(20f, 12f), new Vector2(112f, -12f), highlight ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
+            Label(row, "Name", name, 28f, Vector2.zero, Vector2.one, new Vector2(140f, 12f), new Vector2(-250f, -12f));
+            Label(row, "Time", time, 30f, new Vector2(1f, 0f), Vector2.one, new Vector2(-240f, 12f), new Vector2(-26f, -12f), highlight ? UiFactory.Positive : Color.white, TextAlignmentOptions.MidlineRight);
+        }
+        private async void FillCloudBoard(RectTransform content, ILeaderboards boards)
+        {
+            Section(content, "CloudTitle", Loc.Get("lb.title"));
+            var status = Item(content, "CloudStatus", 90f);
+            var label = Label(status, "Status", Loc.Get("common.loading"), 26f, Vector2.zero, Vector2.one, new Vector2(28f, 12f), new Vector2(-28f, -12f), UiFactory.Muted);
+            var result = await boards.GetAsync(RaceSetup.BoardName, 10, true, 3);
+            if (content == null || !content.gameObject.activeInHierarchy) return;
+            if (!result.Ok) { label.text = Loc.Get("common.unavailable"); return; }
+            if (result.Value == null || result.Value.Count == 0) { label.text = Loc.Get("lb.empty"); return; }
+            status.gameObject.SetActive(false); Destroy(status.gameObject);
+            foreach (var entry in result.Value) BoardRow(content, "Cloud" + entry.Rank, entry.Rank.ToString("00"), UiFactory.Escape(entry.Name), UiFactory.FormatTime(entry.Score / 1000.0), false);
         }
 
-        // ---------- results ----------
         private void BuildResults(RectTransform root)
         {
             var results = race.Results;
             if (results == null) { Show("main"); return; }
-            Title(root, "results.title");
-            CentreCard(root, 560f, -290f, 280f);
-            sb.Clear();
-            foreach (var e in results.Entries)
-            {
-                string me = e.IsPlayer ? " <color=#FFD84A>◄</color>" : "";
-                string time = e.Finished ? UiFactory.FormatTime(e.TotalTime) : Loc.Get("results.dnf");
-                sb.AppendLine($"{e.Position}. {UiFactory.Escape(e.Name),-8}  {time}   {Loc.Format("results.best_lap", "t", UiFactory.FormatTime(e.BestLap))}   {Loc.Format("results.kills", "k", e.Kills, "d", e.Deaths)}{me}");
-            }
-            UiFactory.Text(root, "Table", sb.ToString(), 30f, TextAlignmentOptions.TopLeft, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-520f, -80f), new Vector2(520f, 250f));
+            var content = UiFactory.Scroll(Header(root, "results.title"), "ResultsScroll", Vector2.zero, Vector2.zero);
             int reward = flow.LastReward * (flow.LastRewardDoubled ? 2 : 1);
-            UiFactory.Text(root, "Reward", Loc.Format("results.reward", "n", reward) + "   " + Coins(), 36f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-520f, -150f), new Vector2(520f, -90f), new Color(1f, 0.85f, 0.2f));
+            var summary = Item(content, "Summary", 160f);
+            Label(summary, "Place", results.Player != null ? "#" + results.Player.Position : "—", 80f, Vector2.zero, new Vector2(0f, 1f), new Vector2(28f, 18f), new Vector2(198f, -18f), UiFactory.Accent, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
+            Label(summary, "Reward", Loc.Format("results.reward", "n", reward), 40f, Vector2.zero, Vector2.one, new Vector2(234f, 64f), new Vector2(-28f, -22f), UiFactory.Accent).fontStyle = FontStyles.Bold;
+            Label(summary, "Detail", flow.LastRewardDoubled ? Loc.Get("results.doubled") : flow.CurrentEvent != null ? Loc.Get(flow.CurrentEvent.nameKey) : Loc.Get("results.title"), 26f, Vector2.zero, Vector2.one, new Vector2(234f, 22f), new Vector2(-28f, -92f), UiFactory.Muted);
+            var actions = Item(content, "Actions", 76f, false);
+            var keys = new[] { "results.next", "results.retry", "menu.garage" };
+            Action[] clicks = { () => GoTo("events"), () => flow.RetryRace(), () => GoTo("garage") };
+            for (int i = 0; i < keys.Length; i++) UiFactory.Button(actions, "ResultAction" + i, Loc.Get(keys[i]), clicks[i], new Vector2(i / 3f, 0f), new Vector2((i + 1f) / 3f, 1f), new Vector2(4f, 0f), new Vector2(-8f, 0f), 28f, i == 0 ? UiFactory.Accent : UiFactory.Raised);
             var ads = PlatformGlue.Platform?.Ads;
-            float x = -500f;
             if (!flow.LastRewardDoubled && flow.LastRewardFinished && flow.LastReward > 0 && ads != null && ads.IsRewardedAvailable)
             {
-                UiFactory.Button(root, "Double", Loc.Get("results.double"), () => flow.DoubleReward(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(x, -260f), new Vector2(x + 330f, -180f), 26f, new Color(0.35f, 0.75f, 0.35f, 0.95f));
-                x += 350f;
+                var ad = Item(content, "RewardAction", 68f, false);
+                rewardButton = UiFactory.Button(ad, "Double", Loc.Get("results.double"), () => flow.DoubleReward(), Vector2.zero, Vector2.one, new Vector2(4f, 0f), new Vector2(-8f, 0f), 26f, UiFactory.Positive);
             }
-            UiFactory.Button(root, "Retry", Loc.Get("results.retry"), () => flow.RetryRace(), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(x, -260f), new Vector2(x + 220f, -180f), 28f);
-            x += 240f;
-            UiFactory.Button(root, "Next", Loc.Get("results.next"), () => GoTo("events"), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(x, -260f), new Vector2(x + 220f, -180f), 28f);
-            x += 240f;
-            UiFactory.Button(root, "Garage", Loc.Get("menu.garage"), () => GoTo("garage"), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(x, -260f), new Vector2(x + 220f, -180f), 28f, new Color(0.35f, 0.38f, 0.45f, 0.95f));
+            foreach (var entry in results.Entries)
+            {
+                var row = Item(content, "Result" + entry.Position, Narrow ? 156f : 126f);
+                if (entry.IsPlayer) UiFactory.Panel(row, "Accent", Vector2.zero, new Vector2(0f, 1f), new Vector2(0f, 14f), new Vector2(4f, -14f), UiFactory.Accent, false);
+                Label(row, "Rank", entry.Position.ToString("00"), 42f, Vector2.zero, new Vector2(0f, 1f), new Vector2(22f, 18f), new Vector2(112f, -18f), entry.IsPlayer ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
+                Label(row, "Name", UiFactory.Escape(entry.Name), 30f, Top, Vector2.one, new Vector2(140f, -62f), new Vector2(-244f, -16f)).fontStyle = FontStyles.Bold;
+                Label(row, "Detail", Loc.Format("results.best_lap", "t", UiFactory.FormatTime(entry.BestLap)) + "   /   " + Loc.Format("results.kills", "k", entry.Kills, "d", entry.Deaths), 22f, Vector2.zero, Vector2.one, new Vector2(140f, 16f), new Vector2(-244f, -68f), UiFactory.Muted);
+                Label(row, "Time", entry.Finished ? UiFactory.FormatTime(entry.TotalTime) : Loc.Get("results.dnf"), 30f, new Vector2(1f, 0f), Vector2.one, new Vector2(-238f, 18f), new Vector2(-26f, -18f), entry.IsPlayer ? UiFactory.Positive : Color.white, TextAlignmentOptions.MidlineRight);
+            }
         }
     }
 }

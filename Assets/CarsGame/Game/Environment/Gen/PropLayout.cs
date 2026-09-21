@@ -19,6 +19,7 @@ namespace RacingGame.World.Gen
 
         public const float ColliderTreeDistance = 25f;
         public const float ClearCorridor = 12f;      // nothing generated closer than this to the centre line (barriers sit at ~6 m)
+        public const float GrandstandLateral = 16f;  // front edge of the stand, metres right of the centre line
 
         public static PropLayout Build(TrackSpline spline, IList<Vector3> authoredTrees, float startLineDistance, int seed, float groveRingMin = 55f, float groveRingMax = 240f, int newTreeCap = 90)
         {
@@ -27,12 +28,25 @@ namespace RacingGame.World.Gen
             var rnd = new System.Random(seed);
             float Next() => (float)rnd.NextDouble();
 
+            // 0. Grandstand along the start straight, right side: the left side is only ~25 m from the returning back section.
+            float standD = startLineDistance + 6f;
+            {
+                Vector3 pos = spline.Position(standD) + spline.Right(standD) * GrandstandLateral; pos.y = 0f;
+                layout.Grandstand = new GrandstandPlacement { Position = pos, Forward = -spline.Right(standD), Length = 44f };
+            }
+            bool InStand(Vector3 p)
+            {
+                Vector3 rel = p - layout.Grandstand.Position; rel.y = 0f;
+                float along = Vector3.Dot(rel, spline.Tangent(standD)), back = -Vector3.Dot(rel, layout.Grandstand.Forward);
+                return Mathf.Abs(along) < layout.Grandstand.Length * 0.5f + 4f && back > -8f && back < 16f;
+            }
+
             // 1. Authored trees (scene positions) keep their spots, with regenerated scale/tint.
             var placed = new List<Vector3>();
             foreach (var p in authoredTrees)
             {
                 float d = TerrainMeshGen.DistanceToTrack(spline, p);
-                if (d < ClearCorridor) continue;
+                if (d < ClearCorridor || InStand(p)) continue;
                 layout.Trees.Add(new TreePlacement { Position = new Vector3(p.x, 0f, p.z), Scale = 0.85f + Next() * 0.4f, Yaw = Next() * 360f, Shade = rnd.Next(0, 4), DistToTrack = d });
                 placed.Add(p);
             }
@@ -45,7 +59,7 @@ namespace RacingGame.World.Gen
                 float ang = Next() * Mathf.PI * 2f, rad = 40f + Next() * 320f;
                 var p = new Vector3(centre.x + Mathf.Cos(ang) * rad, 0f, centre.y + Mathf.Sin(ang) * rad);
                 float d = TerrainMeshGen.DistanceToTrack(spline, p);
-                if (d < groveRingMin || d > groveRingMax) continue;
+                if (d < groveRingMin || d > groveRingMax || InStand(p)) continue;
                 if (noise.Value(p.x * 0.012f, p.z * 0.012f, 21) < 0.56f) continue;      // clusters
                 bool tooClose = false;
                 foreach (var q in placed) if ((q - p).sqrMagnitude < 8f * 8f) { tooClose = true; break; }
@@ -77,13 +91,6 @@ namespace RacingGame.World.Gen
                 Vector3 r = spline.Right(d), tan = spline.Tangent(d);
                 Vector3 pos = spline.Position(d) + r * 8.6f; pos.y = 0f;
                 layout.Lamps.Add(new LampPlacement { Position = pos, TowardsTrack = -r, Along = tan, LateralToRoad = 8.6f });
-            }
-
-            // 5. Grandstand along the start straight, left side.
-            {
-                float d = startLineDistance + 6f;
-                Vector3 pos = spline.Position(d) - spline.Right(d) * 15f; pos.y = 0f;
-                layout.Grandstand = new GrandstandPlacement { Position = pos, Forward = spline.Right(d), Length = 44f };
             }
             return layout;
         }

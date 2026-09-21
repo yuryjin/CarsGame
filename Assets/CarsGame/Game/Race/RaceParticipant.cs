@@ -24,6 +24,8 @@ namespace RacingGame
         public KillTally KillTally { get; } = new KillTally();
         public int Kills => KillTally.Total;
         public int Deaths { get; set; }
+        public int EliminatedAtTick { get; private set; } = int.MaxValue;
+        public ArenaLayout Arena { get; set; }
         [Tooltip("Seconds off the asphalt before the car is put back on the track automatically.")]
         public float offTrackResetSeconds = 5f;
         [Tooltip("Lateral distance (m) from the centre line that counts as lost.")]
@@ -57,6 +59,7 @@ namespace RacingGame
         // grass must never have to find the track again (and AI reuse the same rule).
         private void FixedUpdate()
         {
+            if (Arena != null) return;
             if (Car == null || !Car.inputEnabled || Progress == null || Progress.Path == null) return;
             if (Health != null && Health.IsDead) return;
             bool offAsphalt = Car.Surface == GroundSurface.Ground || (Car.Surface == GroundSurface.None && Car.IsGrounded == false && transform.position.y > -5f);
@@ -75,6 +78,7 @@ namespace RacingGame
         private void OnDied(GameObject attacker)
         {
             Deaths++;
+            EliminatedAtTick = SimulationDriver.Instance.Tick;
             if (attacker != null)
             {
                 var other = attacker.GetComponent<RaceParticipant>();
@@ -88,6 +92,7 @@ namespace RacingGame
         /// </summary>
         public bool TryGetRespawnPose(out Vector3 position, out Quaternion rotation)
         {
+            if (Arena != null) return Arena.TryGetRecoveryPose(Car, out position, out rotation);
             position = default; rotation = default;
             var path = Progress != null ? Progress.Path : TrackPath.Instance;
             if (path == null || Progress == null) return false;

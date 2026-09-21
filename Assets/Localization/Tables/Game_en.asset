@@ -337,6 +337,42 @@ MonoBehaviour:
     m_Localized: BRAKE
     m_Metadata:
       m_Items: []
+  - m_Id: 5803307084099617
+    m_Localized: Wrecked {name}!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099618
+    m_Localized: Wrecked by {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099653
+    m_Localized: Graphics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099654
+    m_Localized: Auto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099655
+    m_Localized: Low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099656
+    m_Localized: High
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099657
+    m_Localized: Camera shake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099667
+    m_Localized: Temporarily unavailable. Try again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5803307084099668
+    m_Localized: Ammo {cur}/{max}
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -7,6 +7,13 @@ namespace RacingGame
     /// <summary>Small helpers to build the runtime UGUI/TMP hierarchy from code (no prefabs yet).</summary>
     public static class UiFactory
     {
+        public static readonly Color Ink = new Color(0.035f, 0.05f, 0.08f);
+        public static readonly Color Surface = new Color(0.065f, 0.085f, 0.12f, 0.97f);
+        public static readonly Color Raised = new Color(0.13f, 0.17f, 0.23f);
+        public static readonly Color Muted = new Color(0.68f, 0.75f, 0.83f);
+        public static readonly Color Accent = new Color(1f, 0.8f, 0.25f);
+        public static readonly Color Positive = new Color(0.25f, 0.9f, 0.7f);
+
         public static Canvas CreateOverlayCanvas(string name, int sortingOrder = 0)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -62,8 +69,14 @@ namespace RacingGame
         }
 
         /// <summary>Translucent card behind a group of controls so the moving backdrop stays visible around it.</summary>
-        public static RectTransform Card(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, float alpha = 0.62f)
-            => Panel(parent, name, anchorMin, anchorMax, offsetMin, offsetMax, new Color(0.03f, 0.05f, 0.09f, alpha));
+        public static RectTransform Card(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, float alpha = 0.97f)
+        {
+            var rt = Panel(parent, name, anchorMin, anchorMax, offsetMin, offsetMax, new Color(Surface.r, Surface.g, Surface.b, alpha));
+            var edge = rt.gameObject.AddComponent<Outline>();
+            edge.effectColor = new Color(0.45f, 0.58f, 0.75f, 0.18f);
+            edge.effectDistance = new Vector2(1f, -1f);
+            return rt;
+        }
 
         public static TextMeshProUGUI Text(Transform parent, string name, string text, float size, TextAlignmentOptions align,
             Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, Color? color = null)
@@ -91,17 +104,51 @@ namespace RacingGame
 
         public static Button Button(Transform parent, string name, string label, System.Action onClick, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, float fontSize = 34f, Color? color = null)
         {
-            // Soft drop shadow, then the rounded face.
-            Panel(parent, name + "_Shadow", anchorMin, anchorMax, offsetMin + new Vector2(0f, -5f), offsetMax + new Vector2(0f, -5f), new Color(0f, 0f, 0f, 0.35f));
-            var rt = Panel(parent, name, anchorMin, anchorMax, offsetMin, offsetMax, color ?? new Color(0.98f, 0.80f, 0.22f, 0.97f));
+            Color face = color ?? Accent;
+            var rt = Panel(parent, name, anchorMin, anchorMax, offsetMin, offsetMax, face);
             var img = rt.GetComponent<Image>(); img.raycastTarget = true;
             var btn = rt.gameObject.AddComponent<Button>();
-            var colors = btn.colors; colors.highlightedColor = new Color(1.1f, 1.1f, 1.1f, 1f); colors.pressedColor = new Color(0.82f, 0.82f, 0.82f, 1f); colors.fadeDuration = 0.08f; btn.colors = colors;
-            var text = Text(rt, "Label", label, fontSize, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, new Vector2(8f, 4f), new Vector2(-8f, -4f), new Color(0.1f, 0.08f, 0.02f));
+            var colors = btn.colors;
+            colors.highlightedColor = colors.selectedColor = new Color(1.3f, 1.3f, 1.3f, 1f);
+            colors.pressedColor = new Color(0.72f, 0.72f, 0.72f, 1f);
+            colors.disabledColor = new Color(0.6f, 0.6f, 0.6f, 1f);
+            colors.fadeDuration = 0.12f; btn.colors = colors;
+            var text = Text(rt, "Label", label, fontSize, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, new Vector2(20f, 10f), new Vector2(-20f, -10f), face.grayscale > 0.5f ? Ink : Color.white);
             text.outlineWidth = 0f;
             text.enableAutoSizing = true; text.fontSizeMax = fontSize; text.fontSizeMin = Mathf.Max(14f, fontSize * 0.5f);   // long translations shrink instead of escaping the button
+            text.fontStyle = FontStyles.Bold;
+            btn.interactable = onClick != null;
             if (onClick != null) btn.onClick.AddListener(() => onClick());
+            rt.gameObject.AddComponent<UiButtonFx>();
             return btn;
+        }
+
+        /// <summary>Native scrolling, clipping and layout for lists of any length or viewport size.</summary>
+        public static RectTransform Scroll(Transform parent, string name, Vector2 offsetMin, Vector2 offsetMax)
+        {
+            var root = Panel(parent, name, Vector2.zero, Vector2.one, offsetMin, offsetMax);
+            var scroll = root.gameObject.AddComponent<ScrollRect>();
+            var viewport = Panel(root, "Viewport", Vector2.zero, Vector2.one, Vector2.zero, new Vector2(-18f, 0f), Color.clear, false);
+            viewport.GetComponent<Image>().raycastTarget = true;
+            viewport.gameObject.AddComponent<RectMask2D>();
+            var content = Panel(viewport, "Content", new Vector2(0f, 1f), Vector2.one, Vector2.zero, Vector2.zero);
+            content.pivot = new Vector2(0.5f, 1f);
+            var layout = content.gameObject.AddComponent<VerticalLayoutGroup>();
+            layout.spacing = 16f; layout.padding = new RectOffset(4, 4, 4, 4);
+            layout.childControlHeight = true; layout.childForceExpandHeight = false;
+            layout.childControlWidth = true; layout.childForceExpandWidth = true;
+            content.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            scroll.viewport = viewport; scroll.content = content; scroll.horizontal = false;
+            scroll.movementType = ScrollRect.MovementType.Clamped; scroll.scrollSensitivity = 42f;
+            var track = Panel(root, "Scrollbar", new Vector2(1f, 0f), Vector2.one, new Vector2(-6f, 4f), new Vector2(0f, -4f), Raised);
+            var handle = Panel(track, "Handle", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Muted);
+            var bar = track.gameObject.AddComponent<Scrollbar>();
+            bar.handleRect = handle; bar.targetGraphic = handle.GetComponent<Image>();
+            track.GetComponent<Image>().raycastTarget = handle.GetComponent<Image>().raycastTarget = true;
+            bar.direction = Scrollbar.Direction.BottomToTop;
+            bar.navigation = new Navigation { mode = Navigation.Mode.None };
+            scroll.verticalScrollbar = bar; scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+            return content;
         }
 
         /// <summary>Player names come from the platform: neutralise TMP rich-text tags.</summary>
