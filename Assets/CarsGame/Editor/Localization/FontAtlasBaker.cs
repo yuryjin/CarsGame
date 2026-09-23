@@ -15,6 +15,8 @@ namespace RacingGame.EditorTools
     public static class FontAtlasBaker
     {
         private const string FontsDir = "Assets/CarsGame/Fonts";
+        /// <summary>Glyphs the UI code draws that the default font does not have (the subset TTF must contain them).</summary>
+        public const string UiSymbols = "★☆";
 
         [MenuItem("Racing/Localization/Bake CJK font atlas")]
         public static void BakeMenu() => Debug.Log(BakeChinese());
@@ -26,10 +28,12 @@ namespace RacingGame.EditorTools
             // FontEngine caches faces natively; after the TTF is reimported the stale face yields no glyphs.
             FontEngine.UnloadAllFontFaces();
 
-            // Characters: every non-Latin/Cyrillic char from all translations + digits/punctuation.
-            var chars = new StringBuilder("0123456789:%/.,!?()+-—·…");
+            // Characters: every non-Latin/Cyrillic char from all translations + digits/punctuation, plus
+            // symbols (arrows, shapes, stars) that LiberationSans lacks — the stars are also built in code.
+            var chars = new StringBuilder("0123456789:%/.,!?()+-—·…" + UiSymbols);
             foreach (var line in File.ReadAllLines(LocImporter.CsvPath, Encoding.UTF8))
-                foreach (char c in line) if (c > 0x2E80 && chars.ToString().IndexOf(c) < 0) chars.Append(c);
+                foreach (char c in line)
+                    if ((c > 0x2E80 || (c >= 0x2190 && c <= 0x2BFF)) && chars.ToString().IndexOf(c) < 0) chars.Append(c);
 
             var asset = TMP_FontAsset.CreateFontAsset(font, 36, 5, GlyphRenderMode.SDFAA, 1024, 1024, AtlasPopulationMode.Dynamic, false);
             asset.name = "NotoSansSC-Subset SDF";

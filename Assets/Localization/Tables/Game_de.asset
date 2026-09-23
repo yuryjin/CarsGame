@@ -159,8 +159,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094623
-    m_Localized: "Gas: W oder Pfeil hoch    Lenken: A/D oder Pfeile\nBremse: Leertaste   
-      Feuer: Strg oder LMT\nZur\xFCck auf die Strecke: R    Pause: Esc"
+    m_Localized: "Gas: W oder Pfeil hoch    Lenken: A/D oder Pfeile\r\nBremse: Leertaste   
+      Feuer: Strg oder LMT\r\nZur\xFCck auf die Strecke: R    Pause: Esc"
     m_Metadata:
       m_Items: []
   - m_Id: 4010094624
@@ -367,6 +367,94 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5803307084099668
     m_Localized: Munition {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528248500224
+    m_Localized: "\u2605 {s}/{max}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860352
+    m_Localized: Top-3-Platzierung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860353
+    m_Localized: 2 Rivalen zerlegen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860354
+    m_Localized: "Keine Zerst\xF6rung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860355
+    m_Localized: STERNE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860356
+    m_Localized: +{n} HP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860357
+    m_Localized: "MUNITION AUFGEF\xDCLLT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860358
+    m_Localized: NITRO!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860359
+    m_Localized: "Gras bremst \u2014 bleib auf dem Asphalt"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860360
+    m_Localized: "Du wirst beschossen! Bleib in Bewegung, schie\xDF zur\xFCck"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860361
+    m_Localized: "Ziel erfasst \u2014 Feuer: Strg oder LMT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860362
+    m_Localized: "Ziel erfasst \u2014 tippe auf FEUER"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860363
+    m_Localized: "Gr\xFCne Pickups reparieren dein Auto"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860364
+    m_Localized: Gelbe Pickups laden deine Kanone nach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860365
+    m_Localized: Blaue Pickups geben einen Speed-Boost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860366
+    m_Localized: Rekord aufgestellt!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054656
+    m_Localized: "Neuer Rekord! \u2212{t} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054657
+    m_Localized: +{t} s zum Rekord
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054658
+    m_Localized: 'Freigeschaltet: {name}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054659
+    m_Localized: In der Garage wartet ein Upgrade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054660
+    m_Localized: "Noch {n} M\xFCnzen bis zum Upgrade"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7348941066248192
+    m_Localized: PERFEKTER START!
     m_Metadata:
       m_Items: []
   references:

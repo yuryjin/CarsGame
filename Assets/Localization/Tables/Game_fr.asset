@@ -159,8 +159,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094623
-    m_Localized: "Acc\xE9l\xE9rer : W ou Haut    Diriger : A/D ou fl\xE8ches\nFrein
-      : Espace    Tir : Ctrl ou clic gauche\nRetour piste : R    Pause : \xC9chap"
+    m_Localized: "Acc\xE9l\xE9rer : W ou Haut    Diriger : A/D ou fl\xE8ches\r\nFrein
+      : Espace    Tir : Ctrl ou clic gauche\r\nRetour piste : R    Pause : \xC9chap"
     m_Metadata:
       m_Items: []
   - m_Id: 4010094624
@@ -367,6 +367,94 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5803307084099668
     m_Localized: Munitions {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528248500224
+    m_Localized: "\u2605 {s}/{max}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860352
+    m_Localized: "Top 3 \xE0 l'arriv\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860353
+    m_Localized: "D\xE9truis 2 rivaux"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860354
+    m_Localized: Sans accident
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860355
+    m_Localized: "\xC9TOILES"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860356
+    m_Localized: +{n} PV
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860357
+    m_Localized: "MUNITIONS RECHARG\xC9ES"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860358
+    m_Localized: NITRO !
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860359
+    m_Localized: 'L''herbe ralentit : reste sur l''asphalte'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860360
+    m_Localized: On te tire dessus ! Bouge et riposte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860361
+    m_Localized: "Cible verrouill\xE9e : tir avec Ctrl ou clic gauche"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860362
+    m_Localized: "Cible verrouill\xE9e : appuie sur TIR"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860363
+    m_Localized: "Les bonus verts r\xE9parent ta voiture"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860364
+    m_Localized: Les bonus jaunes rechargent ton canon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860365
+    m_Localized: Les bonus bleus donnent un coup de boost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860366
+    m_Localized: "Record \xE9tabli !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054656
+    m_Localized: "Nouveau record ! \u2212{t} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054657
+    m_Localized: +{t} s sur ton record
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054658
+    m_Localized: "D\xE9bloqu\xE9 : {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054659
+    m_Localized: "Une am\xE9lioration t'attend au garage"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054660
+    m_Localized: "Encore {n} pi\xE8ces pour l'am\xE9lioration"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7348941066248192
+    m_Localized: "D\xC9PART PARFAIT !"
     m_Metadata:
       m_Items: []
   references:

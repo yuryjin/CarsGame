@@ -373,6 +373,94 @@ MonoBehaviour:
     m_Localized: "Munici\xF3n {cur}/{max}"
     m_Metadata:
       m_Items: []
+  - m_Id: 7347528248500224
+    m_Localized: "\u2605 {s}/{max}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860352
+    m_Localized: Top 3 en meta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860353
+    m_Localized: Destruye 2 rivales
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860354
+    m_Localized: Sin accidentes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860355
+    m_Localized: ESTRELLAS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860356
+    m_Localized: +{n} HP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860357
+    m_Localized: "MUNICI\xD3N RECARGADA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860358
+    m_Localized: "\xA1NITRO!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860359
+    m_Localized: "El c\xE9sped te frena: sigue en el asfalto"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860360
+    m_Localized: "\xA1Te disparan! Mu\xE9vete y devuelve el fuego"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860361
+    m_Localized: 'Objetivo fijado: dispara con Ctrl o clic izq.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860362
+    m_Localized: 'Objetivo fijado: toca DISPARO'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860363
+    m_Localized: Los objetos verdes reparan tu coche
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860364
+    m_Localized: "Los objetos amarillos recargan tu ca\xF1\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860365
+    m_Localized: "Los objetos azules dan un aceler\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860366
+    m_Localized: "\xA1R\xE9cord establecido!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054656
+    m_Localized: "\xA1Nuevo r\xE9cord! \u2212{t} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054657
+    m_Localized: "+{t} s de tu r\xE9cord"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054658
+    m_Localized: 'Desbloqueado: {name}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054659
+    m_Localized: Hay una mejora lista en el garaje
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054660
+    m_Localized: Faltan {n} monedas para la mejora
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7348941066248192
+    m_Localized: "\xA1SALIDA PERFECTA!"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

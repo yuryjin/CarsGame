@@ -81,6 +81,17 @@ garage.level,{lvl}/{max},16,Lv {lvl}/{max},Ур. {lvl}/{max},Sv {lvl}/{max},等�
 garage.buy,{cost},12,Buy · {cost},Купить · {cost},Satın al · {cost},购买 · {cost},Kaufen · {cost},Comprar · {cost},Acheter · {cost},Comprar · {cost},Купити · {cost}
 garage.max,,8,MAX,МАКС,MAKS,已满级,MAX,MÁX,MAX,MÁX,МАКС
 garage.not_enough,,20,Not enough coins,Не хватает монет,Yeterli para yok,金币不足,Nicht genug Münzen,Monedas insuficientes,Pas assez de pièces,Moedas insuficientes,Не вистачає монет
+garage.upgrades,section header,12,UPGRADES,УЛУЧШЕНИЯ,YÜKSELTMELER,车辆升级,VERBESSERUNGEN,MEJORAS,AMÉLIORATIONS,MELHORIAS,ПОКРАЩЕННЯ
+garage.weapons,section header,12,WEAPONS,ОРУЖИЕ,SİLAHLAR,武器装备,WAFFEN,ARMAS,ARMEMENT,ARMAS,ЗБРОЯ
+garage.equip,button,10,Equip,Выбрать,Kuşan,装备,Ausrüsten,Equipar,Équiper,Equipar,Обрати
+garage.equipped,button status,10,EQUIPPED,ВЫБРАНО,KUŞANILDI,已装备,AUSGERÜSTET,EQUIPADO,ÉQUIPÉ,EQUIPADO,ОБРАНО
+garage.locked,status,10,Locked,Закрыто,Kilitli,未解锁,Gesperrt,Bloqueado,Verrouillé,Bloqueado,Заблоковано
+garage.mines,weapon name,12,Mines,Мины,Mayınlar,接触地雷,Minen,Minas,Mines,Minas,Міни
+garage.mines.desc,weapon description,60,Drop explosive contact mines behind your car,Сброс контактных мин позади машины,Arkana patlayıcı temas mayınları bırak,在车后放置爆炸性接触地雷,Explosive Kontaktminen hinter dem Auto abwerfen,Suelta minas de contacto explosivas tras tu coche,Larguez des mines explosives derrière votre véhicule,Solte minas de contato explosivas atrás do carro,Скидання контактних мін позаду машини
+garage.freezelauncher,weapon name,14,Cryo Launcher,Заморозка,Dondurucu,冷冻发射器,Kryo-Werfer,Lanzacongelación,Lance-cryo,Lança-gelo,Кріо-гармата
+garage.freezelauncher.desc,weapon description,60,Fire cryogenic shells to freeze rivals,Стрельба крио-снарядами для заморозки соперников,Rakipleri dondurmak için dondurucu mermiler ateşle,发射冷冻弹冰冻对手,Kryo-Geschosse abfeuern um Gegner einzufrieren,Dispara proyectiles criogénicos para congelar rivales,Tirez des obus cryogéniques pour geler vos rivaux,Dispare projéteis criogênicos para congelar rivais,Стрільба кріо-снарядами для заморозки суперників
+garage.machinegun,weapon name,14,Machine Gun,Пулемёт,Makineli Tüfek,速射机枪,Maschinengewehr,Ametralladora,Mitrailleuse,Metralhadora,К��лемет
+garage.machinegun.desc,weapon description,60,Rapid-fire primary weapon prone to overheating,Скорострельное основное оружие с риском перегрева,Aşırı ısınabilen seri birincil silah,易过热的速射主武器,Schnellfeuer-Primärwaffe mit Überhitzungsgefahr,Arma principal de disparo rápido con sobrecalentamiento,Arme principale à tir rapide sujette à surchauffe,Arma principal de tiro rápido com superaquecimento,Швидкострільна основна зброя з ризиком перегріву
 settings.title,,10,SETTINGS,НАСТРОЙКИ,AYARLAR,设置,EINSTELLUNGEN,AJUSTES,OPTIONS,OPÇÕES,НАЛАШТУВАННЯ
 settings.language,,12,Language,Язык,Dil,语言,Sprache,Idioma,Langue,Idioma,Мова
 settings.language.system,follow platform,20,As on platform,Как на платформе,Platformdaki gibi,跟随平台,Wie Plattform,Como la plataforma,Comme la plateforme,Como a plataforma,Як на платформі
@@ -104,3 +115,35 @@ touch.fire,touch button,8,FIRE,ОГОНЬ,ATEŞ,开火,FEUER,FUEGO,TIR,FOGO,ВО
 touch.brake,touch button,8,BRAKE,ТОРМОЗ,FREN,刹车,BREMSE,FRENO,FREIN,FREIO,ГАЛЬМО
 common.unavailable,temporary service failure,50,Temporarily unavailable. Try again.,Временно недоступно. Попробуйте ещё раз.,Geçici olarak kullanılamıyor. Tekrar deneyin.,暂时不可用。请重试。,Vorübergehend nicht verfügbar. Erneut versuchen.,No disponible temporalmente. Inténtalo de nuevo.,Indisponible pour le moment. Réessayez.,Indisponível no momento. Tente novamente.,Тимчасово недоступно. Спробуйте ще раз.
 hud.ammo,ammo counter,24,Ammo {cur}/{max},Боезапас {cur}/{max},Mermi {cur}/{max},弹药 {cur}/{max},Munition {cur}/{max},Munición {cur}/{max},Munitions {cur}/{max},Munição {cur}/{max},Боєзапас {cur}/{max}
+events.stars,stars label,12,★ {s}/{max},★ {s}/{max},★ {s}/{max},★ {s}/{max},★ {s}/{max},★ {s}/{max},★ {s}/{max},★ {s}/{max},★ {s}/{max}
+events.star1,star 1 condition,30,Top 3 finish,Топ-3 на финише,İlk 3'e gir,前三名完赛,Top-3-Platzierung,Top 3 en meta,Top 3 à l'arrivée,Top 3 na chegada,Топ-3 на фініші
+events.star2,star 2 condition,30,Destroy 2 rivals,Разбейте 2 соперников,2 rakip yok et,击毁2名对手,2 Rivalen zerlegen,Destruye 2 rivales,Détruis 2 rivaux,Destrua 2 rivais,Розбийте 2 суперників
+events.star3,star 3 condition,30,No wrecks,Без аварий,Kaza yapmadan bitir,无损完赛,Keine Zerstörung,Sin accidentes,Sans accident,Sem acidentes,Без аварій
+results.stars,results stars header,16,STARS,ЗВЁЗДЫ,YILDIZLAR,星级,STERNE,ESTRELLAS,ÉTOILES,ESTRELAS,ЗІРКИ
+pickup.health,pickup toast {n} = hp,12,+{n} HP,+{n} HP,+{n} HP,+{n} 生命,+{n} HP,+{n} HP,+{n} PV,+{n} HP,+{n} HP
+pickup.ammo,pickup toast,24,AMMO REFILLED,БОЕЗАПАС ПОПОЛНЕН,MERMİ DOLDU,弹药已补满,MUNITION AUFGEFÜLLT,MUNICIÓN RECARGADA,MUNITIONS RECHARGÉES,MUNIÇÃO RECARREGADA,БОЄЗАПАС ПОПОВНЕНО
+pickup.nitro,pickup toast,12,NITRO!,НИТРО!,NİTRO!,氮气加速！,NITRO!,¡NITRO!,NITRO !,NITRO!,НІТРО!
+hint.grass,first time on grass,60,Grass slows you down — stay on the asphalt,Трава тормозит — держитесь асфальта,Çim yavaşlatır — asfaltta kal,草地会减速——请留在柏油路上,Gras bremst — bleib auf dem Asphalt,El césped te frena: sigue en el asfalto,L'herbe ralentit : reste sur l'asphalte,A grama te freia — fique no asfalto,Трава гальмує — тримайтеся асфальту
+hint.under_fire,first shell hit on the player,60,You're under fire! Keep moving and shoot back,По вам стреляют! Не стойте и отвечайте,"Ateş altındasın! Hareket et, karşılık ver",你正遭到攻击！保持移动并还击,"Du wirst beschossen! Bleib in Bewegung, schieß zurück",¡Te disparan! Muévete y devuelve el fuego,On te tire dessus ! Bouge et riposte,Você está sob fogo! Mexa-se e revide,По вас стріляють! Рухайтеся й відповідайте
+hint.aim.keys,"target locked, keyboard",60,Target locked — press Ctrl or LMB to fire,Цель в прицеле — огонь: Ctrl или ЛКМ,Hedef kilitli — ateş: Ctrl veya sol tık,已锁定目标——按 Ctrl 或鼠标左键开火,Ziel erfasst — Feuer: Strg oder LMT,Objetivo fijado: dispara con Ctrl o clic izq.,Cible verrouillée : tir avec Ctrl ou clic gauche,Alvo travado — atire com Ctrl ou botão esq.,Ціль у прицілі — вогонь: Ctrl або ЛКМ
+hint.aim.touch,"target locked, touch",60,Target locked — tap FIRE,Цель в прицеле — жмите ОГОНЬ,Hedef kilitli — ATEŞ'e dokun,已锁定目标——点击开火,Ziel erfasst — tippe auf FEUER,Objetivo fijado: toca DISPARO,Cible verrouillée : appuie sur TIR,Alvo travado — toque em ATIRAR,Ціль у прицілі — тисніть ВОГОНЬ
+hint.pickup.health,first repair pickup,60,Green pickups repair your car,Зелёные бонусы чинят машину,Yeşil bonuslar aracını onarır,绿色道具可以修复车辆,Grüne Pickups reparieren dein Auto,Los objetos verdes reparan tu coche,Les bonus verts réparent ta voiture,Itens verdes consertam seu carro,Зелені бонуси лагодять машину
+hint.pickup.ammo,first ammo pickup,60,Yellow pickups refill your cannon,Жёлтые бонусы пополняют пушку,Sarı bonuslar topunu doldurur,黄色道具可以补充弹药,Gelbe Pickups laden deine Kanone nach,Los objetos amarillos recargan tu cañón,Les bonus jaunes rechargent ton canon,Itens amarelos recarregam seu canhão,Жовті бонуси поповнюють гармату
+hint.pickup.nitro,first nitro pickup,60,Blue pickups give a burst of speed,Синие бонусы дают ускорение,Mavi bonuslar hız verir,蓝色道具提供加速,Blaue Pickups geben einen Speed-Boost,Los objetos azules dan un acelerón,Les bonus bleus donnent un coup de boost,Itens azuis dão um impulso de velocidade,Сині бонуси дають прискорення
+results.pb_first,first finish of an event,30,Record set!,Рекорд установлен!,Rekor kırıldı!,创造纪录！,Rekord aufgestellt!,¡Récord establecido!,Record établi !,Recorde definido!,Рекорд встановлено!
+results.pb_new,"new record, {t} = seconds faster",30,New record! −{t} s,Новый рекорд! −{t} с,Yeni rekor! −{t} sn,新纪录！快了 {t} 秒,Neuer Rekord! −{t} s,¡Nuevo récord! −{t} s,Nouveau record ! −{t} s,Novo recorde! −{t} s,Новий рекорд! −{t} с
+results.pb_behind,{t} = seconds slower than the record,30,+{t} s to your record,+{t} с до рекорда,Rekora +{t} sn,比纪录慢 {t} 秒,+{t} s zum Rekord,+{t} s de tu récord,+{t} s sur ton record,+{t} s do seu recorde,+{t} с до рекорду
+results.unlocked,"toast, {name} = event",40,Unlocked: {name},Открыто: {name},Açıldı: {name},已解锁：{name},Freigeschaltet: {name},Desbloqueado: {name},Débloqué : {name},Desbloqueado: {name},Відкрито: {name}
+results.upgrade_ready,garage nudge,40,An upgrade is ready in the garage,В гараже доступно улучшение,Garajda bir yükseltme hazır,车库里有可用的升级,In der Garage wartet ein Upgrade,Hay una mejora lista en el garaje,Une amélioration t'attend au garage,Há uma melhoria pronta na garagem,У гаражі доступне покращення
+results.upgrade_short,"garage nudge, {n} = coins missing",40,{n} more coins to the next upgrade,Ещё {n} монет до улучшения,Sonraki yükseltmeye {n} para,再获得 {n} 金币即可升级,Noch {n} Münzen bis zum Upgrade,Faltan {n} monedas para la mejora,Encore {n} pièces pour l'amélioration,Faltam {n} moedas para a melhoria,Ще {n} монет до покращення
+hud.perfect_start,launch boost toast,20,PERFECT START!,ИДЕАЛЬНЫЙ СТАРТ!,MÜKEMMEL START!,完美起步！,PERFEKTER START!,¡SALIDA PERFECTA!,DÉPART PARFAIT !,LARGADA PERFEITA!,ІДЕАЛЬНИЙ СТАРТ!
+touch.secondary,touch button,8,MINE,МИНА,MAYIN,地雷,MINE,MINA,MINE,MINA,МІНА
+hud.overheated,weapon overheat status,12,OVERHEAT!,ПЕРЕГРЕВ!,AŞIRI ISINMA!,过热！,ÜBERHITZT!,¡SOBRECALENTADO!,SURCHAUFFE !,SUPERAQUECIDO!,ПЕРЕГРІВ!
+hud.status.shield,status effect,10,SHIELD,ЩИТ,KALKAN,护盾,SCHILD,ESCUDO,BOUCLIER,ESCUDO,ЩИТ
+hud.status.frozen,status effect,10,FROZEN,ЗАМОРОЗКА,DONDU,冰冻,FROST,CONGELADO,GELÉ,CONGELADO,ЗАМОРОЗКА
+hud.status.jammed,status effect,10,JAMMED,КЛИН,TUTUKLUK,卡壳,BLOCKIERT,ATASCADO,ENRAYÉ,TRAVADO,КЛИН
+hud.status.punctured,status effect,10,PUNCTURED,ПРОКОЛ,PATLAK,爆胎,REIFEN,PINCHAZO,CREVAISON,FURO,ПРОКОЛ
+hud.secondary.mines,secondary ammo counter,24,Mines {cur}/{max},Мины {cur}/{max},Mayın {cur}/{max},地雷 {cur}/{max},Minen {cur}/{max},Minas {cur}/{max},Mines {cur}/{max},Minas {cur}/{max},Міни {cur}/{max}
+hud.secondary.freeze,secondary ammo counter,24,Freeze {cur}/{max},Заморозка {cur}/{max},Dondurucu {cur}/{max},冰冻 {cur}/{max},Frost {cur}/{max},Gel {cur}/{max},Gel {cur}/{max},Congelamento {cur}/{max},Заморозка {cur}/{max}
+hud.heat,{pct} percent,12,HEAT {pct}%,НАГРЕВ {pct}%,ISI %{pct},过热度 {pct}%,HITZE {pct}%,CALOR {pct}%,CHAUFFE {pct}%,CALOR {pct}%,НАГРІВ {pct}%
+hud.mg_ready,machine gun ready,10,MG READY,ПУЛЕМЁТ,MT HAZIR,机枪就绪,MG BEREIT,AM LISTA,MITR. PRÊTE,METR. PRONTA,КУЛЕМЕТ

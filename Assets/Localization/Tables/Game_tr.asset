@@ -159,8 +159,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094623
-    m_Localized: "Gaz: W veya Yukar\u0131    Direksiyon: A/D veya oklar\nFren: Bo\u015Fluk   
-      Ate\u015F: Ctrl veya sol t\u0131k\nPiste d\xF6n: R    Duraklat: Esc"
+    m_Localized: "Gaz: W veya Yukar\u0131    Direksiyon: A/D veya oklar\r\nFren:
+      Bo\u015Fluk    Ate\u015F: Ctrl veya sol t\u0131k\r\nPiste d\xF6n: R    Duraklat:
+      Esc"
     m_Metadata:
       m_Items: []
   - m_Id: 4010094624
@@ -367,6 +368,95 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5803307084099668
     m_Localized: Mermi {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528248500224
+    m_Localized: "\u2605 {s}/{max}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860352
+    m_Localized: "\u0130lk 3'e gir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860353
+    m_Localized: 2 rakip yok et
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860354
+    m_Localized: Kaza yapmadan bitir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860355
+    m_Localized: YILDIZLAR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860356
+    m_Localized: +{n} HP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860357
+    m_Localized: "MERM\u0130 DOLDU"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860358
+    m_Localized: "N\u0130TRO!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860359
+    m_Localized: "\xC7im yava\u015Flat\u0131r \u2014 asfaltta kal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860360
+    m_Localized: "Ate\u015F alt\u0131ndas\u0131n! Hareket et, kar\u015F\u0131l\u0131k
+      ver"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860361
+    m_Localized: "Hedef kilitli \u2014 ate\u015F: Ctrl veya sol t\u0131k"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860362
+    m_Localized: "Hedef kilitli \u2014 ATE\u015E'e dokun"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860363
+    m_Localized: "Ye\u015Fil bonuslar arac\u0131n\u0131 onar\u0131r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860364
+    m_Localized: "Sar\u0131 bonuslar topunu doldurur"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860365
+    m_Localized: "Mavi bonuslar h\u0131z verir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860366
+    m_Localized: "Rekor k\u0131r\u0131ld\u0131!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054656
+    m_Localized: "Yeni rekor! \u2212{t} sn"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054657
+    m_Localized: Rekora +{t} sn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054658
+    m_Localized: "A\xE7\u0131ld\u0131: {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054659
+    m_Localized: "Garajda bir y\xFCkseltme haz\u0131r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054660
+    m_Localized: "Sonraki y\xFCkseltmeye {n} para"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7348941066248192
+    m_Localized: "M\xDCKEMMEL START!"
     m_Metadata:
       m_Items: []
   references:

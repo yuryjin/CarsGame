@@ -373,6 +373,94 @@ MonoBehaviour:
     m_Localized: Ammo {cur}/{max}
     m_Metadata:
       m_Items: []
+  - m_Id: 7347528248500224
+    m_Localized: "\u2605 {s}/{max}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860352
+    m_Localized: Top 3 finish
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860353
+    m_Localized: Destroy 2 rivals
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860354
+    m_Localized: No wrecks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860355
+    m_Localized: STARS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860356
+    m_Localized: +{n} HP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860357
+    m_Localized: AMMO REFILLED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860358
+    m_Localized: NITRO!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860359
+    m_Localized: "Grass slows you down \u2014 stay on the asphalt"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860360
+    m_Localized: You're under fire! Keep moving and shoot back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860361
+    m_Localized: "Target locked \u2014 press Ctrl or LMB to fire"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860362
+    m_Localized: "Target locked \u2014 tap FIRE"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860363
+    m_Localized: Green pickups repair your car
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860364
+    m_Localized: Yellow pickups refill your cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860365
+    m_Localized: Blue pickups give a burst of speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860366
+    m_Localized: Record set!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054656
+    m_Localized: "New record! \u2212{t} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054657
+    m_Localized: +{t} s to your record
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054658
+    m_Localized: 'Unlocked: {name}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054659
+    m_Localized: An upgrade is ready in the garage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054660
+    m_Localized: '{n} more coins to the next upgrade'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7348941066248192
+    m_Localized: PERFECT START!
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

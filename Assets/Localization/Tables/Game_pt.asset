@@ -159,8 +159,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094623
-    m_Localized: "Acelerar: W ou Cima    Virar: A/D ou setas\nFreio: Espa\xE7o   
-      Atirar: Ctrl ou bot\xE3o esq.\nVoltar \xE0 pista: R    Pausa: Esc"
+    m_Localized: "Acelerar: W ou Cima    Virar: A/D ou setas\r\nFreio: Espa\xE7o   
+      Atirar: Ctrl ou bot\xE3o esq.\r\nVoltar \xE0 pista: R    Pausa: Esc"
     m_Metadata:
       m_Items: []
   - m_Id: 4010094624
@@ -367,6 +367,94 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5803307084099668
     m_Localized: "Muni\xE7\xE3o {cur}/{max}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528248500224
+    m_Localized: "\u2605 {s}/{max}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860352
+    m_Localized: Top 3 na chegada
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860353
+    m_Localized: Destrua 2 rivais
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860354
+    m_Localized: Sem acidentes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860355
+    m_Localized: ESTRELAS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860356
+    m_Localized: +{n} HP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860357
+    m_Localized: "MUNI\xC7\xC3O RECARREGADA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860358
+    m_Localized: NITRO!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860359
+    m_Localized: "A grama te freia \u2014 fique no asfalto"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860360
+    m_Localized: "Voc\xEA est\xE1 sob fogo! Mexa-se e revide"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860361
+    m_Localized: "Alvo travado \u2014 atire com Ctrl ou bot\xE3o esq."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860362
+    m_Localized: "Alvo travado \u2014 toque em ATIRAR"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860363
+    m_Localized: Itens verdes consertam seu carro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860364
+    m_Localized: "Itens amarelos recarregam seu canh\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860365
+    m_Localized: "Itens azuis d\xE3o um impulso de velocidade"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860366
+    m_Localized: Recorde definido!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054656
+    m_Localized: "Novo recorde! \u2212{t} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054657
+    m_Localized: +{t} s do seu recorde
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054658
+    m_Localized: 'Desbloqueado: {name}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054659
+    m_Localized: "H\xE1 uma melhoria pronta na garagem"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054660
+    m_Localized: Faltam {n} moedas para a melhoria
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7348941066248192
+    m_Localized: LARGADA PERFEITA!
     m_Metadata:
       m_Items: []
   references:

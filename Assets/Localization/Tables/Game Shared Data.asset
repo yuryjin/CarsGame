@@ -363,6 +363,94 @@ MonoBehaviour:
     m_Key: hud.ammo
     m_Metadata:
       m_Items: []
+  - m_Id: 7347528248500224
+    m_Key: events.stars
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860352
+    m_Key: events.star1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860353
+    m_Key: events.star2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860354
+    m_Key: events.star3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860355
+    m_Key: results.stars
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860356
+    m_Key: pickup.health
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860357
+    m_Key: pickup.ammo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860358
+    m_Key: pickup.nitro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860359
+    m_Key: hint.grass
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860360
+    m_Key: hint.under_fire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860361
+    m_Key: hint.aim.keys
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860362
+    m_Key: hint.aim.touch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860363
+    m_Key: hint.pickup.health
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860364
+    m_Key: hint.pickup.ammo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860365
+    m_Key: hint.pickup.nitro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528277860366
+    m_Key: results.pb_first
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054656
+    m_Key: results.pb_new
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054657
+    m_Key: results.pb_behind
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054658
+    m_Key: results.unlocked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054659
+    m_Key: results.upgrade_ready
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7347528282054660
+    m_Key: results.upgrade_short
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7348941066248192
+    m_Key: hud.perfect_start
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228
