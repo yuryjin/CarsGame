@@ -25,6 +25,8 @@ namespace RacingGame
         public float maxCollisionDamage = 60f;
         [Tooltip("Minimum time between two collision damage events.")]
         public float collisionDamageCooldown = 0.25f;
+        [Tooltip("Scale for hits on static scenery (barriers, trees, walls). A wall hit at racing speed used to take 60 HP; car-on-car ramming keeps full damage.")]
+        public float staticDamageMultiplier = 0.5f;
 
         [Header("Death")]
         public float respawnDelay = 3f;
@@ -100,8 +102,9 @@ namespace RacingGame
             float impactSpeed = collision.impulse.magnitude / rb.mass;
             int now = NowTick;
             bool onCooldown = now - lastCollisionDamageTick < SimulationDriver.SecondsToTicks(collisionDamageCooldown);
+            bool isStatic = collision.rigidbody == null;
             float damage = vertical || onCooldown ? 0f
-                : Mathf.Clamp((impactSpeed - minImpactSpeed) * damagePerImpactSpeed, 0f, maxCollisionDamage);
+                : Mathf.Clamp((impactSpeed - minImpactSpeed) * damagePerImpactSpeed * (isStatic ? staticDamageMultiplier : 1f), 0f, maxCollisionDamage);
 
             if (logImpacts)
             {

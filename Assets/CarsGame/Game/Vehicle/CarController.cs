@@ -82,7 +82,48 @@ namespace RacingGame
         public int SimulationOrder => CarId;
         public DriveCommand LastCommand => lastCommand;
         public ICarInputSource InputSource => inputSource;
-        public Rigidbody Body => rb;
+
+        // --- Steering model for drivers. ApplySteering turns an angle into a yaw torque
+        // (angle · v/8 · 120, capped at 2.5 · maxAngle · 120) against the body's angular damping,
+        // so a steady turn settles at yaw = torque / (I_y · damping).
+
+        /// <summary>Largest wheel angle (deg) at this speed: it narrows towards top speed.</summary>
+        public float EffectiveMaxSteer(float speedKmh) =>
+            Mathf.Lerp(maxSteerAngle, maxSteerAngle * 0.55f, Mathf.Clamp01(Mathf.Abs(speedKmh) / maxSpeed));
+
+        /// <summary>Wheel angle (deg) that holds a steady turn of this curvature (rad/m), ignoring the torque cap.</summary>
+        private float AngleForCurvature(float curvature) =>
+            curvature * rb.inertiaTensor.y * Mathf.Max(0.1f, rb.angularDamping) / 15f;
+
+        /// <summary>Steering input (-1..1) that holds a steady turn of this signed curvature (rad/m, +right).</summary>
+        public float SteerForCurvature(float curvature, float speedMs)
+        {
+            if (rb == null) return 0f;
+            float max = EffectiveMaxSteer(speedMs * 3.6f);
+            float angle = AngleForCurvature(curvature);
+            // Above the torque cap the same yaw needs more angle than the cap lets through: saturate.
+            float capSpeed = speedMs > 0.5f ? 20f * max / Mathf.Max(0.01f, Mathf.Abs(angle)) : float.MaxValue;
+            if (speedMs > capSpeed) angle = Mathf.Sign(angle) * max;
+            return Mathf.Clamp(angle / max, -1f, 1f);
+        }
+
+        /// <summary>Highest speed (m/s) at which this car can still hold a turn of this curvature (rad/m).</summary>
+        public float MaxSpeedForCurvature(float curvature)
+        {
+            if (rb == null) return maxSpeed / 3.6f;
+            float k = Mathf.Abs(curvature);
+            if (k < 1e-4f) return maxSpeed / 3.6f;
+            float angle = AngleForCurvature(k);
+            float top = maxSpeed / 3.6f;
+            for (float v = top; v > 3f; v -= 0.5f)
+            {
+                float max = EffectiveMaxSteer(v * 3.6f);
+                // Needs the angle within reach and the torque (angle · v/8) under the cap.
+                if (angle <= max && angle * v / 8f <= 2.5f * max) return v;
+            }
+            return 3f;
+        }
+        public Rigidbody Body => rb != null ? rb : (rb = GetComponent<Rigidbody>());
 
         private void Awake()
         {
