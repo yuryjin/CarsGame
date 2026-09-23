@@ -87,7 +87,8 @@
           device = detectDevice();
           sdk.on('game_api_pause', function () { log('game_api_pause'); setHostPaused(true); });
           sdk.on('game_api_resume', function () { log('game_api_resume'); setHostPaused(false); });
-          document.addEventListener('visibilitychange', function () { if (document.hidden) flushNow(); });
+          // Background tab: pause the race and mute (moderation rule), and flush the save while we still can.
+          document.addEventListener('visibilitychange', function () { send('OnHidden', document.hidden ? '1' : '0'); if (document.hidden) flushNow(); });
           window.addEventListener('pagehide', flushNow);
           return sdk.getPlayer({ scopes: false }).then(function (p) {
             player = p;
@@ -107,6 +108,7 @@
     debug.bootMs.attach = Math.round(performance.now());
     while (queued.length) { var q = queued.shift(); send(q[0], q[1]); }
     if (hostPaused) send('OnHostPause', '1');   // replay a startup pause that arrived before Unity was up
+    if (document.hidden) send('OnHidden', '1');   // backgrounded during loading: start paused and muted
     log('attached');
     // Dev/QA only: ?perf=1 turns on the in-game frame statistics (see DebugBus.cs).
     if (debugEnabled && /[?&]perf=1/.test(location.search)) cmd('perf', 'on');
@@ -142,7 +144,7 @@
   }
 
   function env() {
-    return { lang: lang, device: device, authorized: authorized, playerId: playerId, playerName: playerName, avatar: avatar, adv: !!(ysdk && ysdk.adv), debug: debugEnabled };
+    return { lang: lang, device: device, authorized: authorized, playerId: playerId, playerName: playerName, avatar: avatar, adv: !!(ysdk && ysdk.adv), debug: debugEnabled, mock: mock };
   }
 
   function init(id) {

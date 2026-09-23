@@ -29,6 +29,8 @@ namespace RacingGame.Platform
 
         public event Action<string, string> JsMessage;      // (channel, payload) for unsolicited messages
         public event Action<bool> HostPauseChanged;
+        /// <summary>The page went to the background (tab switch, minimised browser) or came back.</summary>
+        public event Action<bool> HiddenChanged;
         public event Action AdOpened, AdClosed;
 
         public static PlatformRuntime Ensure()
@@ -94,6 +96,8 @@ namespace RacingGame.Platform
         /// True when the page opened the QA channel (local host or ?debug=1). Off on a normal
         /// Yandex session, so a hand-crafted SendMessage cannot drive the game there.
         /// </summary>
+        /// <summary>The page runs the mock SDK on a local host (QA): nothing reaches a real store account.</summary>
+        public static bool MockSdk { get; set; }
         public static bool DebugChannelEnabled { get; set; }
 #if UNITY_EDITOR
             = true;
@@ -112,6 +116,7 @@ namespace RacingGame.Platform
         public static string LastDebug { get; private set; }
 
         [Preserve] public void OnHostPause(string flag) { HostPauseChanged?.Invoke(flag == "1" || flag == "true"); }
+        [Preserve] public void OnHidden(string flag) { HiddenChanged?.Invoke(flag == "1" || flag == "true"); }
         [Preserve] public void OnAdOpen(string _) { AdOpened?.Invoke(); }
         [Preserve] public void OnAdClose(string _) { AdClosed?.Invoke(); }
 

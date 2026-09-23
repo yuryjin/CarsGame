@@ -14,7 +14,7 @@ namespace RacingGame.Platform.Yandex
     /// </summary>
     public sealed class YandexPlatform : IPlatformServices, IAds, ICloudSave, ILeaderboards, IAsyncSessions
     {
-        [Serializable] private class Envelope { public int id; public bool ok; public string error; public string data; public bool rewarded; public string lang; public string device; public bool authorized; public string playerId; public string playerName; public string avatar; public bool adv; public string entries; public string sessions; public bool debug; }
+        [Serializable] private class Envelope { public int id; public bool ok; public string error; public string data; public bool rewarded; public string lang; public string device; public bool authorized; public string playerId; public string playerName; public string avatar; public bool adv; public string entries; public string sessions; public bool debug; public bool mock; }
         [Serializable] private class EntryList { public LeaderboardEntryDto[] items; }
         [Serializable] private class LeaderboardEntryDto { public int rank; public string id; public string name; public long score; public string extra; }
         [Serializable] private class SessionList { public string[] items; }
@@ -44,6 +44,7 @@ namespace RacingGame.Platform.Yandex
         {
             runtime = PlatformRuntime.Ensure();
             runtime.HostPauseChanged += paused => PauseChanged?.Invoke(PauseReason.HostPause, paused);
+            runtime.HiddenChanged += hidden => PauseChanged?.Invoke(PauseReason.Hidden, hidden);
             runtime.AdOpened += () => PauseChanged?.Invoke(PauseReason.Ad, true);
             runtime.AdClosed += () => PauseChanged?.Invoke(PauseReason.Ad, false);
         }
@@ -67,6 +68,7 @@ namespace RacingGame.Platform.Yandex
             Player = new PlayerInfo(string.IsNullOrEmpty(e.playerId) ? "guest" : e.playerId, string.IsNullOrEmpty(e.playerName) ? "Guest" : e.playerName, e.avatar, e.authorized);
             hasAdv = e.adv;
             PlatformRuntime.DebugChannelEnabled = e.debug;   // page said: local host or ?debug=1
+            PlatformRuntime.MockSdk = e.mock;                // local host with the mock SDK: no real store session
         }
 
         public async Task<Result<bool>> RequestAuthAsync()

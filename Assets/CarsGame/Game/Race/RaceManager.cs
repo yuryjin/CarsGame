@@ -194,6 +194,19 @@ namespace RacingGame
             if (finishTimes.Count >= participants.Count) EndRace();
         }
 
+        /// <summary>
+        /// QA only (DebugBus "finish"): the player crosses the line now and the race ends; unfinished rivals are DNF.
+        /// Gated here too: the page can reach any method by name through unityInstance.SendMessage.
+        /// </summary>
+        public void QaFinishNow()
+        {
+            if (!DebugBus.CheatsAllowed) return;
+            if (State != RaceState.Racing && State != RaceState.Finishing) return;
+            var player = Player;
+            if (player != null && !finishTimes.ContainsKey(player)) Finish(player);
+            EndRace();
+        }
+
         private void UpdateRacing()
         {
             rankTimer += Time.unscaledDeltaTime;

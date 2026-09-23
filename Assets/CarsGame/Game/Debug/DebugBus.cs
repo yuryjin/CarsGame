@@ -56,6 +56,15 @@ namespace RacingGame
             Application.isEditor || PlatformRuntime.DebugChannelEnabled ||
             (PlatformRuntime.Current != null && PlatformRuntime.Current.Kind != Core.Platform.PlatformKind.Yandex);
 
+        /// <summary>
+        /// Commands that fake race results (autopilot, finish) would farm coins and post impossible
+        /// leaderboard times on a store page opened with ?debug=1: Editor, development builds, the local
+        /// mock-SDK page and non-Yandex runtimes only.
+        /// </summary>
+        public static bool CheatsAllowed =>
+            Application.isEditor || Debug.isDebugBuild || PlatformRuntime.MockSdk ||
+            (PlatformRuntime.Current != null && PlatformRuntime.Current.Kind != Core.Platform.PlatformKind.Yandex);
+
         private void Awake()
         {
             flow = GetComponent<GameFlow>();
@@ -94,12 +103,13 @@ namespace RacingGame
                 {
                     case "state": break;
                     case "startRace": StartRace(Arg(args, 0), Arg(args, 1)); break;
-                    case "autopilot": SetAutopilot(Arg(args, 0) != "off"); break;
+                    case "autopilot": if (CheatsAllowed) SetAutopilot(Arg(args, 0) != "off"); else lastError = "not in store builds"; break;
                     case "goto": if (menus != null) { if (flow.State == FlowState.Menu) menus.Show(Arg(args, 0) ?? "main"); else menus.GoTo(Arg(args, 0) ?? "main"); } break;
                     case "buy":
                         if (menus == null || !Enum.TryParse(Arg(args, 0) ?? "", true, out UpgradeKind kind)) lastError = "bad kind";
                         else if (!menus.Buy(kind)) lastError = "not bought";
                         break;
+                    case "finish": if (!CheatsAllowed) lastError = "not in store builds"; else if (race != null) race.QaFinishNow(); break;
                     case "touch": if (touch != null) touch.forceShow = Arg(args, 0) != "off"; break;
                     case "perf": perfOn = Arg(args, 0) != "off"; ResetPerf(); break;
                     default: lastError = "unknown command"; break;
