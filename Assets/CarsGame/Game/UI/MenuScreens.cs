@@ -23,7 +23,10 @@ namespace RacingGame
         private static TextMeshProUGUI toastText;
         private static RectTransform toastPanel;
         private static float toastUntil;
-        private int tierIndex = 1;
+        private int tierIndex = -1;               // -1 = not chosen yet this session: derive from the save
+        private TextMeshProUGUI rewardLabel;
+        private float rewardShownAt;
+        private const float RewardCountSeconds = 0.8f;
         private bool authInFlight;
         private float layoutWidth, layoutHeight;
         private Button rewardButton;
@@ -64,6 +67,13 @@ namespace RacingGame
             {
                 if (current == "results") GoTo("main"); else Show("main");
             }
+            if (rewardLabel != null)
+            {
+                float k = Mathf.Clamp01((Time.unscaledTime - rewardShownAt) / RewardCountSeconds);
+                int target = flow.LastReward * (flow.LastRewardDoubled ? 2 : 1);
+                rewardLabel.text = Loc.Format("results.reward", "n", Mathf.RoundToInt(target * (1f - (1f - k) * (1f - k))));
+                if (k >= 1f) rewardLabel = null;
+            }
             if (rewardButton != null)
             {
                 rewardButton.interactable = !flow.IsDoublingReward;
@@ -84,7 +94,11 @@ namespace RacingGame
             {
                 case FlowState.Menu: string target = pendingScreen ?? "main"; pendingScreen = null; Show(target); break;
                 case FlowState.Racing: Show(""); break;
-                case FlowState.Results: Show("results"); break;
+                case FlowState.Results:
+                    rewardShownAt = Time.unscaledTime;
+                    Show("results");
+                    foreach (var e in flow.LastUnlocked) Toast(Loc.Format("results.unlocked", "name", Loc.Get(e.nameKey)));
+                    break;
             }
         }
         private void Rebuild() => Show(current);
@@ -99,7 +113,7 @@ namespace RacingGame
                 if (oldScroll != null) scrollPosition = oldScroll.verticalNormalizedPosition;
             }
             if (panel != null) { panel.gameObject.SetActive(false); Destroy(panel.gameObject); }
-            rewardButton = null; current = name;
+            rewardButton = null; rewardLabel = null; current = name;
             if (string.IsNullOrEmpty(name)) { EventSystem.current?.SetSelectedGameObject(null); return; }
             var canvasRect = ((RectTransform)canvas.transform).rect;
             layoutWidth = canvasRect.width; layoutHeight = canvasRect.height;
@@ -187,13 +201,19 @@ namespace RacingGame
             var title = Label(hero, "EventName", ev != null ? Loc.Get(ev.nameKey) : Loc.Get("menu.play"), 64f, Top, Vector2.one, new Vector2(36f, -226f), new Vector2(-36f, -98f));
             title.fontStyle = FontStyles.Bold;
             string detail = ev != null ? Loc.Format("events.laps", "n", ev.laps) + "  /  " + Loc.Format("events.rivals", "n", ev.aiCountOverride >= 0 ? ev.aiCountOverride : 3) : "";
+            int maxStars = list.Count * 3;
+            int earnedStars = PlatformGlue.Save != null ? PlatformGlue.Save.Data.TotalStars : 0;
+            string stars = "<color=#FFCC40>" + Loc.Format("events.stars", "s", earnedStars, "max", maxStars) + "</color>";
+            // The narrow hero card has no room for a separate stars row above the Play button.
+            if (Narrow) detail += "  /  " + stars;
             Label(hero, "Details", detail, 26f, Top, Vector2.one, new Vector2(38f, -282f), new Vector2(-36f, -230f), UiFactory.Muted);
+            if (!Narrow) Label(hero, "StarsCount", stars, 26f, Top, Vector2.one, new Vector2(38f, -326f), new Vector2(-36f, -282f), UiFactory.Accent);
             if (!Narrow)
             {
                 Label(hero, "Progress", list.FindAll(e => flow.IsUnlocked(e)).Count.ToString("00") + " <color=#8B9AAD>/ " + list.Count.ToString("00") + "</color>", 64f, Vector2.zero, new Vector2(1f, 0f), new Vector2(38f, 162f), new Vector2(-38f, 248f));
                 for (int i = 0; i < list.Count; i++) UiFactory.Panel(hero, "EventProgress" + i, new Vector2(i / (float)list.Count, 0f), new Vector2((i + 1f) / list.Count, 0f), new Vector2(i == 0 ? 38f : 5f, 148f), new Vector2(i == list.Count - 1 ? -38f : -5f, 152f), flow.IsUnlocked(list[i]) ? UiFactory.Accent : UiFactory.Raised, false);
             }
-            UiFactory.Button(hero, "Play", Loc.Get("menu.play") + "   ›", () => Show("events"), Vector2.zero, new Vector2(1f, 0f), new Vector2(36f, 32f), new Vector2(-36f, 116f), 34f);
+            UiFactory.Button(hero, "Play", Loc.Get("menu.play") + "   ›", PlayFromMain, Vector2.zero, new Vector2(1f, 0f), new Vector2(36f, 32f), new Vector2(-36f, 116f), 34f);
             var links = Narrow ? content : UiFactory.Panel(row, "Links", new Vector2(0.58f, 0f), Vector2.one, new Vector2(12f, 0f), Vector2.zero);
             var keys = new[] { "menu.garage", "menu.leaderboard", "menu.settings" };
             var targets = new[] { "garage", "leaders", "settings" };
@@ -210,17 +230,58 @@ namespace RacingGame
             }
         }
 
+        private DifficultyTier[] Tiers() => Array.FindAll(flow.tiers ?? Array.Empty<DifficultyTier>(), t => t != null);
+
+        /// <summary>
+        /// The remembered difficulty, else Easy for a first race or a phone (touch driving is harder),
+        /// else Normal. The choice is stored in settings.tier when the player picks a tab.
+        /// </summary>
+        private int ResolveTierIndex(DifficultyTier[] tiers)
+        {
+            if (tiers.Length == 0) return 0;
+            if (tierIndex >= 0) return Mathf.Clamp(tierIndex, 0, tiers.Length - 1);
+            var save = PlatformGlue.Save;
+            string remembered = save != null ? save.Data.settings.tier : "";
+            if (!string.IsNullOrEmpty(remembered))
+            {
+                int found = Array.FindIndex(tiers, t => t.tierId == remembered);
+                if (found >= 0) return tierIndex = found;
+            }
+            bool newcomer = save == null || save.Data.Races == 0 || PlatformGlue.IsMobileDevice;
+            return tierIndex = newcomer ? 0 : Mathf.Min(1, tiers.Length - 1);
+        }
+
+        private void SelectTier(DifficultyTier[] tiers, int index)
+        {
+            tierIndex = index;
+            var save = PlatformGlue.Save;
+            if (save != null && save.Data.settings.tier != tiers[index].tierId) { save.Data.settings.tier = tiers[index].tierId; save.MarkDirty(); }
+            Show("events");
+        }
+
+        // A brand-new player goes straight into the first race on the resolved (easy) tier; later the
+        // big button opens the event list.
+        private void PlayFromMain()
+        {
+            var save = PlatformGlue.Save;
+            var list = Events();
+            var tiers = Tiers();
+            if (save != null && save.Data.Races == 0 && list.Count > 0)
+                flow.StartRace(list[0], tiers.Length > 0 ? tiers[ResolveTierIndex(tiers)] : null);
+            else Show("events");
+        }
+
         private void BuildEvents(RectTransform root)
         {
             var body = Header(root, "events.title");
-            var tiers = Array.FindAll(flow.tiers ?? Array.Empty<DifficultyTier>(), t => t != null);
+            var tiers = Tiers();
             if (tiers.Length > 0)
             {
-                tierIndex = Mathf.Clamp(tierIndex, 0, tiers.Length - 1);
+                tierIndex = ResolveTierIndex(tiers);
                 for (int i = 0; i < tiers.Length; i++)
                 {
                     int index = i;
-                    UiFactory.Button(body, "Tier" + i, Loc.Get("difficulty." + tiers[i].tierId), () => { tierIndex = index; Show("events"); }, new Vector2(i / (float)tiers.Length, 1f), new Vector2((i + 1f) / tiers.Length, 1f), new Vector2(4f, -68f), new Vector2(-8f, 0f), 27f, i == tierIndex ? UiFactory.Accent : UiFactory.Raised);
+                    UiFactory.Button(body, "Tier" + i, Loc.Get("difficulty." + tiers[i].tierId), () => SelectTier(tiers, index), new Vector2(i / (float)tiers.Length, 1f), new Vector2((i + 1f) / tiers.Length, 1f), new Vector2(4f, -68f), new Vector2(-8f, 0f), 27f, i == tierIndex ? UiFactory.Accent : UiFactory.Raised);
                 }
             }
             var content = UiFactory.Scroll(body, "EventsScroll", Vector2.zero, new Vector2(0f, tiers.Length > 0 ? -90f : 0f));
@@ -228,15 +289,21 @@ namespace RacingGame
             for (int i = 0; i < list.Count; i++)
             {
                 var ev = list[i]; bool unlocked = flow.IsUnlocked(ev);
-                var row = Item(content, ev.eventId, Narrow ? 188f : 154f);
+                var row = Item(content, ev.eventId, Narrow ? 210f : 176f);
                 Label(row, "Number", (i + 1).ToString("00"), 52f, Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(116f, -24f), unlocked ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
-                Label(row, "Name", Loc.Get(ev.nameKey), 34f, Top, Vector2.one, new Vector2(144f, -64f), new Vector2(-236f, -16f)).fontStyle = FontStyles.Bold;
+                Label(row, "Name", Loc.Get(ev.nameKey), 34f, Top, Vector2.one, new Vector2(144f, -60f), new Vector2(-236f, -12f)).fontStyle = FontStyles.Bold;
                 int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[tierIndex].aiCount : 3;
                 string detail = Loc.Format("events.laps", "n", ev.laps) + "   /   " + Loc.Format("events.rivals", "n", rivals);
-                Label(row, "Stats", detail, 23f, Top, Vector2.one, new Vector2(144f, -103f), new Vector2(-236f, -62f), UiFactory.Muted);
+                Label(row, "Stats", detail, 23f, Top, Vector2.one, new Vector2(144f, -96f), new Vector2(-236f, -58f), UiFactory.Muted);
                 var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
-                string status = unlocked ? best != null ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) : "" : Loc.Get("events.locked");
-                Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 77f : 46f), unlocked ? UiFactory.Positive : UiFactory.Muted);
+                int starMask = best != null ? best.stars : 0;
+                string s1 = (starMask & 1) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
+                string s2 = (starMask & 2) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
+                string s3 = (starMask & 4) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
+                string starDisplay = $"{s1} {s2} {s3}";
+                Label(row, "Stars", starDisplay, 26f, Top, Vector2.one, new Vector2(144f, -136f), new Vector2(-236f, -98f));
+                string status = unlocked ? best != null && best.bestTimeMs > 0 ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) : "" : Loc.Get("events.locked");
+                Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 64f : 44f), unlocked ? UiFactory.Positive : UiFactory.Muted);
                 UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—", unlocked ? () => flow.StartRace(ev, tiers.Length > 0 ? tiers[tierIndex] : null) : null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-216f, -36f), new Vector2(-24f, 36f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
             }
         }
@@ -334,7 +401,7 @@ namespace RacingGame
             foreach (var ev in Events())
             {
                 var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
-                if (best == null) continue;
+                if (best == null || best.bestTimeMs <= 0) continue;
                 BoardRow(content, "Local_" + ev.eventId, (++count).ToString("00"), Loc.Get(ev.nameKey), UiFactory.FormatTime(best.bestTimeMs / 1000.0), true);
             }
             if (count == 0)
@@ -388,20 +455,88 @@ namespace RacingGame
             foreach (var entry in result.Value) BoardRow(content, "Cloud" + entry.Rank, entry.Rank.ToString("00"), UiFactory.Escape(entry.Name), UiFactory.FormatTime(entry.Score / 1000.0), false);
         }
 
+        private static readonly Color Gold = new Color(1f, 0.8f, 0.25f), Silver = new Color(0.78f, 0.82f, 0.86f), Bronze = new Color(0.85f, 0.56f, 0.35f);
+        private static Color PlaceColor(RaceResultEntry me)
+        {
+            if (me == null || !me.Finished) return UiFactory.Muted;
+            return me.Position == 1 ? Gold : me.Position == 2 ? Silver : me.Position == 3 ? Bronze : UiFactory.Accent;
+        }
+
+        /// <summary>"New record! −0.83 s" / "+2.10 s to your record" / "Record set!" — empty for a DNF.</summary>
+        private string RecordLine(RaceResultEntry me)
+        {
+            if (me == null || !me.Finished) return "";
+            if (!flow.LastHadPreviousBest) return Loc.Get("results.pb_first");
+            string seconds = (Math.Abs(flow.LastBestDeltaMs) / 1000.0).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+            return flow.LastWasPersonalBest ? Loc.Format("results.pb_new", "t", seconds) : Loc.Format("results.pb_behind", "t", seconds);
+        }
+
+        private static int CheapestUpgrade()
+        {
+            var levels = PlatformGlue.Save?.Data.progress.upgrades;
+            int best = int.MaxValue;
+            foreach (UpgradeKind kind in Enum.GetValues(typeof(UpgradeKind))) best = Math.Min(best, UpgradeCatalog.Cost(UpgradeCatalog.Level(levels, (int)kind)));
+            return best;
+        }
+
         private void BuildResults(RectTransform root)
         {
             var results = race.Results;
             if (results == null) { Show("main"); return; }
             var content = UiFactory.Scroll(Header(root, "results.title"), "ResultsScroll", Vector2.zero, Vector2.zero);
             int reward = flow.LastReward * (flow.LastRewardDoubled ? 2 : 1);
-            var summary = Item(content, "Summary", 160f);
-            Label(summary, "Place", results.Player != null ? "#" + results.Player.Position : "—", 80f, Vector2.zero, new Vector2(0f, 1f), new Vector2(28f, 18f), new Vector2(198f, -18f), UiFactory.Accent, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
-            Label(summary, "Reward", Loc.Format("results.reward", "n", reward), 40f, Vector2.zero, Vector2.one, new Vector2(234f, 64f), new Vector2(-28f, -22f), UiFactory.Accent).fontStyle = FontStyles.Bold;
-            Label(summary, "Detail", flow.LastRewardDoubled ? Loc.Get("results.doubled") : flow.CurrentEvent != null ? Loc.Get(flow.CurrentEvent.nameKey) : Loc.Get("results.title"), 26f, Vector2.zero, Vector2.one, new Vector2(234f, 22f), new Vector2(-28f, -92f), UiFactory.Muted);
+            var summary = Item(content, "Summary", 196f);
+            var me = results.Player;
+            Label(summary, "Place", me != null ? "#" + me.Position : "—", 80f, Vector2.zero, new Vector2(0f, 1f), new Vector2(28f, 18f), new Vector2(198f, -18f), PlaceColor(me), TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
+            var rewardText = Label(summary, "Reward", Loc.Format("results.reward", "n", reward), 40f, Top, Vector2.one, new Vector2(234f, -80f), new Vector2(-28f, -20f), UiFactory.Accent);
+            rewardText.fontStyle = FontStyles.Bold;
+            if (Time.unscaledTime - rewardShownAt < RewardCountSeconds) rewardLabel = rewardText;   // count up once, not on every rebuild
+            Label(summary, "Detail", flow.LastRewardDoubled ? Loc.Get("results.doubled") : flow.CurrentEvent != null ? Loc.Get(flow.CurrentEvent.nameKey) : Loc.Get("results.title"), 26f, Top, Vector2.one, new Vector2(234f, -124f), new Vector2(-28f, -84f), UiFactory.Muted);
+            string record = RecordLine(me);
+            if (record.Length > 0) Label(summary, "Record", record, 24f, Top, Vector2.one, new Vector2(234f, -170f), new Vector2(-28f, -128f), flow.LastWasPersonalBest ? UiFactory.Positive : UiFactory.Muted);
+
+            var starsCard = Item(content, "StarsCard", Narrow ? 164f : 112f);
+            Label(starsCard, "StarsTitle", Loc.Get("results.stars"), 22f, Top, Vector2.one, new Vector2(24f, -38f), new Vector2(-24f, -8f), UiFactory.Accent).fontStyle = FontStyles.Bold;
+            int currentStars = flow.LastStarsEarned;
+            var bestEntry = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == (flow.CurrentEvent != null ? flow.CurrentEvent.eventId : ""));
+            int totalEventStars = bestEntry != null ? bestEntry.stars : currentStars;
+
+            string[] starKeys = { "events.star1", "events.star2", "events.star3" };
+            for (int s = 0; s < 3; s++)
+            {
+                int bit = 1 << s;
+                bool wonThisRace = (currentStars & bit) != 0;
+                bool wonOverall = (totalEventStars & bit) != 0;
+                string starIcon = wonThisRace ? "<color=#FFCC40>★</color>" : wonOverall ? "<color=#FFD870>★</color>" : "<color=#455568>★</color>";
+                if (Narrow)
+                {
+                    // Three 36-unit rows under the 40-unit heading of the 164-unit card.
+                    float bottom = 10f + (2 - s) * 38f;
+                    var starRow = UiFactory.Panel(starsCard, "Star" + s, Vector2.zero, new Vector2(1f, 0f), new Vector2(24f, bottom), new Vector2(-24f, bottom + 36f), Color.clear, false);
+                    Label(starRow, "StarIcon", starIcon, 24f, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(28f, 0f), null, TextAlignmentOptions.MidlineLeft);
+                    Label(starRow, "StarDesc", Loc.Get(starKeys[s]), 19f, new Vector2(0f, 0f), Vector2.one, new Vector2(32f, 0f), Vector2.zero, wonOverall ? Color.white : UiFactory.Muted, TextAlignmentOptions.MidlineLeft);
+                }
+                else
+                {
+                    float xMin = s / 3f, xMax = (s + 1f) / 3f;
+                    var starCol = UiFactory.Panel(starsCard, "Star" + s, new Vector2(xMin, 0f), new Vector2(xMax, 1f), new Vector2(24f, 8f), new Vector2(-12f, -40f), Color.clear, false);
+                    Label(starCol, "StarIcon", starIcon, 26f, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(30f, 0f), null, TextAlignmentOptions.MidlineLeft);
+                    Label(starCol, "StarDesc", Loc.Get(starKeys[s]), 19f, new Vector2(0f, 0f), Vector2.one, new Vector2(32f, 0f), Vector2.zero, wonOverall ? Color.white : UiFactory.Muted, TextAlignmentOptions.MidlineLeft);
+                }
+            }
             var actions = Item(content, "Actions", 76f, false);
             var keys = new[] { "results.next", "results.retry", "menu.garage" };
-            Action[] clicks = { () => GoTo("events"), () => flow.RetryRace(), () => GoTo("garage") };
-            for (int i = 0; i < keys.Length; i++) UiFactory.Button(actions, "ResultAction" + i, Loc.Get(keys[i]), clicks[i], new Vector2(i / 3f, 0f), new Vector2((i + 1f) / 3f, 1f), new Vector2(4f, 0f), new Vector2(-8f, 0f), 28f, i == 0 ? UiFactory.Accent : UiFactory.Raised);
+            var next = flow.NextEvent(flow.CurrentEvent);
+            Action[] clicks = { () => flow.StartRace(next, RaceSetup.Tier), () => flow.RetryRace(), () => GoTo("garage") };
+            int cheapest = CheapestUpgrade();
+            bool canUpgrade = PlatformGlue.Save != null && cheapest < int.MaxValue && PlatformGlue.Save.Data.Coins >= cheapest;
+            for (int i = 0; i < keys.Length; i++) UiFactory.Button(actions, "ResultAction" + i, Loc.Get(keys[i]), clicks[i], new Vector2(i / 3f, 0f), new Vector2((i + 1f) / 3f, 1f), new Vector2(4f, 0f), new Vector2(-8f, 0f), 28f, i == 0 || (i == 2 && canUpgrade) ? UiFactory.Accent : UiFactory.Raised);
+            if (PlatformGlue.Save != null && cheapest < int.MaxValue)
+            {
+                var nudge = Item(content, "GarageNudge", 44f, false);
+                string text = canUpgrade ? Loc.Get("results.upgrade_ready") : Loc.Format("results.upgrade_short", "n", cheapest - PlatformGlue.Save.Data.Coins);
+                Label(nudge, "Text", text, 22f, Vector2.zero, Vector2.one, new Vector2(8f, 0f), new Vector2(-8f, 0f), canUpgrade ? UiFactory.Positive : UiFactory.Muted, TextAlignmentOptions.MidlineRight);
+            }
             var ads = PlatformGlue.Platform?.Ads;
             if (!flow.LastRewardDoubled && flow.LastRewardFinished && flow.LastReward > 0 && ads != null && ads.IsRewardedAvailable)
             {

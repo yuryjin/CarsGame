@@ -465,6 +465,22 @@ namespace RacingGame
             timerText.SetText(TimerFormat, m, rest / 1000, rest % 1000);
         }
 
+        /// <summary>Contextual tip in the hint card (replaces the controls hint) for a few seconds.</summary>
+        public void ShowHint(string text, float seconds)
+        {
+            if (hintText == null || string.IsNullOrEmpty(text)) return;
+            LastHint = text;
+            hintText.text = text;
+            hintPanel.gameObject.SetActive(true);
+            hintUntil = Time.unscaledTime + seconds;
+        }
+
+        /// <summary>Last text shown by <see cref="ShowHint"/> (test hook).</summary>
+        public string LastHint { get; private set; }
+
+        /// <summary>How long the controls card stays up at the start of a race: long for newcomers, a reminder later.</summary>
+        private float ControlsHintSeconds => PlatformGlue.Save != null && PlatformGlue.Save.Data.Races >= 3 ? 8f : hintSeconds;
+
         /// <summary>Short centred message (kill, death, pickup). The newest replaces the current one.</summary>
         public void ShowEvent(string text, Color color)
         {
@@ -507,6 +523,13 @@ namespace RacingGame
         // After CarCameraFollow.LateUpdate (execution order below), so the reticle matches this frame's camera.
         private void LateUpdate()
         {
+            if (countdownPunch > 0f)
+            {
+                // Each digit lands big and settles: 1.6× → 1× over ~0.4 s.
+                countdownPunch = Mathf.MoveTowards(countdownPunch, 0f, Time.unscaledDeltaTime * 2.5f);
+                float k = 1f + 0.6f * countdownPunch * countdownPunch;
+                centerPanel.localScale = new Vector3(k, k, 1f);
+            }
             if (race != null) { UpdateReticle(); UpdateToastAndWarnings(); }
             if (shownCenter != centerText.text)
             {
@@ -553,9 +576,13 @@ namespace RacingGame
             positionText.text = Loc.Format("hud.position", "pos", race.PositionOf(race.Player), "n", race.Participants.Count);
         }
 
+        private static readonly Color[] CountdownColors = { new Color(0.45f, 1f, 0.5f), new Color(1f, 0.9f, 0.3f), new Color(1f, 0.62f, 0.2f), new Color(1f, 0.32f, 0.25f) };
+        private float countdownPunch;
+
         private void OnCountdown(int value)
         {
-            centerText.fontSize = 140f; centerText.color = new Color(1f, 0.9f, 0.3f);
+            centerText.fontSize = 140f; centerText.color = CountdownColors[Mathf.Clamp(value, 0, CountdownColors.Length - 1)];
+            countdownPunch = 1f;
             centerText.text = value > 0 ? value.ToString() : Loc.Get("hud.go");
             if (value == 0) Invoke(nameof(ClearCenter), 1f);
         }
@@ -571,7 +598,11 @@ namespace RacingGame
         {
             foreach (var c in GetComponentsInChildren<Canvas>(true)) if (c.name == "HUD") c.gameObject.SetActive(visible);
             pausePanel.gameObject.SetActive(visible && PauseController.IsPaused);
-            if (visible) { hintUntil = Time.unscaledTime + hintSeconds; hintPanel.gameObject.SetActive(true); playerCar = null; }
+            if (visible)
+            {
+                hintText.text = Loc.Get(touchLayout ? "hud.hint.touch" : "hud.hint.keys");
+                hintUntil = Time.unscaledTime + ControlsHintSeconds; hintPanel.gameObject.SetActive(true); playerCar = null;
+            }
             if (eventPanel != null) eventPanel.gameObject.SetActive(false);
         }
 

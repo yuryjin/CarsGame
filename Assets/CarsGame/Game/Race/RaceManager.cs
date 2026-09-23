@@ -25,10 +25,6 @@ namespace RacingGame
         [Tooltip("After the player finishes, the rest of the field gets this long before the race ends.")]
         public float finishGraceSeconds = 20f;
 
-        [Header("Rubber-banding")]
-        public float rubberBandGapMetres = 150f;
-        public float rubberBandMinMultiplier = 0.8f;
-        public float rubberBandMaxMultiplier = 1.15f;
 
         public RaceState State { get; private set; } = RaceState.Idle;
         public double RaceStartTime { get; private set; }
@@ -245,8 +241,8 @@ namespace RacingGame
             if (changed) OnPositionsChanged?.Invoke();
         }
 
-        // Invisible help: AI far ahead of the player ease off, AI far behind get a little more top
-        // speed. Only top speed is touched (never grip or damage) so it never reads as cheating.
+        // Invisible help (Core.Sim.RubberBand): AI far behind get a little more top speed, AI far ahead ease
+        // off a little but never on their last lap. Only top speed is touched (never grip or damage).
         private void ApplyRubberBand()
         {
             var player = Player;
@@ -259,8 +255,8 @@ namespace RacingGame
                 var ai = p.GetComponent<AiDriver>();
                 if (ai == null) continue;
                 float gap = p.Progress.TotalProgress - playerProgress;          // + = AI ahead
-                float raw = 1f + Mathf.Clamp(-gap / rubberBandGapMetres, rubberBandMinMultiplier - 1f, rubberBandMaxMultiplier - 1f);
-                ai.speedMultiplier = Mathf.Lerp(1f, raw, strength);
+                bool lastLap = p.Progress.LapsCompleted >= laps - 1;
+                ai.speedMultiplier = Core.Sim.RubberBand.Multiplier(gap, lastLap, RaceTime, strength);
                 var gunner = p.GetComponent<AiGunner>();
                 if (gunner != null) gunner.suppressed = gap > 120f;   // far ahead: stop shooting at the pack
             }

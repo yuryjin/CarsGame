@@ -23,5 +23,37 @@ namespace RacingGame
         [Tooltip("Event that must be finished in the top 3 before this one unlocks (empty = always open).")]
         public string unlockAfterEventId = "";
         public int order;
+
+        [Header("3 Stars Goals")]
+        [Tooltip("Target position for Star 1 (default 3 = top 3).")]
+        public int star1TargetPosition = 3;
+        [Tooltip("Target kills for Star 2 (default 2).")]
+        public int star2TargetKills = 2;
+        [Tooltip("Require 0 deaths for Star 3.")]
+        public bool star3ZeroDeaths = true;
+
+        public int StarMask(RaceResultEntry me)
+        {
+            if (me == null) return 0;
+            return StarMask(me.Finished, me.Position, me.Kills, me.Deaths);
+        }
+
+        public int StarMask(bool finished, int position, int kills, int deaths)
+        {
+            int mask = 0;
+            if (finished && position <= (star1TargetPosition > 0 ? star1TargetPosition : 3)) mask |= 1;
+            if (kills >= (star2TargetKills > 0 ? star2TargetKills : 2)) mask |= 2;
+            if (finished && (!star3ZeroDeaths || deaths == 0)) mask |= 4;
+            return mask;
+        }
+
+        public static int CountStars(int mask)
+        {
+            int count = 0;
+            if ((mask & 1) != 0) count++;
+            if ((mask & 2) != 0) count++;
+            if ((mask & 4) != 0) count++;
+            return count;
+        }
     }
 }

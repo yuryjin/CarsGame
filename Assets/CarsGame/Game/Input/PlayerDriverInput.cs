@@ -23,6 +23,8 @@ namespace RacingGame
         public bool UsingActionMap => map != null;
         /// <summary>Current throttle level (0..1 forward) even while the car ignores commands (countdown revving).</summary>
         public float ThrottleLevel => Mathf.Max(0f, throttle);
+        /// <summary>The player's own throttle input before auto-throttle fills it in (0..1 forward).</summary>
+        public float RawThrottle { get; private set; }
 
         private void OnEnable()
         {
@@ -52,6 +54,7 @@ namespace RacingGame
         {
             if (map != null) ReadActions(); else PollDevices();
 
+            RawThrottle = Mathf.Max(0f, throttle);
             if (autoThrottle && Mathf.Abs(throttle) < 0.05f) throttle = brake ? 0f : 1f;
         }
 

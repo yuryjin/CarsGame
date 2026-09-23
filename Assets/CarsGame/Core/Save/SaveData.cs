@@ -19,8 +19,10 @@ namespace RacingGame.Core.Save
         public bool cameraShake = true;
         /// <summary>Last difficulty the player raced ("" = pick by experience).</summary>
         public string tier = "";
+        /// <summary>Contextual tips already shown (bit per <c>Core.Onboarding.Hint</c>).</summary>
+        public int hintsSeen;
     }
-    [Serializable] public class EventBest { public string eventId; public long bestTimeMs; }
+    [Serializable] public class EventBest { public string eventId; public long bestTimeMs; public int stars; }
     /// <summary>
     /// Monotonic counters written by ONE device. Every device owns its own row; totals are the
     /// sum of rows, and rows merge component-wise by max — so two devices that both spent
@@ -49,7 +51,7 @@ namespace RacingGame.Core.Save
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 1;
+        public const int CurrentVersion = 2;
         public int version = CurrentVersion;
         public long updatedAtUnixMs;
         public string deviceId = "";
@@ -72,5 +74,26 @@ namespace RacingGame.Core.Save
         public int Wins { get { int t = 0; foreach (var l in progress.ledger) t += l.wins; return t; } }
         public int Kills { get { int t = 0; foreach (var l in progress.ledger) t += l.kills; return t; } }
         public int Deaths { get { int t = 0; foreach (var l in progress.ledger) t += l.deaths; return t; } }
+        public int TotalStars
+        {
+            get
+            {
+                int total = 0;
+                if (progress?.bests != null)
+                {
+                    foreach (var b in progress.bests)
+                    {
+                        if (b != null)
+                        {
+                            int s = b.stars;
+                            if ((s & 1) != 0) total++;
+                            if ((s & 2) != 0) total++;
+                            if ((s & 4) != 0) total++;
+                        }
+                    }
+                }
+                return total;
+            }
+        }
     }
 }

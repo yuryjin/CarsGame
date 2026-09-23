@@ -15,6 +15,17 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void FirstFinishedRaceAffordsTheFirstUpgrade()
+        {
+            int easyThird = Economy.RaceReward(3, true, null, 0.8f);
+            Assert.Less(easyThird, UpgradeCatalog.Cost(0), "the floor matters: an easy 3rd place alone is short");
+            Assert.AreEqual(UpgradeCatalog.Cost(0), Economy.WithFirstRaceFloor(easyThird, true, true));
+            Assert.AreEqual(easyThird, Economy.WithFirstRaceFloor(easyThird, true, false), "only the first race");
+            Assert.AreEqual(0, Economy.WithFirstRaceFloor(0, false, true), "a DNF earns no floor");
+            Assert.AreEqual(300, Economy.WithFirstRaceFloor(300, true, true), "never lowers a bigger reward");
+        }
+
+        [Test]
         public void RepeatedKillsOnTheSameRivalPayLess()
         {
             int one = Economy.RaceReward(4, true, new[] { 1 }, 1f);

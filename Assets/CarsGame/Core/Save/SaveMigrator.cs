@@ -19,8 +19,11 @@ namespace RacingGame.Core.Save
             catch { status = SaveParseStatus.Corrupt; return null; }
             if (data == null) { status = SaveParseStatus.Corrupt; return null; }
             if (data.version <= 0) data.version = 1;
-            // version 1 -> current: nothing yet. Add steps here as the schema grows:
-            // if (data.version == 1) { ...; data.version = 2; }
+            if (data.version == 1)
+            {
+                // version 1 -> 2: stars in EventBest
+                data.version = 2;
+            }
             if (data.version > SaveData.CurrentVersion) { status = SaveParseStatus.NewerVersion; return null; }    // from a newer build: refuse rather than corrupt
             status = SaveParseStatus.Ok;
             data.settings ??= new SettingsData();

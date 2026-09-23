@@ -22,6 +22,13 @@ namespace RacingGame
         public FlowState State { get; private set; } = FlowState.Menu;
         public RaceEventDefinition CurrentEvent => RaceSetup.Event;
         public int LastReward { get; private set; }
+        public int LastStarsEarned { get; private set; }
+        /// <summary>Finish time minus the previous best (ms); negative = new record. Valid when <see cref="LastHadPreviousBest"/>.</summary>
+        public long LastBestDeltaMs { get; private set; }
+        public bool LastHadPreviousBest { get; private set; }
+        public bool LastWasPersonalBest { get; private set; }
+        /// <summary>Events this race unlocked (for the "Unlocked: …" toast and the Next button).</summary>
+        public readonly System.Collections.Generic.List<RaceEventDefinition> LastUnlocked = new System.Collections.Generic.List<RaceEventDefinition>();
         public bool LastRewardDoubled { get; private set; }
         public bool IsDoublingReward => doubling;
         public event System.Action<FlowState> StateChanged;
@@ -49,6 +56,8 @@ namespace RacingGame
             pickups = GetComponent<PickupSpawner>();
             recorder = GetComponent<GhostRecorder>() ?? gameObject.AddComponent<GhostRecorder>();
             if (GetComponent<DebugBus>() == null) gameObject.AddComponent<DebugBus>();   // QA channel; idle until the page sends a command
+            if (GetComponent<OnboardingHints>() == null) gameObject.AddComponent<OnboardingHints>();
+            if (GetComponent<PerfectStart>() == null) gameObject.AddComponent<PerfectStart>();
             track = TrackPath.Instance;
             var map = InputSystem.actions != null ? InputSystem.actions.FindActionMap("Driving") : null;
             pauseAction = map != null ? map.FindAction("Pause") : null;
@@ -118,6 +127,8 @@ namespace RacingGame
             if (ev != null && !IsUnlocked(ev)) { MenuScreens.Toast(Loc.Get("events.locked")); return; }
             Teardown();
             int generation = raceGeneration;
+            var tierSave = PlatformGlue.Save;   // remember the difficulty actually raced (direct PLAY, Next and Retry too)
+            if (tier != null && tierSave != null && tierSave.Data.settings.tier != tier.tierId) { tierSave.Data.settings.tier = tier.tierId; tierSave.MarkDirty(); }
 
             // Event rules
             race.tier = tier;
@@ -128,7 +139,8 @@ namespace RacingGame
             // Look before the field spawns so the first frame of the countdown is already correct.
             if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
 
-            LastReward = 0; LastRewardDoubled = false;
+            LastReward = 0; LastStarsEarned = 0; LastRewardDoubled = false;
+            LastBestDeltaMs = 0; LastHadPreviousBest = false; LastWasPersonalBest = false; LastUnlocked.Clear();
             if (MenuCameraDirector.Instance != null) MenuCameraDirector.Instance.Activate(false);   // camera hand-over before cars exist
             race.StartRace();
             if (race.State == RaceState.Idle) { EnterMenu(); return; }
@@ -258,7 +270,15 @@ namespace RacingGame
             }
         }
 
-        private void OnCountdown(int value) { SfxPlayer.Instance.PlayUi(value > 0 ? SfxSynth.Beep : SfxSynth.Go); }
+        private void OnCountdown(int value)
+        {
+            SfxPlayer.Instance.PlayUi(value > 0 ? SfxSynth.Beep : SfxSynth.Go);
+            if (value == 0)
+            {
+                var impulse = Camera.main != null ? Camera.main.GetComponent<CameraImpulse>() : null;
+                if (impulse != null) impulse.AddImpulse(0.15f);
+            }
+        }
         private void OnStarted()
         {
             if (playerEngine != null) playerEngine.SetRunning(true);
@@ -295,7 +315,17 @@ namespace RacingGame
             float mult = RaceSetup.Tier != null ? RaceSetup.Tier.rewardMultiplier : 1f;
             int[] killsPerVictim = me != null && me.Kills > 0 ? KillsPerVictim(race.Player) : null;
             LastReward = me != null ? Economy.RaceReward(me.Position, me.Finished, me.Laps, race.laps, killsPerVictim, mult) : 0;
+            // The floor is for the first FINISHED race (a DNF before it must not use it up); a finish always leaves a timed best.
+            bool firstFinish = save != null && !save.Data.progress.bests.Exists(b => b != null && b.bestTimeMs > 0);
+            if (me != null && save != null) LastReward = Economy.WithFirstRaceFloor(LastReward, me.Finished, firstFinish);
             LastRewardFinished = me != null && me.Finished;
+
+            int runStars = 0;
+            if (ev != null && me != null)
+            {
+                runStars = ev.StarMask(me);
+                LastStarsEarned = runStars;
+            }
 
             if (save != null && me != null)
             {
@@ -304,13 +334,30 @@ namespace RacingGame
                 row.races++;
                 row.kills += me.Kills; row.deaths += me.Deaths;
                 if (me.Finished && me.Position == 1) row.wins++;
-                if (ev != null && me.Finished)
+                if (ev != null)
                 {
-                    long ms = (long)(me.TotalTime * 1000.0);
                     var best = save.Data.progress.bests.Find(b => b.eventId == ev.eventId);
-                    if (best == null) save.Data.progress.bests.Add(new Core.Save.EventBest { eventId = ev.eventId, bestTimeMs = ms });
-                    else if (ms < best.bestTimeMs) best.bestTimeMs = ms;
-                    if (me.Position <= 3) UnlockNext(ev, save);
+                    if (me.Finished && best != null && best.bestTimeMs > 0)
+                    {
+                        LastHadPreviousBest = true;
+                        LastBestDeltaMs = (long)(me.TotalTime * 1000.0) - best.bestTimeMs;
+                    }
+                    LastWasPersonalBest = me.Finished && (!LastHadPreviousBest || LastBestDeltaMs < 0);
+                    if (best == null)
+                    {
+                        best = new Core.Save.EventBest { eventId = ev.eventId, bestTimeMs = me.Finished ? (long)(me.TotalTime * 1000.0) : 0, stars = runStars };
+                        save.Data.progress.bests.Add(best);
+                    }
+                    else
+                    {
+                        if (me.Finished)
+                        {
+                            long ms = (long)(me.TotalTime * 1000.0);
+                            if (ms < best.bestTimeMs || best.bestTimeMs <= 0) best.bestTimeMs = ms;
+                        }
+                        best.stars |= runStars;
+                    }
+                    if (me.Finished && me.Position <= 3) UnlockNext(ev, save);
                 }
                 save.MarkDirty();
             }
@@ -329,8 +376,20 @@ namespace RacingGame
             foreach (var e in events)
             {
                 if (e == null || e.unlockAfterEventId != finished.eventId) continue;
-                if (!save.Data.progress.unlockedEvents.Contains(e.eventId)) save.Data.progress.unlockedEvents.Add(e.eventId);
+                if (!save.Data.progress.unlockedEvents.Contains(e.eventId)) { save.Data.progress.unlockedEvents.Add(e.eventId); LastUnlocked.Add(e); }
             }
+        }
+
+        /// <summary>The event the results screen's "Next" starts: the first unlocked one after <paramref name="current"/> in menu order, else the current one again.</summary>
+        public RaceEventDefinition NextEvent(RaceEventDefinition current)
+        {
+            if (events == null || events.Length == 0) return current;
+            var ordered = new System.Collections.Generic.List<RaceEventDefinition>(events);
+            ordered.RemoveAll(e => e == null);
+            ordered.Sort((a, b) => a.order.CompareTo(b.order));
+            int at = current != null ? ordered.IndexOf(current) : -1;
+            for (int i = at + 1; i < ordered.Count; i++) if (IsUnlocked(ordered[i])) return ordered[i];
+            return current != null ? current : ordered[0];
         }
 
         public bool IsUnlocked(RaceEventDefinition e)

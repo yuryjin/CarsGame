@@ -12,6 +12,11 @@ namespace RacingGame.Core.Economy
         public static readonly int[] PositionPayout = { 300, 220, 160, 110, 80, 60, 50, 40 };
         public const int KillBonus = 25;
         public const int DnfPayout = 30;
+        /// <summary>A finished first race always pays at least the first upgrade, so the garage opens at once.</summary>
+        public const int FirstRaceMinimum = 150;
+
+        public static int WithFirstRaceFloor(int reward, bool finished, bool firstRace) =>
+            finished && firstRace ? Math.Max(reward, FirstRaceMinimum) : reward;
 
         public static int RaceReward(int position, bool finished, int[] killsPerVictim, float tierMultiplier) => RaceReward(position, finished, finished ? 1 : 0, 1, killsPerVictim, tierMultiplier);
 

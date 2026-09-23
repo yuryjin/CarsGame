@@ -52,11 +52,14 @@ namespace RacingGame.Tests
         [Test]
         public void UnlocksUnionBestsMinUpgradesMax()
         {
-            var a = Make(1, 0, 0, "e1", "e2"); a.progress.bests.Add(new EventBest { eventId = "e1", bestTimeMs = 60000 }); a.progress.upgrades = new[] { 2, 0, 1 };
-            var b = Make(2, 0, 0, "e3"); b.progress.bests.Add(new EventBest { eventId = "e1", bestTimeMs = 58000 }); b.progress.upgrades = new[] { 1, 3, 1 };
+            var a = Make(1, 0, 0, "e1", "e2"); a.progress.bests.Add(new EventBest { eventId = "e1", bestTimeMs = 60000, stars = 1 }); a.progress.upgrades = new[] { 2, 0, 1 };
+            var b = Make(2, 0, 0, "e3"); b.progress.bests.Add(new EventBest { eventId = "e1", bestTimeMs = 58000, stars = 6 }); b.progress.upgrades = new[] { 1, 3, 1 };
             var m = SaveMerge.Merge(a, b);
             CollectionAssert.AreEquivalent(new[] { "e1", "e2", "e3" }, m.progress.unlockedEvents);
-            Assert.AreEqual(58000, m.progress.bests.Find(x => x.eventId == "e1").bestTimeMs);
+            var bestE1 = m.progress.bests.Find(x => x.eventId == "e1");
+            Assert.AreEqual(58000, bestE1.bestTimeMs);
+            Assert.AreEqual(7, bestE1.stars, "stars 1 and 6 merged bitwise into 7 (1 | 2 | 4)");
+            Assert.AreEqual(3, m.TotalStars);
             CollectionAssert.AreEqual(new[] { 2, 3, 1 }, m.progress.upgrades);
         }
 
@@ -65,7 +68,7 @@ namespace RacingGame.Tests
         {
             var a = Make(100, 0, 0); a.settings.lang = "ru";
             var b = Make(200, 0, 0); b.settings.lang = "tr";
-            b.settings.cameraShake = false; b.settings.qualityAuto = false; b.settings.quality = 0; b.settings.tier = "hard";
+            b.settings.cameraShake = false; b.settings.qualityAuto = false; b.settings.quality = 0; b.settings.tier = "hard"; b.settings.hintsSeen = 5;
             Assert.AreEqual("tr", SaveMerge.Merge(a, b).settings.lang);
             Assert.AreEqual("tr", SaveMerge.Merge(b, a).settings.lang);
             // Every settings field comes from the newer save, not just the ones the merge used to copy.
@@ -74,6 +77,7 @@ namespace RacingGame.Tests
             Assert.IsFalse(merged.settings.qualityAuto);
             Assert.AreEqual(0, merged.settings.quality);
             Assert.AreEqual("hard", merged.settings.tier);
+            Assert.AreEqual(5, merged.settings.hintsSeen);
         }
 
         [Test]

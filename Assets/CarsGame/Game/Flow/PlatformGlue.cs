@@ -76,7 +76,8 @@ namespace RacingGame
         {
             var p = Platform;
             if (p == null || p.Leaderboards == null || !p.Player.IsAuthorized || Save == null) return;
-            foreach (var b in Save.Data.progress.bests) await p.Leaderboards.SubmitAsync("best_" + b.eventId, b.bestTimeMs);
+            foreach (var b in Save.Data.progress.bests)
+                if (b.bestTimeMs > 0) await p.Leaderboards.SubmitAsync("best_" + b.eventId, b.bestTimeMs);   // stars-only rows have no time
         }
 
         // Sign-in swapped the account: no cloud write until the new account's save is fetched and merged.

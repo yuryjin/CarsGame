@@ -42,11 +42,10 @@ namespace RacingGame.Core.Save
             m.progress.unlockedEvents = new List<string>(unlocked);
             m.progress.unlockedEvents.Sort(StringComparer.Ordinal);
 
-            var bests = new Dictionary<string, long>();
+            var bests = new Dictionary<string, EventBest>();
             foreach (var e in a.progress.bests ?? new List<EventBest>()) Best(bests, e);
             foreach (var e in b.progress.bests ?? new List<EventBest>()) Best(bests, e);
-            m.progress.bests = new List<EventBest>();
-            foreach (var kv in bests) m.progress.bests.Add(new EventBest { eventId = kv.Key, bestTimeMs = kv.Value });
+            m.progress.bests = new List<EventBest>(bests.Values);
             m.progress.bests.Sort((x, y) => string.CompareOrdinal(x.eventId, y.eventId));
 
             return m;
@@ -69,15 +68,23 @@ namespace RacingGame.Core.Save
         private static DeviceLedger Copy(DeviceLedger r) => new DeviceLedger { deviceId = r.deviceId ?? "", coinsEarned = r.coinsEarned, coinsSpent = r.coinsSpent, races = r.races, wins = r.wins, kills = r.kills, deaths = r.deaths, distanceKm = r.distanceKm };
 
         private static int At(int[] arr, int i) => arr != null && i < arr.Length ? arr[i] : 0;
-        private static void Best(Dictionary<string, long> d, EventBest e)
+        private static void Best(Dictionary<string, EventBest> d, EventBest e)
         {
-            if (e == null || string.IsNullOrEmpty(e.eventId) || e.bestTimeMs <= 0) return;
-            if (!d.TryGetValue(e.eventId, out long cur) || e.bestTimeMs < cur) d[e.eventId] = e.bestTimeMs;
+            if (e == null || string.IsNullOrEmpty(e.eventId)) return;
+            if (!d.TryGetValue(e.eventId, out var cur))
+            {
+                d[e.eventId] = new EventBest { eventId = e.eventId, bestTimeMs = e.bestTimeMs, stars = e.stars };
+            }
+            else
+            {
+                if (e.bestTimeMs > 0 && (cur.bestTimeMs <= 0 || e.bestTimeMs < cur.bestTimeMs)) cur.bestTimeMs = e.bestTimeMs;
+                cur.stars |= e.stars;
+            }
         }
         private static SettingsData Clone(SettingsData s) => new SettingsData
         {
             lang = s.lang, sfx = s.sfx, music = s.music, quality = s.quality, qualityAuto = s.qualityAuto,
-            autoThrottle = s.autoThrottle, cameraShake = s.cameraShake, tier = s.tier
+            autoThrottle = s.autoThrottle, cameraShake = s.cameraShake, tier = s.tier, hintsSeen = s.hintsSeen
         };
     }
 }

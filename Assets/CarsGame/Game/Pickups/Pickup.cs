@@ -15,9 +15,12 @@ namespace RacingGame
         public float healAmount = 35f;
         public float nitroSeconds = 3f;
         public bool Taken { get; private set; }
+        /// <summary>(pickup, car that took it) — for toasts and first-time tips.</summary>
+        public static event System.Action<Pickup, CarController> PickedUp;
         public int TakenTick { get; private set; }
 
         private Transform visual;
+        private float bobPhase;
         private static Material[] materials;
 
         public static Pickup Create(PickupKind kind, Vector3 position, Transform parent)
@@ -27,7 +30,7 @@ namespace RacingGame
             go.transform.position = position;
             int layer = LayerMask.NameToLayer("Track");
             var col = go.AddComponent<SphereCollider>();
-            col.isTrigger = true; col.radius = 1.3f;
+            col.isTrigger = true; col.radius = 1.8f;   // forgiving: a pickup grazed by the wing counts
             var p = go.AddComponent<Pickup>();
             p.kind = kind;
             p.BuildVisual();
@@ -40,14 +43,24 @@ namespace RacingGame
             Destroy(v.GetComponent<Collider>());
             v.transform.SetParent(transform, false);
             v.transform.localPosition = Vector3.up * 0.9f;
-            v.transform.localScale = Vector3.one * 0.7f;
+            v.transform.localScale = Vector3.one;
             var r = v.GetComponent<Renderer>();
             r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             r.sharedMaterial = MaterialFor(kind);
             visual = v.transform;
+            // A thin glowing post above the pickup: readable from a distance and over other cars.
+            var beacon = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            Destroy(beacon.GetComponent<Collider>());
+            beacon.name = "Beacon";
+            beacon.transform.SetParent(transform, false);
+            beacon.transform.localPosition = Vector3.up * 2.9f;
+            beacon.transform.localScale = new Vector3(0.25f, 1.5f, 0.25f);
+            var br = beacon.GetComponent<Renderer>();
+            br.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            br.sharedMaterial = r.sharedMaterial;
+            bobPhase = (transform.position.x + transform.position.z) * 0.37f;
         }
 
-        // TODO(M8): serialized material assets instead of Shader.Find.
         private static Material MaterialFor(PickupKind kind)
         {
             if (materials == null)
@@ -68,7 +81,9 @@ namespace RacingGame
 
         private void Update()
         {
-            if (visual != null) visual.Rotate(Vector3.up, 120f * Time.deltaTime, Space.World);
+            if (visual == null) return;
+            visual.Rotate(Vector3.up, 120f * Time.deltaTime, Space.World);
+            visual.localPosition = new Vector3(0f, 0.9f + 0.15f * Mathf.Sin(Time.time * 2.5f + bobPhase), 0f);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -89,6 +104,7 @@ namespace RacingGame
             EffectPool.Instance.PlayFlash(transform.position + Vector3.up * 0.9f, new Color(0.8f, 1f, 0.9f), 0.3f, 1.6f, 5f, 3f);
             SfxPlayer.Instance.Play(SfxSynth.LapDing, transform.position, 0.6f, kind == PickupKind.Nitro ? 1.3f : 1f);
             gameObject.SetActive(false);
+            PickedUp?.Invoke(this, car);
         }
 
         /// <summary>Respawn unless a car is sitting on the spot (it would pop straight back into it).</summary>
