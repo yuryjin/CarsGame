@@ -23,6 +23,10 @@ namespace RacingGame
         [Tooltip("Grip multiplier applied when Punctured is active.")]
         public float puncturedGripMultiplier = 0.6f;
 
+        [Header("Slowed Settings")]
+        [Tooltip("Grip multiplier applied when Slowed (e.g. oil slick) is active.")]
+        public float slowedGripMultiplier = 0.4f;
+
         public event Action<StatusKind, bool> OnStatusChanged;
         public event Action OnShieldConsumed;
 
@@ -32,6 +36,7 @@ namespace RacingGame
         private int jammedUntilTick = -1;
         private int puncturedUntilTick = -1;
         private int shieldUntilTick = -1;
+        private int slowedUntilTick = -1;
 
         private CarController controller;
 
@@ -44,6 +49,7 @@ namespace RacingGame
         public bool IsJammed => CurrentTick < jammedUntilTick;
         public bool IsPunctured => CurrentTick < puncturedUntilTick;
         public bool HasShield => CurrentTick < shieldUntilTick;
+        public bool IsSlowed => CurrentTick < slowedUntilTick;
         public bool HasFrozenImmunity => CurrentTick < frozenImmunityUntilTick;
 
         /// <summary>Dominant speed penalty (rule of strongest debuff, never multiplied).</summary>
@@ -75,6 +81,10 @@ namespace RacingGame
                 if (tick < puncturedUntilTick)
                 {
                     multiplier = Mathf.Min(multiplier, puncturedGripMultiplier);
+                }
+                if (tick < slowedUntilTick)
+                {
+                    multiplier = Mathf.Min(multiplier, slowedGripMultiplier);
                 }
                 return Mathf.Clamp(multiplier, 0.3f, 1f);
             }
@@ -130,6 +140,12 @@ namespace RacingGame
                 shieldUntilTick = -1;
                 OnStatusChanged?.Invoke(StatusKind.Shield, false);
             }
+
+            if (slowedUntilTick >= 0 && tick >= slowedUntilTick)
+            {
+                slowedUntilTick = -1;
+                OnStatusChanged?.Invoke(StatusKind.Slowed, false);
+            }
         }
 
         public bool ApplyStatus(StatusKind kind, float durationSeconds, float magnitude = 1f)
@@ -170,6 +186,12 @@ namespace RacingGame
                     bool wasShielded = now < shieldUntilTick;
                     shieldUntilTick = Mathf.Max(shieldUntilTick, targetTick);
                     if (!wasShielded) OnStatusChanged?.Invoke(StatusKind.Shield, true);
+                    return true;
+
+                case StatusKind.Slowed:
+                    bool wasSlowed = now < slowedUntilTick;
+                    slowedUntilTick = Mathf.Max(slowedUntilTick, targetTick);
+                    if (!wasSlowed) OnStatusChanged?.Invoke(StatusKind.Slowed, true);
                     return true;
 
                 default:
@@ -219,6 +241,15 @@ namespace RacingGame
                     }
                     return false;
 
+                case StatusKind.Slowed:
+                    if (now < slowedUntilTick)
+                    {
+                        slowedUntilTick = -1;
+                        OnStatusChanged?.Invoke(StatusKind.Slowed, false);
+                        return true;
+                    }
+                    return false;
+
                 default:
                     return false;
             }
@@ -243,14 +274,16 @@ namespace RacingGame
             jammedUntilTick = -1;
             puncturedUntilTick = -1;
             shieldUntilTick = -1;
+            slowedUntilTick = -1;
         }
 
-        /// <summary>Clears all negative debuffs (Frozen, Jammed, Punctured).</summary>
+        /// <summary>Clears all negative debuffs (Frozen, Jammed, Punctured, Slowed).</summary>
         public void ClearDebuffs()
         {
             RemoveStatus(StatusKind.Frozen);
             RemoveStatus(StatusKind.Jammed);
             RemoveStatus(StatusKind.Punctured);
+            RemoveStatus(StatusKind.Slowed);
         }
 
         public bool IsActive(StatusKind kind)
@@ -262,6 +295,7 @@ namespace RacingGame
                 case StatusKind.Jammed: return now < jammedUntilTick;
                 case StatusKind.Punctured: return now < puncturedUntilTick;
                 case StatusKind.Shield: return now < shieldUntilTick;
+                case StatusKind.Slowed: return now < slowedUntilTick;
                 default: return false;
             }
         }
@@ -276,6 +310,7 @@ namespace RacingGame
                 case StatusKind.Jammed: until = jammedUntilTick; break;
                 case StatusKind.Punctured: until = puncturedUntilTick; break;
                 case StatusKind.Shield: until = shieldUntilTick; break;
+                case StatusKind.Slowed: until = slowedUntilTick; break;
             }
             return until > now ? until - now : 0;
         }

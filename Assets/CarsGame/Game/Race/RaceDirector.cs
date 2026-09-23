@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using RacingGame.Core.Combat;
 using RacingGame.Core.Sim;
 
 namespace RacingGame
@@ -36,7 +37,9 @@ namespace RacingGame
         }
 
         /// <summary>The live director or null — never creates one.</summary>
-        public static RaceDirector Current => SimulationDriver.Current != null ? SimulationDriver.Current.GetComponent<RaceDirector>() : null;
+        public static RaceDirector Current => SimulationDriver.Current != null
+            ? SimulationDriver.Current.GetComponent<RaceDirector>()
+            : FindAnyObjectByType<RaceDirector>();
 
         public RngStreams Rng
         {
@@ -65,6 +68,22 @@ namespace RacingGame
         public event Action<GameObject, GameObject> ShellHit;
         /// <summary>(owner, victim) — fired when a mine damages a car.</summary>
         public event Action<GameObject, GameObject> MineHit;
+        /// <summary>Fired when a car is eliminated with killer and victim attribution.</summary>
+        public event Action<KillEvent> OnKillRegistered;
+
+        public void RegisterKill(int killerId, int victimId)
+        {
+            int expireTick = SimulationDriver.Instance != null
+                ? SimulationDriver.Instance.Tick + SimulationDriver.SecondsToTicks(4f)
+                : 0;
+            var killEvent = new KillEvent(killerId, victimId, expireTick);
+            OnKillRegistered?.Invoke(killEvent);
+        }
+
+        public void RegisterKill(KillEvent killEvent)
+        {
+            OnKillRegistered?.Invoke(killEvent);
+        }
 
         internal void CountHit(GameObject shooter, GameObject victim)
         {
@@ -112,6 +131,25 @@ namespace RacingGame
         public IReadOnlyList<MineHazard> LiveMineHazards => liveMines;
         private int MaxLiveMinesCap => Mathf.Max(1, maxLiveMines);
         public int PooledMines => pooledMines.Count;
+
+        public OilHazardPool OilSlicks
+        {
+            get
+            {
+                if (oilSlicks == null)
+                {
+                    oilSlicks = GetComponent<OilHazardPool>();
+                    if (oilSlicks == null) oilSlicks = gameObject.AddComponent<OilHazardPool>();
+                }
+                return oilSlicks;
+            }
+        }
+        private OilHazardPool oilSlicks;
+
+        public void SpawnOilSlick(Vector3 position, float lifetimeSeconds = OilHazardPool.DefaultLifetimeSeconds)
+        {
+            OilSlicks.SpawnSlick(position, Tick, lifetimeSeconds);
+        }
 
         public Projectile RequestProjectile(in ProjectileSpawn spawn)
         {
@@ -168,6 +206,7 @@ namespace RacingGame
         {
             for (int i = liveShells.Count - 1; i >= 0; i--) liveShells[i].Deactivate();
             for (int i = liveMines.Count - 1; i >= 0; i--) liveMines[i].Deactivate();
+            if (oilSlicks != null) oilSlicks.ResetSlicks();
             ShotsFired = 0;
             ShellHits = 0;
             MinesDropped = 0;
@@ -181,6 +220,7 @@ namespace RacingGame
             // Iterate backwards: objects that expire remove themselves from live lists.
             for (int i = liveShells.Count - 1; i >= 0; i--) liveShells[i].SimulationStep(tick);
             for (int i = liveMines.Count - 1; i >= 0; i--) liveMines[i].SimulationStep(tick);
+            if (oilSlicks != null) oilSlicks.SimulationStep(tick, cars);
         }
 
         private Transform ShellRoot

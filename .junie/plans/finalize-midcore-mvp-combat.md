@@ -128,7 +128,7 @@ Verification will be performed via EditMode unit tests (via `./Tools/qa/edit-tes
 
 # Delivery Steps
 
-### * Step 1: Implement Kill Feed and Hitmarker Kill Confirmation
+### ✓ Step 1: Implement Kill Feed and Hitmarker Kill Confirmation
 The HUD displays kill confirmations on the hitmarker and a 3-slot kill feed without allocating GC memory during races.
 
 - Preallocate a 3-entry ring buffer in `HudScreen.cs` for active kill events with duration timers (4 seconds).
@@ -137,7 +137,7 @@ The HUD displays kill confirmations on the hitmarker and a 3-slot kill feed with
 - Pre-cache localized racer names from `strings.csv` (`ai.name.*`, `player.name`) to prevent runtime string formatting allocations.
 - Add unit tests in `Assets/CarsGame/Tests/EditMode/KillFeedTests.cs` verifying slot rotation, duration decay, and allocation-free rendering.
 
-###   Step 2: Implement Triggerless Oil Slick Hazard System
+### ✓ Step 2: Implement Triggerless Oil Slick Hazard System
 Vehicle wrecks spawn temporary oil slicks on the track that apply slowed status and grip penalties via distance checks in simulation ticks.
 
 - Create `OilSlickPool` in `Assets/CarsGame/Game/Race/` or inside `RaceDirector.cs` with a maximum capacity of 3 active slicks.
@@ -146,7 +146,7 @@ Vehicle wrecks spawn temporary oil slicks on the track that apply slowed status 
 - Apply `StatusKind.Slowed` (2s) and reduced grip (0.4 factor) to vehicles stepping onto oil slicks via `CarStatus.ApplyStatus()`.
 - Add unit tests in `Assets/CarsGame/Tests/EditMode/OilHazardTests.cs` validating spawn limits, lifetime expiry, and status application.
 
-###   Step 3: Enhance HUD Status Icons and Camera Shake Settings
+### * Step 3: Enhance HUD Status Icons and Camera Shake Settings
 Players have clear status indicator widgets on the HUD and a configurable camera shake option in settings.
 
 - Add dedicated icon/glyph widgets to `HudScreen.cs` for active statuses (`Frozen`, `Jammed`, `Punctured`, `Shield`) updating only on status change events.

@@ -45,6 +45,8 @@ namespace RacingGame
 
         public event Action<float, float> OnHealthChanged; // current, max
         public event Action<GameObject> OnDied; // attacker (may be null)
+        public event Action<CarHealth> OnWreck;
+        public event Action<int, int> OnKillRegistered; // (killerId, victimId)
         public event Action OnRespawned;
 
         public float Health => currentHealth;
@@ -248,6 +250,23 @@ namespace RacingGame
             }
 
             OnDied?.Invoke(attacker);
+            OnWreck?.Invoke(this);
+
+            int victimId = controller != null ? controller.CarId : 0;
+            int killerId = 0;
+            if (attacker != null)
+            {
+                var killerCar = attacker.GetComponentInParent<CarController>();
+                if (killerCar != null) killerId = killerCar.CarId;
+            }
+            OnKillRegistered?.Invoke(killerId, victimId);
+
+            var director = RaceDirector.Current ?? FindAnyObjectByType<RaceDirector>() ?? RaceDirector.Instance;
+            if (director != null)
+            {
+                director.RegisterKill(killerId, victimId);
+                director.SpawnOilSlick(transform.position);
+            }
         }
 
         private void Respawn()

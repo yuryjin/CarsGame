@@ -9,6 +9,7 @@ namespace RacingGame.Core.Combat
         Frozen = 1,
         Jammed = 2,
         Punctured = 3,
-        Shield = 4
+        Shield = 4,
+        Slowed = 5
     }
 }

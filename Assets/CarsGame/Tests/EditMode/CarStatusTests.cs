@@ -33,6 +33,7 @@ namespace RacingGame.Tests
             Assert.IsFalse(status.IsJammed);
             Assert.IsFalse(status.IsPunctured);
             Assert.IsFalse(status.HasShield);
+            Assert.IsFalse(status.IsSlowed);
             Assert.IsFalse(status.HasFrozenImmunity);
             Assert.AreEqual(1f, status.SpeedMultiplier, 1e-4f);
             Assert.AreEqual(1f, status.GripMultiplier, 1e-4f);
@@ -125,6 +126,21 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void SlowedStatus_AppliesGripPenaltyAndExpires()
+        {
+            status.SimulationStep(0);
+            bool applied = status.ApplyStatus(StatusKind.Slowed, 50);
+            Assert.IsTrue(applied);
+            Assert.IsTrue(status.IsSlowed);
+            Assert.AreEqual(0.4f, status.GripMultiplier, 1e-4f);
+            Assert.AreEqual(1f, status.SpeedMultiplier, 1e-4f);
+
+            status.SimulationStep(50);
+            Assert.IsFalse(status.IsSlowed);
+            Assert.AreEqual(1f, status.GripMultiplier, 1e-4f);
+        }
+
+        [Test]
         public void ClearAllStatuses_ClearsEverything()
         {
             status.SimulationStep(0);
@@ -132,6 +148,7 @@ namespace RacingGame.Tests
             status.ApplyStatus(StatusKind.Jammed, 50);
             status.ApplyStatus(StatusKind.Punctured, 50);
             status.ApplyStatus(StatusKind.Shield, 50);
+            status.ApplyStatus(StatusKind.Slowed, 50);
 
             status.ClearAllStatuses();
 
@@ -139,6 +156,7 @@ namespace RacingGame.Tests
             Assert.IsFalse(status.IsJammed);
             Assert.IsFalse(status.IsPunctured);
             Assert.IsFalse(status.HasShield);
+            Assert.IsFalse(status.IsSlowed);
             Assert.IsFalse(status.HasFrozenImmunity);
             Assert.AreEqual(1f, status.SpeedMultiplier, 1e-4f);
             Assert.AreEqual(1f, status.GripMultiplier, 1e-4f);
