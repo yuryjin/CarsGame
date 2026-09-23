@@ -81,4 +81,53 @@ namespace RacingGame.Core.Economy
             return true;
         }
     }
+
+    public enum WeaponKind { Mines = 0, FreezeLauncher = 1, MachineGun = 2 }
+
+    /// <summary>Purchasable and upgradable weapon modules for secondary and primary slots.</summary>
+    public static class WeaponCatalog
+    {
+        public const int MaxLevel = 3;
+        public const int BaseCost = 200;
+        public const float CostGrowth = 1.5f;
+
+        public static int Cost(int currentLevel) => currentLevel >= MaxLevel ? int.MaxValue : (int)Math.Round(BaseCost * Math.Pow(CostGrowth, currentLevel));
+
+        public readonly struct WeaponEffects
+        {
+            public readonly float AmmoFactor, CooldownFactor, DamageFactor, HeatFactor;
+            public WeaponEffects(float ammo, float cooldown, float damage, float heat)
+            {
+                AmmoFactor = ammo;
+                CooldownFactor = cooldown;
+                DamageFactor = damage;
+                HeatFactor = heat;
+            }
+        }
+
+        public static WeaponEffects For(int level)
+        {
+            int lvl = Math.Clamp(level, 0, MaxLevel);
+            if (lvl == 0) return new WeaponEffects(1f, 1f, 1f, 1f);
+            int upg = lvl - 1;
+            return new WeaponEffects(
+                ammo: 1f + 0.34f * upg,
+                cooldown: 1f - 0.15f * upg,
+                damage: 1f + 0.20f * upg,
+                heat: 1f - 0.15f * upg
+            );
+        }
+
+        public static int Level(int[] levels, int kind) => levels != null && kind < levels.Length ? Math.Clamp(levels[kind], 0, MaxLevel) : 0;
+
+        /// <summary>Attempt a purchase against a balance. Returns whether purchase succeeded.</summary>
+        public static bool TryBuy(int[] levels, WeaponKind kind, long coins, out int cost)
+        {
+            int lvl = Level(levels, (int)kind);
+            cost = Cost(lvl);
+            if (lvl >= MaxLevel || coins < cost) return false;
+            levels[(int)kind] = lvl + 1;
+            return true;
+        }
+    }
 }

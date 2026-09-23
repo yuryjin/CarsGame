@@ -64,6 +64,25 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void WeaponsMergeByMaxAndEquippedFollowsNewer()
+        {
+            var a = Make(100, 0, 0);
+            a.progress.weapons = new[] { 2, 0, 1 };
+            a.progress.equippedSecondary = 1;
+            a.progress.equippedPrimary = 0;
+
+            var b = Make(200, 0, 0);
+            b.progress.weapons = new[] { 1, 3, 0 };
+            b.progress.equippedSecondary = 2;
+            b.progress.equippedPrimary = 1;
+
+            var m = SaveMerge.Merge(a, b);
+            CollectionAssert.AreEqual(new[] { 2, 3, 1 }, m.progress.weapons);
+            Assert.AreEqual(2, m.progress.equippedSecondary, "equipped secondary follows newer save b");
+            Assert.AreEqual(1, m.progress.equippedPrimary, "equipped primary follows newer save b");
+        }
+
+        [Test]
         public void SettingsFollowTheNewerBlob()
         {
             var a = Make(100, 0, 0); a.settings.lang = "ru";

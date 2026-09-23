@@ -34,8 +34,15 @@ namespace RacingGame.Core.Save
             m.progress.ledger.Sort((x, y) => string.CompareOrdinal(x.deviceId, y.deviceId));
 
             int n = Math.Max(a.progress.upgrades?.Length ?? 0, b.progress.upgrades?.Length ?? 0);
-            m.progress.upgrades = new int[n];
-            for (int i = 0; i < n; i++) m.progress.upgrades[i] = Math.Max(At(a.progress.upgrades, i), At(b.progress.upgrades, i));
+            m.progress.upgrades = new int[Math.Max(3, n)];
+            for (int i = 0; i < m.progress.upgrades.Length; i++) m.progress.upgrades[i] = Math.Max(At(a.progress.upgrades, i), At(b.progress.upgrades, i));
+
+            int nw = Math.Max(a.progress.weapons?.Length ?? 0, b.progress.weapons?.Length ?? 0);
+            m.progress.weapons = new int[Math.Max(3, nw)];
+            for (int i = 0; i < m.progress.weapons.Length; i++) m.progress.weapons[i] = Math.Max(At(a.progress.weapons, i), At(b.progress.weapons, i));
+
+            m.progress.equippedSecondary = newer.progress.equippedSecondary;
+            m.progress.equippedPrimary = newer.progress.equippedPrimary;
 
             var unlocked = new HashSet<string>(a.progress.unlockedEvents ?? new List<string>());
             foreach (var u in b.progress.unlockedEvents ?? new List<string>()) unlocked.Add(u);

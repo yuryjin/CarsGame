@@ -221,7 +221,11 @@ namespace RacingGame
             if (player == null) return;
             playerCar = player.Car;
             var save = PlatformGlue.Save;
-            if (save != null) PlayerProgression.ApplyTo(playerCar, player.Health, playerCar.GetComponent<CarCannon>(), save.Data.progress.upgrades);
+            if (save != null)
+            {
+                PlayerProgression.ApplyTo(playerCar, player.Health, playerCar.GetComponent<CarCannon>(), save.Data.progress.upgrades);
+                PlayerProgression.ApplyWeapons(player.Weapons, save.Data.progress.weapons, save.Data.progress.equippedSecondary, save.Data.progress.equippedPrimary);
+            }
 
             if (playerCar.GetComponent<PlayerEffects>() == null) playerCar.gameObject.AddComponent<PlayerEffects>();
             // Engine, tyres and wind for the player; revs with the pedal during the countdown.

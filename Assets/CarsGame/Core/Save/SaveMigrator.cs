@@ -24,11 +24,29 @@ namespace RacingGame.Core.Save
                 // version 1 -> 2: stars in EventBest
                 data.version = 2;
             }
+            if (data.version == 2)
+            {
+                // version 2 -> 3: weapons and equipped weapon slots
+                data.version = 3;
+            }
             if (data.version > SaveData.CurrentVersion) { status = SaveParseStatus.NewerVersion; return null; }    // from a newer build: refuse rather than corrupt
             status = SaveParseStatus.Ok;
             data.settings ??= new SettingsData();
             data.progress ??= new ProgressData();
             data.progress.upgrades ??= new int[3];
+            if (data.progress.upgrades.Length < 3)
+            {
+                var u = new int[3];
+                System.Array.Copy(data.progress.upgrades, u, data.progress.upgrades.Length);
+                data.progress.upgrades = u;
+            }
+            data.progress.weapons ??= new int[3];
+            if (data.progress.weapons.Length < 3)
+            {
+                var w = new int[3];
+                System.Array.Copy(data.progress.weapons, w, data.progress.weapons.Length);
+                data.progress.weapons = w;
+            }
             data.progress.unlockedEvents ??= new System.Collections.Generic.List<string>();
             data.progress.bests ??= new System.Collections.Generic.List<EventBest>();
             data.progress.ledger ??= new System.Collections.Generic.List<DeviceLedger>();

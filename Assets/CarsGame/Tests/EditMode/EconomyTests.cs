@@ -60,5 +60,33 @@ namespace RacingGame.Tests
             var max = new[] { 4, 4, 4 };
             Assert.IsFalse(UpgradeCatalog.TryBuy(max, UpgradeKind.Armor, long.MaxValue, out _));
         }
+
+        [Test]
+        public void WeaponCatalogCostsAndEffectsScaleCorrectly()
+        {
+            var weapons = new[] { 0, 0, 0 };
+            Assert.AreEqual(200, WeaponCatalog.Cost(0));
+            Assert.IsTrue(WeaponCatalog.TryBuy(weapons, WeaponKind.Mines, 200, out int cost));
+            Assert.AreEqual(200, cost);
+            Assert.AreEqual(1, weapons[(int)WeaponKind.Mines]);
+
+            // Second level cost
+            Assert.AreEqual(300, WeaponCatalog.Cost(1));
+            Assert.IsFalse(WeaponCatalog.TryBuy(weapons, WeaponKind.Mines, 250, out cost));
+            Assert.AreEqual(300, cost);
+
+            var fx0 = WeaponCatalog.For(0);
+            Assert.AreEqual(1f, fx0.AmmoFactor);
+            Assert.AreEqual(1f, fx0.CooldownFactor);
+
+            var fx2 = WeaponCatalog.For(2);
+            Assert.Greater(fx2.AmmoFactor, 1f);
+            Assert.Less(fx2.CooldownFactor, 1f);
+            Assert.Greater(fx2.DamageFactor, 1f);
+            Assert.Less(fx2.HeatFactor, 1f);
+
+            var maxWeapons = new[] { 3, 3, 3 };
+            Assert.IsFalse(WeaponCatalog.TryBuy(maxWeapons, WeaponKind.MachineGun, long.MaxValue, out _));
+        }
     }
 }

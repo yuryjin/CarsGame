@@ -44,6 +44,9 @@ namespace RacingGame.Core.Save
     {
         public List<DeviceLedger> ledger = new List<DeviceLedger>();
         public int[] upgrades = new int[3];
+        public int[] weapons = new int[3];
+        public int equippedSecondary = 0;
+        public int equippedPrimary = 0;
         public List<string> unlockedEvents = new List<string>();
         public List<EventBest> bests = new List<EventBest>();
     }
@@ -51,7 +54,7 @@ namespace RacingGame.Core.Save
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 2;
+        public const int CurrentVersion = 3;
         public int version = CurrentVersion;
         public long updatedAtUnixMs;
         public string deviceId = "";

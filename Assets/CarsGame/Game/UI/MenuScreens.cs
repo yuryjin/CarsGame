@@ -312,6 +312,8 @@ namespace RacingGame
         {
             var content = UiFactory.Scroll(Header(root, "garage.title"), "GarageScroll", Vector2.zero, Vector2.zero);
             var save = PlatformGlue.Save;
+
+            Section(content, "UpgradesTitle", Loc.Get("garage.upgrades"));
             foreach (var kind in new[] { UpgradeKind.Engine, UpgradeKind.Armor, UpgradeKind.Cannon })
             {
                 string key = kind.ToString().ToLowerInvariant();
@@ -327,6 +329,47 @@ namespace RacingGame
                 UiFactory.Button(row, "Buy_" + key, maxed ? Loc.Get("garage.max") : Loc.Format("garage.buy", "cost", cost), maxed || !affordable ? null : () => Buy(kind), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-296f, -25f), new Vector2(-30f, 55f), 28f, maxed ? UiFactory.Raised : affordable ? UiFactory.Accent : UiFactory.Raised);
                 if (!maxed && !affordable) Label(row, "Reason", Loc.Get("garage.not_enough"), 22f, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-296f, -82f), new Vector2(-30f, -32f), UiFactory.Muted, TextAlignmentOptions.Center);
             }
+
+            Section(content, "WeaponsTitle", Loc.Get("garage.weapons"));
+            foreach (var kind in new[] { WeaponKind.Mines, WeaponKind.FreezeLauncher, WeaponKind.MachineGun })
+            {
+                string key = kind.ToString().ToLowerInvariant();
+                int level = WeaponCatalog.Level(save?.Data.progress.weapons, (int)kind), cost = WeaponCatalog.Cost(level);
+                bool maxed = level >= WeaponCatalog.MaxLevel;
+                bool affordable = save != null && save.Data.Coins >= cost;
+                bool unlocked = level > 0;
+
+                bool isEquipped = false;
+                if (kind == WeaponKind.MachineGun)
+                {
+                    isEquipped = save != null && save.Data.progress.equippedPrimary == 1;
+                }
+                else if (kind == WeaponKind.Mines)
+                {
+                    isEquipped = save != null && save.Data.progress.equippedSecondary == (int)SecondaryWeaponType.Mines;
+                }
+                else if (kind == WeaponKind.FreezeLauncher)
+                {
+                    isEquipped = save != null && save.Data.progress.equippedSecondary == (int)SecondaryWeaponType.FreezeLauncher;
+                }
+
+                var row = Item(content, "Weapon_" + key, Narrow ? 320f : 244f);
+                Label(row, "Name", Loc.Get("garage." + key), 36f, Top, Vector2.one, new Vector2(30f, -66f), new Vector2(-420f, -20f)).fontStyle = FontStyles.Bold;
+                Label(row, "Description", Loc.Get("garage." + key + ".desc"), 24f, Top, Vector2.one, new Vector2(30f, -118f), new Vector2(-420f, -70f), UiFactory.Muted);
+                string levelStr = level == 0 ? Loc.Get("garage.locked") : Loc.Format("garage.level", "lvl", level, "max", WeaponCatalog.MaxLevel);
+                Label(row, "Level", levelStr, 23f, Top, Vector2.one, new Vector2(30f, -162f), new Vector2(-420f, -120f), unlocked ? UiFactory.Accent : UiFactory.Muted);
+                var progress = UiFactory.Panel(row, "Progress", Vector2.zero, new Vector2(1f, 0f), new Vector2(30f, 30f), new Vector2(-420f, 44f));
+                for (int i = 0; i < WeaponCatalog.MaxLevel; i++) UiFactory.Panel(progress, "Level" + i, new Vector2(i / (float)WeaponCatalog.MaxLevel, 0f), new Vector2((i + 1f) / WeaponCatalog.MaxLevel, 1f), Vector2.zero, new Vector2(-6f, 0f), i < level ? UiFactory.Accent : UiFactory.Raised, false);
+
+                // Buy button
+                UiFactory.Button(row, "Buy_" + key, maxed ? Loc.Get("garage.max") : Loc.Format("garage.buy", "cost", cost), maxed || !affordable ? null : () => BuyWeapon(kind), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-400f, -25f), new Vector2(-220f, 55f), 26f, maxed ? UiFactory.Raised : affordable ? UiFactory.Accent : UiFactory.Raised);
+                if (!maxed && !affordable) Label(row, "Reason", Loc.Get("garage.not_enough"), 20f, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-400f, -82f), new Vector2(-220f, -32f), UiFactory.Muted, TextAlignmentOptions.Center);
+
+                // Equip button
+                string equipLabel = isEquipped ? Loc.Get("garage.equipped") : Loc.Get("garage.equip");
+                Action equipAction = unlocked && !isEquipped ? () => EquipWeapon(kind) : null;
+                UiFactory.Button(row, "Equip_" + key, equipLabel, equipAction, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-200f, -25f), new Vector2(-20f, 55f), 26f, isEquipped ? UiFactory.Positive : unlocked ? UiFactory.Accent : UiFactory.Raised);
+            }
         }
 
         public bool Buy(UpgradeKind kind)
@@ -339,6 +382,53 @@ namespace RacingGame
                 save.Local.coinsSpent += cost; save.MarkDirty(); SfxPlayer.Instance.PlayUi(SfxSynth.LapDing); Show("garage"); return true;
             }
             Toast(Loc.Get("garage.not_enough")); return false;
+        }
+
+        public bool BuyWeapon(WeaponKind kind)
+        {
+            var save = PlatformGlue.Save;
+            if (save == null) return false;
+            if (save.Data.progress.weapons == null || save.Data.progress.weapons.Length < 3) save.Data.progress.weapons = new int[3];
+            int prevLevel = WeaponCatalog.Level(save.Data.progress.weapons, (int)kind);
+            if (WeaponCatalog.TryBuy(save.Data.progress.weapons, kind, save.Data.Coins, out int cost))
+            {
+                save.Local.coinsSpent += cost;
+                // Auto-equip on first purchase if slot is empty/default
+                if (prevLevel == 0)
+                {
+                    if (kind == WeaponKind.MachineGun) save.Data.progress.equippedPrimary = 1;
+                    else if (kind == WeaponKind.Mines) save.Data.progress.equippedSecondary = (int)SecondaryWeaponType.Mines;
+                    else if (kind == WeaponKind.FreezeLauncher) save.Data.progress.equippedSecondary = (int)SecondaryWeaponType.FreezeLauncher;
+                }
+                save.MarkDirty(); SfxPlayer.Instance.PlayUi(SfxSynth.LapDing); Show("garage"); return true;
+            }
+            Toast(Loc.Get("garage.not_enough")); return false;
+        }
+
+        public bool EquipWeapon(WeaponKind kind)
+        {
+            var save = PlatformGlue.Save;
+            if (save == null) return false;
+            int level = WeaponCatalog.Level(save.Data.progress.weapons, (int)kind);
+            if (level <= 0) return false;
+
+            if (kind == WeaponKind.MachineGun)
+            {
+                save.Data.progress.equippedPrimary = save.Data.progress.equippedPrimary == 1 ? 0 : 1;
+            }
+            else if (kind == WeaponKind.Mines)
+            {
+                save.Data.progress.equippedSecondary = (int)SecondaryWeaponType.Mines;
+            }
+            else if (kind == WeaponKind.FreezeLauncher)
+            {
+                save.Data.progress.equippedSecondary = (int)SecondaryWeaponType.FreezeLauncher;
+            }
+
+            save.MarkDirty();
+            SfxPlayer.Instance.PlayUi(SfxSynth.Beep);
+            Show("garage");
+            return true;
         }
 
         private void BuildSettings(RectTransform root)
@@ -476,6 +566,8 @@ namespace RacingGame
             var levels = PlatformGlue.Save?.Data.progress.upgrades;
             int best = int.MaxValue;
             foreach (UpgradeKind kind in Enum.GetValues(typeof(UpgradeKind))) best = Math.Min(best, UpgradeCatalog.Cost(UpgradeCatalog.Level(levels, (int)kind)));
+            var wLevels = PlatformGlue.Save?.Data.progress.weapons;
+            foreach (WeaponKind kind in Enum.GetValues(typeof(WeaponKind))) best = Math.Min(best, WeaponCatalog.Cost(WeaponCatalog.Level(wLevels, (int)kind)));
             return best;
         }
 
