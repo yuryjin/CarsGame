@@ -21,12 +21,15 @@ namespace RacingGame
         public bool suppressed;
 
         public int ShotsRequested { get; private set; }
+        public int SecondaryRequested { get; private set; }
 
         private CarController car;
         private CarCannon cannon;
         private CarHealth health;
         private AiDriverProfile profile;
         private int nextShotTick;
+        private int nextSecondaryTick;
+        private int burstTicksRemaining;
         private int enabledTick = -1;
         private RaceDirector director;
 
@@ -42,26 +45,72 @@ namespace RacingGame
             profile = driverProfile;
             fireCooldown = cooldown;
             enabledTick = -1;
+            burstTicksRemaining = 0;
         }
 
         /// <summary>Called by <see cref="AiDriver"/> every tick; returns the Fire level for the command.</summary>
         public bool WantsFire(int tick)
         {
+            if (car == null) car = GetComponent<CarController>();
+            if (cannon == null) cannon = GetComponent<CarCannon>();
+            if (health == null) health = GetComponent<CarHealth>();
             if (cannon == null || car == null) return false;
+            if (car.Status != null && car.Status.IsJammed) { burstTicksRemaining = 0; return false; }
+            if (car.Weapons != null && car.Weapons.IsOverheated) { burstTicksRemaining = 0; return false; }
+            if (health != null && health.IsDead) { burstTicksRemaining = 0; return false; }
+
+            if (burstTicksRemaining > 0)
+            {
+                burstTicksRemaining--;
+                return true;
+            }
+
             if (enabledTick < 0) enabledTick = tick;
-            if (tick - enabledTick < SimulationDriver.SecondsToTicks(startGraceSeconds)) return false;
+            if (startGraceSeconds > 0f && tick - enabledTick < SimulationDriver.SecondsToTicks(startGraceSeconds)) return false;
             if (suppressed || tick < nextShotTick || !cannon.IsReady) return false;
-            if (health != null && health.IsDead) return false;
             if (tick % 10 != 0) return false;
 
-            if (director == null) director = RaceDirector.Instance;
+            if (director == null) director = RaceDirector.Current ?? RaceDirector.Instance;
             var target = FindTarget();
             if (target == null) return false;
 
             float aggression = profile != null ? profile.aggression : 0.5f;
-            float scale = Mathf.Lerp(1.5f, 0.7f, aggression) * director.Rng.Range(RngStreams.Stream.Ai, 0.8f, 1.3f);
+            float randScale = (director != null && director.Rng != null) ? director.Rng.Range(RngStreams.Stream.Ai, 0.8f, 1.3f) : 1f;
+            float scale = Mathf.Lerp(1.5f, 0.7f, aggression) * randScale;
             nextShotTick = tick + SimulationDriver.SecondsToTicks(fireCooldown * scale);
             ShotsRequested++;
+
+            var weapons = car.Weapons;
+            if (weapons != null && weapons.primaryType == PrimaryWeaponType.MachineGun)
+            {
+                burstTicksRemaining = (director != null && director.Rng != null) ? director.Rng.Range(RngStreams.Stream.Ai, 4, 8) : 5;
+            }
+            return true;
+        }
+
+        /// <summary>Called by <see cref="AiDriver"/> every tick; returns the Secondary weapon fire command.</summary>
+        public bool WantsSecondary(int tick)
+        {
+            if (car == null) car = GetComponent<CarController>();
+            if (health == null) health = GetComponent<CarHealth>();
+            if (car == null) return false;
+            var weapons = car.Weapons;
+            if (weapons == null || weapons.secondaryType == SecondaryWeaponType.None) return false;
+            if (enabledTick < 0) enabledTick = tick;
+            if (startGraceSeconds > 0f && tick - enabledTick < SimulationDriver.SecondsToTicks(startGraceSeconds)) return false;
+            if (suppressed || tick < nextSecondaryTick || !weapons.IsSecondaryReady(tick)) return false;
+            if (health != null && health.IsDead) return false;
+            if (tick % 10 != 0) return false;
+
+            if (director == null) director = RaceDirector.Current ?? RaceDirector.Instance;
+            var pursuer = TargetFinder.FindPursuer(car, transform.position, -transform.forward, 15f, 25f, 3f);
+            if (pursuer == null) return false;
+
+            float aggression = profile != null ? profile.aggression : 0.5f;
+            float randScale = (director != null && director.Rng != null) ? director.Rng.Range(RngStreams.Stream.Ai, 0.9f, 1.2f) : 1f;
+            float scale = Mathf.Lerp(1.5f, 0.8f, aggression) * randScale;
+            nextSecondaryTick = tick + SimulationDriver.SecondsToTicks(weapons.secondaryCooldown * scale);
+            SecondaryRequested++;
             return true;
         }
 

@@ -28,6 +28,7 @@ namespace RacingGame
         private bool touchSeen;
         private PlayerDriverInput hooked;
         private bool previousAutoThrottle;
+        private bool previousAutoSecondary;
 
         private void Awake()
         {
@@ -67,8 +68,8 @@ namespace RacingGame
             Publish(built && shown);
 
             var input = race != null && race.Player != null ? race.Player.GetComponent<PlayerDriverInput>() : null;
-            if (shown && input != null && hooked != input) { hooked = input; previousAutoThrottle = input.autoThrottle; input.autoThrottle = true; }
-            if (!shown && hooked != null) { hooked.autoThrottle = previousAutoThrottle; hooked = null; }
+            if (shown && input != null && hooked != input) { hooked = input; previousAutoThrottle = input.autoThrottle; previousAutoSecondary = input.autoSecondary; input.autoThrottle = true; input.autoSecondary = true; }
+            if (!shown && hooked != null) { hooked.autoThrottle = previousAutoThrottle; hooked.autoSecondary = previousAutoSecondary; hooked = null; }
             if (!shown && input != null && PlatformGlue.Save != null && PlatformGlue.Save.Data.settings.autoThrottle && !input.autoThrottle) input.autoThrottle = true;
         }
 
@@ -81,6 +82,7 @@ namespace RacingGame
             Button(root, "Left", "◄", "<Gamepad>/dpad/left", new Vector2(0f, 0f), new Vector2(40f, 40f), new Vector2(200f, 200f));
             Button(root, "Right", "►", "<Gamepad>/dpad/right", new Vector2(0f, 0f), new Vector2(260f, 40f), new Vector2(420f, 200f));
             Button(root, "Fire", Loc.Get("touch.fire"), "<Gamepad>/rightShoulder", new Vector2(1f, 0f), new Vector2(-260f, 40f), new Vector2(-40f, 260f));
+            Button(root, "Secondary", Loc.Get("touch.secondary"), "<Gamepad>/leftShoulder", new Vector2(1f, 0f), new Vector2(-480f, 180f), new Vector2(-280f, 300f));
             Button(root, "Brake", Loc.Get("touch.brake"), "<Gamepad>/buttonSouth", new Vector2(1f, 0f), new Vector2(-480f, 40f), new Vector2(-280f, 160f));
             Button(root, "Reset", "R", "<Gamepad>/buttonNorth", new Vector2(1f, 1f), new Vector2(-140f, -140f), new Vector2(-40f, -40f));
         }

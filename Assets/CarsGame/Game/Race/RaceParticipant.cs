@@ -17,9 +17,17 @@ namespace RacingGame
         [Tooltip("Metres behind the current position to respawn (looking forward again).")]
         public float respawnSetback = 6f;
 
-        public CarController Car { get; private set; }
-        public CarHealth Health { get; private set; }
-        public RaceProgress Progress { get; private set; }
+        private CarController car;
+        private CarHealth health;
+        private CarStatus status;
+        private CarWeapons weapons;
+        private RaceProgress progress;
+
+        public CarController Car => car != null ? car : (car = GetComponent<CarController>());
+        public CarHealth Health => health != null ? health : (health = GetComponent<CarHealth>());
+        public CarStatus Status => status != null ? status : (status = GetComponent<CarStatus>() ?? gameObject.AddComponent<CarStatus>());
+        public CarWeapons Weapons => weapons != null ? weapons : (weapons = GetComponent<CarWeapons>() ?? gameObject.AddComponent<CarWeapons>());
+        public RaceProgress Progress => progress != null ? progress : (progress = GetComponent<RaceProgress>());
         /// <summary>Kills this race, per victim (the payout shrinks for repeat kills of the same rival).</summary>
         public KillTally KillTally { get; } = new KillTally();
         public int Kills => KillTally.Total;
@@ -37,10 +45,12 @@ namespace RacingGame
 
         private void Awake()
         {
-            Car = GetComponent<CarController>();
-            Health = GetComponent<CarHealth>();
-            Progress = GetComponent<RaceProgress>();
-            if (Progress == null) Progress = gameObject.AddComponent<RaceProgress>();
+            car = GetComponent<CarController>();
+            health = GetComponent<CarHealth>();
+            status = GetComponent<CarStatus>();
+            weapons = GetComponent<CarWeapons>();
+            progress = GetComponent<RaceProgress>();
+            if (progress == null) progress = gameObject.AddComponent<RaceProgress>();
             int carLayer = LayerMask.NameToLayer("Car");
             carMask = carLayer >= 0 ? 1 << carLayer : Physics.AllLayers;
         }

@@ -30,6 +30,8 @@ namespace RacingGame
 
         private Rigidbody rb;
         private CarController car;
+        private CarStatus status;
+        private CarWeapons weapons;
         private int ammo;
         private int reloadDoneTick = -1;
         private int nextFireTick;
@@ -51,9 +53,40 @@ namespace RacingGame
         {
             rb = GetComponent<Rigidbody>();
             car = GetComponent<CarController>();
+            status = GetComponent<CarStatus>();
+            if (status == null) status = gameObject.AddComponent<CarStatus>();
+            weapons = GetComponent<CarWeapons>();
+            if (weapons == null) weapons = gameObject.AddComponent<CarWeapons>();
             if (barrel == null || muzzle == null) BuildTurret();
             barrelRestPosition = barrel.localPosition;
-            ammo = magazineSize;
+            ApplyPrimaryProfile(weapons != null ? weapons.primaryType : PrimaryWeaponType.Cannon);
+        }
+
+        public void ApplyPrimaryProfile(PrimaryWeaponType type)
+        {
+            if (type == PrimaryWeaponType.MachineGun)
+            {
+                fireInterval = 0.125f; // 8 shots/sec
+                shellSpeed = 120f;
+                shellDamage = 8f;
+                recoilForce = 300f;
+                magazineSize = 0; // heat/overheat governed
+                reloadSeconds = 0f;
+                ammo = 0;
+                reloadDoneTick = -1;
+            }
+            else // Cannon
+            {
+                fireInterval = 0.4f;
+                shellSpeed = 70f;
+                shellDamage = 25f;
+                recoilForce = 1500f;
+                magazineSize = 5;
+                reloadSeconds = 4f;
+                ammo = magazineSize;
+                reloadDoneTick = -1;
+            }
+            AmmoChanged?.Invoke(Ammo, AmmoMax);
         }
 
         public void RefillAmmo()
@@ -71,7 +104,12 @@ namespace RacingGame
         }
 
         /// <summary>Level input: true while the fire button is held. Set by the car every tick.</summary>
-        public void SetWantsFire(bool value) { wantsFire = value; }
+        public void SetWantsFire(bool value)
+        {
+            wantsFire = value;
+            if (weapons == null) weapons = GetComponent<CarWeapons>();
+            if (weapons != null) weapons.SetWantsPrimary(value);
+        }
 
         /// <summary>Called by the owning <see cref="CarController"/> from its simulation step.</summary>
         public void SimulationStep(int tick)
@@ -84,7 +122,11 @@ namespace RacingGame
 
         public bool TryFire(int tick)
         {
-            if (!isActiveAndEnabled || tick < nextFireTick) return false;
+            if (!enabled || tick < nextFireTick) return false;
+            if (status == null) status = GetComponent<CarStatus>();
+            if (status != null && status.IsJammed) return false;
+            if (weapons == null) weapons = GetComponent<CarWeapons>();
+            if (weapons != null && weapons.IsOverheated) return false;
             if (magazineSize > 0 && ammo <= 0) return false;
             nextFireTick = tick + FireIntervalTicks;
             if (magazineSize > 0)
@@ -94,23 +136,38 @@ namespace RacingGame
                 AmmoChanged?.Invoke(Ammo, AmmoMax);
             }
 
-            Vector3 direction = muzzle.forward;
+            if (weapons != null) weapons.AddHeat(weapons.heatPerShot);
+
+            ProjectileKind pKind = (weapons != null && weapons.primaryType == PrimaryWeaponType.MachineGun)
+                ? ProjectileKind.MachineGun
+                : ProjectileKind.Shell;
+
+            Vector3 direction = muzzle != null ? muzzle.forward : transform.forward;
             Vector3 inherited = rb != null ? rb.linearVelocity : Vector3.zero;
-            RaceDirector.Instance.RequestProjectile(new ProjectileSpawn
+            Vector3 muzzlePos = muzzle != null ? muzzle.position : transform.position;
+
+            var director = RaceDirector.Current ?? RaceDirector.Instance;
+            if (director != null)
             {
-                Owner = gameObject,
-                OwnerId = car != null ? car.CarId : 0,
-                Position = muzzle.position,
-                Velocity = direction * shellSpeed + inherited,
-                Damage = shellDamage,
-                Tick = tick,
-                Material = shellMaterial
-            });
+                director.RequestProjectile(new ProjectileSpawn
+                {
+                    Owner = gameObject,
+                    OwnerId = car != null ? car.CarId : 0,
+                    Position = muzzlePos,
+                    Velocity = direction * shellSpeed + inherited,
+                    Damage = shellDamage,
+                    Tick = tick,
+                    Kind = pKind,
+                    Material = shellMaterial
+                });
+            }
 
             recoilOffset = 0.18f;
-            EffectPool.Instance.PlayMuzzle(muzzle.position);
-            SfxPlayer.Instance.Play(SfxSynth.Shot, muzzle.position, 0.9f, 0.95f + 0.1f * (tick % 3));
-            if (rb != null) rb.AddForceAtPosition(-direction * recoilForce, muzzle.position, ForceMode.Impulse);
+            var pool = EffectPool.Current ?? EffectPool.Instance;
+            if (pool != null) pool.PlayMuzzle(muzzlePos);
+            var sfx = SfxPlayer.Current ?? SfxPlayer.Instance;
+            if (sfx != null) sfx.Play(SfxSynth.Shot, muzzlePos, 0.9f, 0.95f + 0.1f * (tick % 3));
+            if (rb != null) rb.AddForceAtPosition(-direction * recoilForce, muzzlePos, ForceMode.Impulse);
 
             return true;
         }

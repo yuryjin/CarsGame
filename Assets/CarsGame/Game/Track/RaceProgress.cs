@@ -49,7 +49,9 @@ namespace RacingGame
         /// <summary>Re-project without crediting anything (after teleport, respawn).</summary>
         public void Resync()
         {
+            if (Path == null) Path = TrackPath.Instance;
             if (Path == null) return;
+            if (Counter == null) Counter = new LapCounter(Path.Length, Path.startLineDistance, gateCount, maxDeltaPerTick);
             hint = -1;
             Distance = Path.Project(transform.position, ref hint);
             Counter.Resync(Distance);

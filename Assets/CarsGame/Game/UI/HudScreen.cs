@@ -22,10 +22,21 @@ namespace RacingGame
 
         private TextMeshProUGUI speedText, lapText, positionText, timerText, centerText, hintText, hpText, pauseText, pauseHint, ammoText, hitMarker;
         private CarCannon playerCannon;
+        private CarStatus playerStatus;
+        private CarWeapons playerWeapons;
         private float hitMarkerUntil;
         private Image hpFill, hpTrail, hpIcon;
         private Sprite healthFillSprite;
-        private RectTransform speedPanel, healthPanel, hintPanel, ammoPanel, eventPanel, centerPanel, pauseButton;
+        private RectTransform speedPanel, healthPanel, hintPanel, ammoPanel, secondaryPanel, statusPanel, eventPanel, centerPanel, pauseButton;
+        private TextMeshProUGUI secondaryText, statusText;
+        private string lastStatusStr;
+        private bool lastStatusShield, lastStatusFrozen, lastStatusJammed, lastStatusPunctured;
+        private int lastSecondaryAmmo = -1;
+        private bool lastSecondaryReady;
+        private SecondaryWeaponType lastSecondaryType = SecondaryWeaponType.None;
+        private PrimaryWeaponType lastPrimaryType = PrimaryWeaponType.Cannon;
+        private bool lastOverheated;
+        private int lastHeatPct = -1;
         private Button resumeButton, restartButton, menuButton;
         private CanvasGroup pauseControls;
         private string shownCenter;
@@ -55,6 +66,17 @@ namespace RacingGame
         private float eventUntil, eventPunch;
         private readonly Image[] lowHpEdges = new Image[4];
         private float nextHeartbeat;
+
+        [Header("Threat Markers")]
+        public float threatMaxRange = 75f;
+        private sealed class ThreatMarkerWidget
+        {
+            public RectTransform root;
+            public TextMeshProUGUI arrow;
+            public TextMeshProUGUI distanceText;
+        }
+        private readonly ThreatMarkerWidget[] threatMarkers = new ThreatMarkerWidget[8];
+
         /// <summary>Last text shown by <see cref="ShowEvent"/> (test hook).</summary>
         public string LastEvent { get; private set; }
         public bool LowHealthWarning { get; private set; }
@@ -103,7 +125,12 @@ namespace RacingGame
             PauseController.PausedChanged -= OnPaused;
             TouchControlsPresenter.ShownChanged -= OnTouchShown;
             Loc.LanguageChanged -= ApplyStaticTexts;
-            var director = RaceDirector.Current; if (director != null) director.ShellHit -= OnShellHit;
+            var director = RaceDirector.Current;
+            if (director != null)
+            {
+                director.ShellHit -= OnShellHit;
+                director.MineHit -= OnMineHit;
+            }
         }
 
         private void Build()
@@ -127,7 +154,18 @@ namespace RacingGame
             ammoPanel = UiFactory.Card(root, "AmmoPanel", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 186f), HudPanelAlpha);
             ammoText = UiFactory.Text(ammoPanel, "Ammo", "", 30f, TextAlignmentOptions.MidlineRight, Vector2.zero, Vector2.one, new Vector2(18f, 4f), new Vector2(-18f, -4f), new Color(1f, 0.85f, 0.3f));
             ammoText.enableAutoSizing = true; ammoText.fontSizeMin = 18f; ammoText.fontSizeMax = 30f;
+
+            secondaryPanel = UiFactory.Card(root, "SecondaryPanel", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 194f), new Vector2(-30f, 242f), HudPanelAlpha);
+            secondaryText = UiFactory.Text(secondaryPanel, "Secondary", "", 24f, TextAlignmentOptions.MidlineRight, Vector2.zero, Vector2.one, new Vector2(18f, 4f), new Vector2(-18f, -4f), new Color(1f, 0.6f, 0.2f));
+            secondaryText.enableAutoSizing = true; secondaryText.fontSizeMin = 16f; secondaryText.fontSizeMax = 24f;
+            secondaryPanel.gameObject.SetActive(false);
+
+            statusPanel = UiFactory.Card(root, "StatusPanel", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 250f), new Vector2(-30f, 298f), HudPanelAlpha);
+            statusText = UiFactory.Text(statusPanel, "Status", "", 22f, TextAlignmentOptions.MidlineRight, Vector2.zero, Vector2.one, new Vector2(18f, 4f), new Vector2(-18f, -4f), UiFactory.Accent);
+            statusText.enableAutoSizing = true; statusText.fontSizeMin = 14f; statusText.fontSizeMax = 22f;
+            statusPanel.gameObject.SetActive(false);
             BuildReticle(root);
+            BuildThreatMarkers(root);
             eventPanel = UiFactory.Card(root, "EventPanel", new Vector2(0.5f, 0.7f), new Vector2(0.5f, 0.7f), new Vector2(-340f, -40f), new Vector2(340f, 40f));
             eventText = UiFactory.Text(eventPanel, "Event", "", 36f, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, new Vector2(24f, 10f), new Vector2(-24f, -10f), UiFactory.Accent);
             eventText.enableAutoSizing = true; eventText.fontSizeMin = 22f; eventText.fontSizeMax = 36f;
@@ -298,6 +336,22 @@ namespace RacingGame
             }
         }
 
+        private void BuildThreatMarkers(Transform root)
+        {
+            var container = UiFactory.Panel(root, "ThreatMarkers", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Color.clear, false);
+            for (int i = 0; i < threatMarkers.Length; i++)
+            {
+                var markerRt = UiFactory.Panel(container, "Threat" + i, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-28f, -28f), new Vector2(28f, 28f), new Color(0.04f, 0.06f, 0.1f, 0.88f), true);
+                var arrow = UiFactory.Text(markerRt, "Arrow", "▲", 24f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-16f, 2f), new Vector2(16f, 28f), Color.red);
+                var dist = UiFactory.Text(markerRt, "Dist", "", 15f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-26f, -24f), new Vector2(26f, 4f), Color.white);
+                dist.outlineWidth = 0.2f; arrow.outlineWidth = 0.2f;
+                arrow.raycastTarget = false; dist.raycastTarget = false;
+                markerRt.GetComponent<Image>().raycastTarget = false;
+                threatMarkers[i] = new ThreatMarkerWidget { root = markerRt, arrow = arrow, distanceText = dist };
+                markerRt.gameObject.SetActive(false);
+            }
+        }
+
         private void ClearLock()
         {
             if (ReticleLocked) { ReticleLocked = false; SetReticleColor(ReticleIdle); }
@@ -388,6 +442,8 @@ namespace RacingGame
                 float row = narrow ? -90f : 0f;
                 Place(healthPanel, Vector2.one, new Vector2(-494f, -134f + row), new Vector2(-170f, -34f + row));
                 Place(ammoPanel, Vector2.one, new Vector2(-494f, -186f + row), new Vector2(-170f, -138f + row));
+                Place(secondaryPanel, Vector2.one, new Vector2(-494f, -238f + row), new Vector2(-170f, -190f + row));
+                Place(statusPanel, Vector2.one, new Vector2(-494f, -290f + row), new Vector2(-170f, -242f + row));
                 Place(hintPanel, new Vector2(0.5f, 1f), new Vector2(-460f, -322f + row), new Vector2(420f, -202f + row));
                 hintText.alignment = TextAlignmentOptions.Center;
             }
@@ -397,6 +453,8 @@ namespace RacingGame
                 Place(speedPanel, Vector2.zero, new Vector2(30f, 30f), new Vector2(274f, 254f));
                 Place(healthPanel, new Vector2(1f, 0f), new Vector2(-354f, 30f), new Vector2(-30f, 130f));
                 Place(ammoPanel, new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 186f));
+                Place(secondaryPanel, new Vector2(1f, 0f), new Vector2(-354f, 194f), new Vector2(-30f, 242f));
+                Place(statusPanel, new Vector2(1f, 0f), new Vector2(-354f, 250f), new Vector2(-30f, 298f));
                 Place(hintPanel, Vector2.zero, new Vector2(30f, 272f), new Vector2(680f, 422f));
                 hintText.alignment = TextAlignmentOptions.MidlineLeft;
             }
@@ -417,9 +475,13 @@ namespace RacingGame
                 if (playerCannon != null) playerCannon.AmmoChanged -= OnAmmo;
                 playerHealth = race.Player.Health;
                 playerCannon = playerCar.GetComponent<CarCannon>();
+                playerStatus = playerCar.GetComponent<CarStatus>();
+                playerWeapons = playerCar.GetComponent<CarWeapons>();
                 if (playerCannon != null) { playerCannon.AmmoChanged += OnAmmo; BuildAmmoPips(playerCannon.AmmoMax); OnAmmo(playerCannon.Ammo, playerCannon.AmmoMax); }
                 RaceDirector.Instance.ShellHit -= OnShellHit;
                 RaceDirector.Instance.ShellHit += OnShellHit;
+                RaceDirector.Instance.MineHit -= OnMineHit;
+                RaceDirector.Instance.MineHit += OnMineHit;
                 if (playerHealth != null) playerHealth.OnHealthChanged += OnHealth;
                 OnHealth(playerHealth != null ? playerHealth.Health : 100f, playerHealth != null ? playerHealth.maxHealth : 100f);
                 RefreshPosition();
@@ -441,6 +503,90 @@ namespace RacingGame
                 int pct = Mathf.RoundToInt(playerCannon.ReloadProgress(SimulationDriver.Instance.Tick) * 100f);
                 if (pct != lastReloadPct) { lastReloadPct = pct; ammoText.SetText(reloadFormat, pct); }
             }
+
+            if (playerStatus != null)
+            {
+                bool shield = playerStatus.HasShield;
+                bool frozen = playerStatus.IsFrozen;
+                bool jammed = playerStatus.IsJammed;
+                bool punctured = playerStatus.IsPunctured;
+                if (lastStatusStr == null || shield != lastStatusShield || frozen != lastStatusFrozen || jammed != lastStatusJammed || punctured != lastStatusPunctured)
+                {
+                    lastStatusShield = shield;
+                    lastStatusFrozen = frozen;
+                    lastStatusJammed = jammed;
+                    lastStatusPunctured = punctured;
+                    sb.Clear();
+                    if (shield) sb.Append("<color=#40E0D0>[").Append(Loc.Get("hud.status.shield")).Append("]</color> ");
+                    if (frozen) sb.Append("<color=#66CCFF>[").Append(Loc.Get("hud.status.frozen")).Append("]</color> ");
+                    if (jammed) sb.Append("<color=#FFA500>[").Append(Loc.Get("hud.status.jammed")).Append("]</color> ");
+                    if (punctured) sb.Append("<color=#FF4444>[").Append(Loc.Get("hud.status.punctured")).Append("]</color> ");
+                    lastStatusStr = sb.ToString();
+                    statusText.text = lastStatusStr;
+                    statusPanel.gameObject.SetActive(!string.IsNullOrEmpty(lastStatusStr));
+                }
+            }
+            else if (statusPanel != null && statusPanel.gameObject.activeSelf)
+            {
+                statusPanel.gameObject.SetActive(false);
+            }
+
+            if (playerWeapons != null && playerWeapons.primaryType == PrimaryWeaponType.MachineGun)
+            {
+                bool overheated = playerWeapons.IsOverheated;
+                int heatPct = Mathf.RoundToInt((playerWeapons.CurrentHeat / Mathf.Max(1f, playerWeapons.heatMax)) * 100f);
+                if (overheated != lastOverheated || heatPct != lastHeatPct || playerWeapons.primaryType != lastPrimaryType)
+                {
+                    lastOverheated = overheated;
+                    lastHeatPct = heatPct;
+                    lastPrimaryType = PrimaryWeaponType.MachineGun;
+                    ammoPanel.gameObject.SetActive(true);
+                    if (overheated)
+                    {
+                        ammoText.text = Loc.Get("hud.overheated");
+                        ammoText.color = CriticalColor;
+                    }
+                    else if (heatPct > 10)
+                    {
+                        ammoText.text = Loc.Format("hud.heat", "pct", heatPct);
+                        ammoText.color = Color.Lerp(new Color(1f, 0.85f, 0.3f), CriticalColor, heatPct / 100f);
+                    }
+                    else
+                    {
+                        ammoText.text = Loc.Get("hud.mg_ready");
+                        ammoText.color = new Color(1f, 0.85f, 0.3f);
+                    }
+                }
+            }
+            else if (playerWeapons != null && playerWeapons.primaryType != lastPrimaryType)
+            {
+                lastPrimaryType = playerWeapons.primaryType;
+                ammoText.color = new Color(1f, 0.85f, 0.3f);
+                if (playerCannon != null) OnAmmo(playerCannon.Ammo, playerCannon.AmmoMax);
+            }
+
+            if (playerWeapons != null && playerWeapons.secondaryType != SecondaryWeaponType.None)
+            {
+                int cur = playerWeapons.SecondaryAmmo;
+                int max = playerWeapons.SecondaryAmmoMax;
+                bool ready = playerWeapons.IsSecondaryReady(SimulationDriver.Instance.Tick);
+                var stype = playerWeapons.secondaryType;
+                if (cur != lastSecondaryAmmo || ready != lastSecondaryReady || stype != lastSecondaryType)
+                {
+                    lastSecondaryAmmo = cur;
+                    lastSecondaryReady = ready;
+                    lastSecondaryType = stype;
+                    secondaryPanel.gameObject.SetActive(true);
+                    string key = stype == SecondaryWeaponType.Mines ? "hud.secondary.mines" : "hud.secondary.freeze";
+                    secondaryText.text = Loc.Format(key, "cur", cur, "max", max);
+                    secondaryText.color = ready ? (cur > 0 ? new Color(1f, 0.6f, 0.2f) : UiFactory.Muted) : new Color(0.7f, 0.7f, 0.7f, 0.5f);
+                }
+            }
+            else if (secondaryPanel != null && secondaryPanel.gameObject.activeSelf)
+            {
+                secondaryPanel.gameObject.SetActive(false);
+            }
+
             if (hitMarker.gameObject.activeSelf && Time.unscaledTime > hitMarkerUntil) hitMarker.gameObject.SetActive(false);
             if (race.State >= RaceState.Racing) SetTimer(race.RaceTime);
 
@@ -530,7 +676,7 @@ namespace RacingGame
                 float k = 1f + 0.6f * countdownPunch * countdownPunch;
                 centerPanel.localScale = new Vector3(k, k, 1f);
             }
-            if (race != null) { UpdateReticle(); UpdateToastAndWarnings(); }
+            if (race != null) { UpdateReticle(); UpdateThreatMarkers(); UpdateToastAndWarnings(); }
             if (shownCenter != centerText.text)
             {
                 shownCenter = centerText.text;
@@ -539,6 +685,104 @@ namespace RacingGame
             }
             if (pausePanel.gameObject.activeSelf)
                 pauseControls.interactable = (PauseController.Reasons & ~PauseReason.User) == PauseReason.None;
+        }
+
+        private void UpdateThreatMarkers()
+        {
+            if (playerCar == null || race == null || race.State < RaceState.Countdown || race.State >= RaceState.Finished)
+            {
+                for (int i = 0; i < threatMarkers.Length; i++)
+                    if (threatMarkers[i]?.root != null && threatMarkers[i].root.gameObject.activeSelf)
+                        threatMarkers[i].root.gameObject.SetActive(false);
+                return;
+            }
+
+            var cam = Camera.main;
+            if (cam == null) return;
+
+            var participants = race.Participants;
+            int markerIdx = 0;
+            Vector3 playerPos = playerCar.transform.position;
+            Vector3 camPos = cam.transform.position;
+            Vector3 camFwd = cam.transform.forward;
+
+            float maxRange = (RaceSetup.Event != null && RaceSetup.Event.mode == EventMode.Arena) ? 90f : threatMaxRange;
+
+            for (int i = 0; i < participants.Count && markerIdx < threatMarkers.Length; i++)
+            {
+                var rival = participants[i];
+                if (rival == null || rival.isPlayer || rival.Car == null || !rival.Car.isActiveAndEnabled) continue;
+                if (rival.Health != null && rival.Health.IsDead) continue;
+
+                Vector3 rivalPos = rival.Car.transform.position;
+                Vector3 toRival = rivalPos - camPos;
+                float dist = Vector3.Distance(playerPos, rivalPos);
+                if (dist > maxRange || dist < 1.5f) continue;
+
+                Vector3 vp = cam.WorldToViewportPoint(rivalPos + Vector3.up * 0.5f);
+                bool behind = vp.z < 0f || Vector3.Dot(camFwd, toRival) < 0f;
+                if (behind)
+                {
+                    vp.x = 1f - vp.x;
+                    vp.y = 1f - vp.y;
+                }
+
+                Vector2 fromCenter = new Vector2(vp.x - 0.5f, vp.y - 0.5f);
+                bool isOffScreen = behind || vp.x < 0.08f || vp.x > 0.92f || vp.y < 0.08f || vp.y > 0.92f;
+                bool isBehindPlayer = Vector3.Dot(playerCar.transform.forward, rivalPos - playerPos) < 0.1f;
+
+                // Only show threat marker when rival is off-screen, behind the player, or very close threat
+                if (!isOffScreen && !isBehindPlayer && dist > 25f) continue;
+
+                if (fromCenter.sqrMagnitude < 0.0001f) fromCenter = new Vector2(0f, -0.5f);
+
+                // Elliptical/box edge intersection
+                float borderX = 0.44f, borderY = 0.42f;
+                float scaleX = borderX / Mathf.Max(0.0001f, Mathf.Abs(fromCenter.x));
+                float scaleY = borderY / Mathf.Max(0.0001f, Mathf.Abs(fromCenter.y));
+                float borderScale = Mathf.Min(scaleX, scaleY);
+                Vector2 edgeVp = new Vector2(0.5f, 0.5f) + fromCenter * Mathf.Min(1f, borderScale);
+
+                Vector2 canvasPos = new Vector2((edgeVp.x - 0.5f) * hudRoot.rect.width, (edgeVp.y - 0.5f) * hudRoot.rect.height);
+
+                Vector3 rivalFwd = rival.Car.transform.forward;
+                Vector3 toPlayer = playerPos - rivalPos;
+                bool aimingAtMe = Vector3.Dot(rivalFwd, toPlayer.normalized) > 0.65f && dist < 45f;
+                bool highThreat = aimingAtMe || (dist < 20f) || (isBehindPlayer && dist < 30f);
+                bool medThreat = dist < 45f;
+
+                Color markerColor = highThreat ? new Color(1f, 0.25f, 0.2f, 0.95f)
+                                  : medThreat ? new Color(1f, 0.75f, 0.2f, 0.9f)
+                                  : new Color(0.4f, 0.8f, 1f, 0.85f);
+
+                var tm = threatMarkers[markerIdx++];
+                if (!tm.root.gameObject.activeSelf) tm.root.gameObject.SetActive(true);
+                tm.root.anchoredPosition = canvasPos;
+
+                float angle = Mathf.Atan2(fromCenter.y, fromCenter.x) * Mathf.Rad2Deg - 90f;
+                tm.arrow.rectTransform.localEulerAngles = new Vector3(0f, 0f, angle);
+                tm.arrow.color = markerColor;
+
+                int dMeters = Mathf.RoundToInt(dist);
+                tm.distanceText.SetText("{0:0}m", dMeters);
+                tm.distanceText.color = highThreat ? new Color(1f, 0.95f, 0.9f) : UiFactory.Muted;
+
+                if (highThreat)
+                {
+                    float pulse = 0.9f + 0.15f * Mathf.Sin(Time.unscaledTime * 12f);
+                    tm.root.localScale = new Vector3(pulse, pulse, 1f);
+                }
+                else
+                {
+                    tm.root.localScale = Vector3.one;
+                }
+            }
+
+            for (int i = markerIdx; i < threatMarkers.Length; i++)
+            {
+                if (threatMarkers[i]?.root != null && threatMarkers[i].root.gameObject.activeSelf)
+                    threatMarkers[i].root.gameObject.SetActive(false);
+            }
         }
 
         private void OnAmmo(int ammo, int max)
@@ -552,6 +796,13 @@ namespace RacingGame
         private void OnShellHit(GameObject shooter, GameObject victim)
         {
             if (playerCar == null || shooter != playerCar.gameObject) return;
+            hitMarker.gameObject.SetActive(true);
+            hitMarkerUntil = Time.unscaledTime + 0.15f;
+        }
+
+        private void OnMineHit(GameObject owner, GameObject victim)
+        {
+            if (playerCar == null || owner != playerCar.gameObject) return;
             hitMarker.gameObject.SetActive(true);
             hitMarkerUntil = Time.unscaledTime + 0.15f;
         }
@@ -604,6 +855,12 @@ namespace RacingGame
                 hintUntil = Time.unscaledTime + ControlsHintSeconds; hintPanel.gameObject.SetActive(true); playerCar = null;
             }
             if (eventPanel != null) eventPanel.gameObject.SetActive(false);
+            if (!visible)
+            {
+                for (int i = 0; i < threatMarkers.Length; i++)
+                    if (threatMarkers[i]?.root != null && threatMarkers[i].root.gameObject.activeSelf)
+                        threatMarkers[i].root.gameObject.SetActive(false);
+            }
         }
 
         private void OnPaused(bool paused)
@@ -617,6 +874,12 @@ namespace RacingGame
         {
             if (playerHealth != null) playerHealth.OnHealthChanged -= OnHealth;
             if (playerCannon != null) playerCannon.AmmoChanged -= OnAmmo;
+            var director = RaceDirector.Current;
+            if (director != null)
+            {
+                director.ShellHit -= OnShellHit;
+                director.MineHit -= OnMineHit;
+            }
             if (healthFillSprite != null) Destroy(healthFillSprite);
         }
     }

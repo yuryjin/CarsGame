@@ -13,11 +13,13 @@ namespace RacingGame
     {
         [Tooltip("Full throttle unless braking — one-hand touch play.")]
         public bool autoThrottle;
+        [Tooltip("Automatically deploy secondary weapon when a rival tails closely behind.")]
+        public bool autoSecondary;
 
         private InputActionMap map;
-        private InputAction throttleAction, steerAction, brakeAction, fireAction, resetAction;
+        private InputAction throttleAction, steerAction, brakeAction, fireAction, secondaryAction, resetAction;
         private float throttle, steer;
-        private bool brake, fire;
+        private bool brake, fire, secondary;
         private readonly EdgeLatch resetLatch = new EdgeLatch();
 
         public bool UsingActionMap => map != null;
@@ -36,6 +38,7 @@ namespace RacingGame
                 steerAction = map.FindAction("Steer");
                 brakeAction = map.FindAction("Brake");
                 fireAction = map.FindAction("Fire");
+                secondaryAction = map.FindAction("Secondary");
                 resetAction = map.FindAction("Reset");
                 map.Enable();
             }
@@ -47,7 +50,7 @@ namespace RacingGame
 
         private void OnDisable()
         {
-            throttle = steer = 0f; brake = fire = false; resetLatch.Clear();
+            throttle = steer = 0f; brake = fire = secondary = false; resetLatch.Clear();
         }
 
         private void Update()
@@ -64,12 +67,13 @@ namespace RacingGame
             steer = steerAction != null ? steerAction.ReadValue<float>() : 0f;
             brake = brakeAction != null && brakeAction.IsPressed();
             fire = fireAction != null && fireAction.IsPressed();
+            secondary = secondaryAction != null && secondaryAction.IsPressed();
             if (resetAction != null && resetAction.WasPressedThisFrame()) resetLatch.Press();
         }
 
         private void PollDevices()
         {
-            throttle = 0f; steer = 0f; brake = false; fire = false;
+            throttle = 0f; steer = 0f; brake = false; fire = false; secondary = false;
             var k = Keyboard.current;
             if (k != null)
             {
@@ -79,10 +83,15 @@ namespace RacingGame
                 if (k.dKey.isPressed || k.rightArrowKey.isPressed) steer += 1f;
                 brake = k.spaceKey.isPressed;
                 fire = k.leftCtrlKey.isPressed || k.rightCtrlKey.isPressed;
+                secondary = k.leftShiftKey.isPressed || k.rightShiftKey.isPressed || k.eKey.isPressed;
                 if (k.rKey.wasPressedThisFrame) resetLatch.Press();
             }
             var m = Mouse.current;
-            if (m != null && m.leftButton.isPressed) fire = true;
+            if (m != null)
+            {
+                if (m.leftButton.isPressed) fire = true;
+                if (m.rightButton.isPressed) secondary = true;
+            }
             var g = Gamepad.current;
             if (g != null)
             {
@@ -92,12 +101,30 @@ namespace RacingGame
                 if (rt > 0.05f || lt > 0.05f) throttle = rt - lt;
                 if (g.buttonSouth.isPressed) brake = true;
                 if (g.rightShoulder.isPressed || g.buttonWest.isPressed) fire = true;
+                if (g.leftShoulder.isPressed || g.buttonEast.isPressed) secondary = true;
                 if (g.buttonNorth.wasPressedThisFrame) resetLatch.Press();
             }
         }
 
         public DriveCommand Sample(int tick)
         {
+            bool sec = secondary;
+            if (!sec && autoSecondary && tick % 10 == 0)
+            {
+                var car = GetComponent<CarController>();
+                if (car != null)
+                {
+                    var weapons = car.Weapons;
+                    if (weapons != null && weapons.secondaryType != SecondaryWeaponType.None && weapons.IsSecondaryReady(tick))
+                    {
+                        if (TargetFinder.FindPursuer(car, transform.position, -transform.forward, 15f, 25f, 3f) != null)
+                        {
+                            sec = true;
+                        }
+                    }
+                }
+            }
+
             return new DriveCommand
             {
                 Tick = tick,
@@ -105,6 +132,7 @@ namespace RacingGame
                 Steer = steer,
                 Brake = brake,
                 Fire = fire,
+                Secondary = sec,
                 ResetEdge = resetLatch.ConsumeAll()
             }.Clamped();
         }

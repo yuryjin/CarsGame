@@ -6,6 +6,7 @@ namespace RacingGame
     public sealed class SfxPlayer : MonoBehaviour
     {
         private static SfxPlayer instance;
+        public static SfxPlayer Current => instance;
         public static SfxPlayer Instance
         {
             get

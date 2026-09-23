@@ -56,6 +56,8 @@ namespace RacingGame
         private Rigidbody rb;
         private ICarInputSource inputSource;
         private CarCannon cannon;
+        private CarWeapons weapons;
+        private CarStatus status;
         private RaceProgress progress;
         private IRespawnPoseProvider respawnProvider;
         private float moveInput;
@@ -82,6 +84,9 @@ namespace RacingGame
         public int SimulationOrder => CarId;
         public DriveCommand LastCommand => lastCommand;
         public ICarInputSource InputSource => inputSource;
+        public CarStatus Status => status != null ? status : (status = GetComponent<CarStatus>() ?? gameObject.AddComponent<CarStatus>());
+        public CarWeapons Weapons => weapons != null ? weapons : (weapons = GetComponent<CarWeapons>() ?? gameObject.AddComponent<CarWeapons>());
+        public CarCannon Cannon => cannon != null ? cannon : (cannon = GetComponent<CarCannon>());
 
         // --- Steering model for drivers. ApplySteering turns an angle into a yaw torque
         // (angle · v/8 · 120, capped at 2.5 · maxAngle · 120) against the body's angular damping,
@@ -143,6 +148,10 @@ namespace RacingGame
             inputSource = GetComponent<ICarInputSource>();
             if (inputSource == null && playerControlled) inputSource = gameObject.AddComponent<PlayerDriverInput>();
             cannon = GetComponent<CarCannon>();
+            weapons = GetComponent<CarWeapons>();
+            if (weapons == null) weapons = gameObject.AddComponent<CarWeapons>();
+            status = GetComponent<CarStatus>();
+            if (status == null) status = gameObject.AddComponent<CarStatus>();
             progress = GetComponent<RaceProgress>();
             respawnProvider = GetComponent<IRespawnPoseProvider>();
 
@@ -159,6 +168,7 @@ namespace RacingGame
             var driver = SimulationDriver.Current; if (driver != null) driver.Unregister(this);
             moveInput = 0f; steerInput = 0f; isBraking = false;
             if (cannon != null) cannon.SetWantsFire(false);
+            if (weapons != null) weapons.SetWantsSecondary(false);
         }
 
         private void OnDestroy() { var director = RaceDirector.Current; if (director != null) director.UnregisterCar(this); }
@@ -250,7 +260,14 @@ namespace RacingGame
         /// <summary>Fixed-rate step, called by <see cref="SimulationDriver"/>. All gameplay state changes happen here.</summary>
         public void SimulationStep(int tick)
         {
-            var command = inputEnabled && inputSource != null ? inputSource.Sample(tick) : DriveCommand.None(tick);
+            if (rb == null) rb = GetComponent<Rigidbody>();
+            if (weapons == null) weapons = GetComponent<CarWeapons>();
+            if (cannon == null) cannon = GetComponent<CarCannon>();
+            if (status == null) status = GetComponent<CarStatus>();
+
+            var command = inputEnabled && inputSource != null
+                ? inputSource.Sample(tick)
+                : (lastCommand.Tick == tick ? lastCommand : DriveCommand.None(tick));
             ApplyCommand(command);
             IsBoosting = tick < boostUntilTick;
 
@@ -258,7 +275,7 @@ namespace RacingGame
 
             GroundQuery();
             CalculateSpeed();
-            SideSlipSpeed = Mathf.Abs(Vector3.Dot(rb.linearVelocity, transform.right));
+            SideSlipSpeed = rb != null ? Mathf.Abs(Vector3.Dot(rb.linearVelocity, transform.right)) : 0f;
             ApplyMotor();
             ApplySteering();
             ApplyFriction();
@@ -270,9 +287,15 @@ namespace RacingGame
                 cannon.SimulationStep(tick);
             }
 
+            if (weapons != null)
+            {
+                weapons.SetWantsSecondary(command.Secondary);
+                weapons.SimulationStep(tick);
+            }
+
             if (progress != null) progress.SimulationStep(tick);
 
-            if (isGrounded && rb.linearVelocity.magnitude < 5f && Vector3.Dot(transform.up, Vector3.up) > 0.7f)
+            if (isGrounded && rb != null && rb.linearVelocity.magnitude < 5f && Vector3.Dot(transform.up, Vector3.up) > 0.7f)
             {
                 lastGroundedPos = transform.position + Vector3.up * 0.5f;
                 lastGroundedRot = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
@@ -327,6 +350,10 @@ namespace RacingGame
                 if (speedKmh >= offTrackMaxSpeedKmh && moveInput > 0.05f) { return; }
             }
 
+            float statusSpeedMul = status != null ? status.SpeedMultiplier : 1f;
+            float top = (IsBoosting ? maxSpeed * BoostSpeedFactor : maxSpeed) * statusSpeedMul;
+            float torque = (IsBoosting ? motorTorque * BoostTorqueFactor : motorTorque) * statusSpeedMul;
+
             if (moveInput > 0.05f)
             {
                 if (forwardSpeed < -0.5f)
@@ -334,10 +361,8 @@ namespace RacingGame
                     // Braking when moving backward
                     rb.AddForce(transform.forward * brakeForce, ForceMode.Force);
                 }
-                else if (speedKmh < (IsBoosting ? maxSpeed * BoostSpeedFactor : maxSpeed))
+                else if (speedKmh < top)
                 {
-                    float top = IsBoosting ? maxSpeed * BoostSpeedFactor : maxSpeed;
-                    float torque = IsBoosting ? motorTorque * BoostTorqueFactor : motorTorque;
                     float forceMultiplier = Mathf.Clamp01(1f - (speedKmh / top));
                     rb.AddForce(transform.forward * (torque * moveInput * (0.4f + 0.6f * forceMultiplier)), ForceMode.Force);
                 }
@@ -349,9 +374,9 @@ namespace RacingGame
                     // Braking when moving forward
                     rb.AddForce(-transform.forward * brakeForce, ForceMode.Force);
                 }
-                else if (speedKmh < maxSpeed * 0.4f)
+                else if (speedKmh < maxSpeed * 0.4f * statusSpeedMul)
                 {
-                    rb.AddForce(transform.forward * (reverseTorque * moveInput), ForceMode.Force);
+                    rb.AddForce(transform.forward * (reverseTorque * moveInput * statusSpeedMul), ForceMode.Force);
                 }
             }
             else
@@ -404,7 +429,8 @@ namespace RacingGame
 
             // Cancel lateral slide to simulate tire grip
             Vector3 sideVelocity = Vector3.Dot(rb.linearVelocity, transform.right) * transform.right;
-            float currentGrip = isBraking ? grip * 0.4f : grip;
+            float statusGripMul = status != null ? status.GripMultiplier : 1f;
+            float currentGrip = (isBraking ? grip * 0.4f : grip) * statusGripMul;
             Vector3 lateralFrictionForce = -sideVelocity * (rb.mass * 8f * currentGrip);
             rb.AddForce(lateralFrictionForce * Time.fixedDeltaTime, ForceMode.Impulse);
         }
@@ -473,6 +499,9 @@ namespace RacingGame
         /// <summary>Back onto the track: the respawn provider decides where, else the last grounded pose.</summary>
         public void ResetCar()
         {
+            if (status == null) status = GetComponent<CarStatus>();
+            if (status != null) status.ClearAllStatuses();
+
             if (respawnProvider == null) respawnProvider = GetComponent<IRespawnPoseProvider>();
             if (respawnProvider != null && respawnProvider.TryGetRespawnPose(out var pos, out var rot))
                 Teleport(pos, rot);

@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
+using RacingGame.Core.Combat;
 
 namespace RacingGame
 {
     /// <summary>
-    /// Pooled cannon shell. Lives on the "Projectile" layer (shell×shell collisions are off in the
-    /// physics matrix), damages the <see cref="CarHealth"/> it hits, shoves the target and returns
-    /// to the <see cref="RaceDirector"/> pool on first contact or when its tick lifetime ends.
+    /// Pooled projectile (cannon shell, machine gun bullet, freeze projectile).
+    /// Lives on the "Projectile" layer, damages the <see cref="CarHealth"/> it hits,
+    /// shoves the target and returns to the <see cref="RaceDirector"/> pool on first contact
+    /// or when its tick lifetime ends.
     /// Every piece of per-shot state (owner, ignored collider pairs, velocity, consumed flag)
     /// is reset on <see cref="Activate"/>/<see cref="Deactivate"/>.
     /// </summary>
@@ -25,10 +27,16 @@ namespace RacingGame
         private bool consumed;
         private bool live;
         private int deathTick;
+        private ProjectileKind kind;
+        private StatusKind statusToApply;
+        private float statusDuration;
+        private Transform homingTarget;
         private readonly List<Collider> ignoredOwnerColliders = new List<Collider>(16);
 
         public GameObject Owner => owner;
         public bool IsLive => live;
+        public ProjectileKind Kind => kind;
+        public StatusKind StatusToApply => statusToApply;
 
         /// <summary>Builds one inactive shell for the pool.</summary>
         public static Projectile CreatePooled(Transform parent)
@@ -67,11 +75,37 @@ namespace RacingGame
             director = owningDirector;
             owner = spawn.Owner;
             damage = spawn.Damage;
+            kind = spawn.Kind;
+            statusToApply = spawn.Status;
+            statusDuration = spawn.StatusDuration;
+            homingTarget = spawn.HomingTarget;
             consumed = false;
             live = true;
-            deathTick = spawn.Tick + SimulationDriver.SecondsToTicks(lifetime);
 
-            if (spawn.Material != null) shellRenderer.sharedMaterial = spawn.Material;
+            float effectiveLifetime = lifetime;
+            float effectiveHitImpulse = 4000f;
+
+            if (kind == ProjectileKind.Freeze)
+            {
+                effectiveLifetime = 2f;
+                statusToApply = StatusKind.Frozen;
+                if (statusDuration <= 0f) statusDuration = 1.5f;
+                if (damage <= 0f) damage = 5f;
+                effectiveHitImpulse = 1500f;
+            }
+            else if (kind == ProjectileKind.MachineGun)
+            {
+                effectiveLifetime = 0.4f;
+                effectiveHitImpulse = 800f;
+            }
+
+            hitImpulse = effectiveHitImpulse;
+            deathTick = spawn.Tick + SimulationDriver.SecondsToTicks(effectiveLifetime);
+
+            if (spawn.Material != null && shellRenderer != null)
+            {
+                shellRenderer.sharedMaterial = spawn.Material;
+            }
 
             transform.position = spawn.Position;
             transform.rotation = Quaternion.LookRotation(spawn.Velocity.sqrMagnitude > 0.01f ? spawn.Velocity : Vector3.forward);
@@ -79,20 +113,43 @@ namespace RacingGame
 
             // Never hit the car that fired us (the muzzle sits inside the owner's body box).
             // The pairs are remembered so they can be cleared when the shell is recycled.
-            if (owner != null)
+            if (owner != null && shellCollider != null)
             {
                 owner.GetComponentsInChildren(true, ignoredOwnerColliders);
-                foreach (var c in ignoredOwnerColliders) if (c != null) Physics.IgnoreCollision(shellCollider, c, true);
+                foreach (var c in ignoredOwnerColliders)
+                {
+                    if (c != null) Physics.IgnoreCollision(shellCollider, c, true);
+                }
             }
 
-            rb.position = spawn.Position;
-            rb.linearVelocity = spawn.Velocity;
-            rb.angularVelocity = Vector3.zero;
+            if (rb != null)
+            {
+                rb.position = spawn.Position;
+                rb.linearVelocity = spawn.Velocity;
+                rb.angularVelocity = Vector3.zero;
+            }
         }
 
         public void SimulationStep(int tick)
         {
-            if (live && tick >= deathTick) Deactivate();
+            if (live && tick >= deathTick)
+            {
+                Deactivate();
+                return;
+            }
+
+            if (live && homingTarget != null && kind == ProjectileKind.Freeze && rb != null)
+            {
+                Vector3 toTarget = homingTarget.position - transform.position;
+                if (toTarget.sqrMagnitude > 0.01f && rb.linearVelocity.sqrMagnitude > 0.01f)
+                {
+                    float speed = rb.linearVelocity.magnitude;
+                    float maxRadians = 30f * Mathf.Deg2Rad * SimulationDriver.FixedStep;
+                    Vector3 newVel = Vector3.RotateTowards(rb.linearVelocity, toTarget.normalized * speed, maxRadians, 0f);
+                    rb.linearVelocity = newVel;
+                    transform.rotation = Quaternion.LookRotation(newVel);
+                }
+            }
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -101,20 +158,42 @@ namespace RacingGame
             consumed = true;
 
             var health = collision.collider.GetComponentInParent<CarHealth>();
-            if (health != null && health.gameObject != owner)
+            bool isCarTarget = health != null && health.gameObject != owner;
+            HitResult hitResult = default;
+
+            if (isCarTarget)
             {
-                bool applied = health.TakeDamage(damage, owner);
-                if (applied && director != null) director.CountHit(owner, health.gameObject);
+                var hit = new HitInfo
+                {
+                    Attacker = owner,
+                    Damage = damage,
+                    Point = collision.contactCount > 0 ? collision.GetContact(0).point : transform.position,
+                    Normal = collision.contactCount > 0 ? collision.GetContact(0).normal : Vector3.up,
+                    HitType = HitType.Projectile,
+                    Status = statusToApply,
+                    StatusDuration = statusDuration
+                };
+                hitResult = health.ApplyHit(in hit);
+                if ((hitResult.DamageApplied || hitResult.StatusApplied) && !hitResult.ShieldAbsorbed && director != null)
+                {
+                    director.CountHit(owner, health.gameObject);
+                }
             }
 
             var targetBody = collision.rigidbody;
             if (targetBody != null && !targetBody.isKinematic)
             {
-                Vector3 dir = rb.linearVelocity.sqrMagnitude > 0.01f ? rb.linearVelocity.normalized : transform.forward;
-                targetBody.AddForceAtPosition(dir * hitImpulse, collision.GetContact(0).point, ForceMode.Impulse);
+                if (!isCarTarget || hitResult.DamageApplied)
+                {
+                    Vector3 dir = (rb != null && rb.linearVelocity.sqrMagnitude > 0.01f) ? rb.linearVelocity.normalized : transform.forward;
+                    targetBody.AddForceAtPosition(dir * hitImpulse, collision.GetContact(0).point, ForceMode.Impulse);
+                }
             }
 
-            EffectPool.Instance.PlayShellImpact(collision.GetContact(0).point);
+            if (EffectPool.Instance != null)
+            {
+                EffectPool.Instance.PlayShellImpact(collision.GetContact(0).point);
+            }
             Deactivate();
         }
 
@@ -122,11 +201,18 @@ namespace RacingGame
         {
             if (!live) return;
             live = false;
-            foreach (var c in ignoredOwnerColliders) if (c != null && shellCollider != null) Physics.IgnoreCollision(shellCollider, c, false);
+            foreach (var c in ignoredOwnerColliders)
+            {
+                if (c != null && shellCollider != null) Physics.IgnoreCollision(shellCollider, c, false);
+            }
             ignoredOwnerColliders.Clear();
             owner = null;
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+            homingTarget = null;
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
             gameObject.SetActive(false);
             if (director != null) director.ReturnToPool(this);
         }

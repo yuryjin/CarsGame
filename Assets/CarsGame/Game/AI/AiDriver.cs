@@ -107,6 +107,9 @@ namespace RacingGame
 
         private void Configure()
         {
+            if (car == null) car = GetComponent<CarController>();
+            if (progress == null) progress = GetComponent<RaceProgress>();
+            if (gunner == null) gunner = GetComponent<AiGunner>();
             path = TrackPath.Instance;
             rng = RaceDirector.Instance.Rng;
             targetLane = currentLane = homeLane = baseLaneOffset;
@@ -122,7 +125,11 @@ namespace RacingGame
         public DriveCommand Sample(int tick)
         {
             if (path == null) path = TrackPath.Instance;
-            if (path == null || progress == null) return DriveCommand.None(tick);
+            if (car == null) car = GetComponent<CarController>();
+            if (progress == null) progress = GetComponent<RaceProgress>();
+            if (gunner == null) gunner = GetComponent<AiGunner>();
+            if (rng == null && RaceDirector.Current != null) rng = RaceDirector.Current.Rng;
+            if (path == null || progress == null || car == null) return DriveCommand.None(tick);
             ticksSinceEnable++;
 
             var cmd = Decide(tick);
@@ -263,7 +270,8 @@ namespace RacingGame
             if (overturnedTime > 2f) { reset = true; overturnedTime = 0f; resetCount++; }
 
             bool fire = gunner != null && !reversing && gunner.WantsFire(tick);
-            return new DriveCommand { Tick = tick, Throttle = throttle, Steer = steer, Brake = brake, Fire = fire, ResetEdge = reset }.Clamped();
+            bool secondary = gunner != null && !reversing && gunner.WantsSecondary(tick);
+            return new DriveCommand { Tick = tick, Throttle = throttle, Steer = steer, Brake = brake, Fire = fire, Secondary = secondary, ResetEdge = reset }.Clamped();
         }
 
         /// <summary>Signed curvature (rad/m, +right) of the centre line over a short window around d.</summary>
@@ -329,7 +337,44 @@ namespace RacingGame
                 if (clearTime > 3f) targetLane = Mathf.Clamp(homeLane, -limit, limit);
             }
 
+            AvoidMines(limit);
+
             currentLane = Mathf.MoveTowards(currentLane, targetLane, 3f * dt);
+        }
+
+        private void AvoidMines(float limit)
+        {
+            var director = RaceDirector.Current;
+            if (director == null || director.LiveMines == 0 || path == null || progress == null) return;
+            var liveMines = director.LiveMineHazards;
+            if (liveMines == null || liveMines.Count == 0) return;
+
+            float carDist = progress.Distance;
+            for (int i = 0; i < liveMines.Count; i++)
+            {
+                var mine = liveMines[i];
+                if (mine == null || !mine.gameObject.activeSelf) continue;
+                int hint = -1;
+                float mineDist = path.Spline.Project(mine.transform.position, ref hint, -1);
+                float deltaDist = path.SignedDelta(carDist, mineDist);
+                if (deltaDist > 2f && deltaDist < 25f)
+                {
+                    float mineLateral = path.Spline.LateralOffset(mine.transform.position, mineDist);
+                    float laneDiff = Mathf.Abs(mineLateral - currentLane);
+                    if (laneDiff < 2.0f)
+                    {
+                        float avoidOffset = mineLateral >= currentLane ? -2.4f : 2.4f;
+                        float candidateLane = currentLane + avoidOffset;
+                        if (candidateLane < -limit || candidateLane > limit)
+                        {
+                            candidateLane = currentLane - avoidOffset;
+                        }
+                        targetLane = Mathf.Clamp(candidateLane, -limit, limit);
+                        clearTime = 0f;
+                        break;
+                    }
+                }
+            }
         }
 
         private bool Cast(Vector3 origin, Vector3 dir, float range, out RaycastHit best)

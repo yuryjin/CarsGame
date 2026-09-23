@@ -36,7 +36,7 @@ namespace RacingGame
             path = TrackPath.Instance;
             if (path == null || count <= 0) return;
             var rng = RaceDirector.Instance.Rng;
-            var kinds = new[] { PickupKind.Health, PickupKind.Ammo, PickupKind.Nitro };
+            var kinds = new[] { PickupKind.Health, PickupKind.Ammo, PickupKind.Nitro, PickupKind.Item };
             float usable = path.Length - startExclusion;
             for (int i = 0; i < count; i++)
             {

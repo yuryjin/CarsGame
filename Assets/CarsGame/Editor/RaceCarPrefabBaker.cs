@@ -94,7 +94,9 @@ namespace RacingGame.EditorTools
 
             var health = root.AddComponent<CarHealth>();
             health.showScreenBar = false; health.showWorldBar = false;
+            root.AddComponent<CarStatus>();
             root.AddComponent<CarCannon>();
+            root.AddComponent<CarWeapons>();
             root.AddComponent<RaceProgress>();
             root.AddComponent<RaceParticipant>();
             root.AddComponent<CarPaint>();

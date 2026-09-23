@@ -97,5 +97,6 @@ namespace RacingGame
         }
 
         public static int SecondsToTicks(float seconds) => Mathf.Max(1, Mathf.CeilToInt(seconds / FixedStep));
+        public static float TicksToSeconds(int ticks) => ticks * FixedStep;
     }
 }

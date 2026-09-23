@@ -1,4 +1,5 @@
 using UnityEngine;
+using RacingGame.Core.Combat;
 
 namespace RacingGame
 {
@@ -12,5 +13,9 @@ namespace RacingGame
         public float Damage;
         public int Tick;
         public Material Material;
+        public ProjectileKind Kind;
+        public StatusKind Status;
+        public float StatusDuration;
+        public Transform HomingTarget;
     }
 }

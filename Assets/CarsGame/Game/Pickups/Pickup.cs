@@ -1,19 +1,23 @@
 using UnityEngine;
+using RacingGame.Core.Combat;
 
 namespace RacingGame
 {
-    public enum PickupKind { Health, Ammo, Nitro }
+    public enum PickupKind { Health, Ammo, Nitro, Item }
 
     /// <summary>
-    /// Trigger pickup on the track: heals, refills the magazine or gives a nitro burst to the
-    /// first car that drives through it, then hides until the spawner respawns it. Visuals are a
-    /// spinning primitive with a colour per kind (no assets).
+    /// Trigger pickup on the track: heals, refills ammo, gives a nitro burst or grants an item
+    /// (Shield / Repair based on target HP) to the first car that drives through it.
+    /// Visuals are a spinning primitive with a colour per kind.
     /// </summary>
     public sealed class Pickup : MonoBehaviour
     {
         public PickupKind kind;
         public float healAmount = 35f;
         public float nitroSeconds = 3f;
+        public float itemRepairThreshold = 60f;
+        public float itemRepairHeal = 40f;
+        public float itemShieldDuration = 6f;
         public bool Taken { get; private set; }
         /// <summary>(pickup, car that took it) — for toasts and first-time tips.</summary>
         public static event System.Action<Pickup, CarController> PickedUp;
@@ -39,7 +43,11 @@ namespace RacingGame
 
         private void BuildVisual()
         {
-            var v = GameObject.CreatePrimitive(kind == PickupKind.Health ? PrimitiveType.Capsule : kind == PickupKind.Ammo ? PrimitiveType.Cube : PrimitiveType.Sphere);
+            PrimitiveType prim = kind == PickupKind.Health ? PrimitiveType.Capsule :
+                                 kind == PickupKind.Ammo ? PrimitiveType.Cube :
+                                 kind == PickupKind.Nitro ? PrimitiveType.Sphere :
+                                 PrimitiveType.Cylinder;
+            var v = GameObject.CreatePrimitive(prim);
             Destroy(v.GetComponent<Collider>());
             v.transform.SetParent(transform, false);
             v.transform.localPosition = Vector3.up * 0.9f;
@@ -66,9 +74,15 @@ namespace RacingGame
             if (materials == null)
             {
                 var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-                materials = new Material[3];
-                var colors = new[] { new Color(0.2f, 0.95f, 0.35f), new Color(1f, 0.8f, 0.2f), new Color(0.3f, 0.6f, 1f) };
-                for (int i = 0; i < 3; i++)
+                materials = new Material[4];
+                var colors = new[]
+                {
+                    new Color(0.2f, 0.95f, 0.35f), // Health (green)
+                    new Color(1f, 0.8f, 0.2f),     // Ammo (yellow)
+                    new Color(0.3f, 0.6f, 1f),     // Nitro (blue)
+                    new Color(0.95f, 0.45f, 0.95f) // Item (magenta/purple)
+                };
+                for (int i = 0; i < 4; i++)
                 {
                     var m = new Material(shader) { name = "Pickup_" + (PickupKind)i };
                     if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", colors[i]);
@@ -86,23 +100,61 @@ namespace RacingGame
             visual.localPosition = new Vector3(0f, 0.9f + 0.15f * Mathf.Sin(Time.time * 2.5f + bobPhase), 0f);
         }
 
-        private void OnTriggerEnter(Collider other)
+        public void OnTriggerEnter(Collider other)
         {
             if (Taken) return;
             var car = other.GetComponentInParent<CarController>();
             if (car == null) return;
             var health = car.GetComponent<CarHealth>();
             if (health != null && health.IsDead) return;      // wrecks take nothing
+
             switch (kind)
             {
-                case PickupKind.Health: { if (health == null || health.Health >= health.maxHealth) return; health.Heal(healAmount); break; }
-                case PickupKind.Ammo: { var c = car.GetComponent<CarCannon>(); if (c == null || c.AmmoMax <= 0 || (c.Ammo >= c.AmmoMax && !c.IsReloading)) return; c.RefillAmmo(); break; }
-                case PickupKind.Nitro: car.ApplyBoost(nitroSeconds); break;
+                case PickupKind.Health:
+                {
+                    if (health == null || health.Health >= health.maxHealth) return;
+                    health.Heal(healAmount);
+                    break;
+                }
+                case PickupKind.Ammo:
+                {
+                    var c = car.GetComponent<CarCannon>();
+                    var w = car.GetComponent<CarWeapons>();
+                    if (c != null) c.RefillAmmo();
+                    if (w != null) w.RefillAll();
+                    break;
+                }
+                case PickupKind.Nitro:
+                {
+                    car.ApplyBoost(nitroSeconds);
+                    break;
+                }
+                case PickupKind.Item:
+                {
+                    var status = car.GetComponent<CarStatus>();
+                    if (health != null && health.Health <= itemRepairThreshold)
+                    {
+                        health.Heal(itemRepairHeal);
+                        if (status != null) status.ClearDebuffs();
+                    }
+                    else if (status != null)
+                    {
+                        status.ApplyStatus(StatusKind.Shield, itemShieldDuration);
+                    }
+                    break;
+                }
             }
+
             Taken = true;
-            TakenTick = SimulationDriver.Instance.Tick;
-            EffectPool.Instance.PlayFlash(transform.position + Vector3.up * 0.9f, new Color(0.8f, 1f, 0.9f), 0.3f, 1.6f, 5f, 3f);
-            SfxPlayer.Instance.Play(SfxSynth.LapDing, transform.position, 0.6f, kind == PickupKind.Nitro ? 1.3f : 1f);
+            TakenTick = SimulationDriver.Instance != null ? SimulationDriver.Instance.Tick : 0;
+            if (EffectPool.Instance != null)
+            {
+                EffectPool.Instance.PlayFlash(transform.position + Vector3.up * 0.9f, new Color(0.8f, 1f, 0.9f), 0.3f, 1.6f, 5f, 3f);
+            }
+            if (SfxPlayer.Instance != null)
+            {
+                SfxPlayer.Instance.Play(SfxSynth.LapDing, transform.position, 0.6f, kind == PickupKind.Nitro ? 1.3f : 1f);
+            }
             gameObject.SetActive(false);
             PickedUp?.Invoke(this, car);
         }

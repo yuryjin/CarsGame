@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using RacingGame.Core.Combat;
 
 namespace RacingGame
 {
@@ -50,16 +51,19 @@ namespace RacingGame
         public bool IsDead { get; private set; }
         public GameObject LastAttacker { get; private set; }
         public bool IsInvulnerable => NowTick < invulnerableUntilTick;
+        public CarStatus Status => status;
         /// <summary>After the car controllers (1..n) and before the race director.</summary>
         public int SimulationOrder => 1000 + (controller != null ? controller.CarId : 0);
 
+        private int currentTick = 0;
         private int invulnerableUntilTick = -1;
         private int lastCollisionDamageTick = -1000000;   // far past, no overflow in (now - last)
         private int respawnAtTick = int.MaxValue;
-        private static int NowTick => SimulationDriver.Instance.Tick;
+        private int NowTick => SimulationDriver.Instance != null ? Mathf.Max(currentTick, SimulationDriver.Instance.Tick) : currentTick;
 
         private Rigidbody rb;
         private CarController controller;
+        private CarStatus status;
         private CarPaint paint;
         [Tooltip("Body blink on every hit that costs HP.")]
         public float hitFlashSeconds = 0.09f;
@@ -73,6 +77,7 @@ namespace RacingGame
         {
             rb = GetComponent<Rigidbody>();
             controller = GetComponent<CarController>();
+            status = GetComponent<CarStatus>();
             paint = GetComponent<CarPaint>();
             currentHealth = maxHealth;
             propertyBlock = new MaterialPropertyBlock();
@@ -83,6 +88,7 @@ namespace RacingGame
 
         public void SimulationStep(int tick)
         {
+            currentTick = tick;
             if (IsDead && respawnOnDeath && tick >= respawnAtTick) Respawn();
         }
 
@@ -119,31 +125,92 @@ namespace RacingGame
             // Ramming counts: the other car (if it is a car) gets the credit.
             GameObject attacker = collision.rigidbody != null && collision.rigidbody.GetComponent<CarHealth>() != null
                 ? collision.rigidbody.gameObject : null;
-            TakeDamage(damage, attacker);
+            var hit = new HitInfo
+            {
+                Attacker = attacker,
+                Damage = damage,
+                Point = collision.contactCount > 0 ? collision.GetContact(0).point : transform.position,
+                Normal = avgNormal.normalized,
+                HitType = HitType.Collision
+            };
+            ApplyHit(in hit);
+        }
+
+        public HitResult ApplyHit(in HitInfo hit)
+        {
+            if (IsDead || IsInvulnerable) return HitResult.Rejected;
+
+            var result = new HitResult();
+            float amount = hit.Damage * GlobalDamageMultiplier;
+
+            if (amount > 0f)
+            {
+                if (status == null) status = GetComponent<CarStatus>();
+                if (status != null && status.ConsumeShield())
+                {
+                    result.DamageApplied = true;
+                    result.ShieldAbsorbed = true;
+                    result.DamageDealt = 0f;
+                    result.Fatal = false;
+                    result.StatusApplied = false;
+                    return result;
+                }
+
+                LastAttacker = hit.Attacker;   // credit goes to whoever dealt the fatal blow; walls (null) get no kill
+                currentHealth = Mathf.Max(0f, currentHealth - amount);
+                result.DamageApplied = true;
+                result.DamageDealt = amount;
+
+                if (currentHealth > 0f)
+                {
+                    if (paint == null) paint = GetComponent<CarPaint>();   // the spawner may add it after Awake
+                    if (paint != null) paint.Flash(hitFlashSeconds, hitFlashColor);
+                }
+                OnHealthChanged?.Invoke(currentHealth, maxHealth);
+
+                if (currentHealth <= 0f)
+                {
+                    result.Fatal = true;
+                    Die(hit.Attacker);
+                    return result;
+                }
+            }
+            else
+            {
+                result.DamageApplied = true;
+                result.DamageDealt = 0f;
+            }
+
+            if (hit.Status != StatusKind.None)
+            {
+                if (status == null) status = GetComponent<CarStatus>();
+                if (status != null)
+                {
+                    float duration = hit.StatusDuration > 0f ? hit.StatusDuration
+                        : (hit.StatusDurationTicks > 0 ? hit.StatusDurationTicks * SimulationDriver.FixedStep : 2.5f);
+                    result.StatusApplied = status.ApplyStatus(hit.Status, duration);
+                }
+            }
+
+            return result;
         }
 
         public bool TakeDamage(float amount) => TakeDamage(amount, null);
 
-        /// <summary>Returns true only if HP actually changed (dead/invulnerable cars reject damage).</summary>
         /// <summary>Event rule (e.g. Night Brawl ×1.5). Reset by the flow when a race ends.</summary>
         public static float GlobalDamageMultiplier = 1f;
 
+        /// <summary>Returns true only if HP actually changed (dead/invulnerable cars reject damage, shield absorbs).</summary>
         public bool TakeDamage(float amount, GameObject attacker)
         {
-            amount *= GlobalDamageMultiplier;
-            if (IsDead || IsInvulnerable || amount <= 0f) return false;
-
-            LastAttacker = attacker;   // credit goes to whoever dealt the fatal blow; walls (null) get no kill
-            currentHealth = Mathf.Max(0f, currentHealth - amount);
-            if (currentHealth > 0f)
+            var hit = new HitInfo
             {
-                if (paint == null) paint = GetComponent<CarPaint>();   // the spawner may add it after Awake
-                if (paint != null) paint.Flash(hitFlashSeconds, hitFlashColor);
-            }
-            OnHealthChanged?.Invoke(currentHealth, maxHealth);
-
-            if (currentHealth <= 0f) Die(attacker);
-            return true;
+                Attacker = attacker,
+                Damage = amount,
+                HitType = HitType.Direct
+            };
+            var result = ApplyHit(in hit);
+            return result.DamageApplied && !result.ShieldAbsorbed && result.DamageDealt > 0f;
         }
 
         /// <summary>Change the pool (difficulty tiers, armour upgrades); current HP follows and the event fires.</summary>
@@ -173,8 +240,12 @@ namespace RacingGame
             SpawnExplosion();
 
             // A wreck sits like a brick.
-            rb.linearDamping = 3f;
-            rb.angularDamping = 3f;
+            if (rb == null) rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.linearDamping = 3f;
+                rb.angularDamping = 3f;
+            }
 
             OnDied?.Invoke(attacker);
         }
@@ -186,12 +257,17 @@ namespace RacingGame
             LastAttacker = null;
             currentHealth = maxHealth;
 
-            rb.linearDamping = 0.05f;
-            rb.angularDamping = 2.5f;
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+            if (rb == null) rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.linearDamping = 0.05f;
+                rb.angularDamping = 2.5f;
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
 
             if (controller != null) controller.ResetCar();
+            if (status != null) status.ClearAllStatuses();
 
             TintWreck(false);
             SetControlsEnabled(true);
@@ -212,6 +288,9 @@ namespace RacingGame
 
             var cannon = GetComponent<CarCannon>();
             if (cannon != null) cannon.enabled = enabled;
+
+            var weapons = GetComponent<CarWeapons>();
+            if (weapons != null) weapons.enabled = enabled;
         }
 
         private void TintWreck(bool wrecked)
@@ -245,7 +324,15 @@ namespace RacingGame
 
         private void SpawnExplosion()
         {
-            EffectPool.Instance.PlayWreck(transform.position + Vector3.up * 0.6f);
+            var pool = EffectPool.Current;
+            if (pool != null)
+            {
+                pool.PlayWreck(transform.position + Vector3.up * 0.6f);
+            }
+            else if (Application.isPlaying)
+            {
+                EffectPool.Instance.PlayWreck(transform.position + Vector3.up * 0.6f);
+            }
         }
     }
 }
