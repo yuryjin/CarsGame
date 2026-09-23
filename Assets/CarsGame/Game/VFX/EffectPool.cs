@@ -11,6 +11,7 @@ namespace RacingGame
     public sealed class EffectPool : MonoBehaviour
     {
         private static EffectPool instance;
+        public static EffectPool Current => instance;
         public static EffectPool Instance
         {
             get
@@ -54,7 +55,7 @@ namespace RacingGame
             // WebGL on a phone reports isMobilePlatform; the device type covers browsers that do not.
             if (Application.isMobilePlatform || SystemInfo.deviceType == DeviceType.Handheld) useLights = false;
             if (flashMaterial == null) flashMaterial = BuildFallbackMaterial();
-            for (int i = 0; i < poolSize; i++) flashes.Add(Build(i));
+            if (flashMaterial != null) for (int i = 0; i < poolSize; i++) flashes.Add(Build(i));   // no material: no flashes, never a magenta sphere
         }
 
         private void OnDestroy() { if (instance == this) instance = null; }
@@ -192,10 +193,15 @@ namespace RacingGame
             f.Renderer.SetPropertyBlock(f.Block);
         }
 
-        // TODO(M5): replace with a serialized material asset so nothing depends on Shader.Find in builds.
+        // The pool is created at runtime, so nothing in the scene references its material: it ships in
+        // Resources (CarsGame/Flash shader). Shader.Find is only an Editor fallback — in a WebGL build an
+        // unreferenced shader is stripped and new Material(null) would throw and kill every effect.
         private static Material BuildFallbackMaterial()
         {
-            var shader = Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Color");
+            var shipped = Resources.Load<Material>("FX_Flash");
+            if (shipped != null) return shipped;
+            var shader = Shader.Find("CarsGame/Flash") ?? Shader.Find("Universal Render Pipeline/Unlit");
+            if (shader == null) { Debug.LogWarning("[EffectPool] no flash shader in the build; flashes disabled"); return null; }
             var m = new Material(shader) { name = "FX_Flash_Unlit" };
             if (m.HasProperty("_Surface")) m.SetFloat("_Surface", 1f); // transparent
             if (m.HasProperty("_Blend")) m.SetFloat("_Blend", 0f);
