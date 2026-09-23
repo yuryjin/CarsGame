@@ -60,3 +60,8 @@ graphify-out
 # ---- Unity AI Assistant scratch files (chat image references etc.) ----
 /[Aa]ssets/AI Toolkit/
 /[Aa]ssets/AI Toolkit.meta
+# ---- Editor crash-recovery scenes and stray batch-build output inside Assets ----
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta
+/[Aa]ssets/CarsGame/Tests/EditMode/Library/
+/[Aa]ssets/CarsGame/Tests/EditMode/Library.meta
