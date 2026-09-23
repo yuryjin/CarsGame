@@ -34,6 +34,7 @@ namespace RacingGame.EditorTools
             string zipPath = Path.Combine(Path.GetDirectoryName(dir) ?? ".", $"{Sanitize(Application.productName)}-web-{version}.zip");
             if (File.Exists(zipPath)) File.Delete(zipPath);   // never leave a stale artifact behind a failed validation
 
+            MoveOutDoNotShip(dir);
             if (!File.Exists(Path.Combine(dir, "index.html"))) problems.AppendLine("index.html missing at build root");
             var files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
             long total = 0;
@@ -57,6 +58,21 @@ namespace RacingGame.EditorTools
                 if (zip.GetEntry("index.html") == null) throw new BuildFailedException("[WebZip] index.html is not at the zip root");
             }
             Debug.Log($"[WebZip] {zipPath} ({new FileInfo(zipPath).Length / 1048576} MB zip, {total / 1048576} MB uncompressed)");
+        }
+
+        /// <summary>
+        /// Unity writes debug-only folders such as "&lt;Product&gt;_BurstDebugInformation_DoNotShip" next to the
+        /// player; they must not reach the store archive. They move beside the build folder instead.
+        /// </summary>
+        private static void MoveOutDoNotShip(string dir)
+        {
+            foreach (var sub in Directory.GetDirectories(dir, "*_DoNotShip", SearchOption.TopDirectoryOnly))
+            {
+                string target = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(dir).TrimEnd('/', '\\')) ?? ".", Path.GetFileName(sub));
+                if (Directory.Exists(target)) Directory.Delete(target, true);
+                Directory.Move(sub, target);
+                Debug.Log("[WebZip] moved out of the shipped folder: " + Path.GetFileName(sub));
+            }
         }
 
         private static void WriteSizeReport(BuildReport report, string dir, long total)
