@@ -45,6 +45,13 @@ namespace RacingGame
                 pickup.transform.rotation = rot;
                 pickups.Add(pickup);
             }
+            if (path.Fork != null)
+            {
+                path.Pose(path.Fork.RepairDistance, -1.8f, out var pos, out var rot);
+                var repair = Pickup.Create(PickupKind.Health, pos, transform);
+                repair.transform.rotation = rot;
+                pickups.Add(repair);
+            }
         }
 
         /// <summary>One pickup per sector: repair outside bends, ammo away from the fast line,

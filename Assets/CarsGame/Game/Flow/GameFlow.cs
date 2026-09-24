@@ -50,6 +50,7 @@ namespace RacingGame
         private TrackPath track;
         private AbyssTrack abyssTrack;
         private SpaceTrack spaceTrack;
+        private TrackFork trackFork;
         private PickupSpawner pickups;
         private HudScreen hud;
         private GhostRecorder recorder;
@@ -125,6 +126,7 @@ namespace RacingGame
             ClearGhosts();
             if (race != null && race.State != RaceState.Idle) race.AbortRace();
             if (pickups != null) pickups.Clear();
+            if (trackFork != null) { trackFork.Restore(); Destroy(trackFork.gameObject); trackFork = null; }
             if (spaceTrack != null) { spaceTrack.Restore(); Destroy(spaceTrack.gameObject); spaceTrack = null; }
             if (abyssTrack != null) { abyssTrack.Restore(); Destroy(abyssTrack.gameObject); abyssTrack = null; }
             var director = RaceDirector.Current; if (director != null) director.ResetRace();   // no shell survives into the next race
@@ -176,6 +178,8 @@ namespace RacingGame
                 abyssTrack = AbyssTrack.Create(track);
                 if (ev.spaceTrack) spaceTrack = SpaceTrack.Create(track, abyssTrack);
             }
+            if (track != null && abyssTrack == null && (ev == null || ev.mode != EventMode.Arena))
+                trackFork = TrackFork.Create(track);
             CarHealth.GlobalDamageMultiplier = ev != null ? ev.damageMultiplier : 1f;
             // Look before the field spawns so the first frame of the countdown is already correct.
             if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
@@ -210,7 +214,7 @@ namespace RacingGame
 
         // ---------- ghosts (async multiplayer) ----------
         // Stable across builds/runtimes (string.GetHashCode is not): FNV-1a over event id, direction and layout version.
-        private const int LayoutVersion = 1;
+        private const int LayoutVersion = 2;
         private int TrackHash(RaceEventDefinition ev)
         {
             unchecked

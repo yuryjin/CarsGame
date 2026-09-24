@@ -74,9 +74,10 @@ namespace RacingGame
             if (Health != null && Health.IsDead) return;
             bool offAsphalt = Car.Surface == GroundSurface.Ground || (Car.Surface == GroundSurface.None && Car.IsGrounded == false && transform.position.y > -5f);
             float lateral = Mathf.Abs(Progress.Path.Spline.LateralOffset(transform.position, Progress.Distance));
-            bool lost = lateral > lostLateralMetres;
+            bool onFork = Progress.Path.OnFork(transform.position);
+            bool lost = !onFork && lateral > lostLateralMetres;
             offTrackTime = offAsphalt || lost ? offTrackTime + Time.fixedDeltaTime : 0f;
-            if (offTrackTime >= offTrackResetSeconds || lateral > lostLateralMetres * 2f)
+            if (offTrackTime >= offTrackResetSeconds || (!onFork && lateral > lostLateralMetres * 2f))
             {
                 offTrackTime = 0f;
                 AutoResets++;

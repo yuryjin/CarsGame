@@ -23,6 +23,7 @@ namespace RacingGame
         private TrackSpline spline;
         private TrackProfile profile;
         private static TrackPath instance;
+        public TrackFork Fork { get; internal set; }
 
         public static TrackPath Instance
         {
@@ -61,7 +62,25 @@ namespace RacingGame
         /// <summary>Target speed and racing line along the current direction.</summary>
         public TrackProfile Profile { get { if (profile == null) Build(); return profile; } }
 
-        public float Project(Vector3 worldPos, ref int hint) => Spline.Project(worldPos, ref hint);
+        public float Project(Vector3 worldPos, ref int hint)
+        {
+            float main = Spline.Project(worldPos, ref hint, Fork != null ? 0 : 6);
+            if (Fork != null)
+            {
+                // Like the main spline, project nearby off-road positions too: falling off the bridge
+                // must not jump over a lap gate before recovery can return the car to the long route.
+                float branch = Fork.Project(worldPos, out float error);
+                if (error < (worldPos - Position(main)).sqrMagnitude) return branch;
+            }
+            return main;
+        }
+
+        public bool OnFork(Vector3 position)
+        {
+            if (Fork == null) return false;
+            Fork.Project(position, out float error);
+            return error < (TrackFork.HalfWidth + 1f) * (TrackFork.HalfWidth + 1f);
+        }
         public Vector3 Position(float d) => Spline.Position(d);
         public Vector3 Tangent(float d) => Spline.Tangent(d);
         public Vector3 Right(float d) => Spline.Right(d);
