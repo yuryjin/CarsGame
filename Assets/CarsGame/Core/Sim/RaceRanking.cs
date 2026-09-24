@@ -9,6 +9,8 @@ namespace RacingGame.Core.Sim
         public bool Finished;
         public double FinishTime;     // seconds, valid when Finished
         public double TotalProgress;  // lap * trackLength + distance, valid when !Finished
+        public int Kills;
+        public int Deaths;
     }
 
     /// <summary>
@@ -54,6 +56,43 @@ namespace RacingGame.Core.Sim
                 int key = order[i];
                 int j = i - 1;
                 while (j >= 0 && Instance.Compare(entries[order[j]], entries[key]) > 0) { order[j + 1] = order[j]; j--; }
+                order[j + 1] = key;
+            }
+            for (int p = 0; p < order.Count; p++) positions[order[p]] = p + 1;
+        }
+
+        public static int CompareArena(RankEntry a, RankEntry b)
+        {
+            int c = b.Kills.CompareTo(a.Kills);
+            if (c != 0) return c;
+            c = a.Deaths.CompareTo(b.Deaths);
+            if (c != 0) return c;
+            return a.CarId.CompareTo(b.CarId);
+        }
+
+        /// <summary>Returns 1-based positions indexed by the entry's original index for arena mode. Allocates; tests and tools only.</summary>
+        public static int[] RankArena(List<RankEntry> entries)
+        {
+            var order = new List<int>(entries.Count);
+            var positions = new int[entries.Count];
+            RankArena(entries, order, positions);
+            return positions;
+        }
+
+        /// <summary>
+        /// Allocation-free ranking for arena deathmatch: <paramref name="order"/> is scratch space,
+        /// <paramref name="positions"/> (length ≥ entries.Count) receives 1-based positions by original index.
+        /// Insertion sort: sorted by Kills desc, Deaths asc, CarId asc.
+        /// </summary>
+        public static void RankArena(List<RankEntry> entries, List<int> order, int[] positions)
+        {
+            order.Clear();
+            for (int i = 0; i < entries.Count; i++) order.Add(i);
+            for (int i = 1; i < order.Count; i++)
+            {
+                int key = order[i];
+                int j = i - 1;
+                while (j >= 0 && CompareArena(entries[order[j]], entries[key]) > 0) { order[j + 1] = order[j]; j--; }
                 order[j + 1] = key;
             }
             for (int p = 0; p < order.Count; p++) positions[order[p]] = p + 1;
