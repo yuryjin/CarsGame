@@ -82,11 +82,15 @@
 ```
 [Преамбула — кроме строки про worktree: здесь работаешь в основном дереве, только на чтение и git]
 
-1. git status в основном дереве. Если есть незакоммиченные изменения, ОСТАНОВИСЬ. Спроси пользователя, чьи они
-   и кто их коммитит. Сам не коммить и не откатывай: это работа других сессий.
+1. git worktree add берёт HEAD, а не рабочую копию. Всё незакоммиченное в main в ветку не попадёт.
+   git status в основном дереве. Если незакоммичены файлы, которые трогают этапы R (Assets/CarsGame/**,
+   Tools/qa/**), ОСТАНОВИСЬ. Спроси пользователя, чьи они и когда их закоммитят: рефакторинг на устаревшей
+   базе потом не сольётся. Незакоммиченные документы и чужие ассеты вне этих путей старт не блокируют.
+   Сам чужое не коммить и не откатывай.
 2. Docs/AI/RefactorPlan.md и Docs/AI/RefactorPrompts.md должны быть в main, иначе их не будет в worktree.
    Если они не закоммичены, спроси пользователя и закоммить только эти два файла: «docs(refactor): plan and prompts».
-3. Когда main чистый: git worktree add .worktrees/refactor -b refactor/code-health main.
+3. Когда пункт 1 выполнен: git worktree add .worktrees/refactor -b refactor/code-health main.
+   Остальные незакоммиченные файлы main не трогать.
 4. Проверь, что Tools/qa/edit-tests.sh с PROJECT=<worktree> проходит на копии. Запиши число тестов.
 5. Отчёт: хэш main, путь worktree, число тестов.
 ```
@@ -129,7 +133,8 @@
    - с --report всегда возвращает 0, без флага — 1, если в выбранных группах есть пробелы.
 5. Проставить [Category("REQ:…")] существующим тестам, которые уже проверяют правило: EconomyTests,
    AdPacerTests, DailyChallengeTests, DailyRaceTests, SaveMergeTests, SaveMigratorTests, SaveServiceTests,
-   EventRulesTests, StarGoalsTests, ArenaModeTests, RewardedOffersTests, PlayerProgressionTests.
+   EventRulesTests, StarGoalsTests, ArenaModeTests, RewardedOffersTests, PlayerProgressionTests,
+   а для RACE — LapCounterTests, RaceRankingTests, RubberBandTests, RaceResultsTests.
    Тесты не переименовывать, утверждения не менять.
 6. Общие фикстуры в Assets/CarsGame/Tests/EditMode/Support/:
    - TestCarRig: Rigidbody + CarController + CarStatus + CarWeapons + CarCannon + CarHealth. Сейчас эта сборка
@@ -245,8 +250,8 @@
 Каждое правило — ID в Requirements.md и тест с [Category("REQ:…")].
 
 Готово, когда:
-- req-coverage.sh --groups FLOW,EVT,STAR,LB,DAILY,ADS,RWD возвращает 0. Группы COMBAT, RACE, WPN закрываются
-  в R3 и R7, сейчас их пробелы допустимы;
+- req-coverage.sh --groups FLOW,EVT,STAR,LB,DAILY,ADS,RWD возвращает 0. Пробелы COMBAT и WPN закрывает R3,
+  RACE — R7 (только правила, которые он переносит) и этап D. Сейчас их пробелы допустимы;
 - в GameFlow не осталось формул этих правил и ручных сравнений поколения;
 - PlayMode TwistPlayTests зелёные.
 Фокус ревью: «R2: правила наград, анлоков, дейлика и лидербордов совпадают с прежним GameFlow/PlatformGlue».
@@ -279,7 +284,9 @@
 
 Готово, когда: CarWeaponsTests, CarStatusTests, CarHealthHitTests, MineHazardTests, ArsenalExpansionTests,
 MineFieldAndChargeTests зелёные без смены ожидаемых чисел. Боевое событие из R0 на race.sh — в коридоре.
-req-coverage.sh --groups COMBAT,WPN возвращает 0.
+Покрыты все ID COMBAT и WPN, относящиеся к перенесённым типам (StatusTimers, HeatGauge, MagazineState,
+HitResolver, вторичный огонь). Остальные пробелы этих групп перечислить в отчёте, тесты на них не дописывать.
+Тесты на всю гонку не писать.
 Фокус ревью: «R3: нагрев, магазин, статусы и попадания численно те же; иммунитет Frozen; порядок внутри тика».
 ```
 
@@ -307,6 +314,8 @@ req-coverage.sh --groups COMBAT,WPN возвращает 0.
 Готово, когда:
 - AiCombatAndInputTests, AiRecoveryTests, TrackProfileTests зелёные;
 - race.sh на e1 и на боевом событии, на трёх сидах, в коридоре R0.
+- Покрыты ID RACE для правил, которые R7 переносит в Core. Остальные RACE (отсчёт, финиш, grace) остаются
+  открытыми до D, перечислить их в отчёте.
 Выход за коридор — это ошибка переноса: найти, а не расширять коридор.
 Фокус ревью: «R7: планировщики ИИ дают те же команды, что старый AiDriver/AiGunner».
 ```
@@ -408,8 +417,9 @@ B2, B3 и B5 — в любой момент после R0. B1 и B4 — посл
 [Преамбула — кроме правила «поведение не меняется»: здесь меняется ровно одно описанное поведение]
 
 B1. Полосы порядка шага пересекаются.
-    nextCarId в RaceDirector только растёт. Порядки: CarController = id, CarStatus 900+id, оружие 950+id,
-    CarHealth 1000+id, масло 1050, HotBomb 1100. Уже примерно через 7 гонок за сессию полосы перемешиваются.
+    nextCarId в RaceDirector только растёт. Порядки: CarController = id, CarStatus 900+id,
+    оружие 950+id (если регистрация ещё есть; R1 её снимает), CarHealth 1000+id, масло 1050, HotBomb 1100.
+    Уже примерно через 7 гонок за сессию полосы перемешиваются.
     Тест: 8 гонок подряд в одной сессии, порядок шага на восьмой совпадает с первой.
     Исправление: ключ сортировки (полоса, id) ИЛИ сброс id на каждую гонку. Сброс id пересекается с D,
     поэтому выбор согласовать с пользователем.

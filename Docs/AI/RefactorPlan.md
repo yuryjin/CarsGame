@@ -8,7 +8,7 @@
 
 Этот файл — единственный порядок работ. [`ArchitectureImprovementPlan.md`](ArchitectureImprovementPlan.md) остаётся разбором находок, а не вторым планом.
 
-**Предусловие.** Рефакторинг начинать только после того, как текущая рабочая копия закоммичена, и только в отдельном worktree `refactor/*`. В `main` сейчас лежат чужие незакоммиченные изменения: их не трогать и не коммитить из этой работы.
+**Предусловие.** `git worktree add` берёт HEAD, а не рабочую копию. Поэтому до старта в `main` должны быть закоммичены этот план, `RefactorPrompts.md` и чужие правки в `Assets/CarsGame` и `Tools/qa`: рефакторинг на устаревшей базе потом не сольётся. Работа идёт только в отдельном worktree `refactor/*`. Остальные незакоммиченные файлы `main` не трогать и не коммитить из этой работы.
 
 ## Порядок
 
@@ -88,7 +88,7 @@ ECS-стиль в этом проекте:
   - У каждого ID: одна строка формулировки, пометка «текущее поведение» или «будущее», источник, имя теста.
   - На механики, которых нет в коде (очки и «Угар» из `ArenaMode.md`), ID не заводить.
 - **Скрипт `Tools/qa/req-coverage.sh`**, без Unity. Сравнивает ID из реестра с `[Category("REQ:…")]` в тестах и печатает требования без теста. `--groups` ограничивает проверку группами. С `--report` всегда возвращает 0, без него — 1, если в выбранных группах есть пробелы.
-- **Категории `[Category("REQ:…")]`** проставить существующим тестам, которые уже проверяют правило: `EconomyTests`, `AdPacerTests`, `DailyChallengeTests`, `DailyRaceTests`, `Save*Tests`, `EventRulesTests`, `StarGoalsTests`, `ArenaModeTests`, `RewardedOffersTests`, `PlayerProgressionTests`. Массово тесты не переименовывать.
+- **Категории `[Category("REQ:…")]`** проставить существующим тестам, которые уже проверяют правило: `EconomyTests`, `AdPacerTests`, `DailyChallengeTests`, `DailyRaceTests`, `Save*Tests`, `EventRulesTests`, `StarGoalsTests`, `ArenaModeTests`, `RewardedOffersTests`, `PlayerProgressionTests`, а для RACE — `LapCounterTests`, `RaceRankingTests`, `RubberBandTests`, `RaceResultsTests`. Массово тесты не переименовывать.
 - **Общие фикстуры** в `Tests/EditMode/Support/`:
   - `TestCarRig` — сборка машины сейчас скопирована по тестам;
   - `FakePlatform` — Ads, Leaderboards, ServerClock, CloudSave;
@@ -169,7 +169,7 @@ ECS-стиль в этом проекте:
 Тесты EditMode — на фейках `IAds`, `ILeaderboards`, `IServerClock`, `ICloudSave`. Категория `REQ:` на каждом новом правиле.
 
 Готово, когда:
-- `req-coverage.sh --groups FLOW,EVT,STAR,LB,DAILY,ADS,RWD` возвращает 0. Пробелы COMBAT, RACE и WPN закрываются в R3 и R7;
+- `req-coverage.sh --groups FLOW,EVT,STAR,LB,DAILY,ADS,RWD` возвращает 0. COMBAT и WPN закрывает R3 по перенесённым типам, RACE — R7 по правилам, которые он переносит, остальное RACE (отсчёт, финиш, grace) — этап D. Правила, уже покрытые `LapCounterTests`, `RaceRankingTests`, `RubberBandTests`, `RaceResultsTests`, получают категории в R0;
 - в `GameFlow` не осталось формул этих правил и ручных сравнений поколения.
 
 ## R3. Компоненты боя в Core
@@ -185,7 +185,7 @@ ECS-стиль в этом проекте:
 - **`HitResolver`** из разбора попадания в `CarHealth`.
 - **Вторичный огонь** (мина, заряд, заморозка) — три функции в хосте, им нужен пул. В Core уезжает только решение «можно ли выстрелить и сколько патронов осталось».
 
-Готово, когда: `CarWeaponsTests`, `CarStatusTests`, `CarHealthHitTests`, `MineHazardTests`, `ArsenalExpansionTests` зелёные без смены ожидаемых чисел.
+Готово, когда: `CarWeaponsTests`, `CarStatusTests`, `CarHealthHitTests`, `MineHazardTests`, `ArsenalExpansionTests` зелёные без смены ожидаемых чисел; покрыты ID COMBAT и WPN, относящиеся к перенесённым типам. Остальные пробелы групп перечислить в отчёте.
 
 ## R7. ИИ
 
@@ -204,15 +204,16 @@ ECS-стиль в этом проекте:
 
 `HudScreen` остаётся сборкой: создание, привязка к игроку, видимость, фасад для `GameFlow`, `PerfectStart`, `OnboardingHints` и `WorldHealthBars`.
 
-Два коммита:
+Три коммита:
 
 1. Разрезать файл на partial: `HudScreen.Build`, `.Combat`, `.Feed`. Это чистый перенос без правки кода, безопасный для параллельных сессий. Связность при этом не падает: около 100 полей остаются общими.
 2. Вынести plain-виджеты (не MonoBehaviour) — **только для частей с собственным состоянием**: прицел, маркеры угрозы, лента убийств, индикаторы статусов, панель оружия с колесом. Простые подписи и полоски остаются методами корня.
    - Интерфейс виджета: `Build`, `Bind`, `Tick`, `LateTick`, `ApplyLayout(touch, narrow)`, `Localize`.
    - У корня два прохода, как сейчас: `Update` (`HudScreen.cs:635`) и `LateUpdate` (`:854`). Прицел, маркеры угроз и тосты обновляются после камеры, в `LateTick`, иначе прицел будет отставать от камеры. Порядок вызовов фиксированный, как сейчас.
 
+3. Одна таблица прямоугольников для десктопа и тача, с тестом. Сейчас смещения задаются и при построении, и в `ApplyLayout`.
+
 Отдельно:
-- Одна таблица прямоугольников для десктопа и тача. Сейчас смещения задаются и при построении, и в `ApplyLayout`.
 - Математика «угроза за спиной / целится в меня» и разбор имени в ленте — чистые функции в Core, если у них нет `Camera` и `RectTransform`.
 
 Готово, когда:
@@ -249,7 +250,7 @@ ECS-стиль в этом проекте:
 
 - **B1. Полосы порядка шага пересекаются.**
   - `nextCarId` начинается с 1, только растёт и не сбрасывается в `ResetRace` (`RaceDirector.cs:114, 128`).
-  - Порядки шага: `CarController` = id, `CarStatus` 900+id, оружие 950+id, `CarHealth` 1000+id, масло 1050, HotBomb 1100.
+  - Порядки шага: `CarController` = id, `CarStatus` 900+id, оружие 950+id (до R1, который снимает эту регистрацию), `CarHealth` 1000+id, масло 1050, HotBomb 1100.
   - Примерно после 7 гонок за сессию полосы перемешиваются. Порядок шага в игре тогда расходится со свежим прогоном `race.sh`.
   - Исправление: ключ сортировки (полоса, id) или сброс id на каждую гонку. Сброс id пересекается с D — выбрать одно.
 - **B2. Варианты шейдера в WebGL.**
