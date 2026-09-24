@@ -159,8 +159,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094623
-    m_Localized: "Gas: W oder Pfeil hoch    Lenken: A/D oder Pfeile\r\nBremse: Leertaste   
-      Feuer: Strg oder LMT\r\nZur\xFCck auf die Strecke: R    Pause: Esc"
+    m_Localized: "Gas: W oder Pfeil hoch    Lenken: A/D oder Pfeile\nBremse: Leertaste   
+      Feuer: Strg oder LMT\nZur\xFCck auf die Strecke: R    Pause: Esc"
     m_Metadata:
       m_Items: []
   - m_Id: 4010094624
@@ -455,6 +455,215 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7348941066248192
     m_Localized: PERFEKTER START!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194746609664
+    m_Localized: VERBESSERUNGEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386880
+    m_Localized: WAFFEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386881
+    m_Localized: "Ausr\xFCsten"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386882
+    m_Localized: "AUSGER\xDCSTET"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386883
+    m_Localized: Gesperrt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386884
+    m_Localized: Minen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386885
+    m_Localized: Explosive Kontaktminen hinter dem Auto abwerfen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386886
+    m_Localized: Kryo-Werfer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386887
+    m_Localized: Kryo-Geschosse abfeuern um Gegner einzufrieren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386888
+    m_Localized: Maschinengewehr
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386889
+    m_Localized: "Schnellfeuer-Prim\xE4rwaffe mit \xDCberhitzungsgefahr"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386890
+    m_Localized: MINE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386891
+    m_Localized: "\xDCBERHITZT!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386892
+    m_Localized: SCHILD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386893
+    m_Localized: FROST
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386894
+    m_Localized: BLOCKIERT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386895
+    m_Localized: REIFEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386896
+    m_Localized: Minen {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581184
+    m_Localized: Frost {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581185
+    m_Localized: HITZE {pct}%
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581186
+    m_Localized: MG BEREIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581187
+    m_Localized: Du
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581188
+    m_Localized: Rex
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581189
+    m_Localized: Nova
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581190
+    m_Localized: Bolt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581191
+    m_Localized: Vega
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581192
+    m_Localized: Zed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581193
+    m_Localized: Kira
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581194
+    m_Localized: Max
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824705679360
+    m_Localized: Fahrzeugabstimmung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262272
+    m_Localized: Ausgewogen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262273
+    m_Localized: Tempo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262274
+    m_Localized: "\xDCberleben"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456576
+    m_Localized: Feuerkraft
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456577
+    m_Localized: Keine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456578
+    m_Localized: Kanone nutzen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456579
+    m_Localized: "Ausr\xFCstung: {primary} / {secondary}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456580
+    m_Localized: Nur gekaufte Waffen. Wechsel kostenlos.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456581
+    m_Localized: Standardwerte. Kanone; keine Zweitwaffe.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456582
+    m_Localized: Tempo +10%, Beschleunigung +8%; HP -15%, Grip -5%. Kanone + Frost.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456583
+    m_Localized: HP +30%; Tempo -6%, Beschleunigung -10%. Kanone + Minen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456584
+    m_Localized: Hauptwaffenschaden +20%, Schussintervall -10%; HP -10%, Tempo -3%.
+      MG + Minen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456585
+    m_Localized: Unter den ersten {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456586
+    m_Localized: "Zerst\xF6re {n} Gegner"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456587
+    m_Localized: Siege ohne Reparatur
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456588
+    m_Localized: Ziel innerhalb von {t}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456589
+    m_Localized: Beende das Rennen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456590
+    m_Localized: TREFFER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456591
+    m_Localized: SCHILD GEBROCHEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456592
+    m_Localized: "ZERST\xD6RT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456593
+    m_Localized: Hindernis
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7666113768497152
+    m_Localized: VERLANGSAMT
     m_Metadata:
       m_Items: []
   references:

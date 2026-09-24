@@ -25,6 +25,7 @@ difficulty.easy,tier,10,Easy,Легко,Kolay,简单,Leicht,Fácil,Facile,Fácil
 difficulty.normal,tier,10,Normal,Нормально,Normal,普通,Normal,Normal,Normal,Normal,Нормально
 difficulty.hard,tier,10,Hard,Сложно,Zor,困难,Schwer,Difícil,Difficile,Difícil,Складно
 hud.lap,{cur}/{total},22,LAP {cur}/{total},КРУГ {cur}/{total},TUR {cur}/{total},第 {cur}/{total} 圈,RUNDE {cur}/{total},VUELTA {cur}/{total},TOUR {cur}/{total},VOLTA {cur}/{total},КОЛО {cur}/{total}
+hud.kills,{n} kills,16,KILLS: {n},ФРАГИ: {n},LEŞ: {n},击杀：{n},KILLS: {n},BAJAS: {n},KILLS : {n},ABATES: {n},ФРАГИ: {n}
 hud.position,P{pos}/{n},14,P{pos}/{n},П{pos}/{n},S{pos}/{n},第{pos}/{n}名,P{pos}/{n},P{pos}/{n},P{pos}/{n},P{pos}/{n},П{pos}/{n}
 hud.speed_unit,,6,km/h,км/ч,km/sa,公里/时,km/h,km/h,km/h,km/h,км/год
 hud.nitro,boost flag,8,NITRO,НИТРО,NİTRO,氮气,NITRO,NITRO,NITRO,NITRO,НІТРО
@@ -143,7 +144,38 @@ hud.status.shield,status effect,10,SHIELD,ЩИТ,KALKAN,护盾,SCHILD,ESCUDO,BOU
 hud.status.frozen,status effect,10,FROZEN,ЗАМОРОЗКА,DONDU,冰冻,FROST,CONGELADO,GELÉ,CONGELADO,ЗАМОРОЗКА
 hud.status.jammed,status effect,10,JAMMED,КЛИН,TUTUKLUK,卡壳,BLOCKIERT,ATASCADO,ENRAYÉ,TRAVADO,КЛИН
 hud.status.punctured,status effect,10,PUNCTURED,ПРОКОЛ,PATLAK,爆胎,REIFEN,PINCHAZO,CREVAISON,FURO,ПРОКОЛ
+hud.status.slowed,status effect,10,SLOWED,ЗАМЕДЛЕНИЕ,YAVAŞ,减速,VERLANGSAMT,RALENTIZADO,RALENTI,LENTO,СПОВІЛЬНЕННЯ
 hud.secondary.mines,secondary ammo counter,24,Mines {cur}/{max},Мины {cur}/{max},Mayın {cur}/{max},地雷 {cur}/{max},Minen {cur}/{max},Minas {cur}/{max},Mines {cur}/{max},Minas {cur}/{max},Міни {cur}/{max}
 hud.secondary.freeze,secondary ammo counter,24,Freeze {cur}/{max},Заморозка {cur}/{max},Dondurucu {cur}/{max},冰冻 {cur}/{max},Frost {cur}/{max},Gel {cur}/{max},Gel {cur}/{max},Congelamento {cur}/{max},Заморозка {cur}/{max}
 hud.heat,{pct} percent,12,HEAT {pct}%,НАГРЕВ {pct}%,ISI %{pct},过热度 {pct}%,HITZE {pct}%,CALOR {pct}%,CHAUFFE {pct}%,CALOR {pct}%,НАГРІВ {pct}%
 hud.mg_ready,machine gun ready,10,MG READY,ПУЛЕМЁТ,MT HAZIR,机枪就绪,MG BEREIT,AM LISTA,MITR. PRÊTE,METR. PRONTA,КУЛЕМЕТ
+player.name,player name,12,You,Вы,Sen,你,Du,Tú,Toi,Você,Ти
+ai.name.rex,ai name,12,Rex,Рекс,Rex,雷克斯,Rex,Rex,Rex,Rex,Рекс
+ai.name.nova,ai name,12,Nova,Нова,Nova,诺娃,Nova,Nova,Nova,Nova,Нова
+ai.name.bolt,ai name,12,Bolt,Болт,Bolt,博尔特,Bolt,Bolt,Bolt,Bolt,Болт
+ai.name.vega,ai name,12,Vega,Вега,Vega,维加,Vega,Vega,Vega,Vega,Вега
+ai.name.zed,ai name,12,Zed,Зед,Zed,泽德,Zed,Zed,Zed,Zed,Зед
+ai.name.kira,ai name,12,Kira,Кира,Kira,基拉,Kira,Kira,Kira,Kira,Кіра
+ai.name.max,ai name,12,Max,Макс,Max,麦克斯,Max,Max,Max,Max,Макс
+garage.builds,gameplay improvements,200,Free tuning presets,Готовые сборки,Hazır ayarlar,预设调校,Fahrzeugabstimmung,Configuraciones,Réglages,Configurações,Готові збірки
+build.balanced,gameplay improvements,200,Balanced,Стандартная,Dengeli,均衡,Ausgewogen,Equilibrada,Équilibré,Equilibrada,Стандартна
+build.speed,gameplay improvements,200,Speed,Скорость,Hız,速度,Tempo,Velocidad,Vitesse,Velocidade,Швидкість
+build.survival,gameplay improvements,200,Survival,Живучесть,Dayanıklılık,生存,Überleben,Supervivencia,Survie,Sobrevivência,Живучість
+build.firepower,gameplay improvements,200,Firepower,Огневая мощь,Ateş gücü,火力,Feuerkraft,Potencia de fuego,Puissance de feu,Poder de fogo,Вогнева міць
+build.none,gameplay improvements,200,None,Нет,Yok,无,Keine,Ninguna,Aucune,Nenhuma,Немає
+build.use_cannon,gameplay improvements,200,Use cannon,Вернуть пушку,Topu kullan,使用火炮,Kanone nutzen,Usar cañón,Utiliser le canon,Usar canhão,Повернути гармату
+build.loadout,gameplay improvements,200,Equipped: {primary} / {secondary},Установлено: {primary} / {secondary},Donanım: {primary} / {secondary},装备：{primary} / {secondary},Ausrüstung: {primary} / {secondary},Equipo: {primary} / {secondary},Équipement : {primary} / {secondary},Equipado: {primary} / {secondary},Встановлено: {primary} / {secondary}
+build.owned_only,gameplay improvements,200,Presets equip owned weapons only. Switching is free.,Сборки используют только купленное оружие. Смена бесплатна.,Yalnızca satın alınan silahlar kullanılır. Değişim ücretsizdir.,预设仅使用已购买的武器，切换免费。,Nur gekaufte Waffen. Wechsel kostenlos.,Solo armas compradas. Cambiar es gratis.,Armes achetées uniquement. Changement gratuit.,Apenas armas compradas. Troca gratuita.,Лише куплена зброя. Зміна безкоштовна.
+build.balanced.desc,gameplay improvements,200,Standard stats. Cannon; no secondary.,Обычные характеристики. Пушка; без второго оружия.,Standart değerler. Top; ikincil silah yok.,标准属性。火炮，无副武器。,Standardwerte. Kanone; keine Zweitwaffe.,Valores normales. Cañón; sin secundaria.,Valeurs normales. Canon ; aucune arme secondaire.,Valores normais. Canhão; sem secundária.,Звичайні характеристики. Гармата; без другої зброї.
+build.speed.desc,gameplay improvements,200,"Speed +10%, acceleration +8%; HP -15%, grip -5%. Cannon + freeze.","Скорость +10%, разгон +8%; HP -15%, сцепление -5%. Пушка + заморозка.","Hız +%10, ivme +%8; can -%15, yol tutuş -%5. Top + dondurucu.",速度+10%，加速+8%；生命-15%，抓地力-5%。火炮+冰冻。,"Tempo +10%, Beschleunigung +8%; HP -15%, Grip -5%. Kanone + Frost.","Velocidad +10%, aceleración +8%; vida -15%, agarre -5%. Cañón + hielo.","Vitesse +10%, accélération +8% ; PV -15%, adhérence -5%. Canon + gel.","Velocidade +10%, aceleração +8%; vida -15%, aderência -5%. Canhão + gelo.","Швидкість +10%, розгін +8%; HP -15%, зчеплення -5%. Гармата + заморозка."
+build.survival.desc,gameplay improvements,200,"HP +30%; speed -6%, acceleration -10%. Cannon + mines.","HP +30%; скорость -6%, разгон -10%. Пушка + мины.","Can +%30; hız -%6, ivme -%10. Top + mayın.",生命+30%；速度-6%，加速-10%。火炮+地雷。,"HP +30%; Tempo -6%, Beschleunigung -10%. Kanone + Minen.","Vida +30%; velocidad -6%, aceleración -10%. Cañón + minas.","PV +30% ; vitesse -6%, accélération -10%. Canon + mines.","Vida +30%; velocidade -6%, aceleração -10%. Canhão + minas.","HP +30%; швидкість -6%, розгін -10%. Гармата + міни."
+build.firepower.desc,gameplay improvements,200,"Primary damage +20%, shot interval -10%; HP -10%, speed -3%. MG + mines.","Урон основного оружия +20%, интервал выстрела -10%; HP -10%, скорость -3%. Пулемёт + мины.","Ana silah hasarı +%20, atış aralığı -%10; can -%10, hız -%3. MT + mayın.",主武器伤害+20%，射击间隔-10%；生命-10%，速度-3%。机枪+地雷。,"Hauptwaffenschaden +20%, Schussintervall -10%; HP -10%, Tempo -3%. MG + Minen.","Daño principal +20%, intervalo -10%; vida -10%, velocidad -3%. Ametralladora + minas.","Dégâts principaux +20%, intervalle -10% ; PV -10%, vitesse -3%. Mitrailleuse + mines.","Dano principal +20%, intervalo -10%; vida -10%, velocidade -3%. Metralhadora + minas.","Урон основної зброї +20%, інтервал -10%; HP -10%, швидкість -3%. Кулемет + міни."
+goals.place,gameplay improvements,200,Finish in top {n},Финишируй в топ-{n},İlk {n} içinde bitir,前{n}名完赛,Unter den ersten {n},Termina entre los {n} primeros,Finir dans le top {n},Termine entre os {n} primeiros,Фінішуй у топ-{n}
+goals.kills,gameplay improvements,200,Wreck {n} rivals,Уничтожь {n} соперников,{n} rakibi yok et,摧毁{n}个对手,Zerstöre {n} Gegner,Destruye {n} rivales,Détruire {n} adversaires,Destrua {n} rivais,Знищ {n} суперників
+goals.no_repair,gameplay improvements,200,Win without repairs,Победи без ремонта,Onarım yapmadan kazan,不维修并获胜,Siege ohne Reparatur,Gana sin reparaciones,Gagner sans réparation,Vença sem reparos,Переможи без ремонту
+goals.time,gameplay improvements,200,Finish within {t},Финишируй за {t},{t} içinde bitir,在{t}内完赛,Ziel innerhalb von {t},Termina en {t},Finir en {t},Termine em {t},Фінішуй за {t}
+goals.finish,gameplay improvements,200,Finish the race,Заверши гонку,Yarışı bitir,完成比赛,Beende das Rennen,Termina la carrera,Finir la course,Termine a corrida,Заверши гонку
+combat.hit,gameplay improvements,200,HIT,ПОПАДАНИЕ,İSABET,命中,TREFFER,IMPACTO,TOUCHÉ,ACERTO,ВЛУЧАННЯ
+combat.shield,gameplay improvements,200,SHIELD BROKEN,ЩИТ СНЯТ,KALKAN KIRILDI,护盾破裂,SCHILD GEBROCHEN,ESCUDO ROTO,BOUCLIER BRISÉ,ESCUDO QUEBRADO,ЩИТ ЗНЯТО
+combat.destroyed,gameplay improvements,200,DESTROYED,УНИЧТОЖЕН,YOK EDİLDİ,已摧毁,ZERSTÖRT,DESTRUIDO,DÉTRUIT,DESTRUÍDO,ЗНИЩЕНО
+combat.obstacle,gameplay improvements,200,Obstacle,Препятствие,Engel,障碍物,Hindernis,Obstáculo,Obstacle,Obstáculo,Перешкода

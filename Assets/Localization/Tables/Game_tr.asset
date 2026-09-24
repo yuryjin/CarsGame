@@ -159,9 +159,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094623
-    m_Localized: "Gaz: W veya Yukar\u0131    Direksiyon: A/D veya oklar\r\nFren:
-      Bo\u015Fluk    Ate\u015F: Ctrl veya sol t\u0131k\r\nPiste d\xF6n: R    Duraklat:
-      Esc"
+    m_Localized: "Gaz: W veya Yukar\u0131    Direksiyon: A/D veya oklar\nFren: Bo\u015Fluk   
+      Ate\u015F: Ctrl veya sol t\u0131k\nPiste d\xF6n: R    Duraklat: Esc"
     m_Metadata:
       m_Items: []
   - m_Id: 4010094624
@@ -457,6 +456,216 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7348941066248192
     m_Localized: "M\xDCKEMMEL START!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194746609664
+    m_Localized: "Y\xDCKSELTMELER"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386880
+    m_Localized: "S\u0130LAHLAR"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386881
+    m_Localized: "Ku\u015Fan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386882
+    m_Localized: "KU\u015EANILDI"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386883
+    m_Localized: Kilitli
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386884
+    m_Localized: "May\u0131nlar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386885
+    m_Localized: "Arkana patlay\u0131c\u0131 temas may\u0131nlar\u0131 b\u0131rak"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386886
+    m_Localized: Dondurucu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386887
+    m_Localized: "Rakipleri dondurmak i\xE7in dondurucu mermiler ate\u015Fle"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386888
+    m_Localized: "Makineli T\xFCfek"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386889
+    m_Localized: "A\u015F\u0131r\u0131 \u0131s\u0131nabilen seri birincil silah"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386890
+    m_Localized: MAYIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386891
+    m_Localized: "A\u015EIRI ISINMA!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386892
+    m_Localized: KALKAN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386893
+    m_Localized: DONDU
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386894
+    m_Localized: TUTUKLUK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386895
+    m_Localized: PATLAK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386896
+    m_Localized: "May\u0131n {cur}/{max}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581184
+    m_Localized: Dondurucu {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581185
+    m_Localized: ISI %{pct}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581186
+    m_Localized: MT HAZIR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581187
+    m_Localized: Sen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581188
+    m_Localized: Rex
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581189
+    m_Localized: Nova
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581190
+    m_Localized: Bolt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581191
+    m_Localized: Vega
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581192
+    m_Localized: Zed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581193
+    m_Localized: Kira
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581194
+    m_Localized: Max
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824705679360
+    m_Localized: "Haz\u0131r ayarlar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262272
+    m_Localized: Dengeli
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262273
+    m_Localized: "H\u0131z"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262274
+    m_Localized: "Dayan\u0131kl\u0131l\u0131k"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456576
+    m_Localized: "Ate\u015F g\xFCc\xFC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456577
+    m_Localized: Yok
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456578
+    m_Localized: Topu kullan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456579
+    m_Localized: "Donan\u0131m: {primary} / {secondary}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456580
+    m_Localized: "Yaln\u0131zca sat\u0131n al\u0131nan silahlar kullan\u0131l\u0131r.
+      De\u011Fi\u015Fim \xFCcretsizdir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456581
+    m_Localized: "Standart de\u011Ferler. Top; ikincil silah yok."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456582
+    m_Localized: "H\u0131z +%10, ivme +%8; can -%15, yol tutu\u015F -%5. Top + dondurucu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456583
+    m_Localized: "Can +%30; h\u0131z -%6, ivme -%10. Top + may\u0131n."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456584
+    m_Localized: "Ana silah hasar\u0131 +%20, at\u0131\u015F aral\u0131\u011F\u0131
+      -%10; can -%10, h\u0131z -%3. MT + may\u0131n."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456585
+    m_Localized: "\u0130lk {n} i\xE7inde bitir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456586
+    m_Localized: '{n} rakibi yok et'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456587
+    m_Localized: "Onar\u0131m yapmadan kazan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456588
+    m_Localized: "{t} i\xE7inde bitir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456589
+    m_Localized: "Yar\u0131\u015F\u0131 bitir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456590
+    m_Localized: "\u0130SABET"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456591
+    m_Localized: KALKAN KIRILDI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456592
+    m_Localized: "YOK ED\u0130LD\u0130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456593
+    m_Localized: Engel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7666113768497152
+    m_Localized: "YAVA\u015E"
     m_Metadata:
       m_Items: []
   references:

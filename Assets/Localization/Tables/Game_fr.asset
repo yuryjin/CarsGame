@@ -159,8 +159,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094623
-    m_Localized: "Acc\xE9l\xE9rer : W ou Haut    Diriger : A/D ou fl\xE8ches\r\nFrein
-      : Espace    Tir : Ctrl ou clic gauche\r\nRetour piste : R    Pause : \xC9chap"
+    m_Localized: "Acc\xE9l\xE9rer : W ou Haut    Diriger : A/D ou fl\xE8ches\nFrein
+      : Espace    Tir : Ctrl ou clic gauche\nRetour piste : R    Pause : \xC9chap"
     m_Metadata:
       m_Items: []
   - m_Id: 4010094624
@@ -455,6 +455,216 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 7348941066248192
     m_Localized: "D\xC9PART PARFAIT !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194746609664
+    m_Localized: "AM\xC9LIORATIONS"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386880
+    m_Localized: ARMEMENT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386881
+    m_Localized: "\xC9quiper"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386882
+    m_Localized: "\xC9QUIP\xC9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386883
+    m_Localized: "Verrouill\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386884
+    m_Localized: Mines
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386885
+    m_Localized: "Larguez des mines explosives derri\xE8re votre v\xE9hicule"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386886
+    m_Localized: Lance-cryo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386887
+    m_Localized: "Tirez des obus cryog\xE9niques pour geler vos rivaux"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386888
+    m_Localized: Mitrailleuse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386889
+    m_Localized: "Arme principale \xE0 tir rapide sujette \xE0 surchauffe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386890
+    m_Localized: MINE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386891
+    m_Localized: SURCHAUFFE !
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386892
+    m_Localized: BOUCLIER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386893
+    m_Localized: "GEL\xC9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386894
+    m_Localized: "ENRAY\xC9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386895
+    m_Localized: CREVAISON
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386896
+    m_Localized: Mines {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581184
+    m_Localized: Gel {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581185
+    m_Localized: CHAUFFE {pct}%
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581186
+    m_Localized: "MITR. PR\xCATE"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581187
+    m_Localized: Toi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581188
+    m_Localized: Rex
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581189
+    m_Localized: Nova
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581190
+    m_Localized: Bolt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581191
+    m_Localized: Vega
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581192
+    m_Localized: Zed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581193
+    m_Localized: Kira
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581194
+    m_Localized: Max
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824705679360
+    m_Localized: "R\xE9glages"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262272
+    m_Localized: "\xC9quilibr\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262273
+    m_Localized: Vitesse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262274
+    m_Localized: Survie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456576
+    m_Localized: Puissance de feu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456577
+    m_Localized: Aucune
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456578
+    m_Localized: Utiliser le canon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456579
+    m_Localized: "\xC9quipement : {primary} / {secondary}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456580
+    m_Localized: "Armes achet\xE9es uniquement. Changement gratuit."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456581
+    m_Localized: Valeurs normales. Canon ; aucune arme secondaire.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456582
+    m_Localized: "Vitesse +10%, acc\xE9l\xE9ration +8% ; PV -15%, adh\xE9rence -5%.
+      Canon + gel."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456583
+    m_Localized: "PV +30% ; vitesse -6%, acc\xE9l\xE9ration -10%. Canon + mines."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456584
+    m_Localized: "D\xE9g\xE2ts principaux +20%, intervalle -10% ; PV -10%, vitesse
+      -3%. Mitrailleuse + mines."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456585
+    m_Localized: Finir dans le top {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456586
+    m_Localized: "D\xE9truire {n} adversaires"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456587
+    m_Localized: "Gagner sans r\xE9paration"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456588
+    m_Localized: Finir en {t}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456589
+    m_Localized: Finir la course
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456590
+    m_Localized: "TOUCH\xC9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456591
+    m_Localized: "BOUCLIER BRIS\xC9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456592
+    m_Localized: "D\xC9TRUIT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456593
+    m_Localized: Obstacle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7666113768497152
+    m_Localized: RALENTI
     m_Metadata:
       m_Items: []
   references:

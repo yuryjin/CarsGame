@@ -461,6 +461,216 @@ MonoBehaviour:
     m_Localized: "\xA1SALIDA PERFECTA!"
     m_Metadata:
       m_Items: []
+  - m_Id: 7651194746609664
+    m_Localized: MEJORAS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386880
+    m_Localized: ARMAS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386881
+    m_Localized: Equipar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386882
+    m_Localized: EQUIPADO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386883
+    m_Localized: Bloqueado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386884
+    m_Localized: Minas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386885
+    m_Localized: Suelta minas de contacto explosivas tras tu coche
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386886
+    m_Localized: "Lanzacongelaci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386887
+    m_Localized: "Dispara proyectiles criog\xE9nicos para congelar rivales"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386888
+    m_Localized: Ametralladora
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386889
+    m_Localized: "Arma principal de disparo r\xE1pido con sobrecalentamiento"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386890
+    m_Localized: MINA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386891
+    m_Localized: "\xA1SOBRECALENTADO!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386892
+    m_Localized: ESCUDO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386893
+    m_Localized: CONGELADO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386894
+    m_Localized: ATASCADO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386895
+    m_Localized: PINCHAZO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386896
+    m_Localized: Minas {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581184
+    m_Localized: Gel {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581185
+    m_Localized: CALOR {pct}%
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581186
+    m_Localized: AM LISTA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581187
+    m_Localized: "T\xFA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581188
+    m_Localized: Rex
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581189
+    m_Localized: Nova
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581190
+    m_Localized: Bolt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581191
+    m_Localized: Vega
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581192
+    m_Localized: Zed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581193
+    m_Localized: Kira
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581194
+    m_Localized: Max
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824705679360
+    m_Localized: Configuraciones
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262272
+    m_Localized: Equilibrada
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262273
+    m_Localized: Velocidad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262274
+    m_Localized: Supervivencia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456576
+    m_Localized: Potencia de fuego
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456577
+    m_Localized: Ninguna
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456578
+    m_Localized: "Usar ca\xF1\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456579
+    m_Localized: 'Equipo: {primary} / {secondary}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456580
+    m_Localized: Solo armas compradas. Cambiar es gratis.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456581
+    m_Localized: "Valores normales. Ca\xF1\xF3n; sin secundaria."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456582
+    m_Localized: "Velocidad +10%, aceleraci\xF3n +8%; vida -15%, agarre -5%. Ca\xF1\xF3n
+      + hielo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456583
+    m_Localized: "Vida +30%; velocidad -6%, aceleraci\xF3n -10%. Ca\xF1\xF3n + minas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456584
+    m_Localized: "Da\xF1o principal +20%, intervalo -10%; vida -10%, velocidad -3%.
+      Ametralladora + minas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456585
+    m_Localized: Termina entre los {n} primeros
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456586
+    m_Localized: Destruye {n} rivales
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456587
+    m_Localized: Gana sin reparaciones
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456588
+    m_Localized: Termina en {t}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456589
+    m_Localized: Termina la carrera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456590
+    m_Localized: IMPACTO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456591
+    m_Localized: ESCUDO ROTO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456592
+    m_Localized: DESTRUIDO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456593
+    m_Localized: "Obst\xE1culo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7666113768497152
+    m_Localized: RALENTIZADO
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

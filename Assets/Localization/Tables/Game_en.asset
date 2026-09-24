@@ -461,6 +461,215 @@ MonoBehaviour:
     m_Localized: PERFECT START!
     m_Metadata:
       m_Items: []
+  - m_Id: 7651194746609664
+    m_Localized: UPGRADES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386880
+    m_Localized: WEAPONS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386881
+    m_Localized: Equip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386882
+    m_Localized: EQUIPPED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386883
+    m_Localized: Locked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386884
+    m_Localized: Mines
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386885
+    m_Localized: Drop explosive contact mines behind your car
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386886
+    m_Localized: Cryo Launcher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386887
+    m_Localized: Fire cryogenic shells to freeze rivals
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386888
+    m_Localized: Machine Gun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386889
+    m_Localized: Rapid-fire primary weapon prone to overheating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386890
+    m_Localized: MINE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386891
+    m_Localized: OVERHEAT!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386892
+    m_Localized: SHIELD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386893
+    m_Localized: FROZEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386894
+    m_Localized: JAMMED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386895
+    m_Localized: PUNCTURED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194763386896
+    m_Localized: Mines {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581184
+    m_Localized: Freeze {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581185
+    m_Localized: HEAT {pct}%
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581186
+    m_Localized: MG READY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581187
+    m_Localized: You
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581188
+    m_Localized: Rex
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581189
+    m_Localized: Nova
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581190
+    m_Localized: Bolt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581191
+    m_Localized: Vega
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581192
+    m_Localized: Zed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581193
+    m_Localized: Kira
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7651194767581194
+    m_Localized: Max
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824705679360
+    m_Localized: Free tuning presets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262272
+    m_Localized: Balanced
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262273
+    m_Localized: Speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824718262274
+    m_Localized: Survival
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456576
+    m_Localized: Firepower
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456577
+    m_Localized: None
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456578
+    m_Localized: Use cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456579
+    m_Localized: 'Equipped: {primary} / {secondary}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456580
+    m_Localized: Presets equip owned weapons only. Switching is free.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456581
+    m_Localized: Standard stats. Cannon; no secondary.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456582
+    m_Localized: Speed +10%, acceleration +8%; HP -15%, grip -5%. Cannon + freeze.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456583
+    m_Localized: HP +30%; speed -6%, acceleration -10%. Cannon + mines.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456584
+    m_Localized: Primary damage +20%, shot interval -10%; HP -10%, speed -3%. MG
+      + mines.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456585
+    m_Localized: Finish in top {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456586
+    m_Localized: Wreck {n} rivals
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456587
+    m_Localized: Win without repairs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456588
+    m_Localized: Finish within {t}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456589
+    m_Localized: Finish the race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456590
+    m_Localized: HIT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456591
+    m_Localized: SHIELD BROKEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456592
+    m_Localized: DESTROYED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7658824722456593
+    m_Localized: Obstacle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7666113768497152
+    m_Localized: SLOWED
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
