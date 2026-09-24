@@ -234,3 +234,5 @@ livery.twin,livery name,14,Twin stripes,Двойные полосы,Çift şerit
 livery.band,livery name,14,Side band,Боковая полоса,Yan şerit,侧条,Seitenband,Banda lateral,Bande latérale,Faixa lateral,Бічна смуга
 livery.hood,livery name,14,Hood panel,Капот,Kaput,引擎盖,Motorhaube,Capó,Capot,Capô,Капот
 livery.tail,livery name,14,Tail,Корма,Arka,车尾,Heck,Zaga,Arrière,Traseira,Корма
+events.e16.name,event name,32,Above the Abyss,Над пропастью,Uçurumun Üzerinde,高空赛道,Über dem Abgrund,Sobre el abismo,Au-dessus du gouffre,Sobre o abismo,Над прірвою
+events.e17.name,event name,32,Space Gates,Космические врата,Uzay Geçitleri,星空赛道,Weltraumtore,Portales espaciales,Portails spatiaux,Portais espaciais,Космічні брами

@@ -891,6 +891,14 @@ MonoBehaviour:
     m_Localized: "Arri\xE8re"
     m_Metadata:
       m_Items: []
+  - m_Id: 7978822900817920
+    m_Localized: Au-dessus du gouffre
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7986139495047168
+    m_Localized: Portails spatiaux
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

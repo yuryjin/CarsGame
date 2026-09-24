@@ -111,7 +111,8 @@ namespace RacingGame
             for (int attempt = 0; attempt < 5; attempt++)
             {
                 float candidate = path.Wrap(d - respawnSetback * (attempt + 1));
-                path.Pose(candidate, laneOffset, out position, out rotation);
+                float safeLane = Mathf.Clamp(laneOffset, -Mathf.Max(0f, path.halfWidth - 1.2f), Mathf.Max(0f, path.halfWidth - 1.2f));
+                path.Pose(candidate, safeLane, out position, out rotation);
                 position += Vector3.up * 0.5f;
                 if (!Physics.CheckBox(position + Vector3.up * 0.5f, new Vector3(1.1f, 0.6f, 2.3f), rotation, carMask, QueryTriggerInteraction.Ignore))
                     return true;

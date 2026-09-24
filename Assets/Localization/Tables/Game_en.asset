@@ -894,6 +894,14 @@ MonoBehaviour:
     m_Localized: Tail
     m_Metadata:
       m_Items: []
+  - m_Id: 7978822900817920
+    m_Localized: Above the Abyss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7986139495047168
+    m_Localized: Space Gates
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

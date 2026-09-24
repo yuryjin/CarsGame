@@ -48,6 +48,8 @@ namespace RacingGame
         private EngineAudio playerEngine;
         private SkyDirector sky;
         private TrackPath track;
+        private AbyssTrack abyssTrack;
+        private SpaceTrack spaceTrack;
         private PickupSpawner pickups;
         private HudScreen hud;
         private GhostRecorder recorder;
@@ -123,6 +125,8 @@ namespace RacingGame
             ClearGhosts();
             if (race != null && race.State != RaceState.Idle) race.AbortRace();
             if (pickups != null) pickups.Clear();
+            if (spaceTrack != null) { spaceTrack.Restore(); Destroy(spaceTrack.gameObject); spaceTrack = null; }
+            if (abyssTrack != null) { abyssTrack.Restore(); Destroy(abyssTrack.gameObject); abyssTrack = null; }
             var director = RaceDirector.Current; if (director != null) director.ResetRace();   // no shell survives into the next race
             if (sky != null) sky.ApplyDefault();
             CarHealth.GlobalDamageMultiplier = 1f;
@@ -167,6 +171,11 @@ namespace RacingGame
             race.laps = ev != null ? ev.laps : 3;
             race.aiCountOverride = ev != null ? ev.aiCountOverride : -1;
             if (track != null) { track.reversed = ev != null && ev.reversed; track.Build(); }
+            if (ev != null && (ev.abyssTrack || ev.spaceTrack) && track != null)
+            {
+                abyssTrack = AbyssTrack.Create(track);
+                if (ev.spaceTrack) spaceTrack = SpaceTrack.Create(track, abyssTrack);
+            }
             CarHealth.GlobalDamageMultiplier = ev != null ? ev.damageMultiplier : 1f;
             // Look before the field spawns so the first frame of the countdown is already correct.
             if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
@@ -178,6 +187,7 @@ namespace RacingGame
             if (MenuCameraDirector.Instance != null) MenuCameraDirector.Instance.Activate(false);   // camera hand-over before cars exist
             race.StartRace();
             if (race.State == RaceState.Idle) { EnterMenu(); return; }
+            if (abyssTrack != null && spaceTrack == null && race.Player != null) abyssTrack.Follow(race.Player.Progress);
             if (pickups != null && (ev == null || ev.mode != EventMode.Arena)) pickups.Spawn(ev != null ? ev.pickupCount : 9);
             if (hud != null) hud.SetVisible(true);
             if (speedFx != null) speedFx.SetVisible(true);

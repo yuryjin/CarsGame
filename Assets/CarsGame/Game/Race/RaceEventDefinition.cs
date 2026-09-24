@@ -20,6 +20,10 @@ namespace RacingGame
         [Tooltip("-1 = take the AI count from the difficulty tier.")]
         public int aiCountOverride = -1;
         public bool reversed;
+        [Tooltip("Road over an abyss: broken barriers on lap 1, no barriers on lap 2, narrow road on lap 3.")]
+        public bool abyssTrack;
+        [Tooltip("Suspended space circuit with circular boost gates.")]
+        public bool spaceTrack;
         [Tooltip("Legacy: night look when no sky preset is assigned.")] public bool night;
         [Tooltip("Time-of-day look for this event (null = day / legacy night flag).")] public RacingGame.World.SkyPreset sky;
         [Range(0.5f, 3f)] public float damageMultiplier = 1f;
