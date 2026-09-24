@@ -8,7 +8,15 @@ namespace RacingGame
     public enum PrimaryWeaponType
     {
         Cannon,
-        MachineGun
+        MachineGun,
+        Shotgun,
+        TwinCannon,
+        Autocannon,
+        Sniper,
+        FreezeGun,
+        EmpGun,
+        SpikeGun,
+        HeavyCannon
     }
 
     public enum SecondaryWeaponType
@@ -88,7 +96,7 @@ namespace RacingGame
 
         public void SetPrimaryType(PrimaryWeaponType type)
         {
-            primaryType = type;
+            primaryType = PrimaryWeaponCatalog.IsValid(type) ? type : PrimaryWeaponType.Cannon;
             ApplyHeatProfile();
             var cannon = GetComponent<CarCannon>();
             if (cannon != null)
@@ -98,12 +106,12 @@ namespace RacingGame
         }
 
         /// <summary>
-        /// Mid-race swap (keys 1 / 2). Unlike <see cref="SetPrimaryType"/> it keeps the upgrade multipliers,
+        /// Mid-race swap (keys 1–0). Unlike <see cref="SetPrimaryType"/> it keeps the upgrade multipliers,
         /// the heat and the cannon's half-used magazine, and holds fire for <see cref="primarySwitchSeconds"/>.
         /// </summary>
         public bool TrySwitchPrimary(PrimaryWeaponType type, int tick)
         {
-            if (type == primaryType) return false;
+            if (!PrimaryWeaponCatalog.IsValid(type) || type == primaryType) return false;
             if (type == PrimaryWeaponType.MachineGun && !machineGunUnlocked)
             {
                 PrimarySwitchDenied?.Invoke();
@@ -117,6 +125,20 @@ namespace RacingGame
             return true;
         }
 
+        public bool IsPrimaryAvailable(PrimaryWeaponType type) => PrimaryWeaponCatalog.IsValid(type)
+            && (type != PrimaryWeaponType.MachineGun || machineGunUnlocked);
+
+        public int CyclePrimarySlot(int currentSlot, int direction)
+        {
+            int slot = Mathf.Clamp(currentSlot, 1, PrimaryWeaponCatalog.Count) - 1;
+            for (int i = 0; i < PrimaryWeaponCatalog.Count; i++)
+            {
+                slot = (slot + (direction >= 0 ? 1 : -1) + PrimaryWeaponCatalog.Count) % PrimaryWeaponCatalog.Count;
+                if (IsPrimaryAvailable((PrimaryWeaponType)slot)) return slot + 1;
+            }
+            return currentSlot;
+        }
+
         private void ApplyHeatProfile()
         {
             if (primaryType == PrimaryWeaponType.MachineGun)
@@ -126,7 +148,7 @@ namespace RacingGame
             }
             else // Cannon
             {
-                heatPerShot = 15f;
+                heatPerShot = PrimaryWeaponCatalog.Get(primaryType).Heat;
                 heatCooldownRate = 20f;
             }
             overheatThreshold = 100f;

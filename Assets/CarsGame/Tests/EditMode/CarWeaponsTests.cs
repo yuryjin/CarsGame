@@ -28,6 +28,67 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void TenSlots_MatchWheelDirectionsAndWrap_RejectInvalidSelection()
+        {
+            Assert.AreEqual(0, WeaponWheelGraphic.SlotAt(Vector2.zero));
+            for (int slot = 1; slot <= PrimaryWeaponCatalog.Count; slot++)
+                Assert.AreEqual(slot, WeaponWheelGraphic.SlotAt(WeaponWheelGraphic.SlotDirection(slot) * 100f));
+            Assert.AreEqual(10, weapons.CyclePrimarySlot(1, -1));
+            Assert.AreEqual(1, weapons.CyclePrimarySlot(10, 1));
+            Assert.AreEqual(3, weapons.CyclePrimarySlot(1, 1), "Locked machine gun is skipped.");
+            Assert.IsFalse(weapons.TrySwitchPrimary((PrimaryWeaponType)10, 0));
+            Assert.IsFalse(weapons.TrySwitchPrimary((PrimaryWeaponType)(-1), 0));
+            Assert.AreEqual(0, new RacingGame.Core.Sim.DriveCommand { SelectPrimary = 11 }.Clamped().SelectPrimary);
+            Assert.AreEqual(10, new RacingGame.Core.Sim.DriveCommand { SelectPrimary = 10 }.Clamped().SelectPrimary);
+        }
+
+        [Test]
+        public void TenWeapons_FireDistinctProfiles_KeepEachMagazineAndUpgrades()
+        {
+            var cannon = testGo.AddComponent<CarCannon>();
+            weapons.SetPrimaryType(PrimaryWeaponType.Cannon);
+            weapons.machineGunUnlocked = true;
+            cannon.shellDamage *= 1.5f;
+            cannon.fireInterval *= 0.9f;
+            var director = RaceDirector.Instance;
+            director.ResetRace();
+            for (int slot = 0; slot < PrimaryWeaponCatalog.Count; slot++)
+            {
+                var type = (PrimaryWeaponType)slot;
+                var stats = PrimaryWeaponCatalog.Get(type);
+                int tick = (slot + 1) * 1000;
+                weapons.TrySwitchPrimary(type, tick);
+                weapons.ResetHeat();
+                int before = director.LiveProjectiles;
+                Assert.IsTrue(cannon.TryFire(tick + 100), type.ToString());
+                Assert.AreEqual(before + stats.Pellets, director.LiveProjectiles, type.ToString());
+                Assert.AreEqual(stats.Damage * 1.5f, cannon.shellDamage, 0.001f);
+                Assert.AreEqual(stats.Interval * 0.9f, cannon.fireInterval, 0.001f);
+            }
+            for (int slot = 0; slot < PrimaryWeaponCatalog.Count; slot++)
+            {
+                var type = (PrimaryWeaponType)slot;
+                weapons.TrySwitchPrimary(type, 20000 + slot);
+                int magazine = PrimaryWeaponCatalog.Get(type).Magazine;
+                Assert.AreEqual(magazine == 0 ? int.MaxValue : magazine - 1, cannon.Ammo, type.ToString());
+            }
+            bool freeze = false, jam = false, puncture = false;
+            foreach (var projectile in director.GetComponentsInChildren<Projectile>())
+            {
+                freeze |= projectile.StatusToApply == StatusKind.Frozen;
+                jam |= projectile.StatusToApply == StatusKind.Jammed;
+                puncture |= projectile.StatusToApply == StatusKind.Punctured;
+            }
+            Assert.IsTrue(freeze && jam && puncture, "Special weapons spawn projectiles with their status effects.");
+            weapons.ResetHeat();
+            Assert.IsTrue(cannon.TryFire(21000)); // empty the heavy cannon's second shell
+            cannon.SimulationStep(22000); // reloading it must not refill other weapons
+            weapons.TrySwitchPrimary(PrimaryWeaponType.Cannon, 23000);
+            Assert.AreEqual(4, cannon.Ammo);
+            director.ResetRace();
+        }
+
+        [Test]
         public void InitialState_HasZeroHeat_AndFullSecondaryAmmo()
         {
             Assert.AreEqual(0f, weapons.CurrentHeat, 1e-4f);
@@ -302,6 +363,12 @@ namespace RacingGame.Tests
             controller.SimulationStep(2);
             Assert.AreEqual(PrimaryWeaponType.Cannon, carWeapons.primaryType);
 
+            for (int slot = 3; slot <= PrimaryWeaponCatalog.Count; slot++)
+            {
+                controller.ApplyCommand(new RacingGame.Core.Sim.DriveCommand { Tick = slot, SelectPrimary = slot });
+                controller.SimulationStep(slot);
+                Assert.AreEqual((PrimaryWeaponType)(slot - 1), carWeapons.primaryType);
+            }
             director.ResetRace();
             Object.DestroyImmediate(carGo);
         }

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine;
 using RacingGame.Core.Combat;
 using RacingGame.Core.Track;
@@ -52,6 +54,61 @@ namespace RacingGame.Tests
             if (rivalGo != null) Object.DestroyImmediate(rivalGo);
             if (trackGo != null) Object.DestroyImmediate(trackGo);
             if (directorGo != null) Object.DestroyImmediate(directorGo);
+        }
+
+        [Test]
+        public void PlayerDriverInput_WheelAndScroll_UsePrimaryCommandAndCancelOnPause()
+        {
+            var keyboard = InputSystem.AddDevice<Keyboard>();
+            var mouse = InputSystem.AddDevice<Mouse>();
+            var input = carGo.AddComponent<PlayerDriverInput>();
+            weapons.machineGunUnlocked = true;
+            typeof(PlayerDriverInput).GetMethod("OnEnable", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+            try
+            {
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Q));
+                InputSystem.Update();
+                typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+                Assert.IsTrue(input.WeaponWheelOpen);
+                Assert.AreEqual(0, input.Sample(1).SelectPrimary, "Opening the wheel must not select anything.");
+
+                InputSystem.QueueStateEvent(mouse, new MouseState { delta = WeaponWheelGraphic.SlotDirection(2) * 100f, buttons = 1 });
+                InputSystem.Update();
+                typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+                Assert.AreEqual(2, input.WheelSelection);
+                Assert.IsFalse(input.Sample(2).Fire, "Pointing at the wheel must not fire.");
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                InputSystem.Update();
+                typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+                Assert.AreEqual(2, input.Sample(3).SelectPrimary, "Releasing Q confirms the highlighted weapon.");
+                Assert.AreEqual(0, input.Sample(4).SelectPrimary, "Selection is consumed once.");
+
+                InputSystem.QueueStateEvent(mouse, new MouseState { scroll = new Vector2(0f, -120f) });
+                InputSystem.Update();
+                typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+                Assert.AreEqual(10, input.Sample(5).SelectPrimary, "Scrolling backward wraps to key 0.");
+                weapons.machineGunUnlocked = false;
+                InputSystem.QueueStateEvent(mouse, new MouseState { scroll = new Vector2(0f, 120f) });
+                InputSystem.Update();
+                typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+                Assert.AreEqual(3, input.Sample(6).SelectPrimary, "Scrolling skips unavailable weapons.");
+
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Q));
+                InputSystem.QueueStateEvent(mouse, new MouseState());
+                InputSystem.Update();
+                typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+                PauseController.Set(RacingGame.Core.Platform.PauseReason.User, true);
+                typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+                Assert.IsFalse(input.WeaponWheelOpen);
+                Assert.AreEqual(0, input.Sample(9).SelectPrimary);
+            }
+            finally
+            {
+                PauseController.ResetAll();
+                Object.DestroyImmediate(input);
+                InputSystem.RemoveDevice(mouse);
+                InputSystem.RemoveDevice(keyboard);
+            }
         }
 
         [Test]

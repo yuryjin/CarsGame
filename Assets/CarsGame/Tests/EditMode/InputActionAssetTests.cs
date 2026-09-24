@@ -10,6 +10,26 @@ namespace RacingGame.Tests
         private const string AssetPath = "Assets/InputSystem_Actions.inputactions";
 
         [Test]
+        public void DrivingActionMap_AllTenSlotsHaveNumberAndNumpadBindings()
+        {
+            var asset = InputActionAsset.FromJson(File.ReadAllText(AssetPath));
+            try
+            {
+                var map = asset.FindActionMap("Driving");
+                for (int slot = 1; slot <= 10; slot++)
+                {
+                    string name = slot == 1 ? "PrimaryCannon" : slot == 2 ? "PrimaryMachineGun" : "PrimarySlot" + slot;
+                    var action = map.FindAction(name, true);
+                    Assert.AreEqual(InputActionType.Button, action.type);
+                    var paths = action.bindings.Select(b => b.path).ToList();
+                    Assert.Contains("<Keyboard>/" + (slot % 10), paths);
+                    Assert.Contains("<Keyboard>/numpad" + (slot % 10), paths);
+                }
+            }
+            finally { UnityEngine.Object.DestroyImmediate(asset); }
+        }
+
+        [Test]
         public void InputSystem_Actions_AssetFileExistsAndIsValidJson()
         {
             Assert.IsTrue(File.Exists(AssetPath), $"Expected input actions asset at {AssetPath}");

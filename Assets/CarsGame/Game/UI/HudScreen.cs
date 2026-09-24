@@ -27,6 +27,11 @@ namespace RacingGame
         private CarCannon playerCannon;
         private CarStatus playerStatus;
         private CarWeapons playerWeapons;
+        private PlayerDriverInput playerInput;
+        private RectTransform weaponWheel;
+        private WeaponWheelGraphic weaponWheelGraphic;
+        private readonly TextMeshProUGUI[] wheelLabels = new TextMeshProUGUI[PrimaryWeaponCatalog.Count];
+        private TextMeshProUGUI wheelCenter;
         private float hitMarkerUntil;
         private RectTransform goalsPanel;
         private TextMeshProUGUI goalsText, combatText, incomingArrow, incomingText;
@@ -246,11 +251,61 @@ namespace RacingGame
             centerText.enableAutoSizing = true; centerText.fontSizeMin = 38f; centerText.fontSizeMax = 140f;
             centerPanel.gameObject.SetActive(false);
 
+            BuildWeaponWheel(root);
             BuildPause(root);
 
             hintUntil = Time.unscaledTime + hintSeconds;
             Loc.LanguageChanged += ApplyStaticTexts;
             ApplyStaticTexts();
+        }
+
+        private void BuildWeaponWheel(Transform root)
+        {
+            var center = new Vector2(0.5f, 0.5f);
+            weaponWheel = UiFactory.Panel(root, "WeaponWheel", center, center, new Vector2(-360f, -360f), new Vector2(360f, 360f));
+            weaponWheelGraphic = weaponWheel.gameObject.AddComponent<WeaponWheelGraphic>();
+            weaponWheelGraphic.raycastTarget = false;
+            for (int i = 0; i < wheelLabels.Length; i++)
+            {
+                Vector2 position = WeaponWheelGraphic.SlotDirection(i + 1) * 266f;
+                var label = UiFactory.Text(weaponWheel, "Slot" + (i + 1), "", 24f, TextAlignmentOptions.Center,
+                    center, center, position - new Vector2(70f, 44f), position + new Vector2(70f, 44f));
+                label.enableAutoSizing = true;
+                label.fontSizeMin = 14f;
+                label.fontSizeMax = 24f;
+                label.overflowMode = TextOverflowModes.Ellipsis;
+                wheelLabels[i] = label;
+            }
+            wheelCenter = UiFactory.Text(weaponWheel, "Selected", "", 26f, TextAlignmentOptions.Center,
+                center, center, new Vector2(-135f, -65f), new Vector2(135f, 65f), UiFactory.Accent);
+            wheelCenter.enableAutoSizing = true;
+            wheelCenter.fontSizeMin = 16f;
+            wheelCenter.fontSizeMax = 26f;
+            UiFactory.Text(weaponWheel, "Key", "Q  ·  1–0", 24f, TextAlignmentOptions.Center,
+                center, center, new Vector2(-100f, -120f), new Vector2(100f, -75f), UiFactory.Muted);
+            weaponWheel.gameObject.SetActive(false);
+        }
+
+        private void UpdateWeaponWheel()
+        {
+            bool visible = playerInput != null && playerInput.WeaponWheelOpen && !PauseController.IsPaused
+                && race.State == RaceState.Racing && playerWeapons != null && playerCannon != null && !playerCannon.locked;
+            weaponWheel.gameObject.SetActive(visible);
+            if (!visible) return;
+            float scale = Mathf.Min(1f, Mathf.Min(hudRoot.rect.width - 40f, hudRoot.rect.height - 40f) / 720f);
+            weaponWheel.localScale = Vector3.one * Mathf.Max(0.1f, scale);
+            int selected = playerInput.WheelSelection;
+            weaponWheelGraphic.SetSelection(selected, playerWeapons.machineGunUnlocked);
+            for (int i = 0; i < wheelLabels.Length; i++)
+            {
+                var type = (PrimaryWeaponType)i;
+                bool available = playerWeapons.IsPrimaryAvailable(type);
+                wheelLabels[i].text = ((i + 1) % 10) + "\n" + Loc.Get(PrimaryWeaponCatalog.Get(type).NameKey);
+                wheelLabels[i].color = !available ? UiFactory.Muted : selected == i + 1 ? UiFactory.Accent : Color.white;
+            }
+            var shown = selected == 0 ? playerWeapons.PrimaryType : (PrimaryWeaponType)(selected - 1);
+            wheelCenter.text = Loc.Get(PrimaryWeaponCatalog.Get(shown).NameKey)
+                + (playerWeapons.IsPrimaryAvailable(shown) ? "" : "\n" + Loc.Get("garage.locked"));
         }
 
         private void BuildPause(Transform root)
@@ -585,6 +640,7 @@ namespace RacingGame
                 playerCannon = playerCar.GetComponent<CarCannon>();
                 playerStatus = playerCar.GetComponent<CarStatus>();
                 playerWeapons = playerCar.GetComponent<CarWeapons>();
+                playerInput = playerCar.GetComponent<PlayerDriverInput>();
                 if (playerWeapons != null) { playerWeapons.PrimarySwitched += OnPrimarySwitched; playerWeapons.PrimarySwitchDenied += OnPrimarySwitchDenied; }
                 if (playerCannon != null) { playerCannon.AmmoChanged += OnAmmo; BuildAmmoPips(playerCannon.AmmoMax); OnAmmo(playerCannon.Ammo, playerCannon.AmmoMax); }
 
@@ -598,6 +654,7 @@ namespace RacingGame
                 RefreshPosition();
             }
 
+            UpdateWeaponWheel();
             if (playerCar != null)
             {
                 int speed = Mathf.RoundToInt(Mathf.Abs(playerCar.SpeedKmh));
@@ -638,7 +695,7 @@ namespace RacingGame
                 HideAllStatusIndicators();
             }
 
-            if (playerWeapons != null && playerWeapons.primaryType == PrimaryWeaponType.MachineGun)
+            if (playerWeapons != null && playerCannon != null && playerCannon.AmmoMax == 0 && !playerCannon.locked)
             {
                 bool overheated = playerWeapons.IsOverheated;
                 int heatPct = Mathf.RoundToInt((playerWeapons.CurrentHeat / Mathf.Max(1f, playerWeapons.heatMax)) * 100f);
@@ -646,7 +703,7 @@ namespace RacingGame
                 {
                     lastOverheated = overheated;
                     lastHeatPct = heatPct;
-                    lastPrimaryType = PrimaryWeaponType.MachineGun;
+                    lastPrimaryType = playerWeapons.primaryType;
                     ammoPanel.gameObject.SetActive(true);
                     if (overheated)
                     {
@@ -660,7 +717,7 @@ namespace RacingGame
                     }
                     else
                     {
-                        ammoText.text = Loc.Get("hud.mg_ready");
+                        ammoText.text = Loc.Get(PrimaryWeaponCatalog.Get(playerWeapons.PrimaryType).NameKey);
                         ammoText.color = new Color(1f, 0.85f, 0.3f);
                     }
                 }
@@ -911,7 +968,7 @@ namespace RacingGame
 
         private void OnPrimarySwitched(PrimaryWeaponType type)
         {
-            ShowHint(Loc.Get(type == PrimaryWeaponType.MachineGun ? "garage.machinegun" : "garage.cannon"), 1.2f);
+            ShowHint(Loc.Get(PrimaryWeaponCatalog.Get(type).NameKey), 1.2f);
         }
 
         private void OnPrimarySwitchDenied()

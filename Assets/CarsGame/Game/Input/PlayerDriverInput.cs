@@ -17,11 +17,19 @@ namespace RacingGame
         public bool autoSecondary;
 
         private InputActionMap map;
-        private InputAction throttleAction, steerAction, brakeAction, fireAction, secondaryAction, resetAction, cannonAction, machineGunAction;
+        private InputAction throttleAction, steerAction, brakeAction, fireAction, secondaryAction, resetAction;
         private float throttle, steer;
         private bool brake, fire, secondary;
         private readonly EdgeLatch resetLatch = new EdgeLatch();
-        private int pendingPrimary;   // last primary picked (1/2) since the previous tick, 0 = none
+        private int pendingPrimary;   // last slot picked (1..10), 0 = none
+        private readonly InputAction[] primaryActions = new InputAction[PrimaryWeaponCatalog.Count];
+        private static readonly Key[] NumberKeys = { Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5, Key.Digit6, Key.Digit7, Key.Digit8, Key.Digit9, Key.Digit0 };
+        private static readonly Key[] NumpadKeys = { Key.Numpad1, Key.Numpad2, Key.Numpad3, Key.Numpad4, Key.Numpad5, Key.Numpad6, Key.Numpad7, Key.Numpad8, Key.Numpad9, Key.Numpad0 };
+
+        private CarWeapons weapons;
+        private Vector2 wheelPointer;
+        public bool WeaponWheelOpen { get; private set; }
+        public int WheelSelection { get; private set; }
 
         public bool UsingActionMap => map != null;
         /// <summary>Current throttle level (0..1 forward) even while the car ignores commands (countdown revving).</summary>
@@ -31,6 +39,7 @@ namespace RacingGame
 
         private void OnEnable()
         {
+            weapons = GetComponent<CarWeapons>();
             var asset = InputSystem.actions;
             map = asset != null ? asset.FindActionMap("Driving") : null;
             if (map != null)
@@ -41,8 +50,8 @@ namespace RacingGame
                 fireAction = map.FindAction("Fire");
                 secondaryAction = map.FindAction("Secondary");
                 resetAction = map.FindAction("Reset");
-                cannonAction = map.FindAction("PrimaryCannon");
-                machineGunAction = map.FindAction("PrimaryMachineGun");
+                for (int i = 0; i < primaryActions.Length; i++)
+                    primaryActions[i] = map.FindAction(i == 0 ? "PrimaryCannon" : i == 1 ? "PrimaryMachineGun" : "PrimarySlot" + (i + 1));
                 map.Enable();
             }
             else
@@ -54,14 +63,52 @@ namespace RacingGame
         private void OnDisable()
         {
             throttle = steer = 0f; brake = fire = secondary = false; resetLatch.Clear(); pendingPrimary = 0;
+            WeaponWheelOpen = false; WheelSelection = 0;
         }
 
         private void Update()
         {
             if (map != null) ReadActions(); else PollDevices();
 
+            ReadWeaponSelection();
             RawThrottle = Mathf.Max(0f, throttle);
             if (autoThrottle && Mathf.Abs(throttle) < 0.05f) throttle = brake ? 0f : 1f;
+        }
+
+        private void ReadWeaponSelection()
+        {
+            if (PauseController.IsPaused || weapons == null)
+            {
+                WeaponWheelOpen = false;
+                WheelSelection = pendingPrimary = 0;
+                return;
+            }
+
+            var mouse = Mouse.current;
+            bool held = Keyboard.current != null && Keyboard.current.qKey.isPressed;
+            bool wasOpen = WeaponWheelOpen;
+            WeaponWheelOpen = held;
+            if (held && !wasOpen) { wheelPointer = Vector2.zero; WheelSelection = 0; }
+            if (held && mouse != null)
+            {
+                wheelPointer = Vector2.ClampMagnitude(wheelPointer + mouse.delta.ReadValue(), 180f);
+                WheelSelection = WeaponWheelGraphic.SlotAt(wheelPointer);
+            }
+
+            if (held || wasOpen) fire = secondary = false;
+
+            // Wheel and number keys use the same simulation command.
+            if (mouse != null && mouse.scroll.y.ReadValue() != 0f)
+            {
+                int current = pendingPrimary != 0 ? pendingPrimary : (int)weapons.PrimaryType + 1;
+                pendingPrimary = weapons.CyclePrimarySlot(current, mouse.scroll.y.ReadValue() > 0f ? 1 : -1);
+            }
+            if (pendingPrimary != 0 && held)
+            {
+                WheelSelection = pendingPrimary;
+                wheelPointer = WeaponWheelGraphic.SlotDirection(pendingPrimary) * 100f;
+            }
+            if (wasOpen && !held && pendingPrimary == 0) pendingPrimary = WheelSelection;
         }
 
         private void ReadActions()
@@ -72,8 +119,8 @@ namespace RacingGame
             fire = fireAction != null && fireAction.IsPressed();
             secondary = secondaryAction != null && secondaryAction.IsPressed();
             if (resetAction != null && resetAction.WasPressedThisFrame()) resetLatch.Press();
-            if (cannonAction != null && cannonAction.WasPressedThisFrame()) pendingPrimary = 1;
-            if (machineGunAction != null && machineGunAction.WasPressedThisFrame()) pendingPrimary = 2;
+            for (int i = 0; i < primaryActions.Length; i++)
+                if (primaryActions[i] != null && primaryActions[i].WasPressedThisFrame()) pendingPrimary = i + 1;
         }
 
         private void PollDevices()
@@ -90,8 +137,8 @@ namespace RacingGame
                 fire = k.leftCtrlKey.isPressed || k.rightCtrlKey.isPressed;
                 secondary = k.leftShiftKey.isPressed || k.rightShiftKey.isPressed || k.eKey.isPressed;
                 if (k.rKey.wasPressedThisFrame) resetLatch.Press();
-                if (k.digit1Key.wasPressedThisFrame || k.numpad1Key.wasPressedThisFrame) pendingPrimary = 1;
-                if (k.digit2Key.wasPressedThisFrame || k.numpad2Key.wasPressedThisFrame) pendingPrimary = 2;
+                for (int i = 0; i < NumberKeys.Length; i++)
+                    if (k[NumberKeys[i]].wasPressedThisFrame || k[NumpadKeys[i]].wasPressedThisFrame) pendingPrimary = i + 1;
             }
             var m = Mouse.current;
             if (m != null)
@@ -118,7 +165,7 @@ namespace RacingGame
         public DriveCommand Sample(int tick)
         {
             bool sec = secondary;
-            if (!sec && autoSecondary && tick % 10 == 0)
+            if (!WeaponWheelOpen && !sec && autoSecondary && tick % 10 == 0)
             {
                 var car = GetComponent<CarController>();
                 if (car != null)

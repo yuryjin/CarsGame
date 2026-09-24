@@ -49,7 +49,8 @@ namespace RacingGame
         private CarWeapons weapons;
         private int ammo;
         private PrimaryWeaponType profile;
-        private int parkedAmmo, parkedReloadDoneTick = -1;   // the cannon magazine while the machine gun is out
+        private readonly int[] parkedAmmo = new int[PrimaryWeaponCatalog.Count];
+        private readonly int[] parkedReloadDoneTick = new int[PrimaryWeaponCatalog.Count];
         private int reloadDoneTick = -1;
         private int nextFireTick;
         private bool wantsFire;
@@ -91,67 +92,64 @@ namespace RacingGame
             ApplyPrimaryProfile(weapons != null ? weapons.primaryType : PrimaryWeaponType.Cannon);
         }
 
-        private const float CannonInterval = 0.4f, CannonDamage = 25f, MachineGunInterval = 0.125f, MachineGunDamage = 8f;
-        private const int CannonMagazine = 5;
-
-        /// <summary>Resets the stats to the base of the primary (before upgrades). Refills the magazine.</summary>
+        /// <summary>Initial loadout setup; resets all magazines before upgrades are applied.</summary>
         public void ApplyPrimaryProfile(PrimaryWeaponType type)
         {
-            profile = type;
-            parkedAmmo = CannonMagazine;
-            parkedReloadDoneTick = -1;
-            if (type == PrimaryWeaponType.MachineGun)
+            for (int i = 0; i < PrimaryWeaponCatalog.Count; i++)
             {
-                fireInterval = MachineGunInterval; // 8 shots/sec
-                shellSpeed = 120f;
-                shellDamage = MachineGunDamage;
-                recoilForce = 300f;
-                magazineSize = 0; // heat/overheat governed
-                reloadSeconds = 0f;
-                ammo = 0;
-                reloadDoneTick = -1;
+                parkedAmmo[i] = PrimaryWeaponCatalog.Get((PrimaryWeaponType)i).Magazine;
+                parkedReloadDoneTick[i] = -1;
             }
-            else // Cannon
-            {
-                fireInterval = CannonInterval;
-                shellSpeed = 70f;
-                shellDamage = CannonDamage;
-                recoilForce = 1500f;
-                magazineSize = CannonMagazine;
-                reloadSeconds = 4f;
-                ammo = magazineSize;
-                reloadDoneTick = -1;
-            }
+            ConfigurePrimary(type);
+            ammo = magazineSize;
+            reloadDoneTick = -1;
             AmmoChanged?.Invoke(Ammo, AmmoMax);
         }
 
-        /// <summary>
-        /// Mid-race swap: carries the upgrade and build multipliers over to the new primary, parks the cannon's
-        /// magazine (its reload keeps counting) instead of refilling it, and holds fire until <paramref name="readyTick"/>.
-        /// </summary>
+        private void ConfigurePrimary(PrimaryWeaponType type)
+        {
+            profile = PrimaryWeaponCatalog.IsValid(type) ? type : PrimaryWeaponType.Cannon;
+            var stats = PrimaryWeaponCatalog.Get(profile);
+            fireInterval = stats.Interval;
+            shellSpeed = stats.Speed;
+            shellDamage = stats.Damage;
+            recoilForce = stats.Recoil;
+            magazineSize = stats.Magazine;
+            reloadSeconds = stats.Reload;
+        }
+
+        /// <summary>Preserves upgrades and each weapon's magazine and reload deadline.</summary>
         public void SwitchPrimaryProfile(PrimaryWeaponType type, int readyTick)
         {
-            if (type == profile) return;
-            bool fromCannon = profile == PrimaryWeaponType.Cannon;
-            float damageScale = shellDamage / (fromCannon ? CannonDamage : MachineGunDamage);
-            float intervalScale = fireInterval / (fromCannon ? CannonInterval : MachineGunInterval);
-            int keptAmmo = fromCannon ? ammo : parkedAmmo;
-            int keptReload = fromCannon ? reloadDoneTick : parkedReloadDoneTick;
-            ApplyPrimaryProfile(type);
+            if (!PrimaryWeaponCatalog.IsValid(type) || type == profile) return;
+            var previous = PrimaryWeaponCatalog.Get(profile);
+            float damageScale = shellDamage / previous.Damage;
+            float intervalScale = fireInterval / previous.Interval;
+            parkedAmmo[(int)profile] = ammo;
+            parkedReloadDoneTick[(int)profile] = reloadDoneTick;
+            ConfigurePrimary(type);
             shellDamage *= damageScale;
             fireInterval *= intervalScale;
-            if (type == PrimaryWeaponType.Cannon) { ammo = keptAmmo; reloadDoneTick = keptReload; }
-            else { parkedAmmo = keptAmmo; parkedReloadDoneTick = keptReload; }
+            ammo = parkedAmmo[(int)profile];
+            reloadDoneTick = parkedReloadDoneTick[(int)profile];
             nextFireTick = Mathf.Max(nextFireTick, readyTick);
             AmmoChanged?.Invoke(Ammo, AmmoMax);
         }
 
         public void RefillAmmo()
         {
+            for (int i = 0; i < PrimaryWeaponCatalog.Count; i++)
+            {
+                parkedAmmo[i] = PrimaryWeaponCatalog.Get((PrimaryWeaponType)i).Magazine;
+                parkedReloadDoneTick[i] = -1;
+            }
+            ReloadCurrentMagazine();
+        }
+
+        private void ReloadCurrentMagazine()
+        {
             ammo = magazineSize;
             reloadDoneTick = -1;
-            parkedAmmo = CannonMagazine;
-            parkedReloadDoneTick = -1;
             AmmoChanged?.Invoke(Ammo, AmmoMax);
         }
 
@@ -173,7 +171,7 @@ namespace RacingGame
         /// <summary>Called by the owning <see cref="CarController"/> from its simulation step.</summary>
         public void SimulationStep(int tick)
         {
-            if (reloadDoneTick >= 0 && tick >= reloadDoneTick) RefillAmmo();
+            if (reloadDoneTick >= 0 && tick >= reloadDoneTick) ReloadCurrentMagazine();
             StepTurret(tick);
             if (wantsFire) TryFire(tick);
         }
@@ -211,7 +209,7 @@ namespace RacingGame
 
         public bool TryFire(int tick)
         {
-            if (!enabled || tick < nextFireTick) return false;
+            if (!enabled || locked || tick < nextFireTick) return false;
             if (status == null) status = GetComponent<CarStatus>();
             if (status != null && status.IsJammed) return false;
             if (weapons == null) weapons = GetComponent<CarWeapons>();
@@ -227,9 +225,7 @@ namespace RacingGame
 
             if (weapons != null) weapons.AddHeat(weapons.heatPerShot);
 
-            ProjectileKind pKind = (weapons != null && weapons.primaryType == PrimaryWeaponType.MachineGun)
-                ? ProjectileKind.MachineGun
-                : ProjectileKind.Shell;
+            var shot = PrimaryWeaponCatalog.Get(profile);
 
             Vector3 direction = muzzle != null ? muzzle.forward : transform.forward;
             Vector3 inherited = rb != null ? rb.linearVelocity : Vector3.zero;
@@ -238,17 +234,24 @@ namespace RacingGame
             var director = RaceDirector.Current ?? RaceDirector.Instance;
             if (director != null)
             {
-                director.RequestProjectile(new ProjectileSpawn
+                for (int pellet = 0; pellet < shot.Pellets; pellet++)
                 {
-                    Owner = gameObject,
-                    OwnerId = car != null ? car.CarId : 0,
-                    Position = muzzlePos,
-                    Velocity = direction * shellSpeed + inherited,
-                    Damage = shellDamage,
-                    Tick = tick,
-                    Kind = pKind,
-                    Material = shellMaterial
-                });
+                    float angle = shot.Pellets == 1 ? 0f : Mathf.Lerp(-shot.Spread * 0.5f, shot.Spread * 0.5f, pellet / (float)(shot.Pellets - 1));
+                    Vector3 shotDirection = Quaternion.AngleAxis(angle, muzzle != null ? muzzle.up : transform.up) * direction;
+                    director.RequestProjectile(new ProjectileSpawn
+                    {
+                        Owner = gameObject,
+                        OwnerId = car != null ? car.CarId : 0,
+                        Position = muzzlePos,
+                        Velocity = shotDirection * shellSpeed + inherited,
+                        Damage = shellDamage,
+                        Tick = tick,
+                        Kind = shot.Kind,
+                        Status = shot.Status,
+                        StatusDuration = shot.StatusSeconds,
+                        Material = shellMaterial
+                    });
+                }
             }
 
             recoilOffset = 0.18f;
