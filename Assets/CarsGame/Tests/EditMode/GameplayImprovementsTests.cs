@@ -28,6 +28,17 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void SlipstreamRequiresAlignedCarWithinTheWake()
+        {
+            Vector3 leader = new Vector3(0f, 0f, 10f);
+            Assert.IsTrue(CarController.IsInSlipstream(Vector3.zero, Vector3.forward, leader, Vector3.forward));
+            Assert.IsFalse(CarController.IsInSlipstream(new Vector3(4f, 0f, 0f), Vector3.forward, leader, Vector3.forward));
+            Assert.IsFalse(CarController.IsInSlipstream(new Vector3(0f, 0f, 8f), Vector3.forward, leader, Vector3.forward));
+            Assert.IsFalse(CarController.IsInSlipstream(new Vector3(0f, 0f, -15f), Vector3.forward, leader, Vector3.forward));
+            Assert.IsFalse(CarController.IsInSlipstream(Vector3.zero, Vector3.back, leader, Vector3.forward));
+        }
+
+        [Test]
         public void PresetsKeepPurchasesAndNeverEquipUnownedWeapons()
         {
             var save = new SaveData();

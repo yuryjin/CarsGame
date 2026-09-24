@@ -72,6 +72,7 @@ namespace RacingGame
         private CarCannon cannon;
         private CarWeapons weapons;
         private CarStatus status;
+        private CarHealth health;
         private RaceProgress progress;
         private IRespawnPoseProvider respawnProvider;
         private float moveInput;
@@ -84,6 +85,7 @@ namespace RacingGame
         private DriveCommand lastCommand;
         private int boostUntilTick = -1;
         private const float BoostSpeedFactor = 1.25f, BoostTorqueFactor = 1.6f;
+        private float draftCharge;
         private readonly DriftCharge drift = new DriftCharge();
 
         public bool IsDrifting => drift.Drifting;
@@ -175,6 +177,7 @@ namespace RacingGame
             cannon = GetComponent<CarCannon>();
             weapons = GetComponent<CarWeapons>();
             if (weapons == null) weapons = gameObject.AddComponent<CarWeapons>();
+            health = GetComponent<CarHealth>();
             status = GetComponent<CarStatus>();
             if (status == null) status = gameObject.AddComponent<CarStatus>();
             progress = GetComponent<RaceProgress>();
@@ -192,6 +195,8 @@ namespace RacingGame
         {
             var driver = SimulationDriver.Current; if (driver != null) driver.Unregister(this);
             moveInput = 0f; steerInput = 0f; isBraking = false;
+            draftCharge = 0f;
+            IsBoosting = false;
             if (cannon != null) cannon.SetWantsFire(false);
             if (weapons != null) weapons.SetWantsSecondary(false);
         }
@@ -300,6 +305,8 @@ namespace RacingGame
 
             GroundQuery();
             CalculateSpeed();
+            UpdateDraft();
+            IsBoosting |= draftCharge > 0.25f;
             // Human input only: the QA autopilot swaps in an AI source, whose braking must stay braking.
             if (driftEnabled && (inputSource is PlayerDriverInput || inputSource is ScriptedDriverInput)) StepDrift(); else if (drift.Drifting) drift.Cancel();
             SideSlipSpeed = rb != null ? Mathf.Abs(Vector3.Dot(rb.linearVelocity, transform.right)) : 0f;
@@ -366,6 +373,38 @@ namespace RacingGame
             currentSpeedKmh = Vector3.Dot(rb.linearVelocity, transform.forward) * 3.6f;
         }
 
+        private void UpdateDraft()
+        {
+            bool inWake = false;
+            if (inputEnabled && (health == null || !health.IsDead) && currentSpeedKmh > 30f &&
+                progress != null && progress.isActiveAndEnabled && progress.Path != null && groundSurface == GroundSurface.Track)
+            {
+                var cars = RaceDirector.Instance.Cars;
+                for (int i = 0; i < cars.Count; i++)
+                {
+                    var leader = cars[i];
+                    if (leader == null || leader == this || !leader.isActiveAndEnabled || !leader.inputEnabled ||
+                        (leader.health != null && leader.health.IsDead) ||
+                        leader.progress == null || !leader.progress.isActiveAndEnabled || leader.progress.Path != progress.Path ||
+                        Vector3.Dot(leader.Body.linearVelocity, leader.transform.forward) < 8f ||
+                        !IsInSlipstream(transform.position, transform.forward, leader.transform.position, leader.transform.forward)) continue;
+                    inWake = true;
+                    break;
+                }
+            }
+            // The stored effect fades after pulling out to pass.
+            draftCharge = Mathf.MoveTowards(draftCharge, inWake ? 1f : 0f, SimulationDriver.FixedStep / 1.5f);
+        }
+
+        public static bool IsInSlipstream(Vector3 followerPosition, Vector3 followerForward, Vector3 leaderPosition, Vector3 leaderForward)
+        {
+            Vector3 gap = followerPosition - leaderPosition;
+            float behind = -Vector3.Dot(gap, leaderForward);
+            return behind >= 5f && behind <= 20f && Mathf.Abs(gap.y) < 4f &&
+                   Mathf.Abs(Vector3.Dot(gap, Vector3.Cross(Vector3.up, leaderForward))) < 3f &&
+                   Vector3.Dot(followerForward, leaderForward) > 0.85f;
+        }
+
         private void ApplyMotor()
         {
             if (!isGrounded) return;
@@ -395,8 +434,9 @@ namespace RacingGame
             }
 
             float statusSpeedMul = status != null ? status.SpeedMultiplier : 1f;
-            float top = (IsBoosting ? maxSpeed * BoostSpeedFactor : maxSpeed) * statusSpeedMul;
-            float torque = (IsBoosting ? motorTorque * BoostTorqueFactor : motorTorque) * statusSpeedMul;
+            float boost = Mathf.Max(boostUntilTick > SimulationDriver.Instance.Tick ? 1f : 0f, draftCharge);
+            float top = maxSpeed * Mathf.Lerp(1f, BoostSpeedFactor, boost) * statusSpeedMul;
+            float torque = motorTorque * Mathf.Lerp(1f, BoostTorqueFactor, boost) * statusSpeedMul;
 
             if (moveInput > 0.05f)
             {
@@ -541,6 +581,7 @@ namespace RacingGame
             rb.angularVelocity = Vector3.zero;
             currentSteerAngle = 0f;
             drift.Cancel();
+            draftCharge = 0f;
             transform.SetPositionAndRotation(position, rotation);
             rb.position = position;
             rb.rotation = rotation;
