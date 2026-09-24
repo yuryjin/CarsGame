@@ -66,6 +66,7 @@ namespace RacingGame
                 Arena = ArenaLayout.Create(renderer != null ? renderer.sharedMaterial : null);
             }
             int total = aiCount + 1;
+            bool introTarget = RaceSetup.IsIntroRace && total > 1;
             int playerSlot = RaceSetup.Event != null && RaceSetup.Event.eventId == "e1" ? Mathf.Min(1, total - 1)
                 : playerGridSlot < 0 ? total - 1 : Mathf.Clamp(playerGridSlot, 0, total - 1);
             int aiIndex = 0;
@@ -75,6 +76,13 @@ namespace RacingGame
                 Vector3 pos; Quaternion rot; float lane = 0f;
                 if (arena) Arena.GetSpawnPose(slot, total, out pos, out rot);
                 else grid.GetSlot(slot, track, out pos, out rot, out lane);
+                if (introTarget && slot == 0)
+                {
+                    // The first rival starts in the player's lane, just ahead of the line of fire.
+                    lane = grid.columnOffset;
+                    track.Pose(track.Wrap(track.startLineDistance - grid.poleSetback + Mathf.Clamp(grid.poleSetback - 1f, 0f, 6f)), lane, out pos, out rot);
+                    pos += Vector3.up * grid.dropHeight;
+                }
                 var go = Instantiate(raceCarPrefab, pos, rot);
                 go.name = isPlayer ? "Player_Car" : $"AI_Car_{aiIndex + 1}";
                 CarBody.Apply(go, isPlayer ? PlayerBody() : RivalBody(aiIndex));   // before drivers and upgrades, which build on it
@@ -131,6 +139,7 @@ namespace RacingGame
                     {
                         var ai = go.GetComponent<AiDriver>() ?? go.AddComponent<AiDriver>();
                         ai.Initialize(profile, lane); // keep the two grid columns apart
+                        if (introTarget && slot == 0) ai.speedMultiplier = RaceSetup.IntroTargetSpeed;
                         car.SetInputSource(ai);
                     }
                     var health = go.GetComponent<CarHealth>();

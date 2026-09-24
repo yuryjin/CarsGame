@@ -17,6 +17,8 @@ namespace RacingGame
         private GameFlow flow;
         private RaceManager race;
         private Canvas canvas;
+        private RectTransform portraitPanel;
+        private TextMeshProUGUI portraitText;
         private RectTransform panel;
         private CanvasGroup transition;
         private string current = "", pendingScreen;
@@ -39,11 +41,15 @@ namespace RacingGame
         private void Awake()
         {
             flow = GetComponent<GameFlow>(); race = GetComponent<RaceManager>();
-            canvas = UiFactory.CreateOverlayCanvas("Menus", 10);
+            canvas = UiFactory.CreateOverlayCanvas("Menus", 30);
             canvas.transform.SetParent(transform, false);
             toastPanel = UiFactory.Card(canvas.transform, "Toast", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(-400f, 24f), new Vector2(400f, 104f));
             toastText = Label(toastPanel, "Message", "", 26f, Vector2.zero, Vector2.one, new Vector2(24f, 12f), new Vector2(-24f, -12f), UiFactory.Accent, TextAlignmentOptions.Center);
             toastPanel.gameObject.SetActive(false);
+            portraitPanel = UiFactory.Panel(canvas.transform, "PortraitHint", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.015f, 0.025f, 0.045f, 0.97f), false);
+            portraitPanel.GetComponent<Image>().raycastTarget = true;
+            portraitText = Label(portraitPanel, "RotatePhone", "", 42f, Vector2.zero, Vector2.one, new Vector2(36f, 36f), new Vector2(-36f, -36f), UiFactory.Accent, TextAlignmentOptions.Center);
+            portraitPanel.gameObject.SetActive(false);
         }
 
         private void OnEnable()
@@ -59,6 +65,12 @@ namespace RacingGame
         private void Update()
         {
             if (toastPanel != null && toastPanel.gameObject.activeSelf && Time.unscaledTime > toastUntil) toastPanel.gameObject.SetActive(false);
+            bool portrait = PlatformGlue.IsReady && PlatformGlue.IsMobileDevice && Screen.height > Screen.width;
+            if (portraitPanel.gameObject.activeSelf != portrait)
+            {
+                if (portrait) { portraitText.text = Loc.Get("ui.rotate_phone"); portraitPanel.SetAsLastSibling(); }
+                portraitPanel.gameObject.SetActive(portrait);
+            }
             if (transition != null) transition.alpha = Mathf.MoveTowards(transition.alpha, 1f, Time.unscaledDeltaTime * 7f);
             if (string.IsNullOrEmpty(current)) return;
             var rect = ((RectTransform)canvas.transform).rect;
@@ -101,7 +113,7 @@ namespace RacingGame
                     break;
             }
         }
-        private void Rebuild() => Show(current);
+        private void Rebuild() { Show(current); if (portraitText != null && Loc.Ready) portraitText.text = Loc.Get("ui.rotate_phone"); }
 
         public void Show(string name)
         {
@@ -135,6 +147,7 @@ namespace RacingGame
                 case "results": BuildResults(frame); break;
             }
             if (toastPanel != null) toastPanel.SetAsLastSibling();
+            if (portraitPanel != null && portraitPanel.gameObject.activeSelf) portraitPanel.SetAsLastSibling();
             Canvas.ForceUpdateCanvases();
             if (panel == null) return;
             foreach (var scroll in panel.GetComponentsInChildren<ScrollRect>())

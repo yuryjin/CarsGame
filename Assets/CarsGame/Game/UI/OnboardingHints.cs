@@ -86,7 +86,8 @@ namespace RacingGame
             // A target sits in the reticle and the player keeps not shooting: say where the trigger is.
             bool idleLock = hud.ReticleLocked && !player.Car.LastCommand.Fire;
             lockedTime = idleLock ? lockedTime + dt : 0f;
-            if (lockedTime > lockedNoFireSeconds) Try(Hint.AimFire, hud.TouchLayout ? "hint.aim.touch" : "hint.aim.keys");
+            bool earlyAim = RaceSetup.IsIntroRace && race.RaceTime <= 15d;
+            if (lockedTime > (earlyAim ? 0f : lockedNoFireSeconds)) Try(Hint.AimFire, hud.TouchLayout ? "hint.aim.touch" : "hint.aim.keys", earlyAim);
         }
 
         private void OnTeleported()
@@ -123,10 +124,10 @@ namespace RacingGame
             }
         }
 
-        private void Try(Hint hint, string key)
+        private void Try(Hint hint, string key, bool early = false)
         {
             // Only while the HUD is up: a pickup rolled into on the results screen must not use up its tip.
-            if (tracker == null || race.State != RaceState.Racing || race.RaceTime < quietAfterGoSeconds || !tracker.TryShow(hint, Time.unscaledTime)) return;
+            if (tracker == null || race.State != RaceState.Racing || (race.RaceTime < quietAfterGoSeconds && !early) || !tracker.TryShow(hint, Time.unscaledTime)) return;
             hud.ShowHint(Loc.Get(key), hintSeconds);
             var save = PlatformGlue.Save;
             if (save == null) return;

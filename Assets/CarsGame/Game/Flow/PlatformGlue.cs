@@ -173,6 +173,7 @@ namespace RacingGame
             Pacer.OnRaceFinished();
             await Save.FlushAsync();            // progress persisted first …
             await SubmitAllBestsAsync();       // … then the boards …
+            await Task.Yield();                 // let the results screen appear before requesting the ad
             if (this == null) return;
             await MaybeInterstitialAsync();    // … and only then the ad
         }

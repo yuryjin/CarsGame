@@ -317,6 +317,7 @@ namespace RacingGame
                 float gap = p.Progress.TotalProgress - playerProgress;          // + = AI ahead
                 bool lastLap = p.Progress.LapsCompleted >= laps - 1;
                 ai.speedMultiplier = Core.Sim.RubberBand.Multiplier(gap, lastLap, RaceTime, strength);
+                if (RaceSetup.IsIntroRace && RaceTime < 15d && p == participants[0]) ai.speedMultiplier = Mathf.Min(ai.speedMultiplier, RaceSetup.IntroTargetSpeed);
                 var gunner = p.GetComponent<AiGunner>();
                 if (gunner != null) gunner.suppressed = gap > 120f;   // far ahead: stop shooting at the pack
             }

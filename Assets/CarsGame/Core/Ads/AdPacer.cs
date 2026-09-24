@@ -2,7 +2,7 @@ namespace RacingGame.Core.Ads
 {
     /// <summary>
     /// Decides when an interstitial may be shown. Pure logic (seconds are realtime):
-    /// never during gameplay, never before the first race of a session, at least
+    /// never during gameplay, never before the second results screen of a session, at least
     /// <see cref="MinIntervalSeconds"/> since the last interstitial, at least
     /// <see cref="MinSessionSeconds"/> into the session, and not right after a rewarded ad.
     /// </summary>
@@ -26,7 +26,7 @@ namespace RacingGame.Core.Ads
         public bool CanShowInterstitial(double now, bool inGameplay)
         {
             if (inGameplay) return false;
-            if (RacesFinished < 1) return false;
+            if (RacesFinished < 2) return false;
             if (now - SessionStart < MinSessionSeconds) return false;
             if (now - LastInterstitialAt < MinIntervalSeconds) return false;
             if (now - LastRewardedAt < RewardedCooldownSeconds) return false;
