@@ -670,6 +670,230 @@ MonoBehaviour:
     m_Localized: SLOWED
     m_Metadata:
       m_Items: []
+  - m_Id: 7959813530755072
+    m_Localized: 'KILLS: {n}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267203452928
+    m_Localized: Minefield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841536
+    m_Localized: Dusk Run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841537
+    m_Localized: Glass Cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841538
+    m_Localized: Last Stand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841539
+    m_Localized: Moon Reverse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841540
+    m_Localized: Arsenal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841541
+    m_Localized: Dark Mines
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841542
+    m_Localized: Blitz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841543
+    m_Localized: Iron Man
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841544
+    m_Localized: Grand Final
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841545
+    m_Localized: Daily Race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841546
+    m_Localized: Mines only
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841547
+    m_Localized: Double damage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841548
+    m_Localized: Night
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841549
+    m_Localized: One life
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841550
+    m_Localized: Double pickups
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841551
+    m_Localized: 'Sprint: 2 laps'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841552
+    m_Localized: New race in {h} h {m} min
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841553
+    m_Localized: 'Streak: {n} days'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841554
+    m_Localized: 'First finish today: +{n}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841555
+    m_Localized: Today's bonus collected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841556
+    m_Localized: Today's leaders
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841557
+    m_Localized: Race against the ghosts of other players
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841558
+    m_Localized: DRIFT BOOST {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841559
+    m_Localized: IN SIGHTS!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841560
+    m_Localized: ELIMINATED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841561
+    m_Localized: Continue the race?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841562
+    m_Localized: Continue (ad)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841563
+    m_Localized: Give up
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841564
+    m_Localized: Try 1 race (ad)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841565
+    m_Localized: On trial next race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841566
+    m_Localized: 'You raced with {name} Lv {lvl}. Keep it: {cost} coins'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841567
+    m_Localized: Paint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841568
+    m_Localized: Livery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841569
+    m_Localized: Unlock (ad)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841570
+    m_Localized: Stripe colour
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841571
+    m_Localized: Auto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841572
+    m_Localized: Racing Red
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841573
+    m_Localized: Snow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841574
+    m_Localized: Carbon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841575
+    m_Localized: Sunshine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841576
+    m_Localized: Tangerine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841577
+    m_Localized: Lime
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841578
+    m_Localized: Ocean
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841579
+    m_Localized: Lagoon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841580
+    m_Localized: Violet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841581
+    m_Localized: Bubblegum
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841582
+    m_Localized: Steel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841583
+    m_Localized: Gold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841584
+    m_Localized: Clean
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841585
+    m_Localized: Racing stripe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841586
+    m_Localized: Twin stripes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841587
+    m_Localized: Side band
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841588
+    m_Localized: Hood panel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841589
+    m_Localized: Tail
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

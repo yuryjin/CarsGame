@@ -91,7 +91,7 @@ garage.mines,weapon name,12,Mines,Мины,Mayınlar,接触地雷,Minen,Minas,Mi
 garage.mines.desc,weapon description,60,Drop explosive contact mines behind your car,Сброс контактных мин позади машины,Arkana patlayıcı temas mayınları bırak,在车后放置爆炸性接触地雷,Explosive Kontaktminen hinter dem Auto abwerfen,Suelta minas de contacto explosivas tras tu coche,Larguez des mines explosives derrière votre véhicule,Solte minas de contato explosivas atrás do carro,Скидання контактних мін позаду машини
 garage.freezelauncher,weapon name,14,Cryo Launcher,Заморозка,Dondurucu,冷冻发射器,Kryo-Werfer,Lanzacongelación,Lance-cryo,Lança-gelo,Кріо-гармата
 garage.freezelauncher.desc,weapon description,60,Fire cryogenic shells to freeze rivals,Стрельба крио-снарядами для заморозки соперников,Rakipleri dondurmak için dondurucu mermiler ateşle,发射冷冻弹冰冻对手,Kryo-Geschosse abfeuern um Gegner einzufrieren,Dispara proyectiles criogénicos para congelar rivales,Tirez des obus cryogéniques pour geler vos rivaux,Dispare projéteis criogênicos para congelar rivais,Стрільба кріо-снарядами для заморозки суперників
-garage.machinegun,weapon name,14,Machine Gun,Пулемёт,Makineli Tüfek,速射机枪,Maschinengewehr,Ametralladora,Mitrailleuse,Metralhadora,К��лемет
+garage.machinegun,weapon name,14,Machine Gun,Пулемёт,Makineli Tüfek,速射机枪,Maschinengewehr,Ametralladora,Mitrailleuse,Metralhadora,Кулемет
 garage.machinegun.desc,weapon description,60,Rapid-fire primary weapon prone to overheating,Скорострельное основное оружие с риском перегрева,Aşırı ısınabilen seri birincil silah,易过热的速射主武器,Schnellfeuer-Primärwaffe mit Überhitzungsgefahr,Arma principal de disparo rápido con sobrecalentamiento,Arme principale à tir rapide sujette à surchauffe,Arma principal de tiro rápido com superaquecimento,Швидкострільна основна зброя з ризиком перегріву
 settings.title,,10,SETTINGS,НАСТРОЙКИ,AYARLAR,设置,EINSTELLUNGEN,AJUSTES,OPTIONS,OPÇÕES,НАЛАШТУВАННЯ
 settings.language,,12,Language,Язык,Dil,语言,Sprache,Idioma,Langue,Idioma,Мова
@@ -179,3 +179,58 @@ combat.hit,gameplay improvements,200,HIT,ПОПАДАНИЕ,İSABET,命中,TREFF
 combat.shield,gameplay improvements,200,SHIELD BROKEN,ЩИТ СНЯТ,KALKAN KIRILDI,护盾破裂,SCHILD GEBROCHEN,ESCUDO ROTO,BOUCLIER BRISÉ,ESCUDO QUEBRADO,ЩИТ ЗНЯТО
 combat.destroyed,gameplay improvements,200,DESTROYED,УНИЧТОЖЕН,YOK EDİLDİ,已摧毁,ZERSTÖRT,DESTRUIDO,DÉTRUIT,DESTRUÍDO,ЗНИЩЕНО
 combat.obstacle,gameplay improvements,200,Obstacle,Препятствие,Engel,障碍物,Hindernis,Obstáculo,Obstacle,Obstáculo,Перешкода
+events.e6.name,event name,16,Minefield,Минное поле,Mayın Tarlası,雷区,Minenfeld,Campo minado,Champ de mines,Campo minado,Мінне поле
+events.e7.name,event name,16,Dusk Run,Закатный забег,Gün Batımı,黄昏逆行,Abendlauf,Carrera al ocaso,Course du soir,Corrida do ocaso,Західний забіг
+events.e8.name,event name,16,Glass Cannon,Стеклянная пушка,Cam Top,玻璃大炮,Glaskanone,Cañón de cristal,Canon de verre,Canhão de vidro,Скляна гармата
+events.e9.name,event name,16,Last Stand,Последний бой,Son Direniş,背水一战,Letztes Gefecht,Última batalla,Dernier combat,Última batalha,Останній бій
+events.e10.name,event name,16,Moon Reverse,Лунный реверс,Ay Tersi,月夜逆行,Mond-Rückwärts,Luna inversa,Lune inversée,Lua reversa,Місячний реверс
+events.e11.name,event name,16,Arsenal,Арсенал,Cephanelik,军火库,Arsenal,Arsenal,Arsenal,Arsenal,Арсенал
+events.e12.name,event name,16,Dark Mines,Тёмные мины,Karanlık Mayın,暗夜雷区,Dunkle Minen,Minas oscuras,Mines obscures,Minas sombrias,Темні міни
+events.e13.name,event name,16,Blitz,Блиц,Yıldırım,闪电战,Blitz,Relámpago,Blitz,Blitz,Бліц
+events.e14.name,event name,16,Iron Man,Железный,Demir Adam,铁人赛,Eisenmann,Hombre de hierro,Homme de fer,Homem de ferro,Залізний
+events.e15.name,event name,16,Grand Final,Гранд-финал,Büyük Final,总决赛,Großes Finale,Gran final,Grande finale,Grande final,Гранд-фінал
+daily.title,daily race name,20,Daily Race,Заезд дня,Günün Yarışı,每日赛,Tagesrennen,Carrera diaria,Course du jour,Corrida do dia,Заїзд дня
+daily.twist.mines_only,rule badge,20,Mines only,Только мины,Sadece mayın,仅限地雷,Nur Minen,Solo minas,Mines seulement,Só minas,Лише міни
+daily.twist.double_damage,rule badge,20,Double damage,Двойной урон,Çift hasar,双倍伤害,Doppelschaden,Daño doble,Dégâts doublés,Dano duplo,Подвійна шкода
+daily.twist.night,rule badge,20,Night,Ночь,Gece,夜间,Nacht,Noche,Nuit,Noite,Ніч
+daily.twist.one_life,rule badge,20,One life,Одна жизнь,Tek can,一条命,Ein Leben,Una vida,Une vie,Uma vida,Одне життя
+daily.twist.arsenal,rule badge,20,Double pickups,Двойные бонусы,Çift bonus,双倍补给,Doppelte Boni,Doble botín,Bonus doublés,Bônus duplos,Подвійні бонуси
+daily.twist.sprint,rule badge,20,Sprint: 2 laps,Спринт: 2 круга,Sprint: 2 tur,冲刺：2圈,Sprint: 2 Runden,Sprint: 2 vueltas,Sprint : 2 tours,Sprint: 2 voltas,Спринт: 2 кола
+daily.new_in,{h} hours {m} minutes,32,New race in {h} h {m} min,Новый заезд через {h} ч {m} мин,Yeni yarış {h} sa {m} dk sonra,{h}小时{m}分钟后更新,Neues Rennen in {h} Std. {m} Min.,Nueva carrera en {h} h {m} min,Nouvelle course dans {h} h {m} min,Nova corrida em {h} h {m} min,Новий заїзд за {h} год {m} хв
+daily.streak,{n} = days in a row,24,Streak: {n} days,Серия: {n} дн.,Seri: {n} gün,连续 {n} 天,Serie: {n} Tage,Racha: {n} días,Série : {n} jours,Sequência: {n} dias,Серія: {n} дн.
+daily.reward,{n} = coins,32,First finish today: +{n},Первый финиш сегодня: +{n},Bugünkü ilk bitiş: +{n},今日首次完赛：+{n},Erstes Ziel heute: +{n},Primera meta hoy: +{n},Première arrivée du jour : +{n},Primeira chegada hoje: +{n},Перший фініш сьогодні: +{n}
+daily.done,bonus already taken,32,Today's bonus collected,Бонус дня получен,Günün bonusu alındı,今日奖励已领取,Tagesbonus erhalten,Bono del día cobrado,Bonus du jour obtenu,Bônus do dia recebido,Бонус дня отримано
+daily.board,leaderboard title,24,Today's leaders,Лидеры дня,Günün liderleri,今日排行,Tagesbeste,Líderes del día,Leaders du jour,Líderes do dia,Лідери дня
+daily.ghosts,hint under the daily card,48,Race against the ghosts of other players,Гонка против призраков других игроков,Diğer oyuncuların hayaletlerine karşı yarış,与其他玩家的幽灵赛车竞速,Fahre gegen die Geister anderer Spieler,Corre contra los fantasmas de otros jugadores,Affrontez les fantômes d'autres joueurs,Corra contra os fantasmas de outros jogadores,Гонка проти привидів інших гравців
+hud.drift_boost,{n} = stage 1-3,20,DRIFT BOOST {n},ДРИФТ-БУСТ {n},DRİFT BOOST {n},漂移加速 {n},DRIFT-BOOST {n},TURBO DERRAPE {n},BOOST DÉRAPAGE {n},TURBO DRIFT {n},ДРИФТ-БУСТ {n}
+hud.aimed,"warning, a rival is aiming at the player",16,IN SIGHTS!,НА ПРИЦЕЛЕ!,NİŞANDASIN!,被瞄准！,IM VISIER!,¡EN LA MIRA!,DANS LE VISEUR !,NA MIRA!,НА ПРИЦІЛІ!
+hud.eliminated,"one-life race, player out",16,ELIMINATED,ВЫБЫЛ,ELENDİN,已淘汰,AUSGESCHIEDEN,ELIMINADO,ÉLIMINÉ,ELIMINADO,ВИБУВ
+continue.title,"one-life race, after a wreck",32,Continue the race?,Продолжить гонку?,Yarışa devam?,继续比赛？,Rennen fortsetzen?,¿Seguir en carrera?,Continuer la course ?,Continuar a corrida?,Продовжити гонку?
+continue.watch,rewarded ad button,22,Continue (ad),Продолжить (реклама),Devam (reklam),继续（广告）,Weiter (Werbung),Seguir (anuncio),Continuer (pub),Continuar (anúncio),Продовжити (реклама)
+continue.give_up,button,16,Give up,Сдаться,Pes et,放弃,Aufgeben,Rendirse,Abandonner,Desistir,Здатися
+garage.try,rewarded ad button,22,Try 1 race (ad),Тест-драйв (реклама),1 yarış dene (reklam),试用1场（广告）,1 Rennen testen (Werbung),Probar 1 carrera (anuncio),Essai 1 course (pub),Testar 1 corrida (anúncio),Тест-драйв (реклама)
+garage.trial_active,status,24,On trial next race,Тест в следующей гонке,Sonraki yarışta denemede,下一场试用中,Test im nächsten Rennen,A prueba en la próxima,À l'essai à la prochaine,Em teste na próxima,Тест у наступній гонці
+results.trial,"{name} upgrade, {lvl} level, {cost} coins",64,You raced with {name} Lv {lvl}. Keep it: {cost} coins,Вы ехали с «{name}» ур. {lvl}. Купить: {cost} монет,{name} Sv {lvl} ile yarıştın. Satın al: {cost} jeton,你刚用了{name} {lvl}级。购买：{cost}金币,Du fuhrst mit {name} St. {lvl}. Behalten: {cost} Münzen,Corriste con {name} Nv {lvl}. Cómpralo: {cost} monedas,Vous rouliez avec {name} niv. {lvl}. Achat : {cost} pièces,Você correu com {name} Nv {lvl}. Compre: {cost} moedas,Ви їхали з «{name}» рів. {lvl}. Купити: {cost} монет
+garage.paints,section title,20,Paint,Покраска,Boya,车漆,Lackierung,Pintura,Peinture,Pintura,Фарбування
+garage.liveries,section title,20,Livery,Ливрея,Desen,涂装,Design,Diseño,Livrée,Pintura especial,Лівреї
+garage.unlock_ad,rewarded ad button,18,Unlock (ad),Открыть (реклама),Aç (reklam),解锁（广告）,Freischalten (Werbung),Desbloquear (anuncio),Débloquer (pub),Desbloquear (anúncio),Відкрити (реклама)
+garage.stripe_color,livery colour selector,20,Stripe colour,Цвет полос,Şerit rengi,条纹颜色,Streifenfarbe,Color de franjas,Couleur des bandes,Cor das faixas,Колір смуг
+garage.stripe_auto,automatic stripe colour,12,Auto,Авто,Otomatik,自动,Auto,Auto,Auto,Auto,Авто
+paint.rosso,paint name,14,Racing Red,Гоночный красный,Yarış Kırmızısı,赛车红,Rennrot,Rojo carrera,Rouge course,Vermelho corrida,Гоночний червоний
+paint.snow,paint name,14,Snow,Снег,Kar,雪白,Schnee,Nieve,Neige,Neve,Сніг
+paint.carbon,paint name,14,Carbon,Карбон,Karbon,碳黑,Carbon,Carbono,Carbone,Carbono,Карбон
+paint.sun,paint name,14,Sunshine,Солнце,Güneş,阳光黄,Sonne,Sol,Soleil,Sol,Сонце
+paint.tangerine,paint name,14,Tangerine,Мандарин,Mandalina,橘色,Mandarine,Mandarina,Mandarine,Tangerina,Мандарин
+paint.lime,paint name,14,Lime,Лайм,Limon,青柠,Limette,Lima,Citron vert,Lima,Лайм
+paint.ocean,paint name,14,Ocean,Океан,Okyanus,海蓝,Ozean,Océano,Océan,Oceano,Океан
+paint.teal,paint name,14,Lagoon,Лагуна,Lagün,泻湖,Lagune,Laguna,Lagon,Lagoa,Лагуна
+paint.violet,paint name,14,Violet,Фиалка,Menekşe,紫罗兰,Violett,Violeta,Violet,Violeta,Фіалка
+paint.bubblegum,paint name,14,Bubblegum,Жвачка,Sakız,泡泡糖,Kaugummi,Chicle,Chewing-gum,Chiclete,Жуйка
+paint.steel,paint name,14,Steel,Сталь,Çelik,钢灰,Stahl,Acero,Acier,Aço,Сталь
+paint.gold,paint name,14,Gold,Золото,Altın,金色,Gold,Oro,Or,Ouro,Золото
+livery.none,livery name,14,Clean,Без рисунка,Sade,纯色,Ohne,Liso,Uni,Lisa,Без малюнка
+livery.stripe,livery name,14,Racing stripe,Гоночная полоса,Yarış şeridi,赛车条纹,Rennstreifen,Franja,Bande course,Faixa,Гоночна смуга
+livery.twin,livery name,14,Twin stripes,Двойные полосы,Çift şerit,双条纹,Doppelstreifen,Franjas dobles,Doubles bandes,Faixas duplas,Подвійні смуги
+livery.band,livery name,14,Side band,Боковая полоса,Yan şerit,侧条,Seitenband,Banda lateral,Bande latérale,Faixa lateral,Бічна смуга
+livery.hood,livery name,14,Hood panel,Капот,Kaput,引擎盖,Motorhaube,Capó,Capot,Capô,Капот
+livery.tail,livery name,14,Tail,Корма,Arka,车尾,Heck,Zaga,Arrière,Traseira,Корма

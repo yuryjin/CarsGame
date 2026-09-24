@@ -667,6 +667,230 @@ MonoBehaviour:
     m_Localized: RALENTI
     m_Metadata:
       m_Items: []
+  - m_Id: 7959813530755072
+    m_Localized: 'KILLS : {n}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267203452928
+    m_Localized: Champ de mines
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841536
+    m_Localized: Course du soir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841537
+    m_Localized: Canon de verre
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841538
+    m_Localized: Dernier combat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841539
+    m_Localized: "Lune invers\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841540
+    m_Localized: Arsenal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841541
+    m_Localized: Mines obscures
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841542
+    m_Localized: Blitz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841543
+    m_Localized: Homme de fer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841544
+    m_Localized: Grande finale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841545
+    m_Localized: Course du jour
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841546
+    m_Localized: Mines seulement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841547
+    m_Localized: "D\xE9g\xE2ts doubl\xE9s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841548
+    m_Localized: Nuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841549
+    m_Localized: Une vie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841550
+    m_Localized: "Bonus doubl\xE9s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841551
+    m_Localized: 'Sprint : 2 tours'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841552
+    m_Localized: Nouvelle course dans {h} h {m} min
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841553
+    m_Localized: "S\xE9rie : {n} jours"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841554
+    m_Localized: "Premi\xE8re arriv\xE9e du jour : +{n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841555
+    m_Localized: Bonus du jour obtenu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841556
+    m_Localized: Leaders du jour
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841557
+    m_Localized: "Affrontez les fant\xF4mes d'autres joueurs"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841558
+    m_Localized: "BOOST D\xC9RAPAGE {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841559
+    m_Localized: DANS LE VISEUR !
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841560
+    m_Localized: "\xC9LIMIN\xC9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841561
+    m_Localized: Continuer la course ?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841562
+    m_Localized: Continuer (pub)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841563
+    m_Localized: Abandonner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841564
+    m_Localized: Essai 1 course (pub)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841565
+    m_Localized: "\xC0 l'essai \xE0 la prochaine"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841566
+    m_Localized: "Vous rouliez avec {name} niv. {lvl}. Achat : {cost} pi\xE8ces"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841567
+    m_Localized: Peinture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841568
+    m_Localized: "Livr\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841569
+    m_Localized: "D\xE9bloquer (pub)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841570
+    m_Localized: Couleur des bandes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841571
+    m_Localized: Auto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841572
+    m_Localized: Rouge course
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841573
+    m_Localized: Neige
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841574
+    m_Localized: Carbone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841575
+    m_Localized: Soleil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841576
+    m_Localized: Mandarine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841577
+    m_Localized: Citron vert
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841578
+    m_Localized: "Oc\xE9an"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841579
+    m_Localized: Lagon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841580
+    m_Localized: Violet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841581
+    m_Localized: Chewing-gum
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841582
+    m_Localized: Acier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841583
+    m_Localized: Or
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841584
+    m_Localized: Uni
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841585
+    m_Localized: Bande course
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841586
+    m_Localized: Doubles bandes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841587
+    m_Localized: "Bande lat\xE9rale"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841588
+    m_Localized: Capot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841589
+    m_Localized: "Arri\xE8re"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

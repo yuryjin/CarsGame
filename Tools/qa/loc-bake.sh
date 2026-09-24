@@ -8,7 +8,7 @@ python3 - <<'P'
 from fontTools.ttLib import TTFont
 cm = TTFont('Assets/CarsGame/Fonts/NotoSansSC-Subset.ttf').getBestCmap()
 csv = open('Assets/CarsGame/Localization/Source/strings.csv', encoding='utf-8').read()
-extra = {ord(c) for c in csv if ord(c) > 0x2E80 or 0x2190 <= ord(c) <= 0x2BFF} | {0x2605, 0x2606}   # + FontAtlasBaker.UiSymbols
+extra = {ord(c) for c in csv if ord(c) > 0x2E80 or 0x2190 <= ord(c) <= 0x2BFF} | {0x2605, 0x2606, 0x00D7, 0x25B2}   # + FontAtlasBaker.UiSymbols
 cps = sorted(set(cm) | extra)
 open('/tmp/cars-qa-unicodes.txt', 'w').write(','.join('U+%04X' % c for c in cps)); print('subset', len(cm), '->', len(cps))
 P
@@ -17,7 +17,7 @@ ensure_sim
 cat > "$SIM/Assets/CarsGame/Editor/ZzBatchLoc.cs" <<'C'
 namespace RacingGame.EditorTools { public static class ZzBatchLoc { public static void Run() { UnityEngine.Debug.Log("LOCRESULT " + LocImporter.Import()); UnityEngine.Debug.Log("BAKERESULT " + FontAtlasBaker.BakeChinese()); } } }
 C
-"$UNITY" -batchmode -nographics -projectPath "$SIM" -executeMethod RacingGame.EditorTools.ZzBatchLoc.Run -quit -logFile "$WORK/loc.log" >/dev/null 2>&1 || true
+"$UNITY" -batchmode -nographics -projectPath "$SIM" -executeMethod RacingGame.EditorTools.ZzBatchLoc.Run -quit -logFile "$WORK/loc.log" >/dev/null 2>&1 || { grep -m10 "error CS\|Exception" "$WORK/loc.log" || true; exit 1; }
 rm -f "$SIM/Assets/CarsGame/Editor/ZzBatchLoc.cs"*
 grep -h "LOCRESULT\|BAKERESULT\|glyphs missing\|error CS" "$WORK/loc.log" | head
 # Assets only (the main project's .meta files keep their GUIDs).

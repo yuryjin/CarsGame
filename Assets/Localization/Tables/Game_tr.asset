@@ -668,6 +668,231 @@ MonoBehaviour:
     m_Localized: "YAVA\u015E"
     m_Metadata:
       m_Items: []
+  - m_Id: 7959813530755072
+    m_Localized: "LE\u015E: {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267203452928
+    m_Localized: "May\u0131n Tarlas\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841536
+    m_Localized: "G\xFCn Bat\u0131m\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841537
+    m_Localized: Cam Top
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841538
+    m_Localized: "Son Direni\u015F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841539
+    m_Localized: Ay Tersi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841540
+    m_Localized: Cephanelik
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841541
+    m_Localized: "Karanl\u0131k May\u0131n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841542
+    m_Localized: "Y\u0131ld\u0131r\u0131m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841543
+    m_Localized: Demir Adam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841544
+    m_Localized: "B\xFCy\xFCk Final"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841545
+    m_Localized: "G\xFCn\xFCn Yar\u0131\u015F\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841546
+    m_Localized: "Sadece may\u0131n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841547
+    m_Localized: "\xC7ift hasar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841548
+    m_Localized: Gece
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841549
+    m_Localized: Tek can
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841550
+    m_Localized: "\xC7ift bonus"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841551
+    m_Localized: 'Sprint: 2 tur'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841552
+    m_Localized: "Yeni yar\u0131\u015F {h} sa {m} dk sonra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841553
+    m_Localized: "Seri: {n} g\xFCn"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841554
+    m_Localized: "Bug\xFCnk\xFC ilk biti\u015F: +{n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841555
+    m_Localized: "G\xFCn\xFCn bonusu al\u0131nd\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841556
+    m_Localized: "G\xFCn\xFCn liderleri"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841557
+    m_Localized: "Di\u011Fer oyuncular\u0131n hayaletlerine kar\u015F\u0131 yar\u0131\u015F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841558
+    m_Localized: "DR\u0130FT BOOST {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841559
+    m_Localized: "N\u0130\u015EANDASIN!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841560
+    m_Localized: "ELEND\u0130N"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841561
+    m_Localized: "Yar\u0131\u015Fa devam?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841562
+    m_Localized: Devam (reklam)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841563
+    m_Localized: Pes et
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841564
+    m_Localized: "1 yar\u0131\u015F dene (reklam)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841565
+    m_Localized: "Sonraki yar\u0131\u015Fta denemede"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841566
+    m_Localized: "{name} Sv {lvl} ile yar\u0131\u015Ft\u0131n. Sat\u0131n al: {cost}
+      jeton"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841567
+    m_Localized: Boya
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841568
+    m_Localized: Desen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841569
+    m_Localized: "A\xE7 (reklam)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841570
+    m_Localized: "\u015Eerit rengi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841571
+    m_Localized: Otomatik
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841572
+    m_Localized: "Yar\u0131\u015F K\u0131rm\u0131z\u0131s\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841573
+    m_Localized: Kar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841574
+    m_Localized: Karbon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841575
+    m_Localized: "G\xFCne\u015F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841576
+    m_Localized: Mandalina
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841577
+    m_Localized: Limon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841578
+    m_Localized: Okyanus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841579
+    m_Localized: "Lag\xFCn"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841580
+    m_Localized: "Menek\u015Fe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841581
+    m_Localized: "Sak\u0131z"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841582
+    m_Localized: "\xC7elik"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841583
+    m_Localized: "Alt\u0131n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841584
+    m_Localized: Sade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841585
+    m_Localized: "Yar\u0131\u015F \u015Feridi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841586
+    m_Localized: "\xC7ift \u015Ferit"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841587
+    m_Localized: "Yan \u015Ferit"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841588
+    m_Localized: Kaput
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841589
+    m_Localized: Arka
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -671,6 +671,230 @@ MonoBehaviour:
     m_Localized: RALENTIZADO
     m_Metadata:
       m_Items: []
+  - m_Id: 7959813530755072
+    m_Localized: 'BAJAS: {n}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267203452928
+    m_Localized: Campo minado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841536
+    m_Localized: Carrera al ocaso
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841537
+    m_Localized: "Ca\xF1\xF3n de cristal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841538
+    m_Localized: "\xDAltima batalla"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841539
+    m_Localized: Luna inversa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841540
+    m_Localized: Arsenal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841541
+    m_Localized: Minas oscuras
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841542
+    m_Localized: "Rel\xE1mpago"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841543
+    m_Localized: Hombre de hierro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841544
+    m_Localized: Gran final
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841545
+    m_Localized: Carrera diaria
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841546
+    m_Localized: Solo minas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841547
+    m_Localized: "Da\xF1o doble"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841548
+    m_Localized: Noche
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841549
+    m_Localized: Una vida
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841550
+    m_Localized: "Doble bot\xEDn"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841551
+    m_Localized: 'Sprint: 2 vueltas'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841552
+    m_Localized: Nueva carrera en {h} h {m} min
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841553
+    m_Localized: "Racha: {n} d\xEDas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841554
+    m_Localized: 'Primera meta hoy: +{n}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841555
+    m_Localized: "Bono del d\xEDa cobrado"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841556
+    m_Localized: "L\xEDderes del d\xEDa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841557
+    m_Localized: Corre contra los fantasmas de otros jugadores
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841558
+    m_Localized: TURBO DERRAPE {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841559
+    m_Localized: "\xA1EN LA MIRA!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841560
+    m_Localized: ELIMINADO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841561
+    m_Localized: "\xBFSeguir en carrera?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841562
+    m_Localized: Seguir (anuncio)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841563
+    m_Localized: Rendirse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841564
+    m_Localized: Probar 1 carrera (anuncio)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841565
+    m_Localized: "A prueba en la pr\xF3xima"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841566
+    m_Localized: "Corriste con {name} Nv {lvl}. C\xF3mpralo: {cost} monedas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841567
+    m_Localized: Pintura
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841568
+    m_Localized: "Dise\xF1o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841569
+    m_Localized: Desbloquear (anuncio)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841570
+    m_Localized: Color de franjas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841571
+    m_Localized: Auto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841572
+    m_Localized: Rojo carrera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841573
+    m_Localized: Nieve
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841574
+    m_Localized: Carbono
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841575
+    m_Localized: Sol
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841576
+    m_Localized: Mandarina
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841577
+    m_Localized: Lima
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841578
+    m_Localized: "Oc\xE9ano"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841579
+    m_Localized: Laguna
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841580
+    m_Localized: Violeta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841581
+    m_Localized: Chicle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841582
+    m_Localized: Acero
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841583
+    m_Localized: Oro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841584
+    m_Localized: Liso
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841585
+    m_Localized: Franja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841586
+    m_Localized: Franjas dobles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841587
+    m_Localized: Banda lateral
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841588
+    m_Localized: "Cap\xF3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841589
+    m_Localized: Zaga
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

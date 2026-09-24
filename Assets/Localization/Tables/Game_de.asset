@@ -666,6 +666,230 @@ MonoBehaviour:
     m_Localized: VERLANGSAMT
     m_Metadata:
       m_Items: []
+  - m_Id: 7959813530755072
+    m_Localized: 'KILLS: {n}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267203452928
+    m_Localized: Minenfeld
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841536
+    m_Localized: Abendlauf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841537
+    m_Localized: Glaskanone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841538
+    m_Localized: Letztes Gefecht
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841539
+    m_Localized: "Mond-R\xFCckw\xE4rts"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841540
+    m_Localized: Arsenal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841541
+    m_Localized: Dunkle Minen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841542
+    m_Localized: Blitz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841543
+    m_Localized: Eisenmann
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841544
+    m_Localized: "Gro\xDFes Finale"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841545
+    m_Localized: Tagesrennen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841546
+    m_Localized: Nur Minen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841547
+    m_Localized: Doppelschaden
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841548
+    m_Localized: Nacht
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841549
+    m_Localized: Ein Leben
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841550
+    m_Localized: Doppelte Boni
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841551
+    m_Localized: 'Sprint: 2 Runden'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841552
+    m_Localized: Neues Rennen in {h} Std. {m} Min.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841553
+    m_Localized: 'Serie: {n} Tage'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841554
+    m_Localized: 'Erstes Ziel heute: +{n}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841555
+    m_Localized: Tagesbonus erhalten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841556
+    m_Localized: Tagesbeste
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841557
+    m_Localized: Fahre gegen die Geister anderer Spieler
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841558
+    m_Localized: DRIFT-BOOST {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841559
+    m_Localized: IM VISIER!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841560
+    m_Localized: AUSGESCHIEDEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841561
+    m_Localized: Rennen fortsetzen?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841562
+    m_Localized: Weiter (Werbung)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841563
+    m_Localized: Aufgeben
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841564
+    m_Localized: 1 Rennen testen (Werbung)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841565
+    m_Localized: "Test im n\xE4chsten Rennen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841566
+    m_Localized: "Du fuhrst mit {name} St. {lvl}. Behalten: {cost} M\xFCnzen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841567
+    m_Localized: Lackierung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841568
+    m_Localized: Design
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841569
+    m_Localized: Freischalten (Werbung)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841570
+    m_Localized: Streifenfarbe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841571
+    m_Localized: Auto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841572
+    m_Localized: Rennrot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841573
+    m_Localized: Schnee
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841574
+    m_Localized: Carbon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841575
+    m_Localized: Sonne
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841576
+    m_Localized: Mandarine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841577
+    m_Localized: Limette
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841578
+    m_Localized: Ozean
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841579
+    m_Localized: Lagune
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841580
+    m_Localized: Violett
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841581
+    m_Localized: Kaugummi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841582
+    m_Localized: Stahl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841583
+    m_Localized: Gold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841584
+    m_Localized: Ohne
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841585
+    m_Localized: Rennstreifen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841586
+    m_Localized: Doppelstreifen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841587
+    m_Localized: Seitenband
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841588
+    m_Localized: Motorhaube
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7960267211841589
+    m_Localized: Heck
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
