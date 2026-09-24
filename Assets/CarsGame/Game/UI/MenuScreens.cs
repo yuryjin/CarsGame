@@ -12,7 +12,7 @@ namespace RacingGame
 {
     /// <summary>Localized runtime menus. Views derive progression and rewards from GameFlow and SaveService.</summary>
     [RequireComponent(typeof(GameFlow))]
-    public sealed class MenuScreens : MonoBehaviour
+    public sealed partial class MenuScreens : MonoBehaviour
     {
         private GameFlow flow;
         private RaceManager race;
@@ -230,6 +230,7 @@ namespace RacingGame
                 Label(button.transform, "Detail", Loc.Get(captions[i]), 22f, Vector2.zero, Vector2.one, new Vector2(82f, 18f), new Vector2(-42f, -82f), UiFactory.Muted);
                 Label(button.transform, "Arrow", "›", 42f, new Vector2(1f, 0f), Vector2.one, new Vector2(-40f, 0f), new Vector2(-14f, 0f), UiFactory.Muted);
             }
+            BuildDailyCard(content);
         }
 
         private DifficultyTier[] Tiers() => Array.FindAll(flow.tiers ?? Array.Empty<DifficultyTier>(), t => t != null);
@@ -295,7 +296,7 @@ namespace RacingGame
                 Label(row, "Number", (i + 1).ToString("00"), 52f, Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(116f, -24f), unlocked ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
                 Label(row, "Name", Loc.Get(ev.nameKey), 34f, Top, Vector2.one, new Vector2(144f, -60f), new Vector2(-236f, -12f)).fontStyle = FontStyles.Bold;
                 int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[tierIndex].aiCount : 3;
-                string detail = Loc.Format("events.laps", "n", ev.laps) + "   /   " + Loc.Format("events.rivals", "n", rivals);
+                string detail = Loc.Format("events.laps", "n", ev.laps) + "   /   " + Loc.Format("events.rivals", "n", rivals) + TwistSuffix(ev);
                 Label(row, "Stats", detail, 23f, Top, Vector2.one, new Vector2(144f, -96f), new Vector2(-236f, -58f), UiFactory.Muted);
                 var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
                 int starMask = best != null ? best.stars : 0;
@@ -349,6 +350,7 @@ namespace RacingGame
                 for (int i = 0; i < UpgradeCatalog.MaxLevel; i++) UiFactory.Panel(progress, "Level" + i, new Vector2(i / (float)UpgradeCatalog.MaxLevel, 0f), new Vector2((i + 1f) / UpgradeCatalog.MaxLevel, 1f), Vector2.zero, new Vector2(-6f, 0f), i < level ? UiFactory.Accent : UiFactory.Raised, false);
                 UiFactory.Button(row, "Buy_" + key, maxed ? Loc.Get("garage.max") : Loc.Format("garage.buy", "cost", cost), maxed || !affordable ? null : () => Buy(kind), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-296f, -25f), new Vector2(-30f, 55f), 28f, maxed ? UiFactory.Raised : affordable ? UiFactory.Accent : UiFactory.Raised);
                 if (!maxed && !affordable) Label(row, "Reason", Loc.Get("garage.not_enough"), 22f, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-296f, -82f), new Vector2(-30f, -32f), UiFactory.Muted, TextAlignmentOptions.Center);
+                TrialRow(content, kind);
             }
 
             Section(content, "WeaponsTitle", Loc.Get("garage.weapons"));
@@ -391,6 +393,7 @@ namespace RacingGame
                 Action equipAction = unlocked && (!isEquipped || kind == WeaponKind.MachineGun) ? () => EquipWeapon(kind) : null;
                 UiFactory.Button(row, "Equip_" + key, equipLabel, equipAction, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-200f, -25f), new Vector2(-20f, 55f), 26f, isEquipped ? UiFactory.Positive : unlocked ? UiFactory.Accent : UiFactory.Raised);
             }
+            BuildCosmetics(content);
         }
 
         public bool SelectBuild(CarBuild build)
@@ -550,7 +553,7 @@ namespace RacingGame
                     finally { if (this != null) { authInFlight = false; if (current == "leaders") Show("leaders"); } }
                 }, Vector2.zero, new Vector2(1f, 0f), new Vector2(28f, 22f), new Vector2(-28f, 88f), 26f, UiFactory.Raised);
             }
-            else if (platform?.Leaderboards != null) FillCloudBoard(content, platform.Leaderboards);
+            else if (platform?.Leaderboards != null) FillBoards(content, platform.Leaderboards);
         }
         private static void Section(Transform content, string name, string title)
         {
@@ -657,6 +660,7 @@ namespace RacingGame
                 string text = canUpgrade ? Loc.Get("results.upgrade_ready") : Loc.Format("results.upgrade_short", "n", cheapest - PlatformGlue.Save.Data.Coins);
                 Label(nudge, "Text", text, 22f, Vector2.zero, Vector2.one, new Vector2(8f, 0f), new Vector2(-8f, 0f), canUpgrade ? UiFactory.Positive : UiFactory.Muted, TextAlignmentOptions.MidlineRight);
             }
+            ResultsExtras(content);
             var ads = PlatformGlue.Platform?.Ads;
             if (!flow.LastRewardDoubled && flow.LastRewardFinished && flow.LastReward > 0 && ads != null && ads.IsRewardedAvailable)
             {

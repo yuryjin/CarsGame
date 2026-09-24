@@ -1,5 +1,5 @@
 // Headless-Chrome smoke of the WebGL build with the mock SDK (served by Tools/qa/serve.py).
-// Env: URL, SP (output dir), W, H, TOUCH=1, TAG, STEPS="click:fx:fy,wait:s,shot:name,cmd:a|b,state,hide:1|0,waitresults:n".
+// Env: URL, SP (output dir), W, H, TOUCH=1, TAG, STEPS="click:fx:fy,wait:s,shot:name,cmd:a|b,state,hide:1|0,waitresults:n,wheel:dy".
 // Needs playwright-core somewhere: PLAYWRIGHT_CORE=/path/to/playwright-core/index.mjs.
 const { chromium } = await import(process.env.PLAYWRIGHT_CORE || '/home/user/gstack/node_modules/playwright-core/index.mjs');
 const SP = process.env.SP, url = process.env.URL, W = +(process.env.W||1280), H = +(process.env.H||720), tag = process.env.TAG||'d';
@@ -32,6 +32,7 @@ for (const s of steps) {
   else if (op === 'cmd') { await cmd(...a.split('|')); await sleep(1500); }
   else if (op === 'wait') await sleep(+a*1000);
   else if (op === 'shot') await shot(a);
+  else if (op === 'wheel') { const box = await page.locator('canvas').first().boundingBox(); await page.mouse.move(box.x + box.width/2, box.y + box.height/2); await page.mouse.wheel(0, +a); await sleep(800); }
   else if (op === 'state') { await cmd('state'); await sleep(300); console.log('state', JSON.stringify(await st())); }
   else if (op === 'hide') { await page.evaluate(v => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => v === '1' }); document.dispatchEvent(new Event('visibilitychange')); }, a); await sleep(1000); }
   else if (op === 'waitresults') { for (let i = 0; i < +a; i++) { await cmd('state'); await sleep(1000); const x = await st(); if (x && x.state && x.state.indexOf('"flow":"Results"') >= 0) break; } }
