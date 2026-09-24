@@ -24,6 +24,7 @@ namespace RacingGame.Platform.Yandex
         [DllImport("__Internal")] public static extern void CarsYa_SessionsCommit(string payload);
         [DllImport("__Internal")] public static extern void CarsYa_SessionsPush(int reqId, string meta);
         [DllImport("__Internal")] public static extern void CarsYa_Debug(string json);
+        [DllImport("__Internal")] public static extern double CarsYa_ServerTime();   // ms; 0 = unknown
         [DllImport("__Internal")] public static extern void CarsYa_Free(IntPtr ptr);   // free() lives in JS: a C "_free" import does not link
 
         public static string TakeString(IntPtr ptr)

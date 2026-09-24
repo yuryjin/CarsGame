@@ -27,7 +27,7 @@ namespace RacingGame
         /// </summary>
         public static async Task<bool> ShowAsync(Action onReward, Func<bool> stillValid = null)
         {
-            if (busy) return false;
+            if (busy || PlatformGlue.InterstitialBusy || (UnityEngine.Object.FindAnyObjectByType<GameFlow>()?.IsDoublingReward ?? false)) return false;   // one ad at a time
             var ads = PlatformGlue.Platform?.Ads;
             if (ads == null || !ads.IsRewardedAvailable) { MenuScreens.Toast(Loc.Get("ads.unavailable")); return false; }
             busy = true;

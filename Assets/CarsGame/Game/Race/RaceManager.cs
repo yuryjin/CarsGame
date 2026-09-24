@@ -260,7 +260,8 @@ namespace RacingGame
             if (participants.Count > 0 && DoneCount() >= participants.Count) { EndRace(); return; }
 
             // Everyone but the player is home: the player gets a longer grace, then is classified DNF.
-            if (State == RaceState.Racing && participants.Count > 1 && DoneCount() == participants.Count - 1 && Player != null && !finishTimes.ContainsKey(Player))
+            // Only when someone actually finished: a one-life player whose rivals were all wrecked races on alone.
+            if (State == RaceState.Racing && participants.Count > 1 && finishTimes.Count > 0 && DoneCount() == participants.Count - 1 && Player != null && !finishTimes.ContainsKey(Player))
             {
                 if (allAiFinishedAt < 0) allAiFinishedAt = RaceClock.Now;
                 else if (RaceClock.Now - allAiFinishedAt >= finishGraceSeconds * 3f) EndRace();

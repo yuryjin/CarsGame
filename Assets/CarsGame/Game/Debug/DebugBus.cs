@@ -103,6 +103,8 @@ namespace RacingGame
                 {
                     case "state": break;
                     case "startRace": StartRace(Arg(args, 0), Arg(args, 1)); break;
+                    case "daily": autopilot = false; flow.StartRace(flow.DailyEvent, null); break;
+                    case "wear": if (CheatsAllowed) Wear(Arg(args, 0), Arg(args, 1)); else lastError = "not in store builds"; break;
                     case "autopilot": if (CheatsAllowed) SetAutopilot(Arg(args, 0) != "off"); else lastError = "not in store builds"; break;
                     case "goto": if (menus != null) { if (flow.State == FlowState.Menu) menus.Show(Arg(args, 0) ?? "main"); else menus.GoTo(Arg(args, 0) ?? "main"); } break;
                     case "buy":
@@ -120,6 +122,18 @@ namespace RacingGame
         }
 
         private static string Arg(string[] args, int i) => args != null && i < args.Length ? args[i] : null;
+
+        // QA: own and wear a paint and a livery (screenshots of cosmetics without buying them).
+        private void Wear(string paint, string livery)
+        {
+            var save = PlatformGlue.Save;
+            if (save == null) { lastError = "no save"; return; }
+            var p = save.Data.progress;
+            p.cosmetics ??= new System.Collections.Generic.List<string>();
+            if (!string.IsNullOrEmpty(paint)) { if (!p.cosmetics.Contains("paint:" + paint)) p.cosmetics.Add("paint:" + paint); p.paint = paint; }
+            if (!string.IsNullOrEmpty(livery)) { if (!p.cosmetics.Contains("livery:" + livery)) p.cosmetics.Add("livery:" + livery); p.livery = livery; }
+            save.MarkDirty();
+        }
 
         private void StartRace(string eventId, string tierId)
         {

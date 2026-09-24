@@ -40,12 +40,24 @@ namespace RacingGame.Core.Save
         public double distanceKm;
     }
 
-    /// <summary>Daily race: streak and the day whose first-finish bonus was already paid. Days are UTC day indices.</summary>
+    /// <summary>One paid daily first-finish bonus. Keyed by day, so merged saves pay each day once.</summary>
+    [Serializable] public class DailyClaim { public int day; public int coins; }
+
+    /// <summary>
+    /// Daily race state. Days are UTC day indices. Both lists merge as unions keyed by day: the streak is derived
+    /// from <see cref="finishDays"/> (never a copied scalar) and each day's bonus exists once in <see cref="claims"/>,
+    /// whose coins count towards <see cref="SaveData.CoinsEarned"/> outside the per-device ledger.
+    /// </summary>
     [Serializable] public class DailyData
     {
-        public int lastFinishDay = int.MinValue;
-        public int streak;
-        public int rewardDay = int.MinValue;
+        /// <summary>Days with a finished daily race (the last month is kept).</summary>
+        public List<int> finishDays = new List<int>();
+        public List<DailyClaim> claims = new List<DailyClaim>();
+
+        public const int KeepDays = 31;
+
+        public bool Claimed(int day) { if (claims != null) foreach (var c in claims) if (c != null && c.day == day) return true; return false; }
+        public long ClaimedCoins { get { long t = 0; if (claims != null) foreach (var c in claims) if (c != null) t += c.coins; return t; } }
     }
 
     [Serializable] public class ProgressData
@@ -86,7 +98,7 @@ namespace RacingGame.Core.Save
             return row;
         }
 
-        public long CoinsEarned { get { long t = 0; foreach (var l in progress.ledger) t += l.coinsEarned; return t; } }
+        public long CoinsEarned { get { long t = 0; foreach (var l in progress.ledger) t += l.coinsEarned; return t + (progress.daily != null ? progress.daily.ClaimedCoins : 0); } }
         public long CoinsSpent { get { long t = 0; foreach (var l in progress.ledger) t += l.coinsSpent; return t; } }
         public long Coins => CoinsEarned - CoinsSpent;
         public int Races { get { int t = 0; foreach (var l in progress.ledger) t += l.races; return t; } }

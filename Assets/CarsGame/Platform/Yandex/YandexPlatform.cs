@@ -12,7 +12,7 @@ namespace RacingGame.Platform.Yandex
     /// the jslib; replies arrive as JSON via PlatformRuntime.OnJs with the request id. Both
     /// sides carry timeouts, so every task completes even if the SDK never answers.
     /// </summary>
-    public sealed class YandexPlatform : IPlatformServices, IAds, ICloudSave, ILeaderboards, IAsyncSessions
+    public sealed class YandexPlatform : IPlatformServices, IAds, ICloudSave, ILeaderboards, IAsyncSessions, IServerClock
     {
         [Serializable] private class Envelope { public int id; public bool ok; public string error; public string data; public bool rewarded; public string lang; public string device; public bool authorized; public string playerId; public string playerName; public string avatar; public bool adv; public string entries; public string sessions; public bool debug; public bool mock; }
         [Serializable] private class EntryList { public LeaderboardEntryDto[] items; }
@@ -20,6 +20,7 @@ namespace RacingGame.Platform.Yandex
         [Serializable] private class SessionList { public string[] items; }
 
         public PlatformKind Kind => PlatformKind.Yandex;
+        public long ServerTimeUnixMs => IsInitialized ? (long)YandexNative.CarsYa_ServerTime() : 0;
         public bool IsInitialized { get; private set; }
         public string LanguageCode { get; private set; } = "";
         public DeviceKind Device { get; private set; } = DeviceKind.Desktop;

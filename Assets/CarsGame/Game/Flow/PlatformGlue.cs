@@ -23,6 +23,8 @@ namespace RacingGame
         private RaceManager race;
         private bool readySent;
         private bool interstitialPending;
+        /// <summary>An interstitial is being requested or shown: rewarded offers wait (one ad at a time).</summary>
+        public static bool InterstitialBusy { get; private set; }
         /// <summary>Save loaded and localization ready: menus may start races.</summary>
         public static bool IsReady => Save != null && Save.Loaded && Loc.Ready;
         public static event System.Action Ready;
@@ -179,12 +181,12 @@ namespace RacingGame
         private async Task MaybeInterstitialAsync()
         {
             var ads = Platform?.Ads;
-            if (ads == null || interstitialPending) return;
+            if (ads == null || interstitialPending || RewardedOffers.Busy) return;
             if (!Pacer.CanShowInterstitial(Time.realtimeSinceStartup, false)) return;
-            interstitialPending = true;
+            interstitialPending = true; InterstitialBusy = true;
             var result = await ads.ShowInterstitialAsync();     // the platform pauses/resumes the game itself
             if (result == AdResult.Shown) Pacer.OnInterstitialShown(Time.realtimeSinceStartup);
-            interstitialPending = false;
+            interstitialPending = false; InterstitialBusy = false;
         }
     }
 }

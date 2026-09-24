@@ -357,6 +357,8 @@
     interstitial: interstitial, rewarded: rewarded,
     loadSave: loadSave, queueSave: queueSave, flushSave: flushSave,
     requestAuth: requestAuth, submitScore: submitScore, getLeaderboard: getLeaderboard,
+    // Host clock for the daily race (ysdk.serverTime() is synchronous); 0 until the SDK is up.
+    serverTime: function () { try { return ysdk && typeof ysdk.serverTime === 'function' ? Number(ysdk.serverTime()) || 0 : 0; } catch (e) { return 0; } },
     sessionsLoad: sessionsLoad, sessionsCommit: sessionsCommit, sessionsPush: sessionsPush
   };
 })();

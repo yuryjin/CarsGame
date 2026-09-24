@@ -89,6 +89,13 @@ namespace RacingGame.Core.Platform
 
     public interface IPayments { bool IsAvailable { get; } }
 
+    /// <summary>Optional: the host's clock (Yandex ysdk.serverTime()), so date-based rewards ignore the device clock.</summary>
+    public interface IServerClock
+    {
+        /// <summary>Unix time in ms, or ≤ 0 when the host has not provided it (fall back to the device clock).</summary>
+        long ServerTimeUnixMs { get; }
+    }
+
     public interface IPlatformServices
     {
         PlatformKind Kind { get; }

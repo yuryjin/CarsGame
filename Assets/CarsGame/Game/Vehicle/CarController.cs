@@ -94,7 +94,7 @@ namespace RacingGame
 
         public bool IsBoosting { get; private set; }
         /// <summary>Nitro: more top speed and torque for a few seconds.</summary>
-        public void ApplyBoost(float seconds) { boostUntilTick = SimulationDriver.Instance.Tick + SimulationDriver.SecondsToTicks(seconds); }
+        public void ApplyBoost(float seconds) { boostUntilTick = Mathf.Max(boostUntilTick, SimulationDriver.Instance.Tick + SimulationDriver.SecondsToTicks(seconds)); }   // a short boost never cuts a longer one
 
         public float SpeedKmh => currentSpeedKmh;
         /// <summary>Sideways speed (m/s) of the body: the slide the tyres are fighting. Read by audio and effects.</summary>
@@ -298,7 +298,8 @@ namespace RacingGame
 
             GroundQuery();
             CalculateSpeed();
-            if (driftEnabled) StepDrift(); else if (drift.Drifting) drift.Cancel();
+            // Human input only: the QA autopilot swaps in an AI source, whose braking must stay braking.
+            if (driftEnabled && (inputSource is PlayerDriverInput || inputSource is ScriptedDriverInput)) StepDrift(); else if (drift.Drifting) drift.Cancel();
             SideSlipSpeed = rb != null ? Mathf.Abs(Vector3.Dot(rb.linearVelocity, transform.right)) : 0f;
             ApplyMotor();
             ApplySteering();

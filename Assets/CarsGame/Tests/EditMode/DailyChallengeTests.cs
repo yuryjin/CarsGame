@@ -66,10 +66,12 @@ namespace RacingGame.Tests
         [Test]
         public void StreakAndReward()
         {
-            Assert.AreEqual(1, DailyChallenge.NextStreak(-100, 0, 10));
-            Assert.AreEqual(4, DailyChallenge.NextStreak(9, 3, 10));
-            Assert.AreEqual(3, DailyChallenge.NextStreak(10, 3, 10));
-            Assert.AreEqual(1, DailyChallenge.NextStreak(8, 5, 10));
+            var days = new System.Collections.Generic.HashSet<int> { 5, 7, 8, 9 };
+            Assert.AreEqual(3, DailyChallenge.StreakEndingAt(days, 9));
+            Assert.AreEqual(0, DailyChallenge.StreakEndingAt(days, 10));
+            Assert.AreEqual(3, DailyChallenge.CurrentStreak(days, 10), "yesterday's streak is still alive today");
+            Assert.AreEqual(0, DailyChallenge.CurrentStreak(days, 11), "a missed day resets it");
+            Assert.AreEqual(1, DailyChallenge.StreakEndingAt(days, 5));
             Assert.AreEqual(150, DailyChallenge.FirstFinishReward(1));
             Assert.AreEqual(180, DailyChallenge.FirstFinishReward(2));
             Assert.AreEqual(330, DailyChallenge.FirstFinishReward(7));

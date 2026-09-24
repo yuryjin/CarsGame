@@ -97,6 +97,8 @@ namespace RacingGame
         {
             if (PromptOpen && promptUntil > 0f)
             {
+                // Paused (menu, hidden tab, host overlay): the decision time does not run.
+                if (PauseController.IsPaused) { promptUntil += Time.unscaledDeltaTime; return; }
                 float left = promptUntil - Time.unscaledTime;
                 int secs = Mathf.CeilToInt(Mathf.Max(0f, left));
                 if (secs != lastSeconds) { lastSeconds = secs; promptTimer.SetText("{0}", secs); }

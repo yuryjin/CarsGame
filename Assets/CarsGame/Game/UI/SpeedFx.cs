@@ -11,10 +11,12 @@ namespace RacingGame
     [DefaultExecutionOrder(110)]
     public sealed class SpeedFx : MonoBehaviour
     {
-        public int lineCount = 28;
+        public int lineCount = 16;
         [Range(0f, 1f)] [Tooltip("Fraction of top speed where the lines start to appear.")]
-        public float lineStartSpeed = 0.72f;
+        public float lineStartSpeed = 0.85f;
         public float lineSpeed = 2600f;   // reference units per second
+        [Range(0f, 1f)] [Tooltip("Peak line opacity at full intensity.")]
+        public float lineAlpha = 0.1f;
 
         private RaceManager race;
         private Canvas canvas;
@@ -51,7 +53,7 @@ namespace RacingGame
                 lines[i] = rt; lineImages[i] = img;
                 lineAngle[i] = (i + (float)rng.NextDouble() * 0.8f) / lineCount * 360f;
                 linePhase[i] = (float)rng.NextDouble();
-                lineLength[i] = 120f + (float)rng.NextDouble() * 220f;
+                lineLength[i] = 80f + (float)rng.NextDouble() * 140f;
             }
 
             driftMeter = UiFactory.Panel(root, "DriftMeter", new Vector2(0.5f, 0.3f), new Vector2(0.5f, 0.3f), new Vector2(-110f, -9f), new Vector2(110f, 9f), new Color(0.03f, 0.05f, 0.09f, 0.75f), false);
@@ -90,8 +92,8 @@ namespace RacingGame
             {
                 float top = Mathf.Max(1f, car.maxSpeed);
                 target = Mathf.Clamp01((Mathf.Abs(car.SpeedKmh) / top - lineStartSpeed) / (1f - lineStartSpeed));
-                if (car.IsBoosting) target = Mathf.Max(target, 0.85f);
-                target = Mathf.Max(target, boostFlash);
+                if (car.IsBoosting) target = Mathf.Max(target, 0.7f);
+                target = Mathf.Max(target, boostFlash * 0.7f);
             }
             intensity = Mathf.MoveTowards(intensity, target, dt * (target > intensity ? 4f : 2f));
             boostFlash = Mathf.MoveTowards(boostFlash, 0f, dt * 1.5f);
@@ -104,18 +106,18 @@ namespace RacingGame
                     if (lineImages[i].color.a != 0f) lineImages[i].color = new Color(1f, 1f, 1f, 0f);
                     continue;
                 }
-                // Each line travels from the corner radius inwards to ~55 % and restarts; brighter the faster we go.
+                // Each line travels from the corner radius inwards to ~75 % (stays at the periphery) and restarts; brighter the faster we go.
                 linePhase[i] += dt * lineSpeed * (0.6f + 0.6f * intensity) / outer;
                 if (linePhase[i] > 1f) { linePhase[i] -= 1f; lineAngle[i] = (lineAngle[i] + 137.5f) % 360f; }
-                float r = Mathf.Lerp(outer, outer * 0.55f, linePhase[i]);
+                float r = Mathf.Lerp(outer, outer * 0.75f, linePhase[i]);
                 float a = lineAngle[i] * Mathf.Deg2Rad;
                 Vector2 dir = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
                 var rt = lines[i];
                 rt.anchoredPosition = dir * r;
                 rt.localRotation = Quaternion.Euler(0f, 0f, lineAngle[i] + 90f);
-                rt.sizeDelta = new Vector2(3f + 2f * intensity, lineLength[i] * (0.5f + intensity));
+                rt.sizeDelta = new Vector2(1.5f + 1f * intensity, lineLength[i] * (0.5f + intensity));
                 float fade = Mathf.Sin(linePhase[i] * Mathf.PI);
-                lineImages[i].color = new Color(1f, 1f, 1f, 0.28f * intensity * fade);
+                lineImages[i].color = new Color(1f, 1f, 1f, lineAlpha * intensity * fade);
             }
 
             // ---- drift meter ----

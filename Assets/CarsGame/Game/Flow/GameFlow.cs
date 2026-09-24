@@ -153,6 +153,8 @@ namespace RacingGame
             if (ev != null) RaceSetup.Event = ev;
             if (tier != null) RaceSetup.Tier = tier;
             ev = RaceSetup.Event; tier = RaceSetup.Tier;
+            // A daily button, Retry or Next built before midnight must start today's race, not yesterday's.
+            if (DailyRace.IsDaily(ev) && DailyRace.DayOf(ev) != DailyRace.Today) RaceSetup.Event = ev = DailyEvent;
             if (!PlatformGlue.IsReady) { MenuScreens.Toast(Loc.Get("common.loading")); return; }
             if (ev != null && !IsUnlocked(ev)) { MenuScreens.Toast(Loc.Get("events.locked")); return; }
             Teardown();
@@ -358,6 +360,7 @@ namespace RacingGame
         {
             bool Valid() => this != null && generation == raceGeneration && player != null && player.Health != null && player.Health.IsDead
                             && (race.State == RaceState.Racing || race.State == RaceState.Finishing);
+            if (!Valid()) { GiveUp(generation); return; }   // never start an ad that could not be rewarded
             bool granted = await RewardedOffers.ShowAsync(() => { continueUsed = true; player.Health.ReviveNow(); }, Valid);
             if (this == null || generation != raceGeneration) return;
             ContinueOpen = false;
@@ -418,6 +421,7 @@ namespace RacingGame
         {
             if (playerEngine != null) playerEngine.SetRunning(false);
             recorder.Stop();                                   // DNF path never reached OnParticipantFinished
+            if (ContinueOpen) { ContinueOpen = false; if (overlays != null) overlays.HideContinuePrompt(); }
             var me = results.Player;
             var save = PlatformGlue.Save;
             var ev = RaceSetup.Event;
@@ -484,18 +488,21 @@ namespace RacingGame
         {
             int day = DailyRace.DayOf(ev);
             var d = save.Data.progress.daily ??= new Core.Save.DailyData();
+            d.finishDays ??= new System.Collections.Generic.List<int>();
+            d.claims ??= new System.Collections.Generic.List<Core.Save.DailyClaim>();
             if (me.Finished)
             {
-                d.streak = DailyChallenge.NextStreak(d.lastFinishDay, d.streak, day);
-                d.lastFinishDay = day;
-                if (d.rewardDay != day)
+                if (!d.finishDays.Contains(day)) { d.finishDays.Add(day); d.finishDays.Sort(); }
+                d.finishDays.RemoveAll(x => x < day - Core.Save.DailyData.KeepDays);
+                // One bonus per day, kept as a day-keyed claim (not in this device's ledger row), so merged saves
+                // of two devices that both finished today pay it once.
+                if (!d.Claimed(day))
                 {
-                    LastDailyBonus = DailyChallenge.FirstFinishReward(d.streak);
-                    d.rewardDay = day;
-                    row.coinsEarned += LastDailyBonus;
+                    LastDailyBonus = DailyChallenge.FirstFinishReward(DailyChallenge.StreakEndingAt(d.finishDays, day));
+                    d.claims.Add(new Core.Save.DailyClaim { day = day, coins = LastDailyBonus });
                 }
             }
-            LastDailyStreak = d.streak;
+            LastDailyStreak = DailyChallenge.CurrentStreak(d.finishDays, day);
             // Keep a week of daily bests; the board has the rest.
             save.Data.progress.bests.RemoveAll(b => b != null && b.eventId != null && b.eventId.Length > 1 && b.eventId[0] == 'd' && char.IsDigit(b.eventId[1])
                 && int.TryParse(b.eventId.Substring(1), out int bd) && bd < day - 7);
@@ -537,7 +544,7 @@ namespace RacingGame
         /// <summary>Rewarded ad on the results screen: doubles the payout once.</summary>
         public async void DoubleReward()
         {
-            if (doubling || LastRewardDoubled || LastReward <= 0 || !LastRewardFinished) return;
+            if (doubling || LastRewardDoubled || LastReward <= 0 || !LastRewardFinished || RewardedOffers.Busy || PlatformGlue.InterstitialBusy) return;
             var ads = PlatformGlue.Platform?.Ads;
             if (ads == null || !ads.IsRewardedAvailable) { MenuScreens.Toast(Loc.Get("ads.unavailable")); return; }
             doubling = true;

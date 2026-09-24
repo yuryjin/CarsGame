@@ -19,6 +19,8 @@ namespace RacingGame
         public float startGraceSeconds = 3f;
         [Tooltip("Set by the race manager while this car is far ahead of the player.")]
         public bool suppressed;
+        [Tooltip("Mines go down when a rival follows this close behind (m) and this far to the side at most.")]
+        public float mineDropMin = 15f, mineDropMax = 25f, mineDropLateral = 3f;
         [Tooltip("Aim time before a shot (s): the target sees the warning this long. 0 = fire on sight.")]
         public float telegraphSeconds;
         [Tooltip("Cone from the profile's aggression: patient aces only take clean shots, rookies spray.")]
@@ -27,8 +29,14 @@ namespace RacingGame
         [Tooltip("Aggression from which the gunner leads a moving target (aims where it will be).")]
         [Range(0f, 1f)] public float leadFromAggression = 0.7f;
 
-        /// <summary>The car this gunner is lining up (during the telegraph), else null. Read by the target's HUD.</summary>
-        public CarController AimTarget { get; private set; }
+        /// <summary>The car this gunner is lining up (during the telegraph), else null. Read by the target's HUD.
+        /// A wrecked gunner never aims (its tick stops while dead, so the field could go stale).</summary>
+        public CarController AimTarget
+        {
+            get { if (health == null) health = GetComponent<CarHealth>(); return health != null && health.IsDead ? null : aimTarget; }
+            private set => aimTarget = value;
+        }
+        private CarController aimTarget;
         private int fireAtTick = -1;
 
         public int ShotsRequested { get; private set; }
@@ -86,11 +94,20 @@ namespace RacingGame
             CarController target;
             if (AimTarget != null)
             {
-                // Telegraph running: fire when it ends if anyone is still in the cone, else give up the shot.
-                if (tick < fireAtTick) { if (tick % 5 == 0 && FindTarget() == null) CancelAim(); return false; }
-                target = FindTarget();
+                // Telegraph running: the shot is committed, so the warning is a cue to dodge rather than a
+                // reason for the AI to hold fire. Only a target that is wrecked or shielded by a respawn calls it off.
+                var aimed = AimTarget.GetComponent<CarHealth>();
+                if (aimed != null && (aimed.IsDead || aimed.IsInvulnerable)) { CancelAim(); return false; }
+                if (tick < fireAtTick) return false;
+                target = AimTarget;
+                // The turret picks its own target: if it swung to a different car, warn that one first.
+                var turretTarget = cannon.TurretTarget;
+                if (turretTarget != null && turretTarget != target && telegraphSeconds > 0f)
+                {
+                    AimTarget = turretTarget; fireAtTick = tick + SimulationDriver.SecondsToTicks(telegraphSeconds);
+                    return false;
+                }
                 CancelAim();
-                if (target == null) return false;
             }
             else
             {
@@ -132,7 +149,7 @@ namespace RacingGame
 
             if (director == null) director = RaceDirector.Current ?? RaceDirector.Instance;
             var pursuer = weapons.secondaryType == SecondaryWeaponType.Mines
-                ? TargetFinder.FindPursuer(car, transform.position, -transform.forward, 15f, 25f, 3f)
+                ? TargetFinder.FindPursuer(car, transform.position, -transform.forward, mineDropMin, mineDropMax, mineDropLateral)
                 : FindTarget();
             if (pursuer == null) return false;
 

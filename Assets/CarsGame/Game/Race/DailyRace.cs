@@ -19,8 +19,12 @@ namespace RacingGame
         private static RaceEventDefinition cached;
         private static int cachedDay = int.MinValue;
 
-        /// <summary>Server time if the platform provides it, else the device clock.</summary>
-        public static Func<long> UnixMsSource = () => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        /// <summary>Server time if the platform provides it (<see cref="Core.Platform.IServerClock"/>), else the device clock.</summary>
+        public static Func<long> UnixMsSource = () =>
+        {
+            long server = PlatformGlue.Platform is Core.Platform.IServerClock clock ? clock.ServerTimeUnixMs : 0;
+            return server > 0 ? server : DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        };
 
         public static long NowUnixMs => UnixMsSource();
         public static int Today => DailyChallenge.DayIndex(NowUnixMs);

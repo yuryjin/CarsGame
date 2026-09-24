@@ -23,6 +23,7 @@ namespace RacingGame
         private MaterialPropertyBlock block;
         private CarHealth health;
         private LiveryPattern pattern = LiveryPattern.None;
+        private Color stripeColor = Color.white;
 
         public LiveryPattern Pattern => pattern;
         /// <summary>Triangles of the current stripe mesh (0 = none; test hook).</summary>
@@ -41,17 +42,24 @@ namespace RacingGame
         }
 
         private void OnDied(GameObject attacker) { if (stripe != null) stripe.enabled = false; }
-        private void OnRespawned() { if (stripe != null) stripe.enabled = pattern != LiveryPattern.None; }
+        // The wreck tint clears the property blocks of every renderer on respawn: put the stripe colour back.
+        private void OnRespawned() { if (stripe == null) return; ApplyColor(); stripe.enabled = pattern != LiveryPattern.None; }
+
+        private void ApplyColor()
+        {
+            block ??= new MaterialPropertyBlock();
+            block.Clear();
+            block.SetColor(BaseColorId, stripeColor);
+            block.SetColor(ColorId, stripeColor);
+            stripe.SetPropertyBlock(block);
+        }
 
         public void Apply(LiveryPattern newPattern, Color color)
         {
             if (newPattern != pattern || stripe == null) Rebuild(newPattern);
             if (stripe == null) return;
-            block ??= new MaterialPropertyBlock();
-            block.Clear();
-            block.SetColor(BaseColorId, color);
-            block.SetColor(ColorId, color);
-            stripe.SetPropertyBlock(block);
+            stripeColor = color;
+            ApplyColor();
             stripe.enabled = pattern != LiveryPattern.None && (health == null || !health.IsDead);
         }
 

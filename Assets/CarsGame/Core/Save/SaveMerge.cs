@@ -69,13 +69,22 @@ namespace RacingGame.Core.Save
             return m;
         }
 
-        // The streak belongs to the most recent finish day (a device that raced later knows the longer or reset
-        // streak); the paid-bonus day only moves forward, so the daily bonus is paid once across devices.
+        // Unions keyed by day: finishes from both devices (the streak is derived from them), and one bonus per
+        // day — two devices that each paid the same day's bonus before syncing keep a single payment.
         private static DailyData MergeDaily(DailyData a, DailyData b)
         {
             a ??= new DailyData(); b ??= new DailyData();
-            var later = a.lastFinishDay > b.lastFinishDay ? a : b.lastFinishDay > a.lastFinishDay ? b : (a.streak >= b.streak ? a : b);
-            return new DailyData { lastFinishDay = later.lastFinishDay, streak = later.streak, rewardDay = Math.Max(a.rewardDay, b.rewardDay) };
+            var days = new SortedSet<int>(a.finishDays ?? new List<int>());
+            foreach (var d in b.finishDays ?? new List<int>()) days.Add(d);
+            var m = new DailyData { finishDays = new List<int>(days) };
+            if (m.finishDays.Count > DailyData.KeepDays) m.finishDays.RemoveRange(0, m.finishDays.Count - DailyData.KeepDays);
+            var claims = new SortedDictionary<int, int>();
+            foreach (var list in new[] { a.claims, b.claims })
+                if (list != null)
+                    foreach (var c in list)
+                        if (c != null) claims[c.day] = claims.TryGetValue(c.day, out int coins) ? Math.Max(coins, c.coins) : c.coins;
+            foreach (var kv in claims) m.claims.Add(new DailyClaim { day = kv.Key, coins = kv.Value });
+            return m;
         }
 
         private static void MergeRow(Dictionary<string, DeviceLedger> rows, DeviceLedger r)

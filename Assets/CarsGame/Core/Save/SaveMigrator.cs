@@ -55,6 +55,8 @@ namespace RacingGame.Core.Save
             data.progress.cosmetics ??= new System.Collections.Generic.List<string>();
             data.progress.paint ??= ""; data.progress.livery ??= ""; data.progress.stripe ??= "";
             data.progress.daily ??= new DailyData();
+            data.progress.daily.finishDays ??= new System.Collections.Generic.List<int>();
+            data.progress.daily.claims ??= new System.Collections.Generic.List<DailyClaim>();
             data.version = SaveData.CurrentVersion;
             return data;
         }

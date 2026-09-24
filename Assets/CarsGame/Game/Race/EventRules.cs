@@ -39,6 +39,9 @@ namespace RacingGame
             w.secondaryAmmoMax = MinesOnlyAmmo;
             w.secondaryCooldown = MinesOnlyCooldown;
             w.RefillSecondaryAmmo();
+            // Mines are the only weapon: drop them on anyone in the mirror, not just a car glued to the bumper.
+            var gunner = p.GetComponent<AiGunner>();
+            if (gunner != null) { gunner.mineDropMin = 6f; gunner.mineDropMax = 45f; gunner.mineDropLateral = 6f; }
         }
 
         /// <summary>True when this car can still fire its primary (the HUD hides the ammo panel otherwise).</summary>

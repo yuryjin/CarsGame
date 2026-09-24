@@ -120,13 +120,19 @@ namespace RacingGame.Core.Daily
         }
 
         // ---------- streak & reward ----------
-        /// <summary>Streak after finishing today's race: +1 after yesterday, unchanged on the same day, else 1.</summary>
-        public static int NextStreak(int lastDay, int streak, int today)
+
+        /// <summary>Consecutive finished days ending at <paramref name="day"/> (0 when that day is not in the set).</summary>
+        public static int StreakEndingAt(System.Collections.Generic.ICollection<int> finishDays, int day)
         {
-            if (lastDay == today) return Math.Max(1, streak);
-            if (lastDay == today - 1) return Math.Max(0, streak) + 1;
-            return 1;
+            if (finishDays == null) return 0;
+            int n = 0;
+            while (finishDays.Contains(day - n)) n++;
+            return n;
         }
+
+        /// <summary>The streak shown before today's race: today's if already finished, else yesterday's (still alive).</summary>
+        public static int CurrentStreak(System.Collections.Generic.ICollection<int> finishDays, int today) =>
+            Math.Max(StreakEndingAt(finishDays, today), StreakEndingAt(finishDays, today - 1));
 
         public const int BaseReward = 150;
         public const int StreakStep = 30;
