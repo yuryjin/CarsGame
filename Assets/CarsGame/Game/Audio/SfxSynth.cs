@@ -3,8 +3,10 @@ using UnityEngine;
 namespace RacingGame
 {
     /// <summary>
-    /// Procedurally generated sound effects so the vertical slice has audio without any asset
-    /// files. Clips are created once per session; playback goes through <see cref="SfxPlayer"/>.
+    /// The game's sound effects. Where a recorded clip exists (<see cref="SfxLibrary"/>, built by
+    /// Tools/audio/make_sfx.py) it is used; otherwise the procedural sound below plays, so a
+    /// missing asset never silences the game. Synth clips are created once per session; playback
+    /// goes through <see cref="SfxPlayer"/>.
     /// </summary>
     public static class SfxSynth
     {
@@ -18,19 +20,23 @@ namespace RacingGame
             return v * 0.5f;
         });
 
-        public static AudioClip Shot => shot ??= OneShot("sfx_shot", 0.14f, t =>
+        public static AudioClip Shot => SfxLibrary.Get("fire_cannon") ?? SynthShot;
+        public static AudioClip Hit => SfxLibrary.Get("hit_metal_0") ?? SynthHit;
+        public static AudioClip Wreck => SfxLibrary.Get("explosion") ?? SynthWreck;
+
+        private static AudioClip SynthShot => shot ??= OneShot("sfx_shot", 0.14f, t =>
         {
             float env = Mathf.Exp(-t * 28f);
             return (Noise() * 0.8f + Mathf.Sin(2f * Mathf.PI * 90f * t) * 0.6f) * env;
         });
 
-        public static AudioClip Hit => hit ??= OneShot("sfx_hit", 0.18f, t =>
+        private static AudioClip SynthHit => hit ??= OneShot("sfx_hit", 0.18f, t =>
         {
             float env = Mathf.Exp(-t * 18f);
             return (Noise() * 0.5f + Mathf.Sin(2f * Mathf.PI * 60f * t) * 0.8f) * env;
         });
 
-        public static AudioClip Wreck => wreck ??= OneShot("sfx_wreck", 0.6f, t =>
+        private static AudioClip SynthWreck => wreck ??= OneShot("sfx_wreck", 0.6f, t =>
         {
             float env = Mathf.Exp(-t * 5f);
             return (Noise() * 0.7f + Mathf.Sin(2f * Mathf.PI * 40f * t) * 0.6f) * env;
@@ -52,7 +58,8 @@ namespace RacingGame
         private static AudioClip engineRich, screech, wind, nitroHiss;
 
         /// <summary>55 Hz firing note with six harmonics, a slightly detuned second voice and exhaust pulses.</summary>
-        public static AudioClip EngineRich => engineRich ??= Loop("sfx_engine_rich", 1f, t =>
+        public static AudioClip EngineRich => SfxLibrary.Get("engine_loop") ?? SynthEngineRich;
+        private static AudioClip SynthEngineRich => engineRich ??= Loop("sfx_engine_rich", 1f, t =>
         {
             const float f = 55f;
             float v = 0f;
@@ -95,7 +102,8 @@ namespace RacingGame
         }
 
         /// <summary>Nitro kick: a noise burst over a rising sweep.</summary>
-        public static AudioClip NitroHiss => nitroHiss ??= OneShot("sfx_nitro", 1.2f, t =>
+        public static AudioClip NitroHiss => SfxLibrary.Get("nitro") ?? SynthNitroHiss;
+        private static AudioClip SynthNitroHiss => nitroHiss ??= OneShot("sfx_nitro", 1.2f, t =>
         {
             float env = Mathf.Min(1f, t / 0.05f) * Mathf.Exp(-t * 2.2f);
             float sweep = Mathf.Sin(2f * Mathf.PI * (300f * t + 250f * t * t));
@@ -105,11 +113,16 @@ namespace RacingGame
         // ---------- combat feedback ----------
         private static AudioClip[] hits;
         private static AudioClip hitMetal, killSting, heartbeat, shieldBreak;
-        public static AudioClip ShieldBreak => shieldBreak ??= OneShot("sfx_shield_break", 0.24f, t =>
+        public static AudioClip ShieldBreak => SfxLibrary.Get("shield_break") ?? SynthShieldBreak;
+        private static AudioClip SynthShieldBreak => shieldBreak ??= OneShot("sfx_shield_break", 0.24f, t =>
             (Mathf.Sin(2f * Mathf.PI * (1800f * t - 2200f * t * t)) + Noise() * 0.2f) * Mathf.Exp(-t * 15f) * 0.6f);
 
-        /// <summary>Three thuds with different body resonance, so a burst of hits does not sound like a loop.</summary>
-        public static AudioClip HitVariant(int i)
+        /// <summary>Three hit sounds, so a burst of hits does not sound like a loop.</summary>
+        public static AudioClip HitVariant(int i) => SfxLibrary.Get(HitNames[((i % HitNames.Length) + HitNames.Length) % HitNames.Length]) ?? SynthHitVariant(i);
+        private static readonly string[] HitNames = { "hit_metal_0", "hit_metal_1", "hit_metal_2" };
+
+        /// <summary>Three thuds with different body resonance.</summary>
+        private static AudioClip SynthHitVariant(int i)
         {
             if (hits == null)
             {
@@ -125,7 +138,8 @@ namespace RacingGame
         }
 
         /// <summary>Hit on the player's own car: a bright metallic clank on top of the thud.</summary>
-        public static AudioClip HitMetal => hitMetal ??= OneShot("sfx_hit_metal", 0.3f, t =>
+        public static AudioClip HitMetal => SfxLibrary.Get("hit_heavy") ?? SynthHitMetal;
+        private static AudioClip SynthHitMetal => hitMetal ??= OneShot("sfx_hit_metal", 0.3f, t =>
         {
             float ring = Mathf.Sin(2f * Mathf.PI * 820f * t) * 0.35f + Mathf.Sin(2f * Mathf.PI * 1310f * t) * 0.25f;
             return (ring * Mathf.Exp(-t * 11f) + (Noise() * 0.4f + Mathf.Sin(2f * Mathf.PI * 75f * t) * 0.7f) * Mathf.Exp(-t * 22f)) * 0.9f;

@@ -298,6 +298,7 @@ namespace RacingGame
             if (shot.Mode != WeaponMode.Projectile)
             {
                 if (specialAttack == null) { specialAttack = new SpecialWeaponAttack(gameObject); specialAttack.Configure(profile); }
+                WeaponSounds.Fire(profile, transform.position, tick);
                 specialAttack.Fire(shot, shellDamage, tick);
                 return true;
             }
@@ -337,8 +338,7 @@ namespace RacingGame
             recoilOffset = 0.18f;
             var pool = EffectPool.Current ?? EffectPool.Instance;
             if (pool != null) pool.PlayMuzzle(muzzlePos);
-            var sfx = SfxPlayer.Current ?? SfxPlayer.Instance;
-            if (sfx != null) sfx.Play(SfxSynth.Shot, muzzlePos, 0.9f, 0.95f + 0.1f * (tick % 3));
+            WeaponSounds.Fire(profile, muzzlePos, tick);
             if (rb != null) rb.AddForceAtPosition(-direction * recoilForce, muzzlePos, ForceMode.Impulse);
 
             return true;

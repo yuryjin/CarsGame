@@ -117,7 +117,7 @@ namespace RacingGame
             RaceDirector.Current?.CountHit(owner, target.gameObject);
             EffectPool.Current?.PlayShellImpact(hit.Point);
             if (shot.Mode == WeaponMode.Melee)
-                SfxPlayer.Current?.Play(SfxSynth.HitMetal, hit.Point, 0.6f, type == PrimaryWeaponType.RubberChicken ? 1.8f : 0.9f);
+                WeaponSounds.MeleeHit(type, hit.Point);
         }
     }
 }

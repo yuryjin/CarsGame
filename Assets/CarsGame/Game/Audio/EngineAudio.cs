@@ -16,6 +16,8 @@ namespace RacingGame
         public float nitroPitch = 1.15f;
         [Tooltip("Side slip (m/s) where the squeal starts and where it is at full volume.")]
         public float screechFrom = 1.5f, screechFull = 5f;
+        [Tooltip("Impact speed along the contact normal (m/s): a light knock from here, the heavy crunch from the second value.")]
+        public float crashFrom = 3f, crashHeavy = 10f;
 
         private CarController car;
         private PlayerDriverInput input;
@@ -23,6 +25,7 @@ namespace RacingGame
         private int gear;
         private float dipUntil;
         private bool wasBoosting, running;
+        private float nextCrash;
 
         public float EnginePitch => engine != null ? engine.pitch : 0f;
         public float ScreechVolume => screech != null ? screech.volume : 0f;
@@ -56,6 +59,21 @@ namespace RacingGame
                 if (on && !s.isPlaying) s.Play();
                 else if (!on && s.isPlaying) s.Stop();
             }
+        }
+
+        /// <summary>Bumps and crashes of the player's car (walls, other cars, landings); shots and mines have their own sounds.</summary>
+        private void OnCollisionEnter(Collision c)
+        {
+            if (!running || Time.unscaledTime < nextCrash || c.contactCount == 0) return;
+            if (c.collider.GetComponentInParent<Projectile>() != null || c.collider.GetComponentInParent<MineHazard>() != null) return;
+            var contact = c.GetContact(0);
+            float speed = Mathf.Abs(Vector3.Dot(c.relativeVelocity, contact.normal));
+            if (speed < crashFrom) return;
+            nextCrash = Time.unscaledTime + 0.15f;
+            bool heavy = speed >= crashHeavy;
+            var clip = SfxLibrary.Get(heavy ? "crash_heavy" : "crash_light") ?? SfxSynth.HitVariant(heavy ? 0 : 2);
+            float vol = Mathf.Lerp(0.35f, 1f, Mathf.InverseLerp(crashFrom, crashHeavy * 1.5f, speed));
+            SfxPlayer.Instance.Play(clip, contact.point, vol, heavy ? 0.9f : 1f + 0.1f * (Time.frameCount % 3));
         }
 
         private void Update()
