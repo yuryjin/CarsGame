@@ -498,8 +498,11 @@ namespace RacingGame
             {
                 if (save == null) return;
                 save.Data.settings.sfx = enabled ? 1f : 0f; save.MarkDirty();
-                SfxPlayer.Instance.volume = save.Data.settings.sfx * 0.8f; AudioListener.volume = enabled ? 1f : 0f; Show("settings");
+                SfxPlayer.Instance.volume = save.Data.settings.sfx * 0.8f; Show("settings");
             });
+            // MusicPlayer polls the setting; see MusicDirector.MusicLevel for saves from before this toggle.
+            ToggleRow(content, "Music", "settings.music", save != null && MusicDirector.MusicLevel(save.Data.settings) > 0f, enabled =>
+            { if (save == null) return; save.Data.settings.music = enabled ? 1f : 0f; save.MarkDirty(); Show("settings"); });
             ToggleRow(content, "AutoThrottle", "settings.auto_throttle", save != null && save.Data.settings.autoThrottle, enabled =>
             { if (save == null) return; save.Data.settings.autoThrottle = enabled; save.MarkDirty(); Show("settings"); });
             if (PlatformGlue.HasQualityChoice && save != null)

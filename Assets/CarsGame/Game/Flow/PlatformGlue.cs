@@ -68,8 +68,7 @@ namespace RacingGame
             }
             if (!Save.Loaded) await Save.LoadAsync();
             Loc.Initialize(p != null ? p.LanguageCode : "", Save.Data.settings.lang);
-            SfxPlayer.Instance.volume = Save.Data.settings.sfx * 0.8f;
-            AudioListener.volume = Save.Data.settings.sfx > 0f ? 1f : 0f;
+            SfxPlayer.Instance.volume = Save.Data.settings.sfx * 0.8f;   // music has its own setting (MusicPlayer)
             ApplyQuality();
         }
 
