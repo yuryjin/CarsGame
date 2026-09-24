@@ -1,0 +1,25 @@
+{
+    "name": "RacingGame.Net",
+    "rootNamespace": "RacingGame.Net",
+    "references": [
+        "Unity.Networking.Transport",
+        "Unity.Collections"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "CARS_NET"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.transport",
+            "expression": "2.0.0",
+            "define": "CARS_NET"
+        }
+    ],
+    "noEngineReferences": false
+}
