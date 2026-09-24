@@ -25,6 +25,9 @@ import bpy
 from mathutils import Matrix, Vector
 from mathutils.bvhtree import BVHTree
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from artlib import apply_mod, bbox, color_layer, decimate, set_colors, transform  # noqa: E402
+
 argv = sys.argv[sys.argv.index("--") + 1:]
 SRC, REF, OUT = Path(argv[0]).resolve(), Path(argv[1]).resolve(), Path(argv[2]).resolve()
 BODY_TRIS = int(argv[3]) if len(argv) > 3 else 4200
@@ -86,17 +89,6 @@ for o in list(scene.objects):
 report["faces_raw"] = len(body.data.polygons)
 
 
-def bbox(ob):
-    xs = [v.co for v in ob.data.vertices]
-    return Vector((min(v.x for v in xs), min(v.y for v in xs), min(v.z for v in xs))), \
-        Vector((max(v.x for v in xs), max(v.y for v in xs), max(v.z for v in xs)))
-
-
-def transform(ob, m):
-    ob.data.transform(m)
-    ob.data.update()
-
-
 # 1. orientation: long horizontal axis -> Y, nose -> +Y (the rear end carries the tall wing)
 lo, hi = bbox(body)
 ext = hi - lo
@@ -125,24 +117,6 @@ transform(body, Matrix.Translation(Vector((-(lo.x + hi.x) * 0.5, ref_c.y - (lo.y
 lo, hi = bbox(body)
 report["scaled_bbox"] = [list(lo), list(hi)]
 report["scale_factor"] = s
-
-
-def apply_mod(ob, mod):
-    bpy.context.view_layer.objects.active = ob
-    bpy.ops.object.modifier_apply(modifier=mod.name)
-
-
-def decimate(ob, target_tris, symmetric=True):
-    ob.data.calc_loop_triangles()
-    n = len(ob.data.loop_triangles)
-    if n <= target_tris:
-        return
-    mod = ob.modifiers.new("dec", "DECIMATE")
-    mod.ratio = target_tris / n
-    mod.use_symmetry = symmetric
-    mod.symmetry_axis = "X"
-    mod.use_collapse_triangulate = True
-    apply_mod(ob, mod)
 
 
 def cylinder_x(name, center, radius, depth, verts):
@@ -207,10 +181,6 @@ report["islands_dropped"] = len(dropped)
 
 
 # 3. vertex colours from the nearest reference surface
-def color_layer(me):
-    return me.color_attributes.get("Col") or me.color_attributes.new("Col", "BYTE_COLOR", "CORNER")
-
-
 def paint_faces(ob, fn):
     me = ob.data
     col = color_layer(me)
@@ -231,19 +201,6 @@ def classify(p):
         tag = "trim_dark"
     counts[tag] = counts.get(tag, 0) + 1
     return PAL[tag]
-
-
-# colours are stored as sRGB bytes; set via .color_srgb when available so the bytes equal the palette
-def set_colors(ob, fn):
-    me = ob.data
-    col = color_layer(me)
-    for p in me.polygons:
-        c = fn(p)
-        for li in p.loop_indices:
-            if hasattr(col.data[li], "color_srgb"):
-                col.data[li].color_srgb = c
-            else:
-                col.data[li].color = c
 
 
 set_colors(body, classify)

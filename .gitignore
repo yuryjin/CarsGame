@@ -67,3 +67,4 @@ graphify-out
 /[Aa]ssets/CarsGame/Tests/EditMode/Library.meta
 graphify-out
 .junie
+__pycache__/

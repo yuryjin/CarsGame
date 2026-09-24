@@ -67,6 +67,13 @@ namespace RacingGame
             shaft = WeaponArt.Part(Root, "ExtendingArm", PrimitiveType.Cylinder, Vector3.zero, Vector3.one, metal);
             tool = new GameObject("ToolHead").transform;
             tool.SetParent(Root, false);
+            if (PropModelLibrary.TryGetWeapon(type, out var model, out var modelMaterial))
+            {
+                // Imported head (Tools/art/conform_prop.py): one renderer instead of up to 19 primitives.
+                PropModelLibrary.Spawn(tool, "Model", model, modelMaterial);
+                SamplePose(100f);
+                return;
+            }
             switch (type)
             {
                 case PrimaryWeaponType.CircularSaw:

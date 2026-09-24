@@ -1,0 +1,820 @@
+{
+  "units": "metres",
+  "axes": "Unity: +X right, +Y up, +Z forward. The Blender script models in X right, Y forward, Z up and the FBX export maps Y->+Z, Z->+Y.",
+  "budget": {
+    "pickup_tris": [
+      300,
+      800
+    ],
+    "weapon_tris": [
+      400,
+      1200
+    ],
+    "batch_tris_max": 12000,
+    "renderers_per_model": 1,
+    "note": "Flat faces, vertex colours only: no UVs, textures, tangents, animation or LODs. One shared material M_Props (CarsGame/StylizedLit). Budgets for all future art live in Tools/art/README.md."
+  },
+  "palette": {
+    "_note": "rgb = sRGB albedo, alpha = emission mask of CarsGame/StylizedLit (0 = none, 1 = full glow)",
+    "white": [
+      0.93,
+      0.93,
+      0.9,
+      0.0
+    ],
+    "black": [
+      0.06,
+      0.06,
+      0.07,
+      0.0
+    ],
+    "metal": [
+      0.55,
+      0.6,
+      0.66,
+      0.0
+    ],
+    "steel_dark": [
+      0.28,
+      0.31,
+      0.36,
+      0.0
+    ],
+    "wood": [
+      0.55,
+      0.34,
+      0.16,
+      0.0
+    ],
+    "health": [
+      0.2,
+      0.85,
+      0.32,
+      0.0
+    ],
+    "health_glow": [
+      0.93,
+      0.98,
+      0.93,
+      1.0
+    ],
+    "ammo": [
+      1.0,
+      0.76,
+      0.16,
+      0.0
+    ],
+    "ammo_dark": [
+      0.36,
+      0.3,
+      0.12,
+      0.0
+    ],
+    "brass": [
+      0.85,
+      0.48,
+      0.2,
+      0.0
+    ],
+    "nitro": [
+      0.22,
+      0.52,
+      1.0,
+      0.0
+    ],
+    "nitro_glow": [
+      0.55,
+      0.85,
+      1.0,
+      1.0
+    ],
+    "item": [
+      0.9,
+      0.36,
+      0.92,
+      0.0
+    ],
+    "item_glow": [
+      1.0,
+      0.75,
+      1.0,
+      1.0
+    ],
+    "orange": [
+      1.0,
+      0.42,
+      0.06,
+      0.0
+    ],
+    "red": [
+      0.92,
+      0.1,
+      0.08,
+      0.0
+    ],
+    "yellow": [
+      1.0,
+      0.82,
+      0.06,
+      0.0
+    ],
+    "cyan_glow": [
+      0.3,
+      0.95,
+      1.0,
+      1.0
+    ],
+    "leather": [
+      0.42,
+      0.24,
+      0.12,
+      0.0
+    ],
+    "rubber_red": [
+      0.85,
+      0.12,
+      0.1,
+      0.0
+    ]
+  },
+  "_rules": "colours: first matching rule wins, else 'default'. Keys (all optional, [min, max]): x/y/z = face centre in the unit box of the fitted mesh (-1..1 per axis); rxy/rxz/ryz = radial distance in that plane (unit box); nx/ny/nz = face normal components. 'fit' scales uniformly so the mesh fits 'bounds' (Unity axes). 'rot' = extra Euler degrees (Unity axes) applied before fitting, found from the contact sheet. 'mirror_x' symmetrises across X. 'cut' = [{axis, below|above}] removes a handle before fitting (unit box of the posed raw shape). Hunyuan puts the picture's front at -Unity Z, so things that must face the target get rot [0, 0, 180].",
+  "items": {
+    "Pickup_Health": {
+      "kind": "pickup",
+      "prompt": "a green first aid kit case with a big white cross on the front, chunky toy-like shape",
+      "bounds": {
+        "min": [
+          -0.55,
+          -0.45,
+          -0.3
+        ],
+        "max": [
+          0.55,
+          0.45,
+          0.3
+        ]
+      },
+      "tris": 500,
+      "mirror_x": true,
+      "colors": {
+        "default": "health",
+        "rules": [
+          {
+            "c": "health_glow",
+            "x": [
+              -0.18,
+              0.18
+            ],
+            "y": [
+              -0.62,
+              0.62
+            ],
+            "nz": [
+              0.6,
+              1
+            ]
+          },
+          {
+            "c": "health_glow",
+            "x": [
+              -0.62,
+              0.62
+            ],
+            "y": [
+              -0.18,
+              0.18
+            ],
+            "nz": [
+              0.6,
+              1
+            ]
+          },
+          {
+            "c": "health_glow",
+            "x": [
+              -0.18,
+              0.18
+            ],
+            "y": [
+              -0.62,
+              0.62
+            ],
+            "nz": [
+              -1,
+              -0.6
+            ]
+          },
+          {
+            "c": "health_glow",
+            "x": [
+              -0.62,
+              0.62
+            ],
+            "y": [
+              -0.18,
+              0.18
+            ],
+            "nz": [
+              -1,
+              -0.6
+            ]
+          },
+          {
+            "c": "white",
+            "y": [
+              0.75,
+              1
+            ]
+          }
+        ]
+      }
+    },
+    "Pickup_Ammo": {
+      "kind": "pickup",
+      "prompt": "a yellow military ammo crate with metal clasps and three big brass bullets sticking out of the top",
+      "bounds": {
+        "min": [
+          -0.55,
+          -0.45,
+          -0.4
+        ],
+        "max": [
+          0.55,
+          0.55,
+          0.4
+        ]
+      },
+      "tris": 600,
+      "mirror_x": true,
+      "colors": {
+        "default": "ammo",
+        "rules": [
+          {
+            "c": "brass",
+            "y": [
+              0.25,
+              1
+            ]
+          },
+          {
+            "c": "ammo_dark",
+            "y": [
+              -1,
+              -0.8
+            ]
+          }
+        ]
+      }
+    },
+    "Pickup_Nitro": {
+      "kind": "pickup",
+      "prompt": "a blue nitro gas bottle standing upright with a chrome valve on top and a glowing stripe",
+      "bounds": {
+        "min": [
+          -0.35,
+          -0.65,
+          -0.35
+        ],
+        "max": [
+          0.35,
+          0.65,
+          0.35
+        ]
+      },
+      "tris": 500,
+      "mirror_x": true,
+      "colors": {
+        "default": "nitro",
+        "rules": [
+          {
+            "c": "metal",
+            "y": [
+              0.55,
+              1
+            ]
+          },
+          {
+            "c": "nitro_glow",
+            "y": [
+              -0.15,
+              0.15
+            ]
+          }
+        ]
+      }
+    },
+    "Pickup_Item": {
+      "kind": "pickup",
+      "prompt": "a purple mystery weapon crate with a big question mark and reinforced metal corners",
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      },
+      "tris": 500,
+      "mirror_x": true,
+      "colors": {
+        "default": "item",
+        "rules": [
+          {
+            "c": "item_glow",
+            "x": [
+              -0.35,
+              0.35
+            ],
+            "y": [
+              -0.35,
+              0.35
+            ],
+            "nz": [
+              0.6,
+              1
+            ]
+          },
+          {
+            "c": "item_glow",
+            "x": [
+              -0.35,
+              0.35
+            ],
+            "y": [
+              -0.35,
+              0.35
+            ],
+            "nz": [
+              -1,
+              -0.6
+            ]
+          },
+          {
+            "c": "item_glow",
+            "z": [
+              -0.35,
+              0.35
+            ],
+            "y": [
+              -0.35,
+              0.35
+            ],
+            "nx": [
+              0.6,
+              1
+            ]
+          },
+          {
+            "c": "item_glow",
+            "z": [
+              -0.35,
+              0.35
+            ],
+            "y": [
+              -0.35,
+              0.35
+            ],
+            "nx": [
+              -1,
+              -0.6
+            ]
+          },
+          {
+            "c": "steel_dark",
+            "rxz": [
+              1.2,
+              2
+            ]
+          }
+        ]
+      }
+    },
+    "Weapon_CircularSaw": {
+      "kind": "weapon",
+      "prompt": "a circular saw blade with big sharp teeth, flat steel disc, front view",
+      "bounds": {
+        "min": [
+          -0.88,
+          -0.88,
+          -0.08
+        ],
+        "max": [
+          0.88,
+          0.88,
+          0.08
+        ]
+      },
+      "tris": 700,
+      "mirror_x": false,
+      "colors": {
+        "default": "metal",
+        "rules": [
+          {
+            "c": "steel_dark",
+            "rxy": [
+              0,
+              0.25
+            ]
+          },
+          {
+            "c": "white",
+            "rxy": [
+              0.82,
+              2
+            ]
+          }
+        ]
+      }
+    },
+    "Weapon_LaserSaw": {
+      "kind": "weapon",
+      "prompt": "a sci-fi energy saw disc with jagged teeth and a glowing ring, front view",
+      "bounds": {
+        "min": [
+          -0.88,
+          -0.88,
+          -0.08
+        ],
+        "max": [
+          0.88,
+          0.88,
+          0.08
+        ]
+      },
+      "tris": 700,
+      "mirror_x": false,
+      "colors": {
+        "default": "cyan_glow",
+        "rules": [
+          {
+            "c": "steel_dark",
+            "rxy": [
+              0,
+              0.3
+            ]
+          }
+        ]
+      }
+    },
+    "Weapon_Chainsaw": {
+      "kind": "weapon",
+      "prompt": "an orange chainsaw with a long steel guide bar, side view",
+      "bounds": {
+        "min": [
+          -0.4,
+          -0.35,
+          -0.7
+        ],
+        "max": [
+          0.4,
+          0.35,
+          1.2
+        ]
+      },
+      "tris": 1000,
+      "mirror_x": true,
+      "colors": {
+        "default": "metal",
+        "rules": [
+          {
+            "c": "orange",
+            "z": [
+              -1,
+              -0.2
+            ]
+          },
+          {
+            "c": "black",
+            "y": [
+              -1,
+              -0.7
+            ]
+          }
+        ]
+      },
+      "rot": [
+        0,
+        0,
+        -90
+      ]
+    },
+    "Weapon_Drill": {
+      "kind": "weapon",
+      "prompt": "a giant spiral drill bit, steel cone with thick yellow spiral threads, side view",
+      "bounds": {
+        "min": [
+          -0.45,
+          -0.45,
+          0.0
+        ],
+        "max": [
+          0.45,
+          0.45,
+          1.7
+        ]
+      },
+      "tris": 800,
+      "mirror_x": false,
+      "colors": {
+        "default": "metal",
+        "rules": [
+          {
+            "c": "yellow",
+            "rxy": [
+              0.55,
+              2
+            ],
+            "z": [
+              -1,
+              0.5
+            ]
+          },
+          {
+            "c": "steel_dark",
+            "z": [
+              -1,
+              -0.85
+            ]
+          }
+        ]
+      },
+      "rot": [
+        90,
+        0,
+        0
+      ]
+    },
+    "Weapon_Sledgehammer": {
+      "kind": "weapon",
+      "prompt": "a big blacksmith sledgehammer standing upright with the short wooden handle pointing down, heavy rectangular steel head with a red painted band around the middle, front view",
+      "bounds": {
+        "min": [
+          -0.85,
+          -0.43,
+          -0.4
+        ],
+        "max": [
+          0.85,
+          0.43,
+          0.4
+        ]
+      },
+      "tris": 500,
+      "mirror_x": true,
+      "colors": {
+        "default": "steel_dark",
+        "rules": [
+          {
+            "c": "red",
+            "x": [
+              -1,
+              -0.75
+            ]
+          },
+          {
+            "c": "red",
+            "x": [
+              0.75,
+              1
+            ]
+          }
+        ]
+      },
+      "cut": [
+        {
+          "axis": "y",
+          "below": 0.45
+        }
+      ]
+    },
+    "Weapon_BattleAxe": {
+      "kind": "weapon",
+      "prompt": "a double-bladed viking battle axe head, two curved steel blades, no handle, front view",
+      "bounds": {
+        "min": [
+          -1.0,
+          -0.75,
+          -0.12
+        ],
+        "max": [
+          1.0,
+          0.75,
+          0.12
+        ]
+      },
+      "tris": 700,
+      "mirror_x": true,
+      "colors": {
+        "default": "metal",
+        "rules": [
+          {
+            "c": "leather",
+            "x": [
+              -0.15,
+              0.15
+            ]
+          },
+          {
+            "c": "white",
+            "x": [
+              -1,
+              -0.85
+            ]
+          },
+          {
+            "c": "white",
+            "x": [
+              0.85,
+              1
+            ]
+          }
+        ]
+      },
+      "cut": [
+        {
+          "axis": "y",
+          "below": 0.05
+        }
+      ]
+    },
+    "Weapon_GiantBoot": {
+      "kind": "weapon",
+      "prompt": "a giant cartoon cowboy boot, side view, toe pointing right",
+      "bounds": {
+        "min": [
+          -0.53,
+          -0.33,
+          -0.65
+        ],
+        "max": [
+          0.53,
+          1.1,
+          1.35
+        ]
+      },
+      "tris": 900,
+      "mirror_x": true,
+      "colors": {
+        "default": "leather",
+        "rules": [
+          {
+            "c": "black",
+            "y": [
+              -1,
+              -0.8
+            ]
+          },
+          {
+            "c": "yellow",
+            "y": [
+              0.8,
+              1
+            ]
+          }
+        ]
+      },
+      "rot": [
+        0,
+        0,
+        90
+      ]
+    },
+    "Weapon_FryingPan": {
+      "kind": "weapon",
+      "prompt": "a cast iron frying pan seen from below, round and heavy, no handle",
+      "bounds": {
+        "min": [
+          -0.75,
+          -0.75,
+          -0.15
+        ],
+        "max": [
+          0.75,
+          0.75,
+          0.15
+        ]
+      },
+      "tris": 500,
+      "mirror_x": true,
+      "colors": {
+        "default": "black",
+        "rules": [
+          {
+            "c": "steel_dark",
+            "rxy": [
+              0.85,
+              2
+            ]
+          }
+        ]
+      },
+      "rot": [
+        90,
+        0,
+        0
+      ],
+      "cut": [
+        {
+          "axis": "y",
+          "above": 0.32
+        }
+      ]
+    },
+    "Weapon_Plunger": {
+      "kind": "weapon",
+      "prompt": "a giant red rubber plunger cup, front view of the suction cup, short stub of a wooden stick",
+      "bounds": {
+        "min": [
+          -0.7,
+          -0.7,
+          -0.6
+        ],
+        "max": [
+          0.7,
+          0.7,
+          0.5
+        ]
+      },
+      "tris": 600,
+      "mirror_x": true,
+      "colors": {
+        "default": "rubber_red",
+        "rules": [
+          {
+            "c": "wood",
+            "rxy": [
+              0,
+              0.18
+            ],
+            "z": [
+              -1,
+              0
+            ]
+          }
+        ]
+      },
+      "rot": [
+        90,
+        0,
+        0
+      ]
+    },
+    "Weapon_RubberChicken": {
+      "kind": "weapon",
+      "prompt": "a funny yellow rubber chicken toy standing upright, red comb and orange beak, front view",
+      "bounds": {
+        "min": [
+          -0.4,
+          -0.7,
+          -0.35
+        ],
+        "max": [
+          0.4,
+          1.25,
+          0.7
+        ]
+      },
+      "tris": 900,
+      "mirror_x": true,
+      "colors": {
+        "default": "yellow",
+        "rules": [
+          {
+            "c": "red",
+            "y": [
+              0.85,
+              1
+            ]
+          },
+          {
+            "c": "orange",
+            "y": [
+              0.4,
+              0.75
+            ],
+            "z": [
+              0.55,
+              1
+            ]
+          },
+          {
+            "c": "orange",
+            "y": [
+              -1,
+              -0.85
+            ]
+          }
+        ]
+      },
+      "rot": [
+        0,
+        0,
+        180
+      ]
+    }
+  }
+}

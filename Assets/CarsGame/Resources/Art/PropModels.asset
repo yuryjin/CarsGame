@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77e7648ab00797b82a5219cb22352d1e, type: 3}
+  m_Name: PropModels
+  m_EditorClassIdentifier: RacingGame.Game::RacingGame.PropModelLibrary
+  material: {fileID: 2100000, guid: a63af56cc802d3cc19e56393c9fa4195, type: 2}
+  entries:
+  - id: Pickup_Ammo
+    mesh: {fileID: 2433190578000273345, guid: 537cb6070a2a82c31be59c528df307d3, type: 3}
+  - id: Pickup_Health
+    mesh: {fileID: 1963836030870330674, guid: c250c031f48984a61ab7f15056a0d29b, type: 3}
+  - id: Pickup_Item
+    mesh: {fileID: 5574974939301499542, guid: 90d5b7ac9ee2fd4e0a181ea1bfede4bc, type: 3}
+  - id: Pickup_Nitro
+    mesh: {fileID: -4849930749477774477, guid: e814dcbd8749876c693e080db36448d6, type: 3}
+  - id: Weapon_BattleAxe
+    mesh: {fileID: -8428963394095983708, guid: 43bb4fcd68f2d2ed689f4690f43de964, type: 3}
+  - id: Weapon_Chainsaw
+    mesh: {fileID: 6871274190302492090, guid: 3bdeacf33d4ac288996d8a6a8ed6c161, type: 3}
+  - id: Weapon_CircularSaw
+    mesh: {fileID: -5971763332341808017, guid: dedb3de78d4843399b69ac375c6cc468, type: 3}
+  - id: Weapon_Drill
+    mesh: {fileID: -2230132994289628668, guid: 43f33956a1566b25ba848e57df2d2759, type: 3}
+  - id: Weapon_FryingPan
+    mesh: {fileID: 2400364419573612181, guid: 8f534e96b631b988389b70fb42171ecb, type: 3}
+  - id: Weapon_GiantBoot
+    mesh: {fileID: 8685270204417162509, guid: 5b8d2e4f90d82b4adb7fff6279ac0219, type: 3}
+  - id: Weapon_LaserSaw
+    mesh: {fileID: -5528574745679071243, guid: 67f85e376ce9f03458fc09a923ad37d0, type: 3}
+  - id: Weapon_Plunger
+    mesh: {fileID: 2931763797839033026, guid: 5da72b25be7247d67a124817f67c5b2e, type: 3}
+  - id: Weapon_RubberChicken
+    mesh: {fileID: -2458232812367080371, guid: e3d601328cd579fe484da4fbd32f883f, type: 3}
+  - id: Weapon_Sledgehammer
+    mesh: {fileID: -5005398368557659601, guid: fe8015350566d760fa87e7fe7a663db5, type: 3}

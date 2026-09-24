@@ -44,19 +44,28 @@ namespace RacingGame
 
         private void BuildVisual()
         {
-            PrimitiveType prim = kind == PickupKind.Health ? PrimitiveType.Capsule :
-                                 kind == PickupKind.Ammo ? PrimitiveType.Cube :
-                                 kind == PickupKind.Nitro ? PrimitiveType.Sphere :
-                                 PrimitiveType.Cylinder;
-            var v = GameObject.CreatePrimitive(prim);
-            Destroy(v.GetComponent<Collider>());
-            v.transform.SetParent(transform, false);
-            v.transform.localPosition = Vector3.up * 0.9f;
-            v.transform.localScale = Vector3.one;
-            var r = v.GetComponent<Renderer>();
-            r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            r.sharedMaterial = MaterialFor(kind);
-            visual = v.transform;
+            if (PropModelLibrary.TryGetPickup(kind, out var model, out var modelMaterial))
+            {
+                // Imported model (Tools/art/conform_prop.py): one renderer, colours and glow in the vertices.
+                visual = PropModelLibrary.Spawn(transform, "Model", model, modelMaterial);
+                visual.localPosition = Vector3.up * 0.9f;
+            }
+            else
+            {
+                PrimitiveType prim = kind == PickupKind.Health ? PrimitiveType.Capsule :
+                                     kind == PickupKind.Ammo ? PrimitiveType.Cube :
+                                     kind == PickupKind.Nitro ? PrimitiveType.Sphere :
+                                     PrimitiveType.Cylinder;
+                var v = GameObject.CreatePrimitive(prim);
+                Destroy(v.GetComponent<Collider>());
+                v.transform.SetParent(transform, false);
+                v.transform.localPosition = Vector3.up * 0.9f;
+                v.transform.localScale = Vector3.one;
+                var vr = v.GetComponent<Renderer>();
+                vr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                vr.sharedMaterial = MaterialFor(kind);
+                visual = v.transform;
+            }
             // A thin glowing post above the pickup: readable from a distance and over other cars.
             var beacon = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             Destroy(beacon.GetComponent<Collider>());
@@ -66,7 +75,7 @@ namespace RacingGame
             beacon.transform.localScale = new Vector3(0.25f, 1.5f, 0.25f);
             var br = beacon.GetComponent<Renderer>();
             br.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            br.sharedMaterial = r.sharedMaterial;
+            br.sharedMaterial = MaterialFor(kind);
             bobPhase = (transform.position.x + transform.position.z) * 0.37f;
         }
 
