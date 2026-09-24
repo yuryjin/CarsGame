@@ -19,6 +19,17 @@ namespace RacingGame
         public float startGraceSeconds = 3f;
         [Tooltip("Set by the race manager while this car is far ahead of the player.")]
         public bool suppressed;
+        [Tooltip("Aim time before a shot (s): the target sees the warning this long. 0 = fire on sight.")]
+        public float telegraphSeconds;
+        [Tooltip("Cone from the profile's aggression: patient aces only take clean shots, rookies spray.")]
+        public bool coneFromAggression = true;
+        public float rookieConeDegrees = 12f, aceConeDegrees = 6f;
+        [Tooltip("Aggression from which the gunner leads a moving target (aims where it will be).")]
+        [Range(0f, 1f)] public float leadFromAggression = 0.7f;
+
+        /// <summary>The car this gunner is lining up (during the telegraph), else null. Read by the target's HUD.</summary>
+        public CarController AimTarget { get; private set; }
+        private int fireAtTick = -1;
 
         public int ShotsRequested { get; private set; }
         public int SecondaryRequested { get; private set; }
@@ -59,20 +70,35 @@ namespace RacingGame
             if (car.Weapons != null && car.Weapons.IsOverheated) { burstTicksRemaining = 0; return false; }
             if (health != null && health.IsDead) { burstTicksRemaining = 0; return false; }
 
+            if (suppressed) { burstTicksRemaining = 0; CancelAim(); return false; }
             if (burstTicksRemaining > 0)
             {
+                if (FindTarget() == null) { burstTicksRemaining = 0; return false; }
                 burstTicksRemaining--;
                 return true;
             }
 
             if (enabledTick < 0) enabledTick = tick;
             if (startGraceSeconds > 0f && tick - enabledTick < SimulationDriver.SecondsToTicks(startGraceSeconds)) return false;
-            if (suppressed || tick < nextShotTick || !cannon.IsReady) return false;
-            if (tick % 10 != 0) return false;
-
+            if (suppressed || tick < nextShotTick || !cannon.IsReady || cannon.locked) { CancelAim(); return false; }
             if (director == null) director = RaceDirector.Current ?? RaceDirector.Instance;
-            var target = FindTarget();
-            if (target == null) return false;
+
+            CarController target;
+            if (AimTarget != null)
+            {
+                // Telegraph running: fire when it ends if anyone is still in the cone, else give up the shot.
+                if (tick < fireAtTick) { if (tick % 5 == 0 && FindTarget() == null) CancelAim(); return false; }
+                target = FindTarget();
+                CancelAim();
+                if (target == null) return false;
+            }
+            else
+            {
+                if (tick % 10 != 0) return false;
+                target = FindTarget();
+                if (target == null) return false;
+                if (telegraphSeconds > 0f) { AimTarget = target; fireAtTick = tick + SimulationDriver.SecondsToTicks(telegraphSeconds); return false; }
+            }
 
             float aggression = profile != null ? profile.aggression : 0.5f;
             float randScale = (director != null && director.Rng != null) ? director.Rng.Range(RngStreams.Stream.Ai, 0.8f, 1.3f) : 1f;
@@ -83,7 +109,9 @@ namespace RacingGame
             var weapons = car.Weapons;
             if (weapons != null && weapons.primaryType == PrimaryWeaponType.MachineGun)
             {
-                burstTicksRemaining = (director != null && director.Rng != null) ? director.Rng.Range(RngStreams.Stream.Ai, 4, 8) : 5;
+                int shots = director != null && director.Rng != null ? director.Rng.Range(RngStreams.Stream.Ai, 3, 6) : 3;
+                burstTicksRemaining = SimulationDriver.SecondsToTicks(cannon.fireInterval) * (shots - 1);
+                nextShotTick += burstTicksRemaining;
             }
             return true;
         }
@@ -103,7 +131,9 @@ namespace RacingGame
             if (tick % 10 != 0) return false;
 
             if (director == null) director = RaceDirector.Current ?? RaceDirector.Instance;
-            var pursuer = TargetFinder.FindPursuer(car, transform.position, -transform.forward, 15f, 25f, 3f);
+            var pursuer = weapons.secondaryType == SecondaryWeaponType.Mines
+                ? TargetFinder.FindPursuer(car, transform.position, -transform.forward, 15f, 25f, 3f)
+                : FindTarget();
             if (pursuer == null) return false;
 
             float aggression = profile != null ? profile.aggression : 0.5f;
@@ -114,10 +144,17 @@ namespace RacingGame
             return true;
         }
 
+        private void CancelAim() { AimTarget = null; fireAtTick = -1; }
+
+        private void OnDisable() { CancelAim(); }
+
         private CarController FindTarget()
         {
             var muzzle = cannon.muzzle != null ? cannon.muzzle : transform;
-            return TargetFinder.Find(car, muzzle.position, muzzle.forward, coneDegrees, minRange, maxRange);
+            float aggression = profile != null ? profile.aggression : 0.5f;
+            float cone = coneFromAggression && profile != null ? Mathf.Lerp(rookieConeDegrees, aceConeDegrees, aggression) : coneDegrees;
+            float lead = profile != null && aggression >= leadFromAggression ? cannon.shellSpeed : 0f;
+            return TargetFinder.Find(car, muzzle.position, muzzle.forward, cone, minRange, maxRange, lead);
         }
     }
 }

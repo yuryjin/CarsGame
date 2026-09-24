@@ -82,6 +82,23 @@ namespace RacingGame.Core.Economy
         }
     }
 
+    public enum CarBuild { Balanced, Speed, Survival, Firepower }
+
+    /// <summary>Free tuning presets; purchased upgrades remain owned and apply on top.</summary>
+    public static class BuildCatalog
+    {
+        public static UpgradeCatalog.Effects For(CarBuild build)
+        {
+            switch (build)
+            {
+                case CarBuild.Speed: return new UpgradeCatalog.Effects(1.10f, 0.95f, 0.85f, 1.08f, 1f, 1f);
+                case CarBuild.Survival: return new UpgradeCatalog.Effects(0.94f, 1f, 1.30f, 0.90f, 1f, 1f);
+                case CarBuild.Firepower: return new UpgradeCatalog.Effects(0.97f, 1f, 0.90f, 1f, 1.20f, 0.90f);
+                default: return new UpgradeCatalog.Effects(1f, 1f, 1f, 1f, 1f, 1f);
+            }
+        }
+    }
+
     public enum WeaponKind { Mines = 0, FreezeLauncher = 1, MachineGun = 2 }
 
     /// <summary>Purchasable and upgradable weapon modules for secondary and primary slots.</summary>

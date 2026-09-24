@@ -35,16 +35,39 @@ namespace RacingGame
             count = amount;
             path = TrackPath.Instance;
             if (path == null || count <= 0) return;
-            var rng = RaceDirector.Instance.Rng;
             var kinds = new[] { PickupKind.Health, PickupKind.Ammo, PickupKind.Nitro, PickupKind.Item };
-            float usable = path.Length - startExclusion;
             for (int i = 0; i < count; i++)
             {
-                float d = path.Wrap(path.startLineDistance + startExclusion + usable * (i + 0.5f) / count + rng.Range(RngStreams.Stream.Spawn, -15f, 15f));
-                float lane = rng.Range(RngStreams.Stream.Spawn, -maxLaneOffset, maxLaneOffset);
-                path.Pose(d, lane, out var pos, out _);
-                pickups.Add(Pickup.Create(kinds[i % kinds.Length], pos, transform));
+                var kind = kinds[i % kinds.Length];
+                Placement(path, kind, i, count, startExclusion, maxLaneOffset, out float d, out float lane);
+                path.Pose(d, lane, out var pos, out var rot);
+                var pickup = Pickup.Create(kind, pos, transform);
+                pickup.transform.rotation = rot;
+                pickups.Add(pickup);
             }
+        }
+
+        /// <summary>One pickup per sector: repair outside bends, ammo away from the fast line,
+        /// nitro on the approach. Uses the current spline direction, including reverse events.</summary>
+        public static void Placement(TrackPath track, PickupKind kind, int index, int amount,
+            float exclusion, float laneLimit, out float distance, out float lane)
+        {
+            float excluded = Mathf.Clamp(exclusion, 0f, track.Length * 0.25f);
+            float sector = (track.Length - excluded) / Mathf.Max(1, amount);
+            float start = track.startLineDistance + excluded + sector * index;
+            float margin = Mathf.Min(12f, sector * 0.2f);
+            float approach = kind == PickupKind.Nitro ? Mathf.Min(24f, sector * 0.3f) : 0f;
+            float best = start + sector * 0.5f, bend = 0f;
+            for (float d = start + margin + approach; d <= start + sector - margin; d += 3f)
+            {
+                float turn = Vector3.SignedAngle(track.Tangent(d - 6f), track.Tangent(d + 6f), Vector3.up);
+                if (Mathf.Abs(turn) > Mathf.Abs(bend)) { bend = turn; best = d; }
+            }
+            distance = track.Wrap(Mathf.Clamp(best - approach, start + margin, start + sector - margin));
+            float limit = Mathf.Min(Mathf.Abs(laneLimit), Mathf.Max(0f, track.halfWidth - 1.2f));
+            float outside = Mathf.Abs(bend) > 0.1f ? -Mathf.Sign(bend) : (index % 2 == 0 ? -1f : 1f);
+            lane = outside * limit;
+            if (kind == PickupKind.Item) lane = -lane;
         }
 
         private void Update()

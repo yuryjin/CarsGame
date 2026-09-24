@@ -2,10 +2,24 @@ using UnityEngine;
 
 namespace RacingGame
 {
+    public enum RivalRole { Racer, Shooter, Defender }
+
     /// <summary>Personality of one AI driver. Several assets give a field of distinguishable rivals.</summary>
     [CreateAssetMenu(menuName = "Racing/AI Driver Profile", fileName = "AiProfile")]
     public sealed class AiDriverProfile : ScriptableObject
     {
+        public RivalRole role;
+        public string rivalName = "";
+        public Color paint = Color.gray;
+
+        public void Equip(CarWeapons weapons)
+        {
+            weapons.SetPrimaryType(role == RivalRole.Shooter ? PrimaryWeaponType.MachineGun : PrimaryWeaponType.Cannon);
+            weapons.secondaryType = role == RivalRole.Defender ? SecondaryWeaponType.Mines : SecondaryWeaponType.None;
+            weapons.secondaryAmmoMax = role == RivalRole.Defender ? 3 : 0;
+            weapons.RefillSecondaryAmmo();
+        }
+
         [Tooltip("Top speed as a fraction of the car's maxSpeed.")]
         [Range(0.5f, 1.2f)] public float topSpeedFactor = 0.9f;
         [Tooltip("How fast the driver dares to take corners (1 = model estimate).")]

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace RacingGame
 {
@@ -11,7 +12,7 @@ namespace RacingGame
         public Vector2 size = new Vector2(90f, 10f);
         public float heightAboveCar = 1.9f;
 
-        private sealed class Entry { public RaceParticipant P; public RectTransform Rt; public Image Fill; }
+        private sealed class Entry { public RaceParticipant P; public RectTransform Rt; public Image Fill; public TextMeshProUGUI Name; }
         private readonly List<Entry> entries = new List<Entry>();
         private Canvas canvas;
         private RectTransform canvasRt;
@@ -22,6 +23,18 @@ namespace RacingGame
             canvas = UiFactory.CreateOverlayCanvas("WorldBars", -1);
             canvas.transform.SetParent(transform, false);
             canvasRt = canvas.GetComponent<RectTransform>();
+        }
+
+        private void OnEnable()
+        {
+            if (race != null) race.OnFieldSpawned += Rebuild;
+            Loc.LanguageChanged += Rebuild;
+        }
+
+        private void OnDisable()
+        {
+            if (race != null) race.OnFieldSpawned -= Rebuild;
+            Loc.LanguageChanged -= Rebuild;
         }
 
         private void LateUpdate()
@@ -38,6 +51,7 @@ namespace RacingGame
                 bool visible = sp.z > 0f && sp.z < 120f && race.State >= RaceState.Countdown && race.State < RaceState.Finished && !PauseController.IsPaused;
                 e.Rt.gameObject.SetActive(visible);
                 if (!visible) continue;
+                e.Name.gameObject.SetActive(sp.z < 60f);
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRt, sp, null, out Vector2 local);
                 e.Rt.anchoredPosition = local;
                 float t = e.P.Health != null && e.P.Health.maxHealth > 0f ? e.P.Health.Health / e.P.Health.maxHealth : 0f;
@@ -55,13 +69,21 @@ namespace RacingGame
 
         private void Rebuild()
         {
+            if (race == null || canvas == null) return;
             foreach (var e in entries) if (e.Rt != null) Destroy(e.Rt.gameObject);
             entries.Clear();
             foreach (var p in race.Participants)
             {
                 if (p.isPlayer) continue;
                 var bg = UiFactory.Bar(canvas.transform, "Bar_" + p.displayName, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), -size * 0.5f, size * 0.5f, new Color(0.2f, 0.85f, 0.25f), out var fill);
-                entries.Add(new Entry { P = p, Rt = bg.rectTransform, Fill = fill });
+                var name = UiFactory.Text(bg.transform, "RivalName", UiFactory.Escape(HudScreen.GetLocalizedRacerName(p.displayName)),
+                    21f, TextAlignmentOptions.Center, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                    new Vector2(-95f, 4f), new Vector2(95f, 33f));
+                name.fontStyle = FontStyles.Bold;
+                name.raycastTarget = false;
+                var ai = p.GetComponent<AiDriver>();
+                if (ai != null && ai.profile != null) name.color = Color.Lerp(ai.profile.paint, Color.white, 0.45f);
+                entries.Add(new Entry { P = p, Rt = bg.rectTransform, Fill = fill, Name = name });
             }
         }
     }

@@ -16,5 +16,8 @@ MonoBehaviour:
   corneringConfidence: 0.95
   steerNoise: 0.05
   reactionDelay: 0.15
-  aggression: 0.4
+  aggression: 0.45
   baseLane: 1
+  role: 2
+  rivalName: Vega
+  paint: {r: 0.25, g: 0.8, b: 0.35, a: 1}

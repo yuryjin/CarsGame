@@ -29,6 +29,7 @@ namespace RacingGame.Core.Save
                 // version 2 -> 3: weapons and equipped weapon slots
                 data.version = 3;
             }
+            if (data.version == 3) { data.progress ??= new ProgressData(); data.progress.buildPreset = 0; data.version = 4; }
             if (data.version > SaveData.CurrentVersion) { status = SaveParseStatus.NewerVersion; return null; }    // from a newer build: refuse rather than corrupt
             status = SaveParseStatus.Ok;
             data.settings ??= new SettingsData();
@@ -47,9 +48,13 @@ namespace RacingGame.Core.Save
                 System.Array.Copy(data.progress.weapons, w, data.progress.weapons.Length);
                 data.progress.weapons = w;
             }
+            data.progress.buildPreset = Mathf.Clamp(data.progress.buildPreset, 0, 3);
             data.progress.unlockedEvents ??= new System.Collections.Generic.List<string>();
             data.progress.bests ??= new System.Collections.Generic.List<EventBest>();
             data.progress.ledger ??= new System.Collections.Generic.List<DeviceLedger>();
+            data.progress.cosmetics ??= new System.Collections.Generic.List<string>();
+            data.progress.paint ??= ""; data.progress.livery ??= ""; data.progress.stripe ??= "";
+            data.progress.daily ??= new DailyData();
             data.version = SaveData.CurrentVersion;
             return data;
         }

@@ -33,8 +33,9 @@ namespace RacingGame
             go.transform.SetParent(parent, false);
             go.transform.position = position;
             int layer = LayerMask.NameToLayer("Track");
-            var col = go.AddComponent<SphereCollider>();
-            col.isTrigger = true; col.radius = 1.8f;   // forgiving: a pickup grazed by the wing counts
+            var col = go.AddComponent<BoxCollider>();
+            col.isTrigger = true; col.center = Vector3.up;
+            col.size = new Vector3(1.6f, 3f, 3.6f); // long along the road, narrow enough to require choosing a lane
             var p = go.AddComponent<Pickup>();
             p.kind = kind;
             p.BuildVisual();

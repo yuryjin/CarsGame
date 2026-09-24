@@ -48,6 +48,8 @@ namespace RacingGame
         public event Action<CarHealth> OnWreck;
         public event Action<int, int> OnKillRegistered; // (killerId, victimId)
         public event Action OnRespawned;
+        public event Action<HitInfo, HitResult> HitResolved;
+        public int RepairsUsed { get; private set; }
 
         public float Health => currentHealth;
         public bool IsDead { get; private set; }
@@ -155,6 +157,7 @@ namespace RacingGame
                     result.DamageDealt = 0f;
                     result.Fatal = false;
                     result.StatusApplied = false;
+                    HitResolved?.Invoke(hit, result);
                     return result;
                 }
 
@@ -174,6 +177,7 @@ namespace RacingGame
                 {
                     result.Fatal = true;
                     Die(hit.Attacker);
+                    HitResolved?.Invoke(hit, result);
                     return result;
                 }
             }
@@ -194,6 +198,7 @@ namespace RacingGame
                 }
             }
 
+            HitResolved?.Invoke(hit, result);
             return result;
         }
 
@@ -225,7 +230,8 @@ namespace RacingGame
 
         public void Heal(float amount)
         {
-            if (IsDead) return;
+            if (IsDead || amount <= 0f || currentHealth >= maxHealth) return;
+            RepairsUsed++;
             currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
             OnHealthChanged?.Invoke(currentHealth, maxHealth);
         }
@@ -267,6 +273,13 @@ namespace RacingGame
                 director.RegisterKill(killerId, victimId);
                 director.SpawnOilSlick(transform.position);
             }
+        }
+
+        /// <summary>Rewarded "continue" in a one-life race: back on the track now with full HP and the respawn shield.</summary>
+        public void ReviveNow()
+        {
+            if (!IsDead) return;
+            Respawn();
         }
 
         private void Respawn()

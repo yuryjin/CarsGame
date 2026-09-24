@@ -14,6 +14,7 @@ namespace RacingGame
         public int Laps;
         public int Kills;
         public int Deaths;
+        public int RepairsUsed;
     }
 
     public sealed class RaceResults

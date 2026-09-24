@@ -18,12 +18,23 @@ namespace RacingGame
         [Tooltip("Shake scale while the on-screen touch controls are shown (small screens need less).")]
         public float touchScale = 0.6f;
 
+        /// <summary>Current impulse energy (test hook).</summary>
+        public float Energy => energy;
+
         public void AddImpulse(float strength)
         {
             var save = PlatformGlue.Save;
             if (save != null && !save.Data.settings.cameraShake) return;   // accessibility setting
             if (TouchControlsPresenter.IsShown) strength *= touchScale;
             energy = Mathf.Clamp01(energy + strength); seed = Random.value * 100f;
+        }
+
+        /// <summary>Clears all active shake energy immediately.</summary>
+        public void ResetEnergy()
+        {
+            energy = 0f;
+            lastOffset = Vector3.zero;
+            lastRoll = Quaternion.identity;
         }
 
         private void LateUpdate()

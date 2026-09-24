@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using RacingGame.Core.Economy;
 using RacingGame.Core.Platform;
 using RacingGame.World;
+using RacingGame.Core.Daily;
 
 namespace RacingGame
 {
@@ -30,6 +31,14 @@ namespace RacingGame
         /// <summary>Events this race unlocked (for the "Unlocked: …" toast and the Next button).</summary>
         public readonly System.Collections.Generic.List<RaceEventDefinition> LastUnlocked = new System.Collections.Generic.List<RaceEventDefinition>();
         public bool LastRewardDoubled { get; private set; }
+        /// <summary>Daily race: first-finish bonus paid by the last race (0 = none) and the streak after it.</summary>
+        public int LastDailyBonus { get; private set; }
+        public int LastDailyStreak { get; private set; }
+        /// <summary>True while the one-life "continue?" choice is open.</summary>
+        public bool ContinueOpen { get; private set; }
+        private bool continueUsed;
+        private SpeedFx speedFx;
+        private RaceOverlays overlays;
         public bool IsDoublingReward => doubling;
         public event System.Action<FlowState> StateChanged;
 
@@ -58,6 +67,9 @@ namespace RacingGame
             if (GetComponent<DebugBus>() == null) gameObject.AddComponent<DebugBus>();   // QA channel; idle until the page sends a command
             if (GetComponent<OnboardingHints>() == null) gameObject.AddComponent<OnboardingHints>();
             if (GetComponent<PerfectStart>() == null) gameObject.AddComponent<PerfectStart>();
+            speedFx = GetComponent<SpeedFx>() ?? gameObject.AddComponent<SpeedFx>();
+            overlays = GetComponent<RaceOverlays>() ?? gameObject.AddComponent<RaceOverlays>();
+            events = MergeResourceEvents(events);
             track = TrackPath.Instance;
             var map = InputSystem.actions != null ? InputSystem.actions.FindActionMap("Driving") : null;
             pauseAction = map != null ? map.FindAction("Pause") : null;
@@ -68,6 +80,20 @@ namespace RacingGame
         }
 
         private void Start() { EnterMenu(); }
+
+        // Events added after the scene was authored live in Resources/Events; the scene list stays the source for e1–e5.
+        private static RaceEventDefinition[] MergeResourceEvents(RaceEventDefinition[] authored)
+        {
+            var list = new System.Collections.Generic.List<RaceEventDefinition>(authored ?? new RaceEventDefinition[0]);
+            list.RemoveAll(e => e == null);
+            foreach (var e in Resources.LoadAll<RaceEventDefinition>("Events"))
+                if (e != null && !list.Exists(x => x.eventId == e.eventId)) list.Add(e);
+            list.Sort((a, b) => a.order.CompareTo(b.order));
+            return list.ToArray();
+        }
+
+        /// <summary>Today's daily race (built from the date; not part of <see cref="events"/>).</summary>
+        public RaceEventDefinition DailyEvent => DailyRace.TodayEvent(events);
 
         private void OnEnable()
         {
@@ -101,6 +127,10 @@ namespace RacingGame
             if (sky != null) sky.ApplyDefault();
             CarHealth.GlobalDamageMultiplier = 1f;
             if (track != null && track.reversed) { track.reversed = false; track.Build(); }
+            continueUsed = false;
+            ContinueOpen = false;
+            if (speedFx != null) speedFx.SetVisible(false);
+            if (overlays != null) overlays.SetVisible(false);
         }
 
         private void Update()
@@ -139,15 +169,19 @@ namespace RacingGame
             // Look before the field spawns so the first frame of the countdown is already correct.
             if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
 
-            LastReward = 0; LastStarsEarned = 0; LastRewardDoubled = false;
+            LastReward = 0; LastStarsEarned = 0; LastRewardDoubled = false; LastDailyBonus = 0; LastDailyStreak = 0;
+            // The daily race is the same race for everyone that day: AI and weapon streams from the day's seed.
+            if (DailyRace.IsDaily(ev)) { var director = RaceDirector.Current ?? RaceDirector.Instance; if (director != null) director.Reseed(DailyChallenge.For(DailyRace.DayOf(ev)).Seed); }
             LastBestDeltaMs = 0; LastHadPreviousBest = false; LastWasPersonalBest = false; LastUnlocked.Clear();
             if (MenuCameraDirector.Instance != null) MenuCameraDirector.Instance.Activate(false);   // camera hand-over before cars exist
             race.StartRace();
             if (race.State == RaceState.Idle) { EnterMenu(); return; }
-            if (pickups != null) pickups.Spawn(ev != null ? ev.pickupCount : 9);
+            if (pickups != null && (ev == null || ev.mode != EventMode.Arena)) pickups.Spawn(ev != null ? ev.pickupCount : 9);
             if (hud != null) hud.SetVisible(true);
+            if (speedFx != null) speedFx.SetVisible(true);
+            if (overlays != null) overlays.SetVisible(true);
             SetState(FlowState.Racing);
-            SpawnGhosts(ev, generation);
+            if (ev == null || ev.mode != EventMode.Arena) SpawnGhosts(ev, generation);
         }
 
         // ---------- ghosts (async multiplayer) ----------
@@ -223,8 +257,27 @@ namespace RacingGame
             var save = PlatformGlue.Save;
             if (save != null)
             {
-                PlayerProgression.ApplyTo(playerCar, player.Health, playerCar.GetComponent<CarCannon>(), save.Data.progress.upgrades);
+                // Selecting the primary resets its base stats, so upgrades and tuning follow it.
                 PlayerProgression.ApplyWeapons(player.Weapons, save.Data.progress.weapons, save.Data.progress.equippedSecondary, save.Data.progress.equippedPrimary);
+                // A rewarded "try it for one race" level rides on top of the saved levels and is used up here.
+                PlayerProgression.ApplyTo(playerCar, player.Health, playerCar.GetComponent<CarCannon>(), RewardedOffers.ConsumeTrial(save.Data.progress.upgrades),
+                    (Core.Economy.CarBuild)save.Data.progress.buildPreset);
+                PlayerCosmetics.Apply(playerCar.gameObject, save.Data.progress);
+            }
+            else RewardedOffers.ConsumeTrial(null);
+
+            // Brake + steer drifts and charges a boost (player only; the AI keeps the plain brake).
+            playerCar.driftEnabled = true;
+            playerCar.DriftBoosted += OnDriftBoost;
+            var ev = RaceSetup.Event;
+            EventRules.Apply(ev != null ? ev.twist : RaceTwist.None, race);
+            // AI gunners line up a shot before firing, so the target sees the warning; longer on easier tiers.
+            float telegraph = RaceSetup.TierId == "easy" ? 0.55f : RaceSetup.TierId == "hard" ? 0.25f : 0.38f;
+            foreach (var p in race.Participants)
+            {
+                if (p == null || p.isPlayer) continue;
+                var gunner = p.GetComponent<AiGunner>();
+                if (gunner != null) gunner.telegraphSeconds = telegraph;
             }
 
             if (playerCar.GetComponent<PlayerEffects>() == null) playerCar.gameObject.AddComponent<PlayerEffects>();
@@ -235,6 +288,7 @@ namespace RacingGame
             {
                 var health = p.Health; var participant = p;
                 if (health == null) continue;
+                health.HitResolved += (hit, result) => { if (hud != null) hud.ShowCombatHit(participant, hit, result); };
                 float lastHp = health.Health;
                 int hitIndex = 0;
                 health.OnHealthChanged += (cur, max) =>
@@ -271,7 +325,58 @@ namespace RacingGame
             {
                 var killer = attacker != null ? attacker.GetComponent<RaceParticipant>() : null;
                 hud.ShowEvent(killer != null ? Loc.Format("hud.killed_by", "name", killer.displayName) : Loc.Get("hud.wrecked"), DeathColor);
+                if (victim.Health != null && !victim.Health.respawnOnDeath && !race.HasFinished(victim)) OfferContinue(victim);
             }
+        }
+
+        private static readonly Color[] DriftColors = { Color.white, new Color(0.35f, 0.75f, 1f), new Color(1f, 0.65f, 0.15f), new Color(1f, 0.3f, 0.85f) };
+
+        private void OnDriftBoost(int stage, float seconds)
+        {
+            if (hud != null) hud.ShowEvent(Loc.Format("hud.drift_boost", "n", stage), DriftColors[Mathf.Clamp(stage, 0, 3)]);
+            SfxPlayer.Instance.PlayUi(SfxSynth.Go, 0.35f + 0.15f * stage, 1f + 0.1f * stage);
+            var impulse = Camera.main != null ? Camera.main.GetComponent<CameraImpulse>() : null;
+            if (impulse != null) impulse.AddImpulse(0.05f * stage);
+        }
+
+        // ---------- one-life: continue with a rewarded ad, once per race ----------
+        private void OfferContinue(RaceParticipant player)
+        {
+            int generation = raceGeneration;
+            bool canWatch = !continueUsed && RewardedOffers.Available;
+            if (!canWatch || overlays == null)
+            {
+                if (hud != null) hud.ShowEvent(Loc.Get("hud.eliminated"), DeathColor);
+                StartCoroutine(EndAfter(2.5f, generation));
+                return;
+            }
+            ContinueOpen = true;
+            overlays.ShowContinuePrompt(6f, () => WatchToContinue(player, generation), () => GiveUp(generation));
+        }
+
+        private async void WatchToContinue(RaceParticipant player, int generation)
+        {
+            bool Valid() => this != null && generation == raceGeneration && player != null && player.Health != null && player.Health.IsDead
+                            && (race.State == RaceState.Racing || race.State == RaceState.Finishing);
+            bool granted = await RewardedOffers.ShowAsync(() => { continueUsed = true; player.Health.ReviveNow(); }, Valid);
+            if (this == null || generation != raceGeneration) return;
+            ContinueOpen = false;
+            if (overlays != null) overlays.HideContinuePrompt();
+            if (!granted) GiveUp(generation);
+        }
+
+        private void GiveUp(int generation)
+        {
+            if (generation != raceGeneration) return;
+            ContinueOpen = false;
+            if (overlays != null) overlays.HideContinuePrompt();
+            race.EndForPlayerOut();
+        }
+
+        private System.Collections.IEnumerator EndAfter(float seconds, int generation)
+        {
+            yield return new WaitForSecondsRealtime(seconds);
+            if (generation == raceGeneration) race.EndForPlayerOut();
         }
 
         private void OnCountdown(int value)
@@ -325,7 +430,8 @@ namespace RacingGame
             LastRewardFinished = me != null && me.Finished;
 
             int runStars = 0;
-            if (ev != null && me != null)
+            bool daily = DailyRace.IsDaily(ev);
+            if (ev != null && me != null && !daily)   // the daily race has no stars (they count towards the event total)
             {
                 runStars = ev.StarMask(me);
                 LastStarsEarned = runStars;
@@ -362,6 +468,7 @@ namespace RacingGame
                         best.stars |= runStars;
                     }
                     if (me.Finished && me.Position <= 3) UnlockNext(ev, save);
+                    if (daily) RecordDaily(ev, me, save, row);
                 }
                 save.MarkDirty();
             }
@@ -371,6 +478,28 @@ namespace RacingGame
         }
 
         public bool LastRewardFinished { get; private set; }
+
+        /// <summary>Daily race finish: streak, the once-a-day bonus, and pruning of old daily bests.</summary>
+        private void RecordDaily(RaceEventDefinition ev, RaceResultEntry me, Core.Save.SaveService save, Core.Save.DeviceLedger row)
+        {
+            int day = DailyRace.DayOf(ev);
+            var d = save.Data.progress.daily ??= new Core.Save.DailyData();
+            if (me.Finished)
+            {
+                d.streak = DailyChallenge.NextStreak(d.lastFinishDay, d.streak, day);
+                d.lastFinishDay = day;
+                if (d.rewardDay != day)
+                {
+                    LastDailyBonus = DailyChallenge.FirstFinishReward(d.streak);
+                    d.rewardDay = day;
+                    row.coinsEarned += LastDailyBonus;
+                }
+            }
+            LastDailyStreak = d.streak;
+            // Keep a week of daily bests; the board has the rest.
+            save.Data.progress.bests.RemoveAll(b => b != null && b.eventId != null && b.eventId.Length > 1 && b.eventId[0] == 'd' && char.IsDigit(b.eventId[1])
+                && int.TryParse(b.eventId.Substring(1), out int bd) && bd < day - 7);
+        }
 
         private static int[] KillsPerVictim(RaceParticipant player) => player != null ? player.KillTally.ToPerVictimCounts() : null;
 
@@ -391,6 +520,7 @@ namespace RacingGame
             var ordered = new System.Collections.Generic.List<RaceEventDefinition>(events);
             ordered.RemoveAll(e => e == null);
             ordered.Sort((a, b) => a.order.CompareTo(b.order));
+            if (DailyRace.IsDaily(current)) return current;   // "Next" after the daily race is another go at it
             int at = current != null ? ordered.IndexOf(current) : -1;
             for (int i = at + 1; i < ordered.Count; i++) if (IsUnlocked(ordered[i])) return ordered[i];
             return current != null ? current : ordered[0];

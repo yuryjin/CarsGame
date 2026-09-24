@@ -65,14 +65,14 @@ namespace RacingGame.Tests
             string v1Json = "{\"version\":1,\"deviceId\":\"d1\",\"progress\":{\"upgrades\":[1,2,0]}}";
             var data1 = SaveMigrator.Parse(v1Json, out var status1);
             Assert.AreEqual(SaveParseStatus.Ok, status1);
-            Assert.AreEqual(3, data1.version);
+            Assert.AreEqual(SaveData.CurrentVersion, data1.version);
             Assert.AreEqual(3, data1.progress.weapons.Length);
             CollectionAssert.AreEqual(new[] { 1, 2, 0 }, data1.progress.upgrades);
 
             string v2Json = "{\"version\":2,\"deviceId\":\"d2\",\"progress\":{\"upgrades\":[2,1,1]}}";
             var data2 = SaveMigrator.Parse(v2Json, out var status2);
             Assert.AreEqual(SaveParseStatus.Ok, status2);
-            Assert.AreEqual(3, data2.version);
+            Assert.AreEqual(SaveData.CurrentVersion, data2.version);
             Assert.AreEqual(3, data2.progress.weapons.Length);
             CollectionAssert.AreEqual(new[] { 2, 1, 1 }, data2.progress.upgrades);
         }

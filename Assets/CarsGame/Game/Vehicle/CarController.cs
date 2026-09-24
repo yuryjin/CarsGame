@@ -28,6 +28,8 @@ namespace RacingGame
         public float brakeForce = 9000f;
         public float reverseTorque = 3500f;
         public float maxSteerAngle = 32f;
+        [Tooltip("Extra steering authority below 12 m/s, so cars can negotiate the track's tight hairpin.")]
+        public float lowSpeedSteeringBoost = 3f;
         public float steerSpeed = 6f;
         public float grip = 0.85f; // Lateral grip factor
         public float downforce = 60f;
@@ -37,6 +39,16 @@ namespace RacingGame
         [Tooltip("Speed cap (km/h) while on the Ground layer.")]
         public float offTrackMaxSpeedKmh = 70f;
         public Vector3 centerOfMassOffset = new Vector3(0f, -0.4f, 0.1f);
+
+        [Header("Drift (player only)")]
+        [Tooltip("Brake + hard steer at speed slides instead of braking and charges a boost. The AI never sets this.")]
+        public bool driftEnabled;
+        [Tooltip("Lateral grip factor while drifting.")]
+        public float driftGrip = 0.3f;
+        [Tooltip("Extra yaw torque (N·m per m/s) into the drift, so the tail comes round.")]
+        public float driftYawTorque = 130f;
+        [Tooltip("Throttle held during a drift even when auto-throttle lifts for the brake.")]
+        public float driftThrottle = 0.75f;
 
         [Header("Audio (Optional)")]
         public AudioSource engineAudio;
@@ -70,6 +82,15 @@ namespace RacingGame
         private DriveCommand lastCommand;
         private int boostUntilTick = -1;
         private const float BoostSpeedFactor = 1.25f, BoostTorqueFactor = 1.6f;
+        private readonly DriftCharge drift = new DriftCharge();
+
+        public bool IsDrifting => drift.Drifting;
+        /// <summary>0 while not drifting, 1–3 once the charge reaches a boost stage.</summary>
+        public int DriftStage => drift.Drifting ? drift.Stage : 0;
+        /// <summary>0..1 towards the top drift stage (HUD meter).</summary>
+        public float DriftCharge01 => drift.Drifting ? Mathf.Clamp01(drift.Charge / drift.StageCharge[drift.StageCharge.Length - 1]) : 0f;
+        /// <summary>Raised on the tick a drift ends in a boost: stage (1–3) and boost seconds.</summary>
+        public event System.Action<int, float> DriftBoosted;
 
         public bool IsBoosting { get; private set; }
         /// <summary>Nitro: more top speed and torque for a few seconds.</summary>
@@ -97,15 +118,17 @@ namespace RacingGame
             Mathf.Lerp(maxSteerAngle, maxSteerAngle * 0.55f, Mathf.Clamp01(Mathf.Abs(speedKmh) / maxSpeed));
 
         /// <summary>Wheel angle (deg) that holds a steady turn of this curvature (rad/m), ignoring the torque cap.</summary>
-        private float AngleForCurvature(float curvature) =>
-            curvature * rb.inertiaTensor.y * Mathf.Max(0.1f, rb.angularDamping) / 15f;
+        private float SteeringGain(float speedMs) => Mathf.Lerp(Mathf.Max(1f, lowSpeedSteeringBoost), 1f, Mathf.Clamp01(Mathf.Abs(speedMs) / 12f));
+
+        private float AngleForCurvature(float curvature, float speedMs) =>
+            curvature * rb.inertiaTensor.y * Mathf.Max(0.1f, rb.angularDamping) / (15f * SteeringGain(speedMs));
 
         /// <summary>Steering input (-1..1) that holds a steady turn of this signed curvature (rad/m, +right).</summary>
         public float SteerForCurvature(float curvature, float speedMs)
         {
             if (rb == null) return 0f;
             float max = EffectiveMaxSteer(speedMs * 3.6f);
-            float angle = AngleForCurvature(curvature);
+            float angle = AngleForCurvature(curvature, speedMs);
             // Above the torque cap the same yaw needs more angle than the cap lets through: saturate.
             float capSpeed = speedMs > 0.5f ? 20f * max / Mathf.Max(0.01f, Mathf.Abs(angle)) : float.MaxValue;
             if (speedMs > capSpeed) angle = Mathf.Sign(angle) * max;
@@ -118,11 +141,11 @@ namespace RacingGame
             if (rb == null) return maxSpeed / 3.6f;
             float k = Mathf.Abs(curvature);
             if (k < 1e-4f) return maxSpeed / 3.6f;
-            float angle = AngleForCurvature(k);
             float top = maxSpeed / 3.6f;
             for (float v = top; v > 3f; v -= 0.5f)
             {
                 float max = EffectiveMaxSteer(v * 3.6f);
+                float angle = AngleForCurvature(k, v);
                 // Needs the angle within reach and the torque (angle · v/8) under the cap.
                 if (angle <= max && angle * v / 8f <= 2.5f * max) return v;
             }
@@ -275,13 +298,14 @@ namespace RacingGame
 
             GroundQuery();
             CalculateSpeed();
+            if (driftEnabled) StepDrift(); else if (drift.Drifting) drift.Cancel();
             SideSlipSpeed = rb != null ? Mathf.Abs(Vector3.Dot(rb.linearVelocity, transform.right)) : 0f;
             ApplyMotor();
             ApplySteering();
             ApplyFriction();
             ApplyDownforce();
 
-            if (cannon != null)
+            if (cannon != null && !cannon.locked)   // locked by the mines-only rule
             {
                 cannon.SetWantsFire(command.Fire);
                 cannon.SimulationStep(tick);
@@ -300,6 +324,18 @@ namespace RacingGame
                 lastGroundedPos = transform.position + Vector3.up * 0.5f;
                 lastGroundedRot = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
             }
+        }
+
+        // The brake becomes the drift button: while drifting the car keeps its throttle and slides on low grip
+        // with extra yaw into the turn; releasing the brake fires the charged boost.
+        private void StepDrift()
+        {
+            int stage = drift.Stage;
+            float boost = drift.Step(isBraking, steerInput, rb.linearVelocity.magnitude, isGrounded, Time.fixedDeltaTime);
+            if (boost > 0f) { ApplyBoost(boost); IsBoosting = true; DriftBoosted?.Invoke(stage, boost); }
+            if (!drift.Drifting) return;
+            isBraking = false;
+            if (moveInput < driftThrottle) moveInput = driftThrottle;
         }
 
         public void ApplyCommand(in DriveCommand command)
@@ -419,7 +455,14 @@ namespace RacingGame
                 float direction = Vector3.Dot(rb.linearVelocity, transform.forward) >= 0 ? 1f : -1f;
                 float turnTorque = currentSteerAngle * direction * (speedMagnitude / 8f);
                 turnTorque = Mathf.Clamp(turnTorque, -effectiveMaxSteer * 2.5f, effectiveMaxSteer * 2.5f);
-                rb.AddTorque(Vector3.up * (turnTorque * 120f), ForceMode.Force);
+                rb.AddTorque(Vector3.up * (turnTorque * 120f * SteeringGain(speedMagnitude)), ForceMode.Force);
+                if (drift.Drifting)
+                {
+                    // Hold a slide angle of ~30°: push the tail out below it, stop pushing beyond it.
+                    float slip = Vector3.SignedAngle(transform.forward, new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z), Vector3.up) * -drift.Direction;
+                    float want = Mathf.Clamp01((32f - slip) / 20f);
+                    rb.AddTorque(Vector3.up * (drift.Direction * driftYawTorque * speedMagnitude * want), ForceMode.Force);
+                }
             }
         }
 
@@ -430,7 +473,7 @@ namespace RacingGame
             // Cancel lateral slide to simulate tire grip
             Vector3 sideVelocity = Vector3.Dot(rb.linearVelocity, transform.right) * transform.right;
             float statusGripMul = status != null ? status.GripMultiplier : 1f;
-            float currentGrip = (isBraking ? grip * 0.4f : grip) * statusGripMul;
+            float currentGrip = (drift.Drifting ? grip * driftGrip : isBraking ? grip * 0.4f : grip) * statusGripMul;
             Vector3 lateralFrictionForce = -sideVelocity * (rb.mass * 8f * currentGrip);
             rb.AddForce(lateralFrictionForce * Time.fixedDeltaTime, ForceMode.Impulse);
         }
@@ -489,6 +532,7 @@ namespace RacingGame
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             currentSteerAngle = 0f;
+            drift.Cancel();
             transform.SetPositionAndRotation(position, rotation);
             rb.position = position;
             rb.rotation = rotation;

@@ -289,7 +289,7 @@ namespace RacingGame
             for (int i = 0; i < list.Count; i++)
             {
                 var ev = list[i]; bool unlocked = flow.IsUnlocked(ev);
-                var row = Item(content, ev.eventId, Narrow ? 210f : 176f);
+                var row = Item(content, ev.eventId, Narrow ? 310f : 270f);
                 Label(row, "Number", (i + 1).ToString("00"), 52f, Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(116f, -24f), unlocked ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
                 Label(row, "Name", Loc.Get(ev.nameKey), 34f, Top, Vector2.one, new Vector2(144f, -60f), new Vector2(-236f, -12f)).fontStyle = FontStyles.Bold;
                 int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[tierIndex].aiCount : 3;
@@ -300,8 +300,8 @@ namespace RacingGame
                 string s1 = (starMask & 1) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
                 string s2 = (starMask & 2) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
                 string s3 = (starMask & 4) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
-                string starDisplay = $"{s1} {s2} {s3}";
-                Label(row, "Stars", starDisplay, 26f, Top, Vector2.one, new Vector2(144f, -136f), new Vector2(-236f, -98f));
+                string starDisplay = s1 + " " + StarGoalText.Description(ev, 0) + "\n" + s2 + " " + StarGoalText.Description(ev, 1) + "\n" + s3 + " " + StarGoalText.Description(ev, 2);
+                Label(row, "Stars", starDisplay, 22f, Top, Vector2.one, new Vector2(144f, -222f), new Vector2(-236f, -98f));
                 string status = unlocked ? best != null && best.bestTimeMs > 0 ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) : "" : Loc.Get("events.locked");
                 Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 64f : 44f), unlocked ? UiFactory.Positive : UiFactory.Muted);
                 UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—", unlocked ? () => flow.StartRace(ev, tiers.Length > 0 ? tiers[tierIndex] : null) : null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-216f, -36f), new Vector2(-24f, 36f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
@@ -312,6 +312,25 @@ namespace RacingGame
         {
             var content = UiFactory.Scroll(Header(root, "garage.title"), "GarageScroll", Vector2.zero, Vector2.zero);
             var save = PlatformGlue.Save;
+
+            Section(content, "BuildsTitle", Loc.Get("garage.builds"));
+            foreach (var build in new[] { CarBuild.Balanced, CarBuild.Speed, CarBuild.Survival, CarBuild.Firepower })
+            {
+                string key = "build." + build.ToString().ToLowerInvariant();
+                bool selected = save != null && save.Data.progress.buildPreset == (int)build;
+                var row = Item(content, "Build_" + build, Narrow ? 190f : 150f);
+                Label(row, "Name", Loc.Get(key), 30f, Top, Vector2.one, new Vector2(30f, -55f), new Vector2(-270f, -12f)).fontStyle = FontStyles.Bold;
+                Label(row, "Tradeoff", Loc.Get(key + ".desc"), 23f, Vector2.zero, Vector2.one, new Vector2(30f, 12f), new Vector2(-270f, -60f), UiFactory.Muted);
+                UiFactory.Button(row, "Select_" + build, Loc.Get(selected ? "garage.equipped" : "garage.equip"),
+                    selected || save == null ? null : () => SelectBuild(build), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f),
+                    new Vector2(-245f, -34f), new Vector2(-24f, 34f), 25f, selected ? UiFactory.Positive : UiFactory.Accent);
+            }
+            var loadout = Item(content, "Loadout", 92f, false);
+            string primary = Loc.Get(save?.Data.progress.equippedPrimary == 1 ? "garage.machinegun" : "garage.cannon");
+            int secondary = save != null ? save.Data.progress.equippedSecondary : 0;
+            string secondaryName = Loc.Get(secondary == 1 ? "garage.mines" : secondary == 2 ? "garage.freezelauncher" : "build.none");
+            Label(loadout, "Current", Loc.Format("build.loadout", "primary", primary, "secondary", secondaryName) + "\n" + Loc.Get("build.owned_only"),
+                23f, Vector2.zero, Vector2.one, new Vector2(20f, 6f), new Vector2(-20f, -6f), UiFactory.Muted);
 
             Section(content, "UpgradesTitle", Loc.Get("garage.upgrades"));
             foreach (var kind in new[] { UpgradeKind.Engine, UpgradeKind.Armor, UpgradeKind.Cannon })
@@ -366,10 +385,21 @@ namespace RacingGame
                 if (!maxed && !affordable) Label(row, "Reason", Loc.Get("garage.not_enough"), 20f, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-400f, -82f), new Vector2(-220f, -32f), UiFactory.Muted, TextAlignmentOptions.Center);
 
                 // Equip button
-                string equipLabel = isEquipped ? Loc.Get("garage.equipped") : Loc.Get("garage.equip");
-                Action equipAction = unlocked && !isEquipped ? () => EquipWeapon(kind) : null;
+                string equipLabel = isEquipped ? Loc.Get(kind == WeaponKind.MachineGun ? "build.use_cannon" : "garage.equipped") : Loc.Get("garage.equip");
+                Action equipAction = unlocked && (!isEquipped || kind == WeaponKind.MachineGun) ? () => EquipWeapon(kind) : null;
                 UiFactory.Button(row, "Equip_" + key, equipLabel, equipAction, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-200f, -25f), new Vector2(-20f, 55f), 26f, isEquipped ? UiFactory.Positive : unlocked ? UiFactory.Accent : UiFactory.Raised);
             }
+        }
+
+        public bool SelectBuild(CarBuild build)
+        {
+            var save = PlatformGlue.Save;
+            if (save == null || (int)build < 0 || (int)build > 3) return false;
+            PlayerProgression.SelectBuild(save.Data.progress, build);
+            save.MarkDirty();
+            SfxPlayer.Instance.PlayUi(SfxSynth.Beep);
+            Show("garage");
+            return true;
         }
 
         public bool Buy(UpgradeKind kind)
@@ -593,7 +623,6 @@ namespace RacingGame
             var bestEntry = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == (flow.CurrentEvent != null ? flow.CurrentEvent.eventId : ""));
             int totalEventStars = bestEntry != null ? bestEntry.stars : currentStars;
 
-            string[] starKeys = { "events.star1", "events.star2", "events.star3" };
             for (int s = 0; s < 3; s++)
             {
                 int bit = 1 << s;
@@ -606,14 +635,14 @@ namespace RacingGame
                     float bottom = 10f + (2 - s) * 38f;
                     var starRow = UiFactory.Panel(starsCard, "Star" + s, Vector2.zero, new Vector2(1f, 0f), new Vector2(24f, bottom), new Vector2(-24f, bottom + 36f), Color.clear, false);
                     Label(starRow, "StarIcon", starIcon, 24f, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(28f, 0f), null, TextAlignmentOptions.MidlineLeft);
-                    Label(starRow, "StarDesc", Loc.Get(starKeys[s]), 19f, new Vector2(0f, 0f), Vector2.one, new Vector2(32f, 0f), Vector2.zero, wonOverall ? Color.white : UiFactory.Muted, TextAlignmentOptions.MidlineLeft);
+                    Label(starRow, "StarDesc", StarGoalText.Description(flow.CurrentEvent, s), 19f, new Vector2(0f, 0f), Vector2.one, new Vector2(32f, 0f), Vector2.zero, wonOverall ? Color.white : UiFactory.Muted, TextAlignmentOptions.MidlineLeft);
                 }
                 else
                 {
                     float xMin = s / 3f, xMax = (s + 1f) / 3f;
                     var starCol = UiFactory.Panel(starsCard, "Star" + s, new Vector2(xMin, 0f), new Vector2(xMax, 1f), new Vector2(24f, 8f), new Vector2(-12f, -40f), Color.clear, false);
                     Label(starCol, "StarIcon", starIcon, 26f, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(30f, 0f), null, TextAlignmentOptions.MidlineLeft);
-                    Label(starCol, "StarDesc", Loc.Get(starKeys[s]), 19f, new Vector2(0f, 0f), Vector2.one, new Vector2(32f, 0f), Vector2.zero, wonOverall ? Color.white : UiFactory.Muted, TextAlignmentOptions.MidlineLeft);
+                    Label(starCol, "StarDesc", StarGoalText.Description(flow.CurrentEvent, s), 19f, new Vector2(0f, 0f), Vector2.one, new Vector2(32f, 0f), Vector2.zero, wonOverall ? Color.white : UiFactory.Muted, TextAlignmentOptions.MidlineLeft);
                 }
             }
             var actions = Item(content, "Actions", 76f, false);

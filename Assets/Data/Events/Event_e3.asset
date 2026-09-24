@@ -23,3 +23,5 @@ MonoBehaviour:
   pickupCount: 16
   unlockAfterEventId: e2
   order: 2
+  finishGoal: 1
+  targetSeconds: 180

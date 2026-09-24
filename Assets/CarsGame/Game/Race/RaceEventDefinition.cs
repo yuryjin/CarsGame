@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace RacingGame
 {
+    public enum FinishGoal { NoDeaths, WinWithoutRepair, BeatTime }
+
     public enum EventMode { Race, Arena }
 
     /// <summary>One entry of the race-select screen. Rules vary per event so the single track stays fresh.</summary>
@@ -10,6 +12,8 @@ namespace RacingGame
     {
         public string eventId = "e1";
         public EventMode mode;
+        [Tooltip("Match duration in seconds for Arena mode.")]
+        public float matchDuration = 75f;
         [Tooltip("Localization key of the display name.")]
         public string nameKey = "events.e1.name";
         [Range(1, 20)] public int laps = 3;
@@ -31,19 +35,26 @@ namespace RacingGame
         public int star2TargetKills = 2;
         [Tooltip("Require 0 deaths for Star 3.")]
         public bool star3ZeroDeaths = true;
+        public FinishGoal finishGoal;
+        [Tooltip("Rule twist (mines only, one life …) applied to the cars when the race starts.")]
+        public RacingGame.Core.Daily.RaceTwist twist;
+        [Min(1f)] public float targetSeconds = 210f;
 
         public int StarMask(RaceResultEntry me)
         {
             if (me == null) return 0;
-            return StarMask(me.Finished, me.Position, me.Kills, me.Deaths);
+            return StarMask(me.Finished, me.Position, me.Kills, me.Deaths, me.RepairsUsed, me.TotalTime);
         }
 
-        public int StarMask(bool finished, int position, int kills, int deaths)
+        public int StarMask(bool finished, int position, int kills, int deaths, int repairsUsed = 0, double totalTime = double.PositiveInfinity)
         {
             int mask = 0;
             if (finished && position <= (star1TargetPosition > 0 ? star1TargetPosition : 3)) mask |= 1;
             if (kills >= (star2TargetKills > 0 ? star2TargetKills : 2)) mask |= 2;
-            if (finished && (!star3ZeroDeaths || deaths == 0)) mask |= 4;
+            bool goalMet = finishGoal == FinishGoal.WinWithoutRepair ? position == 1 && repairsUsed == 0
+                : finishGoal == FinishGoal.BeatTime ? totalTime > 0 && totalTime <= targetSeconds
+                : !star3ZeroDeaths || deaths == 0;
+            if (finished && goalMet) mask |= 4;
             return mask;
         }
 

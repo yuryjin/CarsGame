@@ -18,3 +18,6 @@ MonoBehaviour:
   reactionDelay: 0.25
   aggression: 0.2
   baseLane: -1
+  role: 2
+  rivalName: Bolt
+  paint: {r: 0.65, g: 0.35, b: 0.85, a: 1}

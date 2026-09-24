@@ -21,11 +21,11 @@ namespace RacingGame
         [Tooltip("Comfortable braking deceleration used to plan corner entry (m/s^2).")]
         public float plannedDeceleration = 6f;
         [Tooltip("Use TrackPath.Profile (local curvature + braking pass) for speed and the racing line instead of the averaged-curvature estimate.")]
-        public bool useSpeedProfile = false;
+        public bool useSpeedProfile = true;
         [Tooltip("How far the racing line pulls the driver (0 = keep the spawn lane).")]
-        [Range(0f, 1f)] public float racingLineWeight = 1f;
+        [Range(0f, 1f)] public float racingLineWeight = 0f;
         [Tooltip("Lanes stop this far inside the road edge (m): room for lane-tracking error before the barriers.")]
-        public float laneEdgeMargin = 2.2f;
+        public float laneEdgeMargin = 3.1f;
         [Tooltip("Side slip (m/s) above which the steering is limited so a bump does not turn into a full-lock spin.")]
         public float slideSteerSlip = 2.5f;
         [Range(0.2f, 1f)] public float slideSteerLimit = 0.45f;
@@ -35,6 +35,8 @@ namespace RacingGame
         [Range(0.5f, 1f)] public float cornerSpeedMargin = 0.85f;
         [Tooltip("Steering per metre of lateral error from the lane (the pursuit term alone corrects a 3 m error with ~0.17).")]
         public float lateralErrorGain = 0.08f;
+        [Tooltip("Steering damping per m/s across the track, to prevent overshooting the lane.")]
+        public float lateralVelocityGain = 0.08f;
 
         [Header("Telemetry")]
         [SerializeField] private float offTrackTime;
@@ -63,6 +65,7 @@ namespace RacingGame
         private float homeLane;
         private float clearTime;
         private int passDirection;      // -1 left, +1 right, 0 none (latched until the pass resolves)
+        private float trafficSpeedKmh;
         private bool boxedIn;           // blocked ahead with no free side: hold the lane and brake
         private float stuckTime, reverseTime, overturnedTime;
         private bool reversing;
@@ -92,7 +95,9 @@ namespace RacingGame
         private void OnTeleported()
         {
             reversing = false; stuckTime = reverseTime = overturnedTime = 0f;
-            passDirection = 0; boxedIn = false;
+            passDirection = 0; boxedIn = false; clearTime = 0f;
+            if (path != null && progress != null)
+                currentLane = targetLane = path.Spline.LateralOffset(transform.position, progress.Distance);
             if (delayBuffer != null) System.Array.Clear(delayBuffer, 0, delayBuffer.Length);
             delayHead = 0;
         }
@@ -140,6 +145,10 @@ namespace RacingGame
             delayHead = (delayHead + 1) % delayBuffer.Length;
             // Edges must not be lost or duplicated by the delay line.
             delayed.ResetEdge = cmd.ResetEdge;
+            // Reaction delay belongs to tactical decisions. Delaying closed-loop steering
+            // makes high-latency profiles oscillate across the road instead of holding a lane.
+            delayed.Steer = cmd.Steer;
+            if (reversing || cmd.ResetEdge) return cmd;
             if (delayed.Tick == 0) return DriveCommand.None(tick);
             delayed.Tick = tick;
             return delayed;
@@ -187,8 +196,9 @@ namespace RacingGame
             float expectedYaw = speedMs * kappa * Mathf.Rad2Deg;
             // Lateral error from the lane, straight: the pursuit angle shrinks it by the lookahead distance.
             float lateral = path.Spline.LateralOffset(transform.position, d);
-            float lateralTerm = Mathf.Clamp((currentLane - lateral) * lateralErrorGain, -0.4f, 0.4f);
-            float steer = Mathf.Clamp(feedForward + lateralTerm + turnAngle / 35f * gain - (yawRate - expectedYaw) / 180f * 0.6f + noise * P.steerNoise, -1f, 1f);
+            float lateralVelocity = body != null ? Vector3.Dot(body.linearVelocity, path.Right(d)) : 0f;
+            float lateralTerm = Mathf.Clamp((currentLane - lateral) * lateralErrorGain - lateralVelocity * lateralVelocityGain, -0.6f, 0.6f);
+            float steer = Mathf.Clamp(feedForward + lateralTerm + turnAngle / 35f * gain - (yawRate - expectedYaw) / 90f * 1.2f + noise * P.steerNoise, -1f, 1f);
             // Knocked sideways (usually by another car): full lock whips the car across the road into the far
             // barrier, so while sliding steer gently and let the grip catch it.
             float slip = body != null ? Mathf.Abs(Vector3.Dot(body.linearVelocity, transform.right)) : 0f;
@@ -227,16 +237,17 @@ namespace RacingGame
             LastSideSlip = sideSlip;
 
             // Boxed in (car ahead, both sides taken): match its pace instead of ramming through.
-            if (boxedIn) desired = Mathf.Min(desired, Mathf.Max(20f, speedKmh - 8f));
+            if (boxedIn) desired = Mathf.Min(desired, trafficSpeedKmh);
+            if (car.Surface == GroundSurface.Ground) desired = Mathf.Min(desired, car.offTrackMaxSpeedKmh);
             LastDesiredSpeed = desired; LastCurvature = curvature;
 
             float throttle;
             bool brake = false;
-            if (speedKmh > desired + 5f) { throttle = 0f; brake = true; }
+            // Negative throttle brakes without the handbrake's 60% grip loss.
+            if (speedKmh > desired + 5f) throttle = -1f;
             else if (speedKmh > desired) throttle = 0f;
             else throttle = 1f;
             if (sideSlip > 3f) throttle = Mathf.Min(throttle, 0f);
-            if (sideSlip > 5f) brake = true;
 
             // Start ramp so the grid does not pile into itself.
             throttle *= Mathf.Min(1f, 0.5f + ticksSinceEnable / 75f);
@@ -254,13 +265,13 @@ namespace RacingGame
             // "Stuck" means no progress along the track, not zero speed: a car pinned against a barrier
             // keeps bouncing at a few m/s and would otherwise grind there until it is wrecked.
             float along = progress.SpeedAlongTrack;
-            if (along < 1f && throttle > 0.5f && ticksSinceEnable > 100) stuckTime += dt; else if (along > 2f) stuckTime = 0f;
+            if (along < 1f && ticksSinceEnable > 100 && !car.Status.IsFrozen) stuckTime += dt; else if (along > 2f) stuckTime = 0f;
             if (!reversing && stuckTime > 2.5f) { reversing = true; reverseTime = 0f; }
             if (reversing)
             {
                 reverseTime += dt;
                 throttle = -1f; brake = false; steer = -steer;
-                if (reverseTime > 1.2f) { reversing = false; stuckTime = Mathf.Max(0f, stuckTime - 1.5f); }
+                if (reverseTime > 1.2f) reversing = false; // only forward progress clears the recovery deadline
             }
             if (stuckTime > 6f) { reset = true; stuckTime = 0f; reversing = false; resetCount++; }
 
@@ -298,6 +309,7 @@ namespace RacingGame
             {
                 var otherBody = centreHit.rigidbody;
                 float otherSpeed = otherBody != null ? Vector3.Dot(otherBody.linearVelocity, transform.forward) : 0f;
+                trafficSpeedKmh = Mathf.Max(0f, otherSpeed * 3.6f - 3f);
                 blocked = otherSpeed < speedMs - 0.5f || speedMs < 2f;
             }
 

@@ -16,5 +16,8 @@ MonoBehaviour:
   corneringConfidence: 1
   steerNoise: 0.03
   reactionDelay: 0.1
-  aggression: 0.6
+  aggression: 0.9
   baseLane: 0
+  role: 1
+  rivalName: Rex
+  paint: {r: 0.95, g: 0.55, b: 0.1, a: 1}

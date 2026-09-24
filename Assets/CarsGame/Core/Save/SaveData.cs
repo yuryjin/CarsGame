@@ -40,6 +40,14 @@ namespace RacingGame.Core.Save
         public double distanceKm;
     }
 
+    /// <summary>Daily race: streak and the day whose first-finish bonus was already paid. Days are UTC day indices.</summary>
+    [Serializable] public class DailyData
+    {
+        public int lastFinishDay = int.MinValue;
+        public int streak;
+        public int rewardDay = int.MinValue;
+    }
+
     [Serializable] public class ProgressData
     {
         public List<DeviceLedger> ledger = new List<DeviceLedger>();
@@ -47,14 +55,22 @@ namespace RacingGame.Core.Save
         public int[] weapons = new int[3];
         public int equippedSecondary = 0;
         public int equippedPrimary = 0;
+        public int buildPreset; // CarBuild; zero preserves the handling of old saves
         public List<string> unlockedEvents = new List<string>();
         public List<EventBest> bests = new List<EventBest>();
+        /// <summary>Owned cosmetics as "paint:id" / "livery:id" (free ones are implicit).</summary>
+        public List<string> cosmetics = new List<string>();
+        public string paint = "";
+        public string livery = "";
+        /// <summary>Stripe colour as a paint id; "" = automatic contrast.</summary>
+        public string stripe = "";
+        public DailyData daily = new DailyData();
     }
 
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 3;
+        public const int CurrentVersion = 4;
         public int version = CurrentVersion;
         public long updatedAtUnixMs;
         public string deviceId = "";

@@ -43,6 +43,17 @@ namespace RacingGame.Core.Save
 
             m.progress.equippedSecondary = newer.progress.equippedSecondary;
             m.progress.equippedPrimary = newer.progress.equippedPrimary;
+            m.progress.buildPreset = Math.Clamp(newer.progress.buildPreset, 0, 3);
+
+            // Cosmetics: owned items are a union (a purchase is never lost); the selection follows the newer blob.
+            var owned = new HashSet<string>(a.progress.cosmetics ?? new List<string>());
+            foreach (var c in b.progress.cosmetics ?? new List<string>()) owned.Add(c);
+            m.progress.cosmetics = new List<string>(owned);
+            m.progress.cosmetics.Sort(StringComparer.Ordinal);
+            m.progress.paint = newer.progress.paint ?? "";
+            m.progress.livery = newer.progress.livery ?? "";
+            m.progress.stripe = newer.progress.stripe ?? "";
+            m.progress.daily = MergeDaily(a.progress.daily, b.progress.daily);
 
             var unlocked = new HashSet<string>(a.progress.unlockedEvents ?? new List<string>());
             foreach (var u in b.progress.unlockedEvents ?? new List<string>()) unlocked.Add(u);
@@ -56,6 +67,15 @@ namespace RacingGame.Core.Save
             m.progress.bests.Sort((x, y) => string.CompareOrdinal(x.eventId, y.eventId));
 
             return m;
+        }
+
+        // The streak belongs to the most recent finish day (a device that raced later knows the longer or reset
+        // streak); the paid-bonus day only moves forward, so the daily bonus is paid once across devices.
+        private static DailyData MergeDaily(DailyData a, DailyData b)
+        {
+            a ??= new DailyData(); b ??= new DailyData();
+            var later = a.lastFinishDay > b.lastFinishDay ? a : b.lastFinishDay > a.lastFinishDay ? b : (a.streak >= b.streak ? a : b);
+            return new DailyData { lastFinishDay = later.lastFinishDay, streak = later.streak, rewardDay = Math.Max(a.rewardDay, b.rewardDay) };
         }
 
         private static void MergeRow(Dictionary<string, DeviceLedger> rows, DeviceLedger r)

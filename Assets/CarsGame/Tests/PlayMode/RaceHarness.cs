@@ -55,6 +55,7 @@ namespace RacingGame.Tests
             public string name; public bool player, finished;
             public int laps, deaths, kills, autoResets, aiResets, wallImpacts;
             public float offTrackSeconds, worstImpact, maxLateral, finishSeconds;
+            public float distance, speed, desiredSpeed, stuckSeconds; public int nextGate;
             public float[] lapSeconds; public float[] impactAt;
         }
         [Serializable] public class Report
@@ -168,7 +169,9 @@ namespace RacingGame.Tests
                     laps = p.Progress.LapsCompleted, deaths = p.Deaths, kills = p.Kills, autoResets = p.AutoResets,
                     aiResets = ai != null ? ai.ResetCount : 0, wallImpacts = wc != null ? wc.Impacts : 0,
                     worstImpact = wc != null ? wc.WorstSpeed : 0f, impactAt = wc != null ? wc.ImpactDistances.ToArray() : new float[0],
-                    offTrackSeconds = off[p], maxLateral = maxLat[p], lapSeconds = lapsSec
+                    offTrackSeconds = off[p], maxLateral = maxLat[p], lapSeconds = lapsSec,
+                    distance = p.Progress.Distance, speed = p.Car.SpeedKmh, nextGate = p.Progress.GatesPassedThisLap,
+                    desiredSpeed = ai != null ? ai.LastDesiredSpeed : 0f, stuckSeconds = ai != null ? ai.StuckTime : 0f
                 });
             }
             report.cars = cars.ToArray();

@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using RacingGame.Core.Combat;
 using RacingGame.Core.Platform;
+using RacingGame.Core.Sim;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
@@ -25,12 +28,18 @@ namespace RacingGame
         private CarStatus playerStatus;
         private CarWeapons playerWeapons;
         private float hitMarkerUntil;
+        private RectTransform goalsPanel;
+        private TextMeshProUGUI goalsText, combatText, incomingArrow, incomingText;
+        private readonly RaceResultEntry goalEntry = new RaceResultEntry();
+        private float nextGoalRefresh, incomingUntil;
+        private Vector3 incomingSource;
+
         private Image hpFill, hpTrail, hpIcon;
         private Sprite healthFillSprite;
         private RectTransform speedPanel, healthPanel, hintPanel, ammoPanel, secondaryPanel, statusPanel, eventPanel, centerPanel, pauseButton;
         private TextMeshProUGUI secondaryText, statusText;
         private string lastStatusStr;
-        private bool lastStatusShield, lastStatusFrozen, lastStatusJammed, lastStatusPunctured;
+        private bool lastStatusShield, lastStatusFrozen, lastStatusJammed, lastStatusPunctured, lastStatusSlowed;
         private int lastSecondaryAmmo = -1;
         private bool lastSecondaryReady;
         private SecondaryWeaponType lastSecondaryType = SecondaryWeaponType.None;
@@ -77,6 +86,25 @@ namespace RacingGame
         }
         private readonly ThreatMarkerWidget[] threatMarkers = new ThreatMarkerWidget[8];
 
+        [Header("Kill Feed")]
+        private readonly KillFeedBuffer killFeedBuffer = new KillFeedBuffer();
+        private RectTransform killFeedPanel;
+        private readonly RectTransform[] killFeedRows = new RectTransform[KillFeedBuffer.MaxEntries];
+        private readonly TextMeshProUGUI[] killFeedTexts = new TextMeshProUGUI[KillFeedBuffer.MaxEntries];
+        private readonly Image[] killFeedBgs = new Image[KillFeedBuffer.MaxEntries];
+        private bool killFeedNamesCached;
+        private static readonly Color HitmarkerNormalColor = new Color(1f, 0.35f, 0.2f);
+        private static readonly Color HitmarkerKillColor = new Color(1f, 0.12f, 0.12f);
+
+        [Header("Status Indicators")]
+        private readonly StatusIndicatorWidget[] statusIndicators = new StatusIndicatorWidget[5];
+
+        /// <summary>Dedicated status indicator widgets for active vehicle effects (test hook).</summary>
+        public IReadOnlyList<StatusIndicatorWidget> StatusIndicators => statusIndicators;
+
+        /// <summary>Access to the kill feed ring buffer (test hook).</summary>
+        public KillFeedBuffer KillFeed => killFeedBuffer;
+
         /// <summary>Last text shown by <see cref="ShowEvent"/> (test hook).</summary>
         public string LastEvent { get; private set; }
         public bool LowHealthWarning { get; private set; }
@@ -113,6 +141,12 @@ namespace RacingGame
             PauseController.PausedChanged += OnPaused;
             TouchControlsPresenter.ShownChanged += OnTouchShown;
             if (touchLayout != TouchControlsPresenter.IsShown) OnTouchShown(TouchControlsPresenter.IsShown);
+            var director = RaceDirector.Current != null ? RaceDirector.Current : RaceDirector.Instance;
+            if (director != null)
+            {
+                director.OnKillRegistered -= OnKillRegistered;
+                director.OnKillRegistered += OnKillRegistered;
+            }
         }
 
         private void OnDisable()
@@ -128,8 +162,7 @@ namespace RacingGame
             var director = RaceDirector.Current;
             if (director != null)
             {
-                director.ShellHit -= OnShellHit;
-                director.MineHit -= OnMineHit;
+                director.OnKillRegistered -= OnKillRegistered;
             }
         }
 
@@ -160,12 +193,10 @@ namespace RacingGame
             secondaryText.enableAutoSizing = true; secondaryText.fontSizeMin = 16f; secondaryText.fontSizeMax = 24f;
             secondaryPanel.gameObject.SetActive(false);
 
-            statusPanel = UiFactory.Card(root, "StatusPanel", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 250f), new Vector2(-30f, 298f), HudPanelAlpha);
-            statusText = UiFactory.Text(statusPanel, "Status", "", 22f, TextAlignmentOptions.MidlineRight, Vector2.zero, Vector2.one, new Vector2(18f, 4f), new Vector2(-18f, -4f), UiFactory.Accent);
-            statusText.enableAutoSizing = true; statusText.fontSizeMin = 14f; statusText.fontSizeMax = 22f;
-            statusPanel.gameObject.SetActive(false);
+            BuildStatusPanel(root);
             BuildReticle(root);
             BuildThreatMarkers(root);
+            BuildKillFeed(root);
             eventPanel = UiFactory.Card(root, "EventPanel", new Vector2(0.5f, 0.7f), new Vector2(0.5f, 0.7f), new Vector2(-340f, -40f), new Vector2(340f, 40f));
             eventText = UiFactory.Text(eventPanel, "Event", "", 36f, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, new Vector2(24f, 10f), new Vector2(-24f, -10f), UiFactory.Accent);
             eventText.enableAutoSizing = true; eventText.fontSizeMin = 22f; eventText.fontSizeMax = 36f;
@@ -177,8 +208,21 @@ namespace RacingGame
             lowHpEdges[2] = UiFactory.Panel(root, "LowHpT", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -16f), Vector2.zero, red, roundedCorners: false).GetComponent<Image>();
             lowHpEdges[3] = UiFactory.Panel(root, "LowHpB", new Vector2(0f, 0f), new Vector2(1f, 0f), Vector2.zero, new Vector2(0f, 16f), red, roundedCorners: false).GetComponent<Image>();
             foreach (var e in lowHpEdges) { e.raycastTarget = false; e.gameObject.SetActive(false); }
-            hitMarker = UiFactory.Text(reticle, "HitMarker", "×", 64f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-60f, -60f), new Vector2(60f, 60f), new Color(1f, 0.35f, 0.2f));
+            hitMarker = UiFactory.Text(reticle, "HitMarker", "×", 64f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-60f, -60f), new Vector2(60f, 60f), HitmarkerNormalColor);
             hitMarker.gameObject.SetActive(false);
+            combatText = UiFactory.Text(reticle, "HitOutcome", "", 22f, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-180f, 60f), new Vector2(180f, 100f));
+            incomingArrow = UiFactory.Text(root, "IncomingDirection", "▲", 44f, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-28f, -28f), new Vector2(28f, 28f), CriticalColor);
+            incomingText = UiFactory.Text(root, "IncomingSource", "", 23f, TextAlignmentOptions.Center,
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-260f, -150f), new Vector2(260f, -112f));
+            incomingArrow.gameObject.SetActive(false); incomingText.gameObject.SetActive(false);
+            goalsPanel = UiFactory.Card(root, "LiveGoals", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -342f), new Vector2(530f, -190f), HudPanelAlpha);
+            goalsText = UiFactory.Text(goalsPanel, "Goals", "", 23f, TextAlignmentOptions.MidlineLeft,
+                Vector2.zero, Vector2.one, new Vector2(16f, 8f), new Vector2(-16f, -8f));
+            goalsText.enableAutoSizing = true; goalsText.fontSizeMin = 18f; goalsText.fontSizeMax = 23f;
+            goalsText.raycastTarget = combatText.raycastTarget = incomingArrow.raycastTarget = incomingText.raycastTarget = false;
+            goalsPanel.GetComponent<Image>().raycastTarget = false;
 
             // Top-left: lap + position
             var racePanel = UiFactory.Card(root, "RaceStatus", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -174f), new Vector2(310f, -24f), HudPanelAlpha);
@@ -284,6 +328,51 @@ namespace RacingGame
                 UiFactory.Panel(track, "Divider" + i, new Vector2(i / 10f, 0f), new Vector2(i / 10f, 1f), new Vector2(-1f, 0f), new Vector2(1f, 0f), new Color(0.03f, 0.05f, 0.09f, 0.85f), false);
         }
 
+        private void BuildStatusPanel(Transform root)
+        {
+            statusPanel = UiFactory.Card(root, "StatusPanel", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 250f), new Vector2(-30f, 298f), HudPanelAlpha);
+            statusText = UiFactory.Text(statusPanel, "Status", "", 22f, TextAlignmentOptions.MidlineRight, Vector2.zero, Vector2.one, new Vector2(18f, 4f), new Vector2(-18f, -4f), UiFactory.Accent);
+            statusText.enableAutoSizing = true; statusText.fontSizeMin = 14f; statusText.fontSizeMax = 22f;
+            statusText.raycastTarget = false;
+
+            BuildStatusIndicator(0, StatusKind.Shield, new Color(0.25f, 0.88f, 0.82f), "◆", "hud.status.shield");
+            BuildStatusIndicator(1, StatusKind.Frozen, new Color(0.4f, 0.8f, 1f), "✦", "hud.status.frozen");
+            BuildStatusIndicator(2, StatusKind.Jammed, new Color(1f, 0.65f, 0f), "▲", "hud.status.jammed");
+            BuildStatusIndicator(3, StatusKind.Punctured, new Color(1f, 0.27f, 0.27f), "●", "hud.status.punctured");
+            BuildStatusIndicator(4, StatusKind.Slowed, new Color(0.6f, 0.35f, 1f), "▼", "hud.status.slowed");
+
+            statusPanel.gameObject.SetActive(false);
+        }
+
+        private void BuildStatusIndicator(int index, StatusKind kind, Color themeColor, string glyph, string locKey)
+        {
+            var badge = UiFactory.Card(statusPanel, "Status_" + kind, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 0.85f);
+            var bgImage = badge.GetComponent<Image>();
+            if (bgImage != null)
+            {
+                bgImage.color = new Color(themeColor.r * 0.22f, themeColor.g * 0.22f, themeColor.b * 0.22f, 0.9f);
+                bgImage.raycastTarget = false;
+            }
+
+            var glyphText = UiFactory.Text(badge, "Glyph", glyph, 22f, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(8f, 0f), new Vector2(30f, 0f), themeColor);
+            glyphText.fontStyle = FontStyles.Bold;
+            glyphText.raycastTarget = false;
+
+            var labelText = UiFactory.Text(badge, "Label", "", 18f, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(32f, 0f), new Vector2(-6f, 0f), themeColor);
+            labelText.fontStyle = FontStyles.Bold;
+            labelText.enableAutoSizing = true;
+            labelText.fontSizeMin = 11f;
+            labelText.fontSizeMax = 18f;
+            labelText.raycastTarget = false;
+
+            var widget = new StatusIndicatorWidget(badge, bgImage, glyphText, labelText, kind, themeColor, glyph, locKey);
+            widget.RefreshLocalization();
+            widget.SetActive(false);
+            statusIndicators[index] = widget;
+        }
+
         private void ApplyStaticTexts()
         {
             ApplyLayout(touchLayout);
@@ -298,6 +387,17 @@ namespace RacingGame
             RefreshPosition();
             if (playerHealth != null) OnHealth(playerHealth.Health, playerHealth.maxHealth);
             if (playerCannon != null) OnAmmo(playerCannon.Ammo, playerCannon.AmmoMax);
+            if (statusIndicators != null)
+            {
+                for (int i = 0; i < statusIndicators.Length; i++)
+                {
+                    statusIndicators[i]?.RefreshLocalization();
+                }
+            }
+            lastStatusStr = null;
+            killFeedNamesCached = false;
+            EnsureKillFeedNames();
+            UpdateKillFeedDisplay();
         }
 
         // Four corner brackets around the aim point; ammo pips underneath. Plain images, no glyphs.
@@ -366,7 +466,7 @@ namespace RacingGame
         // Where the shell will be after aimDistance: muzzle, launch velocity (barrel + car), gravity drop.
         private void UpdateReticle()
         {
-            bool show = playerCar != null && playerCannon != null && playerCannon.muzzle != null && race.State >= RaceState.Countdown && race.State < RaceState.Finished
+            bool show = playerCar != null && playerCannon != null && !playerCannon.locked && playerCannon.muzzle != null && race.State >= RaceState.Countdown && race.State < RaceState.Finished
                         && (playerHealth == null || !playerHealth.IsDead);
             var cam = Camera.main;
             if (!show || cam == null) { if (reticle.gameObject.activeSelf) reticle.gameObject.SetActive(false); ClearLock(); return; }
@@ -445,6 +545,8 @@ namespace RacingGame
                 Place(secondaryPanel, Vector2.one, new Vector2(-494f, -238f + row), new Vector2(-170f, -190f + row));
                 Place(statusPanel, Vector2.one, new Vector2(-494f, -290f + row), new Vector2(-170f, -242f + row));
                 Place(hintPanel, new Vector2(0.5f, 1f), new Vector2(-460f, -322f + row), new Vector2(420f, -202f + row));
+                if (killFeedPanel != null) Place(killFeedPanel, new Vector2(0f, 1f), new Vector2(30f, -310f), new Vector2(360f, -190f));
+                for (int i = 0; i < killFeedTexts.Length; i++) if (killFeedTexts[i] != null) killFeedTexts[i].alignment = TextAlignmentOptions.MidlineLeft;
                 hintText.alignment = TextAlignmentOptions.Center;
             }
             else
@@ -456,8 +558,12 @@ namespace RacingGame
                 Place(secondaryPanel, new Vector2(1f, 0f), new Vector2(-354f, 194f), new Vector2(-30f, 242f));
                 Place(statusPanel, new Vector2(1f, 0f), new Vector2(-354f, 250f), new Vector2(-30f, 298f));
                 Place(hintPanel, Vector2.zero, new Vector2(30f, 272f), new Vector2(680f, 422f));
+                if (killFeedPanel != null) Place(killFeedPanel, Vector2.one, new Vector2(-360f, -230f), new Vector2(-30f, -110f));
+                for (int i = 0; i < killFeedTexts.Length; i++) if (killFeedTexts[i] != null) killFeedTexts[i].alignment = TextAlignmentOptions.MidlineRight;
                 hintText.alignment = TextAlignmentOptions.MidlineLeft;
             }
+            if (goalsPanel != null) Place(goalsPanel, new Vector2(0f, 1f),
+                new Vector2(30f, touch ? -484f : -342f), new Vector2(530f, touch ? -332f : -190f));
             pauseHint.gameObject.SetActive(!touch);
         }
 
@@ -467,6 +573,7 @@ namespace RacingGame
         private void Update()
         {
             if (race == null) return;
+            UpdateCombatAndGoals();
             if (hudRoot != null && Mathf.Abs(hudRoot.rect.width - layoutWidth) > 1f) ApplyLayout(touchLayout);   // rotation / resize
             if (playerCar == null && race.Player != null)
             {
@@ -478,10 +585,12 @@ namespace RacingGame
                 playerStatus = playerCar.GetComponent<CarStatus>();
                 playerWeapons = playerCar.GetComponent<CarWeapons>();
                 if (playerCannon != null) { playerCannon.AmmoChanged += OnAmmo; BuildAmmoPips(playerCannon.AmmoMax); OnAmmo(playerCannon.Ammo, playerCannon.AmmoMax); }
-                RaceDirector.Instance.ShellHit -= OnShellHit;
-                RaceDirector.Instance.ShellHit += OnShellHit;
-                RaceDirector.Instance.MineHit -= OnMineHit;
-                RaceDirector.Instance.MineHit += OnMineHit;
+
+
+
+
+                RaceDirector.Instance.OnKillRegistered -= OnKillRegistered;
+                RaceDirector.Instance.OnKillRegistered += OnKillRegistered;
                 if (playerHealth != null) playerHealth.OnHealthChanged += OnHealth;
                 OnHealth(playerHealth != null ? playerHealth.Health : 100f, playerHealth != null ? playerHealth.maxHealth : 100f);
                 RefreshPosition();
@@ -510,25 +619,21 @@ namespace RacingGame
                 bool frozen = playerStatus.IsFrozen;
                 bool jammed = playerStatus.IsJammed;
                 bool punctured = playerStatus.IsPunctured;
-                if (lastStatusStr == null || shield != lastStatusShield || frozen != lastStatusFrozen || jammed != lastStatusJammed || punctured != lastStatusPunctured)
+                bool slowed = playerStatus.IsSlowed;
+                if (lastStatusStr == null || shield != lastStatusShield || frozen != lastStatusFrozen || jammed != lastStatusJammed || punctured != lastStatusPunctured || slowed != lastStatusSlowed)
                 {
                     lastStatusShield = shield;
                     lastStatusFrozen = frozen;
                     lastStatusJammed = jammed;
                     lastStatusPunctured = punctured;
-                    sb.Clear();
-                    if (shield) sb.Append("<color=#40E0D0>[").Append(Loc.Get("hud.status.shield")).Append("]</color> ");
-                    if (frozen) sb.Append("<color=#66CCFF>[").Append(Loc.Get("hud.status.frozen")).Append("]</color> ");
-                    if (jammed) sb.Append("<color=#FFA500>[").Append(Loc.Get("hud.status.jammed")).Append("]</color> ");
-                    if (punctured) sb.Append("<color=#FF4444>[").Append(Loc.Get("hud.status.punctured")).Append("]</color> ");
-                    lastStatusStr = sb.ToString();
-                    statusText.text = lastStatusStr;
-                    statusPanel.gameObject.SetActive(!string.IsNullOrEmpty(lastStatusStr));
+                    lastStatusSlowed = slowed;
+                    UpdateStatusIndicators(shield, frozen, jammed, punctured, slowed);
                 }
             }
             else if (statusPanel != null && statusPanel.gameObject.activeSelf)
             {
                 statusPanel.gameObject.SetActive(false);
+                HideAllStatusIndicators();
             }
 
             if (playerWeapons != null && playerWeapons.primaryType == PrimaryWeaponType.MachineGun)
@@ -598,6 +703,13 @@ namespace RacingGame
                 string wrongText = Loc.Get("hud.wrong_way");
                 if (wrong && centerText.text != wrongText) { centerText.fontSize = 80f; centerText.color = new Color(1f, 0.3f, 0.2f); centerText.text = wrongText; }
                 else if (!wrong && centerText.text == wrongText) centerText.text = "";
+            }
+
+            if (race != null)
+            {
+                if (!killFeedNamesCached) EnsureKillFeedNames();
+                killFeedBuffer.Update(Time.deltaTime);
+                UpdateKillFeedDisplay();
             }
         }
 
@@ -788,23 +900,179 @@ namespace RacingGame
         private void OnAmmo(int ammo, int max)
         {
             lastReloadPct = -1;
-            ammoPanel.gameObject.SetActive(max > 0);
-            if (max <= 0) { ammoText.text = ""; return; }
+            bool primary = max > 0 && (playerCannon == null || !playerCannon.locked);   // mines-only events lock the cannon
+            ammoPanel.gameObject.SetActive(primary);
+            if (!primary) { ammoText.text = ""; return; }
             ammoText.text = ammo > 0 ? Loc.Format("hud.ammo", "cur", ammo, "max", max) : Loc.Format("hud.reload", "p", 0);
         }
 
-        private void OnShellHit(GameObject shooter, GameObject victim)
+        public void ShowCombatHit(RaceParticipant victim, HitInfo hit, HitResult result)
         {
-            if (playerCar == null || shooter != playerCar.gameObject) return;
-            hitMarker.gameObject.SetActive(true);
-            hitMarkerUntil = Time.unscaledTime + 0.15f;
+            var player = race != null ? race.Player : null;
+            if (player == null || victim == null || (!result.ShieldAbsorbed && result.DamageDealt <= 0f && !result.StatusApplied)) return;
+            bool outgoing = hit.Attacker == player.gameObject && victim != player;
+            if (!outgoing && victim != player) return;
+            string outcome = Loc.Get(result.Fatal ? "combat.destroyed" : result.ShieldAbsorbed ? "combat.shield" : "combat.hit");
+            Color color = result.Fatal ? HitmarkerKillColor : result.ShieldAbsorbed ? new Color(0.3f, 0.95f, 1f) : HitmarkerNormalColor;
+            if (outgoing)
+            {
+                // Preserve a kill confirmation if another bullet lands during the same burst.
+                if (!result.Fatal && hitMarker.color == HitmarkerKillColor && Time.unscaledTime < hitMarkerUntil) return;
+                hitMarker.color = color; hitMarker.gameObject.SetActive(true);
+                combatText.text = outcome; combatText.color = color;
+                hitMarkerUntil = Time.unscaledTime + (result.Fatal ? 0.6f : 0.35f);
+                if (!result.Fatal) SfxPlayer.Instance.PlayUi(result.ShieldAbsorbed ? SfxSynth.ShieldBreak : SfxSynth.Hit, 0.45f, 1.3f);
+            }
+            else
+            {
+                incomingSource = hit.Attacker != null ? hit.Attacker.transform.position : hit.Point;
+                incomingUntil = Time.time + 0.85f;
+                var attacker = hit.Attacker != null ? hit.Attacker.GetComponent<RaceParticipant>() : null;
+                string name = attacker != null ? UiFactory.Escape(GetLocalizedRacerName(attacker.displayName)) : Loc.Get("combat.obstacle");
+                incomingText.text = name + " · " + outcome;
+                incomingText.color = incomingArrow.color = color;
+                if (result.ShieldAbsorbed) SfxPlayer.Instance.PlayUi(SfxSynth.ShieldBreak, 0.65f);
+            }
         }
 
-        private void OnMineHit(GameObject owner, GameObject victim)
+        private void UpdateCombatAndGoals()
         {
-            if (playerCar == null || owner != playerCar.gameObject) return;
-            hitMarker.gameObject.SetActive(true);
-            hitMarkerUntil = Time.unscaledTime + 0.15f;
+            bool incoming = playerCar != null && Time.time < incomingUntil;
+            incomingArrow.gameObject.SetActive(incoming);
+            incomingText.gameObject.SetActive(incoming);
+            if (incoming)
+            {
+                var cam = Camera.main;
+                Vector3 delta = incomingSource - playerCar.transform.position;
+                Vector3 right = cam != null ? cam.transform.right : playerCar.transform.right;
+                Vector3 forward = cam != null ? Vector3.Cross(right, Vector3.up).normalized : playerCar.transform.forward;
+                Vector2 direction = new Vector2(Vector3.Dot(delta, right), Vector3.Dot(delta, forward)).normalized;
+                incomingArrow.rectTransform.anchoredPosition = direction * 175f;
+                incomingArrow.rectTransform.localEulerAngles = new Vector3(0f, 0f, -Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg);
+            }
+            if (Time.unscaledTime > hitMarkerUntil) combatText.text = "";
+            if (PauseController.IsPaused || Time.unscaledTime < nextGoalRefresh) return;
+            nextGoalRefresh = Time.unscaledTime + 0.25f;
+            bool showGoals = race.Player != null && RaceSetup.Event != null && race.State >= RaceState.Countdown && race.State <= RaceState.Finishing;
+            goalsPanel.gameObject.SetActive(showGoals);
+            if (showGoals)
+            {
+                race.ReadResult(race.Player, goalEntry);
+                goalsText.text = StarGoalText.Progress(RaceSetup.Event, goalEntry);
+            }
+        }
+
+        private void OnKillRegistered(KillEvent evt)
+        {
+            EnsureKillFeedNames();
+            if (playerCar != null && evt.KillerId == playerCar.CarId && evt.KillerId != evt.VictimId)
+            {
+                hitMarker.color = HitmarkerKillColor;
+                hitMarker.gameObject.SetActive(true);
+                hitMarkerUntil = Time.unscaledTime + 0.5f;
+            }
+            killFeedBuffer.Push(evt.KillerId, evt.VictimId);
+            UpdateKillFeedDisplay();
+        }
+
+        private void BuildKillFeed(Transform root)
+        {
+            killFeedPanel = UiFactory.Panel(root, "KillFeed", Vector2.one, Vector2.one, new Vector2(-360f, -230f), new Vector2(-30f, -110f), Color.clear, false);
+            var panelImg = killFeedPanel.GetComponent<Image>();
+            if (panelImg != null) panelImg.raycastTarget = false;
+
+            for (int i = 0; i < KillFeedBuffer.MaxEntries; i++)
+            {
+                float top = -i * 38f;
+                float btm = top - 34f;
+                var rowRt = UiFactory.Card(killFeedPanel, $"KillRow{i}", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, btm), new Vector2(0f, top), HudPanelAlpha);
+                var bg = rowRt.GetComponent<Image>();
+                if (bg != null) bg.raycastTarget = false;
+
+                var txt = UiFactory.Text(rowRt, "Text", "", 20f, TextAlignmentOptions.MidlineRight, Vector2.zero, Vector2.one, new Vector2(12f, 2f), new Vector2(-12f, -2f), Color.white);
+                txt.fontStyle = FontStyles.Bold;
+                txt.enableAutoSizing = true;
+                txt.fontSizeMin = 14f;
+                txt.fontSizeMax = 20f;
+                txt.raycastTarget = false;
+
+                killFeedRows[i] = rowRt;
+                killFeedBgs[i] = bg;
+                killFeedTexts[i] = txt;
+                rowRt.gameObject.SetActive(false);
+            }
+        }
+
+        private void EnsureKillFeedNames()
+        {
+            if (killFeedNamesCached) return;
+            if (race == null) return;
+            var participants = race.Participants;
+            if (participants == null || participants.Count == 0) return;
+
+            for (int i = 0; i < participants.Count; i++)
+            {
+                var p = participants[i];
+                if (p == null) continue;
+                int carId = p.Car != null ? p.Car.CarId : 0;
+                string locName = GetLocalizedRacerName(p.displayName, p.isPlayer);
+                killFeedBuffer.RegisterRacerName(carId, locName);
+            }
+            killFeedBuffer.PrecacheAll();
+            killFeedNamesCached = true;
+        }
+
+        public static string GetLocalizedRacerName(string rawName, bool isPlayer = false)
+        {
+            if (isPlayer || string.Equals(rawName, "You", System.StringComparison.OrdinalIgnoreCase))
+            {
+                string loc = Loc.Get("player.name");
+                if (!string.IsNullOrEmpty(loc) && !loc.StartsWith("[")) return loc;
+                return "You";
+            }
+            if (string.IsNullOrEmpty(rawName)) return "Car";
+            string baseName = rawName, suffix = "";
+            int split = rawName.LastIndexOf(' ');
+            if (split > 0 && int.TryParse(rawName.Substring(split + 1), out _))
+            { baseName = rawName.Substring(0, split); suffix = rawName.Substring(split); }
+            string key = "ai.name." + baseName.ToLowerInvariant();
+            string aiLoc = Loc.Get(key);
+            if (!string.IsNullOrEmpty(aiLoc) && !aiLoc.StartsWith("[")) return aiLoc + suffix;
+            return rawName;
+        }
+
+        private void UpdateKillFeedDisplay()
+        {
+            for (int i = 0; i < KillFeedBuffer.MaxEntries; i++)
+            {
+                var entry = killFeedBuffer.GetEntry(i);
+                if (entry.IsActive)
+                {
+                    if (killFeedRows[i] != null && !killFeedRows[i].gameObject.activeSelf)
+                        killFeedRows[i].gameObject.SetActive(true);
+
+                    if (killFeedTexts[i] != null)
+                    {
+                        killFeedTexts[i].text = entry.FormattedText;
+                        float alpha = entry.Alpha;
+                        var tc = killFeedTexts[i].color;
+                        tc.a = alpha;
+                        killFeedTexts[i].color = tc;
+
+                        if (killFeedBgs[i] != null)
+                        {
+                            var bc = killFeedBgs[i].color;
+                            bc.a = alpha * HudPanelAlpha;
+                            killFeedBgs[i].color = bc;
+                        }
+                    }
+                }
+                else
+                {
+                    if (killFeedRows[i] != null && killFeedRows[i].gameObject.activeSelf)
+                        killFeedRows[i].gameObject.SetActive(false);
+                }
+            }
         }
 
         private void OnHealth(float current, float max)
@@ -855,6 +1123,10 @@ namespace RacingGame
                 hintUntil = Time.unscaledTime + ControlsHintSeconds; hintPanel.gameObject.SetActive(true); playerCar = null;
             }
             if (eventPanel != null) eventPanel.gameObject.SetActive(false);
+            incomingUntil = hitMarkerUntil = nextGoalRefresh = 0f;
+            combatText.text = "";
+            incomingArrow.gameObject.SetActive(false); incomingText.gameObject.SetActive(false);
+            goalsPanel.gameObject.SetActive(visible);
             if (!visible)
             {
                 for (int i = 0; i < threatMarkers.Length; i++)
@@ -870,6 +1142,86 @@ namespace RacingGame
             else EventSystem.current?.SetSelectedGameObject(null);
         }
 
+        private void UpdateStatusIndicators(bool shield, bool frozen, bool jammed, bool punctured, bool slowed)
+        {
+            if (statusIndicators[0] != null) statusIndicators[0].SetActive(shield);
+            if (statusIndicators[1] != null) statusIndicators[1].SetActive(frozen);
+            if (statusIndicators[2] != null) statusIndicators[2].SetActive(jammed);
+            if (statusIndicators[3] != null) statusIndicators[3].SetActive(punctured);
+            if (statusIndicators[4] != null) statusIndicators[4].SetActive(slowed);
+
+            int activeCount = 0;
+            for (int i = 0; i < statusIndicators.Length; i++)
+            {
+                if (statusIndicators[i] != null && statusIndicators[i].IsActive) activeCount++;
+            }
+
+            if (activeCount == 0)
+            {
+                lastStatusStr = "";
+                if (statusText != null) statusText.text = "";
+                statusPanel.gameObject.SetActive(false);
+                return;
+            }
+
+            statusPanel.gameObject.SetActive(true);
+
+            int currentSlot = 0;
+            for (int i = 0; i < statusIndicators.Length; i++)
+            {
+                var ind = statusIndicators[i];
+                if (ind != null && ind.IsActive)
+                {
+                    float minX = (float)currentSlot / activeCount;
+                    float maxX = (float)(currentSlot + 1) / activeCount;
+                    ind.Root.anchorMin = new Vector2(minX, 0f);
+                    ind.Root.anchorMax = new Vector2(maxX, 1f);
+                    ind.Root.offsetMin = new Vector2(3f, 3f);
+                    ind.Root.offsetMax = new Vector2(-3f, -3f);
+                    currentSlot++;
+                }
+            }
+
+            sb.Clear();
+            if (shield && statusIndicators[0] != null) sb.Append("<color=#40E0D0>[").Append(statusIndicators[0].CachedLabel).Append("]</color> ");
+            if (frozen && statusIndicators[1] != null) sb.Append("<color=#66CCFF>[").Append(statusIndicators[1].CachedLabel).Append("]</color> ");
+            if (jammed && statusIndicators[2] != null) sb.Append("<color=#FFA500>[").Append(statusIndicators[2].CachedLabel).Append("]</color> ");
+            if (punctured && statusIndicators[3] != null) sb.Append("<color=#FF4444>[").Append(statusIndicators[3].CachedLabel).Append("]</color> ");
+            if (slowed && statusIndicators[4] != null) sb.Append("<color=#8855FF>[").Append(statusIndicators[4].CachedLabel).Append("]</color> ");
+            lastStatusStr = sb.ToString();
+            if (statusText != null) statusText.text = lastStatusStr;
+        }
+
+        private void HideAllStatusIndicators()
+        {
+            if (statusIndicators == null) return;
+            for (int i = 0; i < statusIndicators.Length; i++)
+            {
+                statusIndicators[i]?.SetActive(false);
+            }
+            lastStatusStr = "";
+            lastStatusShield = lastStatusFrozen = lastStatusJammed = lastStatusPunctured = lastStatusSlowed = false;
+        }
+
+        /// <summary>Returns true if the dedicated status indicator widget for the specified status kind is active.</summary>
+        public bool IsStatusIndicatorActive(StatusKind kind)
+        {
+            var widget = GetStatusIndicator(kind);
+            return widget != null && widget.IsActive;
+        }
+
+        /// <summary>Gets the dedicated status indicator widget for the specified kind.</summary>
+        public StatusIndicatorWidget GetStatusIndicator(StatusKind kind)
+        {
+            if (statusIndicators == null) return null;
+            for (int i = 0; i < statusIndicators.Length; i++)
+            {
+                if (statusIndicators[i] != null && statusIndicators[i].Kind == kind)
+                    return statusIndicators[i];
+            }
+            return null;
+        }
+
         private void OnDestroy()
         {
             if (playerHealth != null) playerHealth.OnHealthChanged -= OnHealth;
@@ -877,10 +1229,54 @@ namespace RacingGame
             var director = RaceDirector.Current;
             if (director != null)
             {
-                director.ShellHit -= OnShellHit;
-                director.MineHit -= OnMineHit;
+                director.OnKillRegistered -= OnKillRegistered;
             }
             if (healthFillSprite != null) Destroy(healthFillSprite);
+        }
+    }
+
+    /// <summary>
+    /// Dedicated status indicator widget on the HUD displaying visual glyph and localized label for an active status effect.
+    /// </summary>
+    public sealed class StatusIndicatorWidget
+    {
+        public StatusKind Kind { get; }
+        public RectTransform Root { get; }
+        public Image Background { get; }
+        public TextMeshProUGUI GlyphText { get; }
+        public TextMeshProUGUI LabelText { get; }
+        public Color ThemeColor { get; }
+        public string Glyph { get; }
+        public string LocKey { get; }
+        public string CachedLabel { get; private set; }
+        public bool IsActive => Root != null && Root.gameObject.activeSelf;
+
+        public StatusIndicatorWidget(RectTransform root, Image background, TextMeshProUGUI glyphText, TextMeshProUGUI labelText, StatusKind kind, Color themeColor, string glyph, string locKey)
+        {
+            Root = root;
+            Background = background;
+            GlyphText = glyphText;
+            LabelText = labelText;
+            Kind = kind;
+            ThemeColor = themeColor;
+            Glyph = glyph;
+            LocKey = locKey;
+            CachedLabel = "";
+        }
+
+        public void SetActive(bool active)
+        {
+            if (Root != null && Root.gameObject.activeSelf != active)
+            {
+                Root.gameObject.SetActive(active);
+            }
+        }
+
+        public void RefreshLocalization()
+        {
+            CachedLabel = Loc.Get(LocKey);
+            if (LabelText != null) LabelText.text = CachedLabel;
+            if (GlyphText != null) GlyphText.text = Glyph;
         }
     }
 }

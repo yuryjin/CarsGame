@@ -104,7 +104,9 @@ namespace RacingGame
 
         // ---------- combat feedback ----------
         private static AudioClip[] hits;
-        private static AudioClip hitMetal, killSting, heartbeat;
+        private static AudioClip hitMetal, killSting, heartbeat, shieldBreak;
+        public static AudioClip ShieldBreak => shieldBreak ??= OneShot("sfx_shield_break", 0.24f, t =>
+            (Mathf.Sin(2f * Mathf.PI * (1800f * t - 2200f * t * t)) + Noise() * 0.2f) * Mathf.Exp(-t * 15f) * 0.6f);
 
         /// <summary>Three thuds with different body resonance, so a burst of hits does not sound like a loop.</summary>
         public static AudioClip HitVariant(int i)

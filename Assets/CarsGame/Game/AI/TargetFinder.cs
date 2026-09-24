@@ -25,7 +25,8 @@ namespace RacingGame
             }
         }
 
-        public static CarController Find(CarController self, Vector3 origin, Vector3 forward, float coneDegrees, float minRange, float maxRange)
+        /// <param name="leadShellSpeed">When &gt; 0, test the cone against where the target will be when a shell of this speed arrives.</param>
+        public static CarController Find(CarController self, Vector3 origin, Vector3 forward, float coneDegrees, float minRange, float maxRange, float leadShellSpeed = 0f)
         {
             var director = RaceDirector.Current ?? Object.FindAnyObjectByType<RaceDirector>();
             if (director == null) return null;
@@ -43,7 +44,14 @@ namespace RacingGame
                 Vector3 to = aim - origin;
                 float dist = to.magnitude;
                 if (dist < minRange || dist > maxRange) continue;
-                if (Vector3.Dot(to / dist, forward) < cosCone) continue;
+                if (leadShellSpeed > 0f && other.Body != null)
+                {
+                    Vector3 lead = aim + other.Body.linearVelocity * (dist / leadShellSpeed);
+                    Vector3 toLead = lead - origin;
+                    float leadDist = toLead.magnitude;
+                    if (leadDist < 0.01f || Vector3.Dot(toLead / leadDist, forward) < cosCone) continue;
+                }
+                else if (Vector3.Dot(to / dist, forward) < cosCone) continue;
                 if (mask != 0 && Physics.Linecast(origin, aim, mask, QueryTriggerInteraction.Ignore)) continue;
                 if (dist < bestDist) { bestDist = dist; best = other; }
             }

@@ -23,6 +23,8 @@ namespace RacingGame
         [Header("Mount")]
         public Vector3 turretLocalPosition = new Vector3(0f, 1.12f, -0.45f);
         public float barrelLength = 1.3f;
+        [Tooltip("Event rule (mines only): the cannon never fires this race. Separate from enabled, which the wreck toggles.")]
+        public bool locked;
 
         [Header("References (auto-created if empty)")]
         public Transform barrel;

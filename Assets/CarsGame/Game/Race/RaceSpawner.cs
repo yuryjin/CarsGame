@@ -77,7 +77,15 @@ namespace RacingGame
                 participant.laneOffset = lane;
                 participant.Arena = Arena;
                 participant.Progress.enabled = !arena;
-                if (participant.Health != null) participant.Health.respawnOnDeath = !arena;
+                if (participant.Health != null)
+                {
+                    participant.Health.respawnOnDeath = true;
+                    if (arena)
+                    {
+                        participant.Health.respawnDelay = 2f;
+                        participant.Health.respawnInvulnerability = 2f;
+                    }
+                }
 
                 if (isPlayer)
                 {
@@ -95,6 +103,13 @@ namespace RacingGame
                     participant.displayName = aiNames.Length > 0 ? aiNames[aiIndex % aiNames.Length] : $"AI {aiIndex + 1}";
                     paint.SetColor(paints.Length > 0 ? paints[aiIndex % paints.Length] : Color.gray);
                     var profile = profiles != null && profiles.Length > 0 ? profiles[aiIndex % profiles.Length] : null;
+                    if (profile != null)
+                    {
+                        if (!string.IsNullOrEmpty(profile.rivalName))
+                            participant.displayName = profile.rivalName + (aiIndex >= profiles.Length ? " " + (aiIndex / profiles.Length + 1) : "");
+                        paint.SetColor(profile.paint);
+                        profile.Equip(participant.Weapons);
+                    }
                     var gunner = go.GetComponent<AiGunner>() ?? go.AddComponent<AiGunner>();
                     gunner.Initialize(profile, aiFireCooldown);
                     if (arena)
@@ -106,7 +121,7 @@ namespace RacingGame
                     else
                     {
                         var ai = go.GetComponent<AiDriver>() ?? go.AddComponent<AiDriver>();
-                        ai.Initialize(profile, lane * 0.4f);
+                        ai.Initialize(profile, lane); // keep the two grid columns apart
                         car.SetInputSource(ai);
                     }
                     var health = go.GetComponent<CarHealth>();
@@ -125,10 +140,24 @@ namespace RacingGame
 
         public void Clear()
         {
-            foreach (var p in participants) if (p != null) { p.gameObject.SetActive(false); Destroy(p.gameObject); }
+            foreach (var p in participants)
+            {
+                if (p != null)
+                {
+                    p.gameObject.SetActive(false);
+                    if (Application.isPlaying) Destroy(p.gameObject);
+                    else DestroyImmediate(p.gameObject);
+                }
+            }
             participants.Clear();
             Player = null;
-            if (Arena != null) { Arena.gameObject.SetActive(false); Destroy(Arena.gameObject); Arena = null; }
+            if (Arena != null)
+            {
+                Arena.gameObject.SetActive(false);
+                if (Application.isPlaying) Destroy(Arena.gameObject);
+                else DestroyImmediate(Arena.gameObject);
+                Arena = null;
+            }
         }
 
         private void AttachCamera(GameObject playerCar)

@@ -15,14 +15,22 @@ namespace RacingGame
 
         public static GhostCar Spawn(GameObject carPrefab, GhostRecord record, Color tint)
         {
-            var go = Instantiate(carPrefab);
-            go.name = "Ghost_" + record.PlayerName;
-            foreach (var c in go.GetComponentsInChildren<Collider>(true)) Destroy(c);
-            foreach (var mb in go.GetComponentsInChildren<MonoBehaviour>(true)) if (!(mb is GhostCar)) Destroy(mb);
-            var rb = go.GetComponent<Rigidbody>(); if (rb != null) Destroy(rb);
+            // Copy only the baked visuals: cloning a live car runs its Awake and registers it with
+            // the race, while removing its controller fails RequireComponent dependency checks.
+            var go = new GameObject("Ghost_" + record.PlayerName);
             var block = new MaterialPropertyBlock();
-            foreach (var r in go.GetComponentsInChildren<Renderer>(true))
+            foreach (var source in carPrefab.GetComponentsInChildren<MeshFilter>(true))
             {
+                var renderer = source.GetComponent<MeshRenderer>();
+                if (renderer == null || source.sharedMesh == null) continue;
+                var visual = new GameObject(source.name);
+                visual.transform.SetParent(go.transform, false);
+                var pose = carPrefab.transform.worldToLocalMatrix * source.transform.localToWorldMatrix;
+                visual.transform.SetLocalPositionAndRotation(pose.GetColumn(3), pose.rotation);
+                visual.transform.localScale = pose.lossyScale;
+                visual.AddComponent<MeshFilter>().sharedMesh = source.sharedMesh;
+                var r = visual.AddComponent<MeshRenderer>();
+                r.sharedMaterials = renderer.sharedMaterials;
                 r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 block.Clear(); block.SetColor("_BaseColor", tint); block.SetColor("_Color", tint); r.SetPropertyBlock(block);
             }

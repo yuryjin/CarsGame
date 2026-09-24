@@ -56,6 +56,13 @@ namespace RacingGame
         }
         private RngStreams rng;
         public int Tick => SimulationDriver.Instance.Tick;
+
+        /// <summary>Fresh streams from a known seed (the daily race is the same race for everyone that day).</summary>
+        public void Reseed(int seed)
+        {
+            raceSeed = seed != 0 ? seed : 1;
+            rng = new RngStreams(raceSeed);
+        }
         public IReadOnlyList<CarController> Cars => cars;
         public int SimulationOrder => int.MaxValue; // after every car
 

@@ -76,8 +76,19 @@ namespace RacingGame
         {
             var p = Platform;
             if (p == null || p.Leaderboards == null || !p.Player.IsAuthorized || Save == null) return;
+            int today = DailyRace.Today;
             foreach (var b in Save.Data.progress.bests)
-                if (b.bestTimeMs > 0) await p.Leaderboards.SubmitAsync("best_" + b.eventId, b.bestTimeMs);   // stars-only rows have no time
+            {
+                if (b.bestTimeMs <= 0) continue;   // stars-only rows have no time
+                if (b.eventId != null && b.eventId.Length > 1 && b.eventId[0] == 'd' && char.IsDigit(b.eventId[1]))
+                {
+                    // Daily runs share one descending board keyed by day (see DailyChallenge.EncodeScore); only today's counts.
+                    if (int.TryParse(b.eventId.Substring(1), out int day) && day == today)
+                        await p.Leaderboards.SubmitAsync(DailyRace.BoardName, Core.Daily.DailyChallenge.EncodeScore(day, b.bestTimeMs));
+                    continue;
+                }
+                await p.Leaderboards.SubmitAsync("best_" + b.eventId, b.bestTimeMs);
+            }
         }
 
         // Sign-in swapped the account: no cloud write until the new account's save is fetched and merged.
