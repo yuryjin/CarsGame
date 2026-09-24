@@ -34,6 +34,7 @@ namespace RacingGame
         public int Deaths { get; set; }
         public int EliminatedAtTick { get; private set; } = int.MaxValue;
         public ArenaLayout Arena { get; set; }
+        public HotBombRace HotBomb { get; internal set; }
         [Tooltip("Seconds off the asphalt before the car is put back on the track automatically.")]
         public float offTrackResetSeconds = 5f;
         [Tooltip("Lateral distance (m) from the centre line that counts as lost.")]
@@ -84,6 +85,16 @@ namespace RacingGame
                 Car.ResetCar();
                 if (Health != null) Health.SetInvulnerable(1.5f);
             }
+        }
+
+        private void OnCollisionEnter(Collision collision) => PassBomb(collision);
+        private void OnCollisionStay(Collision collision) => PassBomb(collision);
+
+        private void PassBomb(Collision collision)
+        {
+            if (HotBomb == null || collision.rigidbody == null) return;
+            var other = collision.rigidbody.GetComponent<RaceParticipant>();
+            if (other != null) HotBomb.Touch(this, other);
         }
 
         private void OnDied(GameObject attacker)

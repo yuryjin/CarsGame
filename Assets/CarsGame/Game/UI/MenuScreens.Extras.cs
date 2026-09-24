@@ -26,6 +26,7 @@ namespace RacingGame
                 case RaceTwist.OneLife: return "daily.twist.one_life";
                 case RaceTwist.Arsenal: return "daily.twist.arsenal";
                 case RaceTwist.Sprint: return "daily.twist.sprint";
+                case RaceTwist.HotBomb: return "bomb.rules";
                 default: return null;
             }
         }

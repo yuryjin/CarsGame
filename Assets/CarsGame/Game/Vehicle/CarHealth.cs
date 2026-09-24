@@ -236,6 +236,19 @@ namespace RacingGame
             OnHealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
+        /// <summary>The carried bomb destroys its carrier even through a shield or reset invulnerability.</summary>
+        public void Detonate(GameObject attacker)
+        {
+            if (IsDead) return;
+            float damage = currentHealth;
+            currentHealth = 0f;
+            LastAttacker = attacker;
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            Die(attacker);
+            HitResolved?.Invoke(new HitInfo(attacker, damage, HitType.Explosion),
+                new HitResult { DamageApplied = true, DamageDealt = damage, Fatal = true });
+        }
+
         private void Die(GameObject attacker)
         {
             IsDead = true;

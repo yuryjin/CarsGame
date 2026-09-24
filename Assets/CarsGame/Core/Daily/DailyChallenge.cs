@@ -18,6 +18,8 @@ namespace RacingGame.Core.Daily
         Arsenal = 5,
         /// <summary>Two short laps.</summary>
         Sprint = 6,
+        /// <summary>Pass a live bomb by touching another car; its fuse never resets.</summary>
+        HotBomb = 7,
     }
 
     /// <summary>Everything that defines one day's race. Identical for every player on the same UTC day.</summary>

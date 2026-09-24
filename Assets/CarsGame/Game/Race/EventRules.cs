@@ -22,7 +22,13 @@ namespace RacingGame
             foreach (var p in race.Participants)
             {
                 if (p == null) continue;
-                if (arena && twist != RaceTwist.MinesOnly) ArenaCharges(p);
+                if (twist == RaceTwist.HotBomb)
+                {
+                    if (p.Car.Cannon != null) p.Car.Cannon.locked = true;
+                    p.Weapons.secondaryType = SecondaryWeaponType.None;
+                    if (p.Health != null) { p.Health.respawnOnDeath = true; p.Health.damagePerImpactSpeed = 0f; }
+                }
+                if (arena && twist != RaceTwist.MinesOnly && twist != RaceTwist.HotBomb) ArenaCharges(p);
                 if (twist == RaceTwist.MinesOnly) MinesOnly(p);
                 if (twist == RaceTwist.OneLife && p.Health != null) p.Health.respawnOnDeath = false;
             }

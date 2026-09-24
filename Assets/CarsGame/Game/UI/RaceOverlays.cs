@@ -15,6 +15,14 @@ namespace RacingGame
     public sealed class RaceOverlays : MonoBehaviour
     {
         private RaceManager race;
+        private RectTransform bombPanel;
+        private TextMeshProUGUI bombTitle, bombHint;
+        private Transform bombMarker;
+        private Material bombMaterial;
+        private RaceParticipant shownCarrier;
+        private int shownBombSeconds = -1, shownLockSeconds = -1;
+        private bool bombNarrow;
+        public string BombMessage => bombTitle != null ? bombTitle.text : "";
         private Canvas canvas;
         private RectTransform aimedPanel;
         private TextMeshProUGUI aimedText;
@@ -41,6 +49,16 @@ namespace RacingGame
             canvas = UiFactory.CreateOverlayCanvas("RaceOverlays", 25);
             canvas.transform.SetParent(transform, false);
             var root = canvas.transform;
+
+            bombPanel = UiFactory.Card(root, "HotBomb", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-320f, -198f), new Vector2(320f, -108f));
+            bombTitle = UiFactory.Text(bombPanel, "CarrierTimer", "", 32f, TextAlignmentOptions.Center, new Vector2(0f, 0.45f), Vector2.one, new Vector2(14f, 0f), new Vector2(-14f, -6f));
+            bombTitle.fontStyle = FontStyles.Bold;
+            bombTitle.richText = false;
+            bombTitle.enableAutoSizing = true; bombTitle.fontSizeMin = 20f; bombTitle.fontSizeMax = 32f;
+            bombHint = UiFactory.Text(bombPanel, "PassHint", "", 23f, TextAlignmentOptions.Center, Vector2.zero, new Vector2(1f, 0.45f), new Vector2(14f, 5f), new Vector2(-14f, 0f), UiFactory.Muted);
+            bombHint.enableAutoSizing = true; bombHint.fontSizeMin = 16f; bombHint.fontSizeMax = 23f;
+            foreach (var graphic in bombPanel.GetComponentsInChildren<Graphic>()) graphic.raycastTarget = false;
+            bombPanel.gameObject.SetActive(false);
 
             aimedPanel = UiFactory.Card(root, "Aimed", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-170f, -160f), new Vector2(170f, -108f));
             aimedText = UiFactory.Text(aimedPanel, "Text", "", 30f, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, new Vector2(12f, 4f), new Vector2(-12f, -4f), AimRed);
@@ -105,12 +123,13 @@ namespace RacingGame
                 if (left <= 0f) Choose(false);
             }
             UpdateAimed();
+            UpdateBomb();
         }
 
         private void UpdateAimed()
         {
             var player = race != null ? race.Player : null;
-            bool racing = player != null && player.Car != null && race.State == RaceState.Racing && !PauseController.IsPaused && !PromptOpen
+            bool racing = player != null && player.HotBomb == null && player.Car != null && race.State == RaceState.Racing && !PauseController.IsPaused && !PromptOpen
                           && (player.Health == null || !player.Health.IsDead);
             bool aimed = false;
             if (racing)
@@ -135,6 +154,71 @@ namespace RacingGame
             aimedPanel.localScale = new Vector3(s, s, 1f);
         }
 
+        private void UpdateBomb()
+        {
+            var player = race != null ? race.Player : null;
+            var bomb = player != null ? player.HotBomb : null;
+            bool visible = canvas.gameObject.activeSelf && bomb != null && !PauseController.IsPaused
+                && race.State >= RaceState.Countdown && race.State < RaceState.Finished && !race.HasFinished(player);
+            bombPanel.gameObject.SetActive(visible);
+            bool narrow = ((RectTransform)canvas.transform).rect.width < 1400f;
+            if (narrow != bombNarrow)
+            {
+                bombNarrow = narrow;
+                float top = narrow ? -430f : -108f;
+                bombPanel.offsetMin = new Vector2(-320f, top - 90f);
+                bombPanel.offsetMax = new Vector2(320f, top);
+            }
+            var carrier = visible ? bomb.Carrier : null;
+            if (bombMarker != null) bombMarker.gameObject.SetActive(carrier != null);
+            if (!visible) { shownCarrier = null; shownBombSeconds = -1; return; }
+            int seconds = carrier != null ? Mathf.CeilToInt(bomb.SecondsLeft) : 0;
+            int lockSeconds = carrier != null ? Mathf.CeilToInt(bomb.PassLockSeconds) : 0;
+            if (shownCarrier != carrier || shownBombSeconds != seconds || shownLockSeconds != lockSeconds)
+            {
+                bool mine = carrier == player;
+                bombTitle.text = carrier == null ? Loc.Get("bomb.wait") : Loc.Format(mine ? "bomb.yours" : "bomb.owner", "name", carrier.displayName, "n", seconds);
+                bombTitle.color = mine ? AimRed : UiFactory.Accent;
+                bombHint.text = mine && lockSeconds > 0 ? Loc.Format("bomb.locked", "n", lockSeconds)
+                    : Loc.Get(carrier == null ? "bomb.rules" : mine ? "bomb.pass" : "bomb.avoid");
+                if (carrier != null && (mine || seconds <= 5) && (shownCarrier != carrier || shownBombSeconds != seconds))
+                    SfxPlayer.Instance.PlayUi(SfxSynth.Beep, 0.35f, seconds <= 5 ? 1.8f : 1.2f);
+                shownCarrier = carrier;
+                shownBombSeconds = seconds;
+                shownLockSeconds = lockSeconds;
+            }
+            if (carrier == null) return;
+            if (bombMarker == null) BuildBombMarker();
+            bombMarker.gameObject.SetActive(true);
+            bombMarker.position = carrier.transform.position + Vector3.up * 3f;
+            float pulse = 1f + 0.1f * Mathf.Sin(bomb.SecondsLeft * Mathf.PI * (seconds <= 5 ? 8f : 2f));
+            bombMarker.localScale = Vector3.one * pulse;
+            Color color = seconds <= 5 ? AimRed : UiFactory.Accent;
+            bombMaterial.SetColor("_BaseColor", color);
+            bombMaterial.SetColor("_EmissionColor", color * 1.5f);
+        }
+
+        private void BuildBombMarker()
+        {
+            bombMarker = new GameObject("HotBombMarker").transform;
+            bombMarker.SetParent(transform, false);
+            bombMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit")) { name = "HotBombGlow" };
+            bombMaterial.EnableKeyword("_EMISSION");
+            foreach (var shape in new[] { PrimitiveType.Sphere, PrimitiveType.Cube })
+            {
+                var piece = GameObject.CreatePrimitive(shape);
+                Destroy(piece.GetComponent<Collider>());
+                piece.transform.SetParent(bombMarker, false);
+                piece.transform.localPosition = shape == PrimitiveType.Sphere ? Vector3.zero : Vector3.up * 0.8f;
+                piece.transform.localScale = shape == PrimitiveType.Sphere ? Vector3.one * 1.2f : new Vector3(0.2f, 0.5f, 0.2f);
+                var renderer = piece.GetComponent<Renderer>();
+                renderer.sharedMaterial = bombMaterial;
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            }
+        }
+
+        private void OnDestroy() { if (bombMaterial != null) Destroy(bombMaterial); }
+
         private void CollectGunners(RaceParticipant player)
         {
             gunnersFor = player;
@@ -153,7 +237,11 @@ namespace RacingGame
 
         public void SetVisible(bool visible)
         {
-            if (!visible) HideContinuePrompt();
+            if (!visible)
+            {
+                HideContinuePrompt();
+                if (bombMarker != null) bombMarker.gameObject.SetActive(false);
+            }
             if (canvas != null) canvas.gameObject.SetActive(visible);
         }
     }

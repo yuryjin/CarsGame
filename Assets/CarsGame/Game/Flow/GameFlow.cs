@@ -51,6 +51,7 @@ namespace RacingGame
         private AbyssTrack abyssTrack;
         private SpaceTrack spaceTrack;
         private TrackFork trackFork;
+        private HotBombRace hotBomb;
         private PickupSpawner pickups;
         private HudScreen hud;
         private GhostRecorder recorder;
@@ -124,6 +125,7 @@ namespace RacingGame
             PauseController.ResetAll();
             if (recorder != null) recorder.Stop();
             ClearGhosts();
+            if (hotBomb != null) { hotBomb.Stop(); Destroy(hotBomb); hotBomb = null; }
             if (race != null && race.State != RaceState.Idle) race.AbortRace();
             if (pickups != null) pickups.Clear();
             if (trackFork != null) { trackFork.Restore(); Destroy(trackFork.gameObject); trackFork = null; }
@@ -299,6 +301,11 @@ namespace RacingGame
             playerCar.DriftBoosted += OnDriftBoost;
             var ev = RaceSetup.Event;
             EventRules.Apply(ev != null ? ev.twist : RaceTwist.None, race);
+            if (ev != null && ev.twist == RaceTwist.HotBomb)
+            {
+                hotBomb = gameObject.AddComponent<HotBombRace>();
+                hotBomb.Initialize(race);
+            }
             // AI gunners line up a shot before firing, so the target sees the warning; longer on easier tiers.
             // A lane change stretches this base inside BotAim. Hard still keeps a window long enough to dodge.
             float telegraph = BotAim.BaseTelegraph(RaceSetup.TierId);
@@ -447,6 +454,7 @@ namespace RacingGame
 
         private void OnFinished(RaceResults results)
         {
+            if (hotBomb != null) hotBomb.Stop();
             if (playerEngine != null) playerEngine.SetRunning(false);
             recorder.Stop();                                   // DNF path never reached OnParticipantFinished
             if (ContinueOpen) { ContinueOpen = false; if (overlays != null) overlays.HideContinuePrompt(); }

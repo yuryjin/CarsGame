@@ -59,6 +59,8 @@ namespace RacingGame
         public float LastSideSlip { get; private set; }
 
         private CarController car;
+        private RaceParticipant participant;
+        private float bombSpeedLimit = float.PositiveInfinity;
         private AiGunner gunner;
         private RaceProgress progress;
         private TrackPath path;
@@ -83,6 +85,7 @@ namespace RacingGame
         private void Awake()
         {
             car = GetComponent<CarController>();
+            participant = GetComponent<RaceParticipant>();
             car.playerControlled = false;
             gunner = GetComponent<AiGunner>();
             progress = GetComponent<RaceProgress>();
@@ -242,6 +245,7 @@ namespace RacingGame
             // Boxed in (car ahead, both sides taken): match its pace instead of ramming through.
             if (boxedIn) desired = Mathf.Min(desired, trafficSpeedKmh);
             if (car.Surface == GroundSurface.Ground) desired = Mathf.Min(desired, car.offTrackMaxSpeedKmh);
+            desired = Mathf.Min(desired, bombSpeedLimit);
             LastDesiredSpeed = desired; LastCurvature = curvature;
 
             float throttle;
@@ -354,6 +358,14 @@ namespace RacingGame
 
             AvoidMines(Mathf.Max(limit, halfWidth - 1.2f));
 
+            bombSpeedLimit = float.PositiveInfinity;
+            var bomb = participant != null ? participant.HotBomb : null;
+            if (bomb != null && bomb.TryGetTactic(participant, limit, out float bombLane, out float speedLimit))
+            {
+                targetLane = bombLane;
+                bombSpeedLimit = speedLimit;
+                if (bomb.Carrier == participant) boxedIn = false;
+            }
             currentLane = Mathf.MoveTowards(currentLane, targetLane, 3f * dt);
         }
 
