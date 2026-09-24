@@ -77,7 +77,7 @@ namespace RacingGame.Tests
             b.progress.equippedPrimary = 1;
 
             var m = SaveMerge.Merge(a, b);
-            CollectionAssert.AreEqual(new[] { 2, 3, 1 }, m.progress.weapons);
+            CollectionAssert.AreEqual(new[] { 2, 3, 1, 0 }, m.progress.weapons, "merged saves always have the charge slot");
             Assert.AreEqual(2, m.progress.equippedSecondary, "equipped secondary follows newer save b");
             Assert.AreEqual(1, m.progress.equippedPrimary, "equipped primary follows newer save b");
         }

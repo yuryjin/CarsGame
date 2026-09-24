@@ -48,6 +48,7 @@ namespace RacingGame
         private int lastSecondaryAmmo = -1;
         private bool lastSecondaryReady;
         private SecondaryWeaponType lastSecondaryType = SecondaryWeaponType.None;
+        private bool lastChargePlanted;
         private PrimaryWeaponType lastPrimaryType = PrimaryWeaponType.Cannon;
         private bool lastOverheated;
         private int lastHeatPct = -1;
@@ -739,15 +740,21 @@ namespace RacingGame
                 int max = playerWeapons.SecondaryAmmoMax;
                 bool ready = playerWeapons.IsSecondaryReady(SimulationDriver.Instance.Tick);
                 var stype = playerWeapons.secondaryType;
-                if (cur != lastSecondaryAmmo || ready != lastSecondaryReady || stype != lastSecondaryType)
+                bool planted = playerWeapons.PlantedCharge != null;
+                if (cur != lastSecondaryAmmo || ready != lastSecondaryReady || stype != lastSecondaryType || planted != lastChargePlanted)
                 {
                     lastSecondaryAmmo = cur;
                     lastSecondaryReady = ready;
                     lastSecondaryType = stype;
+                    lastChargePlanted = planted;
                     secondaryPanel.gameObject.SetActive(true);
-                    string key = stype == SecondaryWeaponType.Mines ? "hud.secondary.mines" : "hud.secondary.freeze";
+                    string key = stype == SecondaryWeaponType.Mines ? "hud.secondary.mines"
+                        : stype == SecondaryWeaponType.RemoteCharge ? (planted ? "hud.secondary.charge_live" : "hud.secondary.charge")
+                        : "hud.secondary.freeze";
                     secondaryText.text = Loc.Format(key, "cur", cur, "max", max);
-                    secondaryText.color = ready ? (cur > 0 ? new Color(1f, 0.6f, 0.2f) : UiFactory.Muted) : new Color(0.7f, 0.7f, 0.7f, 0.5f);
+                    // A planted charge is the one state that asks for a press right now: red, like its light.
+                    secondaryText.color = planted ? new Color(1f, 0.25f, 0.2f)
+                        : ready ? (cur > 0 ? new Color(1f, 0.6f, 0.2f) : UiFactory.Muted) : new Color(0.7f, 0.7f, 0.7f, 0.5f);
                 }
             }
             else if (secondaryPanel != null && secondaryPanel.gameObject.activeSelf)

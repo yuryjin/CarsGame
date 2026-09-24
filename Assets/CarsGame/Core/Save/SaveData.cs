@@ -64,7 +64,7 @@ namespace RacingGame.Core.Save
     {
         public List<DeviceLedger> ledger = new List<DeviceLedger>();
         public int[] upgrades = new int[3];
-        public int[] weapons = new int[3];
+        public int[] weapons = new int[4];   // WeaponKind levels
         public int equippedSecondary = 0;
         public int equippedPrimary = 0;
         public int buildPreset; // CarBuild; zero preserves the handling of old saves

@@ -99,7 +99,7 @@ namespace RacingGame.Core.Economy
         }
     }
 
-    public enum WeaponKind { Mines = 0, FreezeLauncher = 1, MachineGun = 2 }
+    public enum WeaponKind { Mines = 0, FreezeLauncher = 1, MachineGun = 2, RemoteCharge = 3 }
 
     /// <summary>Purchasable and upgradable weapon modules for secondary and primary slots.</summary>
     public static class WeaponCatalog

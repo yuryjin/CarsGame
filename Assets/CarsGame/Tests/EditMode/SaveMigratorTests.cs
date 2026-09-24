@@ -53,7 +53,7 @@ namespace RacingGame.Tests
             Assert.NotNull(data.progress.upgrades);
             Assert.AreEqual(3, data.progress.upgrades.Length);
             Assert.NotNull(data.progress.weapons);
-            Assert.AreEqual(3, data.progress.weapons.Length);
+            Assert.AreEqual(4, data.progress.weapons.Length, "WeaponKind has four garage lines (remote charge)");
             Assert.NotNull(data.progress.unlockedEvents);
             Assert.NotNull(data.progress.bests);
             Assert.NotNull(data.progress.ledger);
@@ -66,14 +66,14 @@ namespace RacingGame.Tests
             var data1 = SaveMigrator.Parse(v1Json, out var status1);
             Assert.AreEqual(SaveParseStatus.Ok, status1);
             Assert.AreEqual(SaveData.CurrentVersion, data1.version);
-            Assert.AreEqual(3, data1.progress.weapons.Length);
+            Assert.AreEqual(4, data1.progress.weapons.Length);
             CollectionAssert.AreEqual(new[] { 1, 2, 0 }, data1.progress.upgrades);
 
             string v2Json = "{\"version\":2,\"deviceId\":\"d2\",\"progress\":{\"upgrades\":[2,1,1]}}";
             var data2 = SaveMigrator.Parse(v2Json, out var status2);
             Assert.AreEqual(SaveParseStatus.Ok, status2);
             Assert.AreEqual(SaveData.CurrentVersion, data2.version);
-            Assert.AreEqual(3, data2.progress.weapons.Length);
+            Assert.AreEqual(4, data2.progress.weapons.Length);
             CollectionAssert.AreEqual(new[] { 2, 1, 1 }, data2.progress.upgrades);
         }
 
@@ -95,7 +95,7 @@ namespace RacingGame.Tests
             Assert.AreEqual("roundtrip_device", restored.deviceId);
             Assert.AreEqual(777, restored.CoinsEarned);
             Assert.Contains("event_desert_1", restored.progress.unlockedEvents);
-            CollectionAssert.AreEqual(new[] { 2, 1, 0 }, restored.progress.weapons);
+            CollectionAssert.AreEqual(new[] { 2, 1, 0, 0 }, restored.progress.weapons, "a 3-slot save gains the charge slot");
             Assert.AreEqual(1, restored.progress.equippedSecondary);
             Assert.AreEqual(1, restored.progress.equippedPrimary);
         }

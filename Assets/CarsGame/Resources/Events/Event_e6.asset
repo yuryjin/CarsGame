@@ -22,6 +22,7 @@ MonoBehaviour:
   sky: {fileID: 11400000, guid: 7beefcbf75c496d58bfec6920b6762ae, type: 2}
   damageMultiplier: 1
   pickupCount: 12
+  mineFieldCount: 12
   unlockAfterEventId: e5
   order: 5
   star1TargetPosition: 3

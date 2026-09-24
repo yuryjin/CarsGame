@@ -331,7 +331,7 @@ namespace RacingGame
             var loadout = Item(content, "Loadout", 92f, false);
             string primary = Loc.Get(save?.Data.progress.equippedPrimary == 1 ? "garage.machinegun" : "garage.cannon");
             int secondary = save != null ? save.Data.progress.equippedSecondary : 0;
-            string secondaryName = Loc.Get(secondary == 1 ? "garage.mines" : secondary == 2 ? "garage.freezelauncher" : "build.none");
+            string secondaryName = Loc.Get(secondary == 1 ? "garage.mines" : secondary == 2 ? "garage.freezelauncher" : secondary == 3 ? "garage.remotecharge" : "build.none");
             Label(loadout, "Current", Loc.Format("build.loadout", "primary", primary, "secondary", secondaryName) + "\n" + Loc.Get("build.owned_only"),
                 23f, Vector2.zero, Vector2.one, new Vector2(20f, 6f), new Vector2(-20f, -6f), UiFactory.Muted);
 
@@ -354,7 +354,7 @@ namespace RacingGame
             }
 
             Section(content, "WeaponsTitle", Loc.Get("garage.weapons"));
-            foreach (var kind in new[] { WeaponKind.Mines, WeaponKind.FreezeLauncher, WeaponKind.MachineGun })
+            foreach (var kind in new[] { WeaponKind.Mines, WeaponKind.RemoteCharge, WeaponKind.FreezeLauncher, WeaponKind.MachineGun })
             {
                 string key = kind.ToString().ToLowerInvariant();
                 int level = WeaponCatalog.Level(save?.Data.progress.weapons, (int)kind), cost = WeaponCatalog.Cost(level);
@@ -374,6 +374,10 @@ namespace RacingGame
                 else if (kind == WeaponKind.FreezeLauncher)
                 {
                     isEquipped = save != null && save.Data.progress.equippedSecondary == (int)SecondaryWeaponType.FreezeLauncher;
+                }
+                else if (kind == WeaponKind.RemoteCharge)
+                {
+                    isEquipped = save != null && save.Data.progress.equippedSecondary == (int)SecondaryWeaponType.RemoteCharge;
                 }
 
                 var row = Item(content, "Weapon_" + key, Narrow ? 320f : 244f);
@@ -423,7 +427,13 @@ namespace RacingGame
         {
             var save = PlatformGlue.Save;
             if (save == null) return false;
-            if (save.Data.progress.weapons == null || save.Data.progress.weapons.Length < 3) save.Data.progress.weapons = new int[3];
+            var owned = save.Data.progress.weapons;
+            if (owned == null || owned.Length < 4)
+            {
+                // Keep the levels an old 3-slot save already has.
+                save.Data.progress.weapons = new int[4];
+                if (owned != null) Array.Copy(owned, save.Data.progress.weapons, owned.Length);
+            }
             int prevLevel = WeaponCatalog.Level(save.Data.progress.weapons, (int)kind);
             if (WeaponCatalog.TryBuy(save.Data.progress.weapons, kind, save.Data.Coins, out int cost))
             {
@@ -434,6 +444,7 @@ namespace RacingGame
                     if (kind == WeaponKind.MachineGun) save.Data.progress.equippedPrimary = 1;
                     else if (kind == WeaponKind.Mines) save.Data.progress.equippedSecondary = (int)SecondaryWeaponType.Mines;
                     else if (kind == WeaponKind.FreezeLauncher) save.Data.progress.equippedSecondary = (int)SecondaryWeaponType.FreezeLauncher;
+                    else if (kind == WeaponKind.RemoteCharge) save.Data.progress.equippedSecondary = (int)SecondaryWeaponType.RemoteCharge;
                 }
                 save.MarkDirty(); SfxPlayer.Instance.PlayUi(SfxSynth.LapDing); Show("garage"); return true;
             }
@@ -458,6 +469,10 @@ namespace RacingGame
             else if (kind == WeaponKind.FreezeLauncher)
             {
                 save.Data.progress.equippedSecondary = (int)SecondaryWeaponType.FreezeLauncher;
+            }
+            else if (kind == WeaponKind.RemoteCharge)
+            {
+                save.Data.progress.equippedSecondary = (int)SecondaryWeaponType.RemoteCharge;
             }
 
             save.MarkDirty();

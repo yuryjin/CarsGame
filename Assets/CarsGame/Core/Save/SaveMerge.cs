@@ -38,7 +38,7 @@ namespace RacingGame.Core.Save
             for (int i = 0; i < m.progress.upgrades.Length; i++) m.progress.upgrades[i] = Math.Max(At(a.progress.upgrades, i), At(b.progress.upgrades, i));
 
             int nw = Math.Max(a.progress.weapons?.Length ?? 0, b.progress.weapons?.Length ?? 0);
-            m.progress.weapons = new int[Math.Max(3, nw)];
+            m.progress.weapons = new int[Math.Max(4, nw)];
             for (int i = 0; i < m.progress.weapons.Length; i++) m.progress.weapons[i] = Math.Max(At(a.progress.weapons, i), At(b.progress.weapons, i));
 
             m.progress.equippedSecondary = newer.progress.equippedSecondary;

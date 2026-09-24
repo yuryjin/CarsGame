@@ -157,12 +157,22 @@ namespace RacingGame
             if (weapons == null || weapons.secondaryType == SecondaryWeaponType.None) return false;
             if (enabledTick < 0) enabledTick = tick;
             if (startGraceSeconds > 0f && tick - enabledTick < SimulationDriver.SecondsToTicks(startGraceSeconds)) return false;
-            if (suppressed || tick < nextSecondaryTick || !weapons.IsSecondaryReady(tick)) return false;
-            if (health != null && health.IsDead) return false;
+            if (suppressed || (health != null && health.IsDead)) return false;
+            // A planted charge: the button is now the detonator. Checked every tick, so a rival crossing it is not missed.
+            if (weapons.secondaryType == SecondaryWeaponType.RemoteCharge)
+            {
+                var planted = weapons.PlantedCharge;
+                if (planted != null) return TargetFinder.ChargeWorthFiring(car, planted, tick);
+            }
+            if (tick < nextSecondaryTick || !weapons.IsSecondaryReady(tick)) return false;
             if (tick % 10 != 0) return false;
 
             if (director == null) director = RaceDirector.Current ?? RaceDirector.Instance;
-            var pursuer = weapons.secondaryType == SecondaryWeaponType.Mines
+            // Mines and charges go down in front of a rival in the mirror; the freeze launcher shoots ahead.
+            // A charge is blown by hand later, so anyone roughly behind will do; a mine needs a car right on its line.
+            var pursuer = weapons.secondaryType == SecondaryWeaponType.RemoteCharge
+                ? TargetFinder.FindPursuer(car, transform.position, -transform.forward, 5f, Mathf.Max(30f, mineDropMax), Mathf.Max(6f, mineDropLateral))
+                : weapons.secondaryType != SecondaryWeaponType.FreezeLauncher
                 ? TargetFinder.FindPursuer(car, transform.position, -transform.forward, mineDropMin, mineDropMax, mineDropLateral)
                 : FindTarget();
             if (pursuer == null) return false;

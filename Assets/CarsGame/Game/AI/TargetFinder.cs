@@ -98,5 +98,30 @@ namespace RacingGame
             }
             return best;
         }
+
+        /// <summary>
+        /// Worth setting off this charge now: it is armed, a live rival is well inside the blast
+        /// (<paramref name="reach"/> of its radius) and the owner is clear of it. Shared by the AI and touch auto-fire.
+        /// </summary>
+        public static bool ChargeWorthFiring(CarController owner, MineHazard charge, int tick, float reach = 0.8f)
+        {
+            if (charge == null || !charge.IsArmed(tick) || charge.Kind != MineKind.Charge) return false;
+            var director = RaceDirector.Current;
+            if (director == null) return false;
+            Vector3 centre = charge.transform.position;
+            float radius = charge.BlastRadius;
+            if (owner != null && (owner.transform.position - centre).sqrMagnitude < (radius + 1f) * (radius + 1f)) return false;
+            float hit = radius * reach;
+            var cars = director.Cars;
+            for (int i = 0; i < cars.Count; i++)
+            {
+                var other = cars[i];
+                if (other == null || other == owner || !other.isActiveAndEnabled) continue;
+                var h = other.GetComponent<CarHealth>();
+                if (h != null && (h.IsDead || h.IsInvulnerable)) continue;
+                if ((other.transform.position - centre).sqrMagnitude <= hit * hit) return true;
+            }
+            return false;
+        }
     }
 }

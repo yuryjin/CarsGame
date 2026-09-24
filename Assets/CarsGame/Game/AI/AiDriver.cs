@@ -349,12 +349,23 @@ namespace RacingGame
                 if (clearTime > 3f) targetLane = Mathf.Clamp(homeLane, -limit, limit);
             }
 
-            AvoidMines(limit);
+            AvoidMines(Mathf.Max(limit, halfWidth - 1.2f));
 
             currentLane = Mathf.MoveTowards(currentLane, targetLane, 3f * dt);
         }
 
-        private void AvoidMines(float limit)
+        // Lateral spans (m) the car must not drive through, one per mine ahead, weighted by closeness. No per-tick garbage.
+        private readonly float[] mineLo = new float[24], mineHi = new float[24], mineWeight = new float[24];
+        private int mineSpans;
+        private const float MineLookAhead = 45f;
+
+        /// <summary>
+        /// Keep the target lane out of the mines ahead. A minefield row covers two of three lanes and the free lane
+        /// moves from row to row, so a fixed dodge step can steer into the neighbour: score every lane by the mines it
+        /// would cross (nearer ones count more) and take the cleanest, closest one. Dodging may use the whole road
+        /// (<paramref name="roadLimit"/>), not just the racing lanes.
+        /// </summary>
+        private void AvoidMines(float roadLimit)
         {
             var director = RaceDirector.Current;
             if (director == null || director.LiveMines == 0 || path == null || progress == null) return;
@@ -362,31 +373,51 @@ namespace RacingGame
             if (liveMines == null || liveMines.Count == 0) return;
 
             float carDist = progress.Distance;
-            for (int i = 0; i < liveMines.Count; i++)
+            mineSpans = 0;
+            for (int i = 0; i < liveMines.Count && mineSpans < mineLo.Length; i++)
             {
                 var mine = liveMines[i];
                 if (mine == null || !mine.gameObject.activeSelf) continue;
-                int hint = -1;
-                float mineDist = path.Spline.Project(mine.transform.position, ref hint, -1);
-                float deltaDist = path.SignedDelta(carDist, mineDist);
-                if (deltaDist > 2f && deltaDist < 25f)
+                if (!mine.HasTrackPose)
                 {
-                    float mineLateral = path.Spline.LateralOffset(mine.transform.position, mineDist);
-                    float laneDiff = Mathf.Abs(mineLateral - currentLane);
-                    if (laneDiff < 2.0f)
-                    {
-                        float avoidOffset = mineLateral >= currentLane ? -2.4f : 2.4f;
-                        float candidateLane = currentLane + avoidOffset;
-                        if (candidateLane < -limit || candidateLane > limit)
-                        {
-                            candidateLane = currentLane - avoidOffset;
-                        }
-                        targetLane = Mathf.Clamp(candidateLane, -limit, limit);
-                        clearTime = 0f;
-                        break;
-                    }
+                    // A mine never moves: project it onto the spline once per activation.
+                    int hint = -1;
+                    mine.TrackDistance = path.Spline.Project(mine.transform.position, ref hint, -1);
+                    mine.TrackLateral = path.Spline.LateralOffset(mine.transform.position, mine.TrackDistance);
+                    mine.HasTrackPose = true;
+                }
+                float deltaDist = path.SignedDelta(carDist, mine.TrackDistance);
+                if (deltaDist <= 2f || deltaDist >= MineLookAhead) continue;
+                // Proximity is measured to the car's centre. Charges ignore it, but parking on one hands its owner a kill.
+                float half = Mathf.Max(mine.TriggerRadius, 1.2f) + 0.3f;
+                mineLo[mineSpans] = mine.TrackLateral - half;
+                mineHi[mineSpans] = mine.TrackLateral + half;
+                mineWeight[mineSpans] = 1f / deltaDist;
+                mineSpans++;
+            }
+            if (mineSpans == 0) return;
+            float current = MinePenalty(targetLane);
+            if (current <= 0f) return;   // already heading for a free lane: no flip-flopping
+
+            float best = targetLane, bestPenalty = current;
+            for (float lane = -roadLimit; lane <= roadLimit + 0.001f; lane += 0.25f)
+            {
+                float penalty = MinePenalty(lane);
+                if (penalty < bestPenalty - 1e-5f || (Mathf.Abs(penalty - bestPenalty) <= 1e-5f && Mathf.Abs(lane - currentLane) < Mathf.Abs(best - currentLane)))
+                {
+                    best = lane;
+                    bestPenalty = penalty;
                 }
             }
+            targetLane = best;
+            clearTime = 0f;
+        }
+
+        private float MinePenalty(float lane)
+        {
+            float sum = 0f;
+            for (int i = 0; i < mineSpans; i++) if (lane > mineLo[i] && lane < mineHi[i]) sum += mineWeight[i];
+            return sum;
         }
 
         private bool Cast(Vector3 origin, Vector3 dir, float range, out RaycastHit best)

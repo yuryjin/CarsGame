@@ -1,14 +1,20 @@
-using System.Collections.Generic;
 using UnityEngine;
 using RacingGame.Core.Combat;
 
 namespace RacingGame
 {
     /// <summary>
-    /// Pooled contact mine. Spawned behind vehicles with delayed arming (0.5s / 25 ticks)
-    /// and owner immunity window (1.0s / 50 ticks). Detonates on proximity of rivals,
-    /// deals radial blast damage with linear falloff, knocks victims back and applies Punctured status.
-    /// Returns to <see cref="RaceDirector"/> pool on detonation or lifetime expiry (15s / 750 ticks).
+    /// Pooled mine, simulated in ticks. Three flavours share the pool:
+    /// <list type="bullet">
+    /// <item>Dropped contact mine: arms after 0.5s (25 ticks), spares its owner for 1.0s (50 ticks),
+    /// goes off when a car drives within <see cref="triggerRadius"/>, fizzles after 15s (750 ticks).</item>
+    /// <item>Field mine (<see cref="MineField"/>): a contact mine the map lays. No owner, no expiry, a
+    /// tighter trigger so a row of them leaves a lane to slalom through, and a yellow warning disc.</item>
+    /// <item>Charge: ignores proximity. Its owner sets it off with a second press
+    /// (<see cref="TryDetonateCharge"/>); otherwise the fuse fires it after <see cref="chargeFuseSeconds"/>.</item>
+    /// </list>
+    /// Every blast deals radial damage with linear falloff, knocks cars back and punctures them.
+    /// Returns to the <see cref="RaceDirector"/> pool when it explodes or expires.
     /// </summary>
     public class MineHazard : MonoBehaviour, ISimulated
     {
@@ -23,6 +29,19 @@ namespace RacingGame
         public float armDelaySeconds = 0.5f;
         public float lifetimeSeconds = 15f;
         public float ownerImmunitySeconds = 1.0f;
+
+        [Header("Field mine")]
+        [Tooltip("Field mines trigger only when a car is nearly on top of them, so a row leaves a lane free.")]
+        public float fieldTriggerRadius = 1.6f;
+        public float fieldExplosionRadius = 3.5f;
+
+        [Header("Charge")]
+        public float chargeMinDamage = 15f;
+        public float chargeExplosionRadius = 7f;
+        public float chargeExplosionImpulse = 4500f;
+        public float chargeArmSeconds = 0.6f;
+        [Tooltip("An untouched charge goes off by itself this long after it was planted.")]
+        public float chargeFuseSeconds = 8f;
 
         [Header("Status Effect")]
         public StatusKind statusApplied = StatusKind.Punctured;
@@ -41,18 +60,34 @@ namespace RacingGame
         private float customBlastRadius, customImpulse, activeStatusDuration;
         private StatusKind activeStatus;
         public MineSkin Skin { get; private set; }
-        public float BlastRadius => customBlastRadius > 0f ? customBlastRadius : explosionRadius;
 
         public GameObject Owner => owner;
         public int OwnerId => ownerId;
         public bool IsLive => live;
+        public MineKind Kind { get; private set; }
+        public bool IsField { get; private set; }
+        /// <summary>Bumped on every activation, so a holder of a pooled reference can tell its mine was reused.</summary>
+        public int Generation { get; private set; }
+        public int SpawnTick => spawnTick;
+        public int ArmTick => armTick;
+        /// <summary>Tick the mine expires (contact) or its fuse fires (charge); -1 for field mines.</summary>
+        public int DeathTick => deathTick;
         public int SimulationOrder => 1100;
+
+        /// <summary>Distance at which a car sets this mine off (0 for charges, which ignore proximity).</summary>
+        public float TriggerRadius => Kind == MineKind.Charge ? 0f : IsField ? fieldTriggerRadius : triggerRadius;
+        public float BlastRadius => customBlastRadius > 0f ? customBlastRadius : Kind == MineKind.Charge ? chargeExplosionRadius : IsField ? fieldExplosionRadius : explosionRadius;
+
+        /// <summary>AI cache: where the mine sits on the track spline (filled lazily by <see cref="AiDriver"/>).</summary>
+        [System.NonSerialized] public bool HasTrackPose;
+        [System.NonSerialized] public float TrackDistance, TrackLateral;
 
         public bool IsArmed(int tick) => live && tick >= armTick;
         public bool IsOwnerImmune(int tick) => live && tick < ownerImmunityTick;
 
         public static MineHazard CreatePooled(Transform parent)
         {
+            // Detection is deterministic in the tick simulation: the mine has no collider at all.
             var go = new GameObject("Mine_Hazard");
             go.transform.SetParent(parent, false);
             var mine = go.AddComponent<MineHazard>();
@@ -66,27 +101,29 @@ namespace RacingGame
             director = owningDirector;
             owner = spawn.Owner;
             ownerId = spawn.OwnerId;
+            Kind = spawn.Kind;
             Skin = spawn.Skin;
             customBlastRadius = Mathf.Max(0f, spawn.BlastRadius);
             customImpulse = spawn.Impulse;
             activeStatus = spawn.OverrideStatus ? spawn.Status : statusApplied;
             activeStatusDuration = spawn.OverrideStatus ? spawn.StatusDuration : statusDuration;
-            damage = spawn.Damage > 0f ? spawn.Damage : 25f;
+            IsField = spawn.Field && spawn.Kind == MineKind.Contact;
+            damage = spawn.Damage > 0f ? spawn.Damage : Kind == MineKind.Charge ? 45f : 25f;
             spawnTick = spawn.Tick;
             live = true;
+            Generation++;
+            HasTrackPose = false;
 
-            int armDelayTicks = SimulationDriver.SecondsToTicks(armDelaySeconds);
-            int lifetimeTicks = SimulationDriver.SecondsToTicks(lifetimeSeconds);
-            int ownerImmunityTicks = SimulationDriver.SecondsToTicks(ownerImmunitySeconds);
-
-            armTick = spawn.Tick + armDelayTicks;
-            deathTick = spawn.Tick + lifetimeTicks;
-            ownerImmunityTick = spawn.Tick + ownerImmunityTicks;
+            float armSeconds = Kind == MineKind.Charge ? chargeArmSeconds : armDelaySeconds;
+            armTick = spawn.Tick + SimulationDriver.SecondsToTicks(armSeconds);
+            ownerImmunityTick = spawn.Tick + SimulationDriver.SecondsToTicks(ownerImmunitySeconds);
+            if (IsField) deathTick = -1;
+            else deathTick = spawn.Tick + SimulationDriver.SecondsToTicks(Kind == MineKind.Charge ? chargeFuseSeconds : lifetimeSeconds);
 
             transform.position = spawn.Position;
             transform.rotation = spawn.Rotation;
 
-            if (visual != null) visual.Show(MineKind.Contact, false, spawn.Material, Skin);
+            if (visual != null) visual.Show(Kind, IsField, spawn.Material, Skin);
 
             gameObject.SetActive(true);
         }
@@ -95,17 +132,20 @@ namespace RacingGame
         {
             if (!live) return;
 
-            if (tick >= deathTick)
+            if (deathTick >= 0 && tick >= deathTick)
             {
-                Deactivate();
+                // A charge's fuse ends in a bang; an old contact mine just fizzles out.
+                if (Kind == MineKind.Charge) Detonate(tick);
+                else Deactivate();
                 return;
             }
 
-            if (tick < armTick) return;
+            if (tick < armTick || Kind == MineKind.Charge) return;
 
             // Check proximity to all registered cars
             if (director != null && director.Cars != null)
             {
+                float radius = TriggerRadius;
                 var cars = director.Cars;
                 for (int i = 0; i < cars.Count; i++)
                 {
@@ -113,13 +153,13 @@ namespace RacingGame
                     if (car == null || !car.gameObject.activeInHierarchy) continue;
 
                     var health = car.GetComponent<CarHealth>();
-                    if (health == null || health.IsDead) continue;
+                    if (health != null && health.IsDead) continue;
 
-                    bool isOwner = car.gameObject == owner;
+                    bool isOwner = owner != null && car.gameObject == owner;
                     if (isOwner && tick < ownerImmunityTick) continue;
 
                     float dist = Vector3.Distance(transform.position, car.transform.position);
-                    if (dist <= triggerRadius)
+                    if (dist <= radius)
                     {
                         Detonate(tick);
                         return;
@@ -128,14 +168,22 @@ namespace RacingGame
             }
         }
 
+        /// <summary>The owner's second press. Only a charge that has finished arming goes off.</summary>
+        public bool TryDetonateCharge(int tick)
+        {
+            if (!live || Kind != MineKind.Charge || tick < armTick) return false;
+            Detonate(tick);
+            return true;
+        }
+
         public void Detonate(int tick)
         {
             if (!live) return;
 
             Vector3 blastCenter = transform.position;
             float radius = BlastRadius;
-            float floor = Mathf.Min(damage, minDamage);
-            float impulse = customImpulse != 0f ? customImpulse : explosionImpulse;
+            float floor = Mathf.Min(damage, Kind == MineKind.Charge ? chargeMinDamage : minDamage);
+            float impulse = customImpulse != 0f ? customImpulse : Kind == MineKind.Charge ? chargeExplosionImpulse : explosionImpulse;
 
             if (director != null && director.Cars != null)
             {
@@ -192,7 +240,7 @@ namespace RacingGame
 
             if (SfxPlayer.Instance != null)
             {
-                SfxPlayer.Instance.Play(SfxSynth.Wreck, blastCenter, 0.9f, 1.1f);
+                SfxPlayer.Instance.Play(SfxSynth.Wreck, blastCenter, Kind == MineKind.Charge ? 1f : 0.9f, Kind == MineKind.Charge ? 0.8f : 1.1f);
             }
 
             Deactivate();
@@ -206,12 +254,14 @@ namespace RacingGame
             gameObject.SetActive(false);
             if (director != null) director.ReturnToPool(this);
         }
+
+        // Presentation only: the light blinks from the tick the simulation already reached.
         private void LateUpdate()
         {
             if (!live || visual == null) return;
             var driver = SimulationDriver.Current;
             int tick = driver != null ? driver.Tick : spawnTick;
-            visual.Blink(tick, armTick, deathTick, MineKind.Contact, Time.time);
+            visual.Blink(tick, armTick, deathTick, Kind, Time.time);
         }
     }
 }

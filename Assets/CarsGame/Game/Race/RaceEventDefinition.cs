@@ -28,6 +28,10 @@ namespace RacingGame
         [Tooltip("Time-of-day look for this event (null = day / legacy night flag).")] public RacingGame.World.SkyPreset sky;
         [Range(0.5f, 3f)] public float damageMultiplier = 1f;
         [Range(0, 20)] public int pickupCount = 9;
+        [Tooltip("Mines the map lays at the start and relays after each blast. -1 = mode default (arena 10, race none).")]
+        [Range(-1, 40)] public int mineFieldCount = -1;
+        public const int ArenaMineFieldDefault = 10;
+        public int MineFieldCount => mineFieldCount >= 0 ? mineFieldCount : mode == EventMode.Arena ? ArenaMineFieldDefault : 0;
         [Tooltip("Event that must be finished in the top 3 before this one unlocks (empty = always open).")]
         public string unlockAfterEventId = "";
         public int order;

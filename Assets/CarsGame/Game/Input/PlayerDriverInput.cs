@@ -177,7 +177,10 @@ namespace RacingGame
         public DriveCommand Sample(int tick)
         {
             bool sec = secondary;
-            if (!WeaponWheelOpen && !sec && autoSecondary && tick % 10 == 0)
+            // Touch auto-fire of a planted charge: blow it the moment a rival rolls over it (every tick, not every 10th).
+            if (!WeaponWheelOpen && !sec && autoSecondary && weapons != null && weapons.PlantedCharge != null)
+                sec = TargetFinder.ChargeWorthFiring(GetComponent<CarController>(), weapons.PlantedCharge, tick);
+            else if (!WeaponWheelOpen && !sec && autoSecondary && tick % 10 == 0)
             {
                 var car = GetComponent<CarController>();
                 if (car != null)

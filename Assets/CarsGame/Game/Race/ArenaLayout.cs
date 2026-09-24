@@ -1,12 +1,15 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RacingGame
 {
     /// <summary>A runtime arena with a floor, four walls and inward-facing spawn points.</summary>
-    public sealed class ArenaLayout : MonoBehaviour
+    public sealed class ArenaLayout : MonoBehaviour, IMineFieldSite
     {
         public const float HalfSize = 50f;
+        /// <summary>The fight zone the minefield covers: a ring between the centre and the spawn circle.</summary>
+        public const float MineInnerRadius = 7f, MineOuterRadius = HalfSize - 16f, MineSpacing = 7f;
 
         public static ArenaLayout Create(Material material)
         {
@@ -41,6 +44,33 @@ namespace RacingGame
             var radial = new Vector3(Mathf.Sin(angle), 0f, Mathf.Cos(angle));
             position = transform.TransformPoint(radial * (HalfSize - 10f) + Vector3.up * 0.5f);
             rotation = transform.rotation * Quaternion.LookRotation(-radial, Vector3.up);
+        }
+
+        /// <summary>
+        /// Mines scattered over the fight zone: none in the middle (bots head there when no rival is in sight and
+        /// the recovery fallback drops cars there), none on the spawn circle, at least <see cref="MineSpacing"/>
+        /// apart so there is always a way through.
+        /// </summary>
+        public void GetMinePoses(int count, int seed, List<Pose> into)
+        {
+            var rng = new System.Random(seed);
+            int first = into.Count;
+            for (int attempt = 0; attempt < count * 60 && into.Count - first < count; attempt++)
+            {
+                float angle = (float)rng.NextDouble() * Mathf.PI * 2f;
+                // Uniform over the ring's area, not bunched at the inner edge.
+                float r = Mathf.Sqrt(Mathf.Lerp(MineInnerRadius * MineInnerRadius, MineOuterRadius * MineOuterRadius, (float)rng.NextDouble()));
+                var local = new Vector3(Mathf.Sin(angle) * r, 0f, Mathf.Cos(angle) * r);
+                if (!FreeOfMines(into, first, transform.TransformPoint(local))) continue;
+                into.Add(new Pose(transform.TransformPoint(local), transform.rotation * Quaternion.Euler(0f, angle * Mathf.Rad2Deg, 0f)));
+            }
+        }
+
+        private static bool FreeOfMines(List<Pose> poses, int first, Vector3 point)
+        {
+            for (int i = first; i < poses.Count; i++)
+                if ((poses[i].position - point).sqrMagnitude < MineSpacing * MineSpacing) return false;
+            return true;
         }
 
         public bool TryGetRecoveryPose(CarController car, out Vector3 position, out Quaternion rotation)

@@ -31,8 +31,12 @@ namespace RacingGame
             progress.buildPreset = (int)build;
             progress.equippedPrimary = build == CarBuild.Firepower && WeaponCatalog.Level(progress.weapons, 2) > 0 ? 1 : 0;
             int secondary = build == CarBuild.Speed ? 2 : build == CarBuild.Balanced ? 0 : 1;
-            progress.equippedSecondary = secondary > 0 && WeaponCatalog.Level(progress.weapons, secondary - 1) > 0 ? secondary : 0;
+            progress.equippedSecondary = secondary > 0 && WeaponCatalog.Level(progress.weapons, (int)KindOf((SecondaryWeaponType)secondary)) > 0 ? secondary : 0;
         }
+
+        /// <summary>The garage line that unlocks a secondary weapon (the two enums are numbered differently).</summary>
+        public static WeaponKind KindOf(SecondaryWeaponType type) => type == SecondaryWeaponType.Mines ? WeaponKind.Mines
+            : type == SecondaryWeaponType.FreezeLauncher ? WeaponKind.FreezeLauncher : WeaponKind.RemoteCharge;
 
         public static void ApplyWeapons(CarWeapons weapons, int[] weaponLevels, int equippedSecondary, int equippedPrimary = 0)
         {
@@ -45,8 +49,8 @@ namespace RacingGame
             if (primaryType == PrimaryWeaponType.MachineGun && mgLevel == 0) primaryType = PrimaryWeaponType.Cannon;
             weapons.SetPrimaryType(primaryType);
 
-            var secondaryType = (SecondaryWeaponType)Mathf.Clamp(equippedSecondary, 0, 2);
-            if (secondaryType != SecondaryWeaponType.None && WeaponCatalog.Level(weaponLevels, (int)secondaryType - 1) == 0) secondaryType = SecondaryWeaponType.None;
+            var secondaryType = (SecondaryWeaponType)Mathf.Clamp(equippedSecondary, 0, (int)SecondaryWeaponType.RemoteCharge);
+            if (secondaryType != SecondaryWeaponType.None && WeaponCatalog.Level(weaponLevels, (int)KindOf(secondaryType)) == 0) secondaryType = SecondaryWeaponType.None;
             weapons.secondaryType = secondaryType;
 
             if (secondaryType == SecondaryWeaponType.Mines)
@@ -63,6 +67,16 @@ namespace RacingGame
                 var fx = WeaponCatalog.For(lvl);
                 weapons.secondaryAmmoMax = Mathf.Max(1, Mathf.RoundToInt(3 * fx.AmmoFactor));
                 weapons.secondaryCooldown = 3f * fx.CooldownFactor;
+                weapons.RefillSecondaryAmmo();
+            }
+            else if (secondaryType == SecondaryWeaponType.RemoteCharge)
+            {
+                // Fewer, heavier blasts than mines: 2 / 3 / 3 charges, upgrades also add damage.
+                int lvl = WeaponCatalog.Level(weaponLevels, (int)WeaponKind.RemoteCharge);
+                var fx = WeaponCatalog.For(lvl);
+                weapons.secondaryAmmoMax = Mathf.Max(1, Mathf.RoundToInt(2 * fx.AmmoFactor));
+                weapons.secondaryCooldown = 4f * fx.CooldownFactor;
+                weapons.chargeDamage = 45f * fx.DamageFactor;
                 weapons.RefillSecondaryAmmo();
             }
             else

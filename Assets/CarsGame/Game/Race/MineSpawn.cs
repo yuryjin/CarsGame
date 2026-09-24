@@ -3,6 +3,7 @@ using RacingGame.Core.Combat;
 
 namespace RacingGame
 {
+    /// <summary>Contact mines go off when a rival drives close; charges wait for their owner (or the fuse).</summary>
     public enum MineSkin { Standard, Banana, BearTrap, Glue, Ice, Emp, Spring, Cactus }
 
     public enum MineKind { Contact, Charge }
@@ -19,11 +20,14 @@ namespace RacingGame
         public float Damage;
         public int Tick;
         public Material Material;
+        public MineKind Kind;
         public MineSkin Skin;
         public bool OverrideStatus;
         public StatusKind Status;
         public float StatusDuration;
         public float BlastRadius;
         public float Impulse;
+        /// <summary>Laid by the map (<see cref="MineField"/>), not a car: no owner, never expires, not counted in the dropped-mine cap.</summary>
+        public bool Field;
     }
 }

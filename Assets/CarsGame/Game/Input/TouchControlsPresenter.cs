@@ -29,6 +29,8 @@ namespace RacingGame
         private PlayerDriverInput hooked;
         private bool previousAutoThrottle;
         private bool previousAutoSecondary;
+        private TMPro.TextMeshProUGUI secondaryLabel;
+        private string secondaryKey = "touch.secondary";
 
         private void Awake()
         {
@@ -71,6 +73,22 @@ namespace RacingGame
             if (shown && input != null && hooked != input) { hooked = input; previousAutoThrottle = input.autoThrottle; previousAutoSecondary = input.autoSecondary; input.autoThrottle = true; input.autoSecondary = true; }
             if (!shown && hooked != null) { hooked.autoThrottle = previousAutoThrottle; hooked.autoSecondary = previousAutoSecondary; hooked = null; }
             if (!shown && input != null && PlatformGlue.Save != null && PlatformGlue.Save.Data.settings.autoThrottle && !input.autoThrottle) input.autoThrottle = true;
+            if (shown) UpdateSecondaryLabel(input != null ? input.GetComponent<CarWeapons>() : null);
+        }
+
+        // The second button says what a press does now: drop a mine, plant a charge, blow the planted one, freeze.
+        private void UpdateSecondaryLabel(CarWeapons weapons)
+        {
+            if (secondaryLabel == null) return;
+            var type = weapons != null ? weapons.secondaryType : SecondaryWeaponType.None;
+            secondaryLabel.transform.parent.gameObject.SetActive(type != SecondaryWeaponType.None);
+            if (type == SecondaryWeaponType.None) return;
+            string key = type == SecondaryWeaponType.FreezeLauncher ? "touch.freeze"
+                : type == SecondaryWeaponType.RemoteCharge ? (weapons.PlantedCharge != null ? "touch.detonate" : "touch.charge")
+                : "touch.secondary";
+            if (key == secondaryKey) return;
+            secondaryKey = key;
+            secondaryLabel.text = Loc.Get(key);
         }
 
         private void Build()
@@ -82,18 +100,21 @@ namespace RacingGame
             Button(root, "Left", "◄", "<Gamepad>/dpad/left", new Vector2(0f, 0f), new Vector2(40f, 40f), new Vector2(200f, 200f));
             Button(root, "Right", "►", "<Gamepad>/dpad/right", new Vector2(0f, 0f), new Vector2(260f, 40f), new Vector2(420f, 200f));
             Button(root, "Fire", Loc.Get("touch.fire"), "<Gamepad>/rightShoulder", new Vector2(1f, 0f), new Vector2(-260f, 40f), new Vector2(-40f, 260f));
-            Button(root, "Secondary", Loc.Get("touch.secondary"), "<Gamepad>/leftShoulder", new Vector2(1f, 0f), new Vector2(-480f, 180f), new Vector2(-280f, 300f));
+            secondaryLabel = Button(root, "Secondary", Loc.Get("touch.secondary"), "<Gamepad>/leftShoulder", new Vector2(1f, 0f), new Vector2(-480f, 180f), new Vector2(-280f, 300f));
+            secondaryKey = "touch.secondary";
+            secondaryLabel.transform.parent.gameObject.SetActive(false);
             Button(root, "Brake", Loc.Get("touch.brake"), "<Gamepad>/buttonSouth", new Vector2(1f, 0f), new Vector2(-480f, 40f), new Vector2(-280f, 160f));
             Button(root, "Reset", "R", "<Gamepad>/buttonNorth", new Vector2(1f, 1f), new Vector2(-140f, -140f), new Vector2(-40f, -40f));
         }
 
-        private static void Button(Transform parent, string name, string label, string controlPath, Vector2 anchor, Vector2 offsetMin, Vector2 offsetMax)
+        private static TMPro.TextMeshProUGUI Button(Transform parent, string name, string label, string controlPath, Vector2 anchor, Vector2 offsetMin, Vector2 offsetMax)
         {
             var face = UiFactory.Button(parent, name, label, null, anchor, anchor, offsetMin, offsetMax, 34f, name == "Fire" ? UiFactory.Accent : UiFactory.Surface);
             // OnScreenButton owns press/release; the uGUI button supplies visual feedback only.
             face.interactable = true; face.navigation = new Navigation { mode = Navigation.Mode.None };
             var btn = face.gameObject.AddComponent<OnScreenButton>();
             btn.controlPath = controlPath;
+            return face.GetComponentInChildren<TMPro.TextMeshProUGUI>();
         }
     }
 }

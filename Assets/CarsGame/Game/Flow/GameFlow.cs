@@ -189,11 +189,23 @@ namespace RacingGame
             if (race.State == RaceState.Idle) { EnterMenu(); return; }
             if (abyssTrack != null && spaceTrack == null && race.Player != null) abyssTrack.Follow(race.Player.Progress);
             if (pickups != null && (ev == null || ev.mode != EventMode.Arena)) pickups.Spawn(ev != null ? ev.pickupCount : 9);
+            LayMineField(ev);
             if (hud != null) hud.SetVisible(true);
             if (speedFx != null) speedFx.SetVisible(true);
             if (overlays != null) overlays.SetVisible(true);
             SetState(FlowState.Racing);
             if (ev == null || ev.mode != EventMode.Arena) SpawnGhosts(ev, generation);
+        }
+
+        // Arena: the fight zone; a race: slalom gates on the straights. Seeded from the race, so the daily race matches for everyone.
+        private void LayMineField(RaceEventDefinition ev)
+        {
+            int count = ev != null ? ev.MineFieldCount : 0;
+            var director = RaceDirector.Current ?? RaceDirector.Instance;
+            if (count <= 0 || director == null) return;
+            var arena = race.spawner != null ? race.spawner.Arena : null;
+            IMineFieldSite site = arena != null ? arena : track != null ? new TrackMineSite(track) : null;
+            director.Field.Lay(director, site, count, director.raceSeed ^ 0x6d696e65, arena != null ? 10f : 20f);
         }
 
         // ---------- ghosts (async multiplayer) ----------

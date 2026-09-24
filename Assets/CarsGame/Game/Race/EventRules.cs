@@ -12,13 +12,17 @@ namespace RacingGame
     {
         public const int MinesOnlyAmmo = 5;
         public const float MinesOnlyCooldown = 2f;
+        public const int ArenaChargeAmmo = 2;
+        public const float ArenaChargeCooldown = 4f;
 
         public static void Apply(RaceTwist twist, RaceManager race)
         {
             if (race == null) return;
+            bool arena = race.IsArenaMode;
             foreach (var p in race.Participants)
             {
                 if (p == null) continue;
+                if (arena && twist != RaceTwist.MinesOnly) ArenaCharges(p);
                 if (twist == RaceTwist.MinesOnly) MinesOnly(p);
                 if (twist == RaceTwist.OneLife && p.Health != null) p.Health.respawnOnDeath = false;
             }
@@ -42,6 +46,17 @@ namespace RacingGame
             // Mines are the only weapon: drop them on anyone in the mirror, not just a car glued to the bumper.
             var gunner = p.GetComponent<AiGunner>();
             if (gunner != null) { gunner.mineDropMin = 6f; gunner.mineDropMax = 45f; gunner.mineDropLateral = 6f; }
+        }
+
+        // Arena: whoever brought no secondary weapon gets planted charges, so the brawl has traps on both sides.
+        private static void ArenaCharges(RaceParticipant p)
+        {
+            var w = p.Weapons;
+            if (w == null || w.secondaryType != SecondaryWeaponType.None) return;
+            w.secondaryType = SecondaryWeaponType.RemoteCharge;
+            w.secondaryAmmoMax = ArenaChargeAmmo;
+            w.secondaryCooldown = ArenaChargeCooldown;
+            w.RefillSecondaryAmmo();
         }
 
         /// <summary>True when this car can still fire its primary (the HUD hides the ammo panel otherwise).</summary>

@@ -23,7 +23,7 @@ namespace RacingGame
 
         [Tooltip("Mines created up front (prewarmed before the race starts).")]
         public int minePoolSize = 12;
-        [Tooltip("Hard cap on active mines on track. When reached the oldest mine is recycled.")]
+        [Tooltip("Hard cap on mines dropped by cars. When reached the oldest dropped mine is recycled; minefield mines never are.")]
         public int maxLiveMines = 24;
 
         public static RaceDirector Instance
@@ -186,21 +186,63 @@ namespace RacingGame
         public MineHazard RequestMine(in MineSpawn spawn)
         {
             var root = MineRoot;   // prewarms the pool on first use
-            int cap = MaxLiveMinesCap;
-            while (liveMines.Count >= cap)
+            if (!spawn.Field)
             {
-                int before = liveMines.Count;
-                liveMines[0].Deactivate();
-                if (liveMines.Count == before) liveMines.RemoveAt(0);
+                int cap = MaxLiveMinesCap;
+                while (DroppedMineCount() >= cap)
+                {
+                    int oldest = liveMines.FindIndex(m => !m.IsField);
+                    int before = liveMines.Count;
+                    liveMines[oldest].Deactivate();
+                    if (liveMines.Count == before) liveMines.RemoveAt(oldest);
+                }
             }
             if (pooledMines.Count == 0) pooledMines.Add(MineHazard.CreatePooled(root));
             var mine = pooledMines[pooledMines.Count - 1];
             pooledMines.RemoveAt(pooledMines.Count - 1);
             liveMines.Add(mine);
-            mine.Activate(this, spawn);
-            MinesDropped++;
+            var placed = spawn;
+            placed.Position = SnapToGround(spawn.Position);
+            mine.Activate(this, placed);
+            if (!spawn.Field) MinesDropped++;
             return mine;
         }
+
+        private int DroppedMineCount()
+        {
+            int n = 0;
+            for (int i = 0; i < liveMines.Count; i++) if (!liveMines[i].IsField) n++;
+            return n;
+        }
+
+        /// <summary>Mines lie on the road surface, not at the height of the car's pivot.</summary>
+        private static Vector3 SnapToGround(Vector3 position)
+        {
+            int layer = LayerMask.NameToLayer("Track");
+            if (layer < 0) return position;
+            return Physics.Raycast(position + Vector3.up * 1.5f, Vector3.down, out var hit, 4f, 1 << layer, QueryTriggerInteraction.Ignore)
+                ? hit.point + Vector3.up * 0.02f : position;
+        }
+
+        /// <summary>The owner's live charge, or null. A car has at most one: its second press sets it off.</summary>
+        public MineHazard FindCharge(GameObject owner)
+        {
+            if (owner == null) return null;
+            for (int i = 0; i < liveMines.Count; i++)
+                if (liveMines[i].Kind == MineKind.Charge && liveMines[i].Owner == owner) return liveMines[i];
+            return null;
+        }
+
+        /// <summary>Mines the map lays (arena fight zone, minefield events); relaid by <see cref="MineField"/> after a blast.</summary>
+        public MineField Field
+        {
+            get
+            {
+                if (field == null) field = GetComponent<MineField>() ?? gameObject.AddComponent<MineField>();
+                return field;
+            }
+        }
+        private MineField field;
 
         internal void ReturnToPool(MineHazard mine)
         {
@@ -212,6 +254,7 @@ namespace RacingGame
         public void ResetRace()
         {
             for (int i = liveShells.Count - 1; i >= 0; i--) liveShells[i].Deactivate();
+            if (field != null) field.Clear();   // before the mines go, or it would relay them
             for (int i = liveMines.Count - 1; i >= 0; i--) liveMines[i].Deactivate();
             if (oilSlicks != null) oilSlicks.ResetSlicks();
             ShotsFired = 0;
@@ -227,6 +270,7 @@ namespace RacingGame
             // Iterate backwards: objects that expire remove themselves from live lists.
             for (int i = liveShells.Count - 1; i >= 0; i--) liveShells[i].SimulationStep(tick);
             for (int i = liveMines.Count - 1; i >= 0; i--) liveMines[i].SimulationStep(tick);
+            if (field != null) field.SimulationStep(this, tick);
             if (oilSlicks != null) oilSlicks.SimulationStep(tick, cars);
         }
 

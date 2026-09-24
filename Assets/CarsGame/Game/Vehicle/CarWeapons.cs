@@ -63,7 +63,9 @@ namespace RacingGame
     {
         None,
         Mines,
-        FreezeLauncher
+        FreezeLauncher,
+        /// <summary>Planted charge: first press plants it, the next press sets it off (or the fuse does).</summary>
+        RemoteCharge
     }
 
     /// <summary>
@@ -100,17 +102,21 @@ namespace RacingGame
         public int secondaryAmmoMax = 3;
         [Tooltip("Cooldown between secondary uses in seconds.")]
         public float secondaryCooldown = 3f;
+        [Tooltip("Damage at the centre of a planted charge's blast (garage upgrades raise it).")]
+        public float chargeDamage = 45f;
 
         public event Action<float, float> HeatChanged; // current, max
         public event Action<int, int> SecondaryAmmoChanged; // current, max
         public event Action<bool> OverheatChanged; // isOverheated
         public event Action<PrimaryWeaponType> PrimarySwitched; // mid-race swap done
         public event Action PrimarySwitchDenied; // asked for the machine gun without owning it
+        public event Action ChargeDetonated; // the driver set off their planted charge
 
         private CarController car;
         private CarStatus status;
         private Rigidbody rb;
         private bool wantsSecondary;
+        private bool secondaryHeld;   // charges act on the press, so holding the button never plants and blows in one go
         private bool wantsPrimary;
         private int nextSecondaryTick;
         private int lastTickedTick = -1;
@@ -124,6 +130,17 @@ namespace RacingGame
         public int SimulationOrder => 950 + (car != null ? car.CarId : 0);
 
         public bool IsSecondaryReady(int tick) => tick >= nextSecondaryTick && (secondaryAmmoMax <= 0 || secondaryAmmo > 0);
+
+        /// <summary>This car's charge still on the ground (armed or arming), or null.</summary>
+        public MineHazard PlantedCharge
+        {
+            get
+            {
+                if (secondaryType != SecondaryWeaponType.RemoteCharge) return null;
+                var director = RaceDirector.Current;
+                return director != null ? director.FindCharge(gameObject) : null;
+            }
+        }
 
         private void Awake()
         {
@@ -236,7 +253,9 @@ namespace RacingGame
                 CoolHeat(SimulationDriver.FixedStep);
             }
 
-            if (wantsSecondary)
+            bool pressed = wantsSecondary && !secondaryHeld;
+            secondaryHeld = wantsSecondary;
+            if (secondaryType == SecondaryWeaponType.RemoteCharge ? pressed : wantsSecondary)
             {
                 TryFireSecondary(tick);
             }
@@ -281,10 +300,22 @@ namespace RacingGame
 
         public bool TryFireSecondary(int tick)
         {
-            if (!enabled || tick < nextSecondaryTick) return false;
+            if (!enabled) return false;
             if (status == null) status = GetComponent<CarStatus>();
             if (status != null && status.IsJammed) return false;
             if (secondaryType == SecondaryWeaponType.None) return false;
+            if (secondaryType == SecondaryWeaponType.RemoteCharge)
+            {
+                // A charge on the ground turns the button into the detonator; the cooldown only gates planting.
+                var planted = PlantedCharge;
+                if (planted != null)
+                {
+                    if (!planted.TryDetonateCharge(tick)) return false;
+                    ChargeDetonated?.Invoke();
+                    return true;
+                }
+            }
+            if (tick < nextSecondaryTick) return false;
             if (secondaryAmmoMax > 0 && secondaryAmmo <= 0) return false;
 
             if (secondaryType == SecondaryWeaponType.Mines)
@@ -301,6 +332,23 @@ namespace RacingGame
                         Rotation = transform.rotation,
                         Damage = 25f,
                         Tick = tick
+                    });
+                }
+            }
+            else if (secondaryType == SecondaryWeaponType.RemoteCharge)
+            {
+                var director = RaceDirector.Current ?? RaceDirector.Instance;
+                if (director != null)
+                {
+                    director.RequestMine(new MineSpawn
+                    {
+                        Owner = gameObject,
+                        OwnerId = car != null ? car.CarId : 0,
+                        Position = transform.position - transform.forward * 2.4f + Vector3.up * 0.1f,
+                        Rotation = transform.rotation,
+                        Damage = chargeDamage,
+                        Tick = tick,
+                        Kind = MineKind.Charge
                     });
                 }
             }

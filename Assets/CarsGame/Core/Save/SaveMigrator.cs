@@ -41,10 +41,11 @@ namespace RacingGame.Core.Save
                 System.Array.Copy(data.progress.upgrades, u, data.progress.upgrades.Length);
                 data.progress.upgrades = u;
             }
-            data.progress.weapons ??= new int[3];
-            if (data.progress.weapons.Length < 3)
+            // Old saves have 3 weapon slots; the remote charge (WeaponKind 3) gets a zero level.
+            data.progress.weapons ??= new int[4];
+            if (data.progress.weapons.Length < 4)
             {
-                var w = new int[3];
+                var w = new int[4];
                 System.Array.Copy(data.progress.weapons, w, data.progress.weapons.Length);
                 data.progress.weapons = w;
             }
