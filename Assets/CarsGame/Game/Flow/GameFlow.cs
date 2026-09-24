@@ -284,12 +284,14 @@ namespace RacingGame
             var ev = RaceSetup.Event;
             EventRules.Apply(ev != null ? ev.twist : RaceTwist.None, race);
             // AI gunners line up a shot before firing, so the target sees the warning; longer on easier tiers.
-            float telegraph = RaceSetup.TierId == "easy" ? 0.55f : RaceSetup.TierId == "hard" ? 0.25f : 0.38f;
+            // A lane change stretches this base inside BotAim. Hard still keeps a window long enough to dodge.
+            float telegraph = BotAim.BaseTelegraph(RaceSetup.TierId);
+            bool hard = RaceSetup.TierId == "hard";
             foreach (var p in race.Participants)
             {
                 if (p == null || p.isPlayer) continue;
                 var gunner = p.GetComponent<AiGunner>();
-                if (gunner != null) gunner.telegraphSeconds = telegraph;
+                if (gunner != null) { gunner.telegraphSeconds = telegraph; gunner.hardTier = hard; }
             }
 
             if (playerCar.GetComponent<PlayerEffects>() == null) playerCar.gameObject.AddComponent<PlayerEffects>();

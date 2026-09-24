@@ -21,8 +21,10 @@ namespace RacingGame
         public bool suppressed;
         [Tooltip("Mines go down when a rival follows this close behind (m) and this far to the side at most.")]
         public float mineDropMin = 15f, mineDropMax = 25f, mineDropLateral = 3f;
-        [Tooltip("Aim time before a shot (s): the target sees the warning this long. 0 = fire on sight.")]
+        [Tooltip("Base aim time before a shot (s). A lane change stretches it. 0 still commits the aim point.")]
         public float telegraphSeconds;
+        [Tooltip("Hard tier: a calm machine-gun target draws a burst of 3 instead of 2.")]
+        public bool hardTier;
         [Tooltip("Cone from the profile's aggression: patient aces only take clean shots, rookies spray.")]
         public bool coneFromAggression = true;
         public float rookieConeDegrees = 12f, aceConeDegrees = 6f;
@@ -49,8 +51,15 @@ namespace RacingGame
         private int nextShotTick;
         private int nextSecondaryTick;
         private int burstTicksRemaining;
+        private int pendingBurstShots = 1;
+        private bool aimHeld;
         private int enabledTick = -1;
         private RaceDirector director;
+        private CarController lateralTarget;
+        private int lateralSampleTick = -1;
+        private float lateralOffset;
+        private float sampledRate;
+        private CarController sampledTarget;
 
         private void Awake()
         {
@@ -74,47 +83,53 @@ namespace RacingGame
             if (cannon == null) cannon = GetComponent<CarCannon>();
             if (health == null) health = GetComponent<CarHealth>();
             if (cannon == null || car == null) return false;
-            if (car.Status != null && car.Status.IsJammed) { burstTicksRemaining = 0; return false; }
-            if (car.Weapons != null && car.Weapons.IsOverheated) { burstTicksRemaining = 0; return false; }
-            if (health != null && health.IsDead) { burstTicksRemaining = 0; return false; }
+            if (car.Status != null && car.Status.IsJammed) { burstTicksRemaining = 0; ReleaseAim(); return false; }
+            if (car.Weapons != null && car.Weapons.IsOverheated) { burstTicksRemaining = 0; ReleaseAim(); return false; }
+            if (health != null && health.IsDead) { burstTicksRemaining = 0; ReleaseAim(); return false; }
 
-            if (suppressed) { burstTicksRemaining = 0; CancelAim(); return false; }
+            if (suppressed) { burstTicksRemaining = 0; ReleaseAim(); return false; }
             if (burstTicksRemaining > 0)
             {
-                if (FindTarget() == null) { burstTicksRemaining = 0; return false; }
+                // The rest of the burst stays on the frozen point, even if the target has left the cone.
                 burstTicksRemaining--;
                 return true;
             }
+            // The tick after the last shot: the shell already left along the committed barrel.
+            if (aimHeld && AimTarget == null) ReleaseAim();
 
             if (enabledTick < 0) enabledTick = tick;
             if (startGraceSeconds > 0f && tick - enabledTick < SimulationDriver.SecondsToTicks(startGraceSeconds)) return false;
-            if (suppressed || tick < nextShotTick || !cannon.IsReady || cannon.locked) { CancelAim(); return false; }
+            // Keep sampling across the cooldown so a lane change is measured over ~0.2 s, not since the last shot.
+            if (tick % 10 == 0 && AimTarget == null) SampleLateral(tick);
+            if (tick < nextShotTick || !cannon.IsReady || cannon.locked) { CancelAim(); return false; }
             if (director == null) director = RaceDirector.Current ?? RaceDirector.Instance;
 
-            CarController target;
             if (AimTarget != null)
             {
-                // Telegraph running: the shot is committed, so the warning is a cue to dodge rather than a
-                // reason for the AI to hold fire. Only a target that is wrecked or shielded by a respawn calls it off.
+                // The warning is the dodge window: the barrel stays on the point captured when it started.
+                // Only a wreck or a respawn shield calls the shot off.
                 var aimed = AimTarget.GetComponent<CarHealth>();
-                if (aimed != null && (aimed.IsDead || aimed.IsInvulnerable)) { CancelAim(); return false; }
+                if (aimed != null && (aimed.IsDead || aimed.IsInvulnerable)) { ReleaseAim(); return false; }
                 if (tick < fireAtTick) return false;
-                target = AimTarget;
-                // The turret picks its own target: if it swung to a different car, warn that one first.
-                var turretTarget = cannon.TurretTarget;
-                if (turretTarget != null && turretTarget != target && telegraphSeconds > 0f)
-                {
-                    AimTarget = turretTarget; fireAtTick = tick + SimulationDriver.SecondsToTicks(telegraphSeconds);
-                    return false;
-                }
                 CancelAim();
             }
             else
             {
                 if (tick % 10 != 0) return false;
-                target = FindTarget();
+                var target = sampledTarget;
                 if (target == null) return false;
-                if (telegraphSeconds > 0f) { AimTarget = target; fireAtTick = tick + SimulationDriver.SecondsToTicks(telegraphSeconds); return false; }
+                var weaponsNow = car.Weapons;
+                bool machineGun = weaponsNow != null && weaponsNow.primaryType == PrimaryWeaponType.MachineGun;
+                var decision = BotAim.Evaluate(sampledRate, telegraphSeconds, machineGun, hardTier);
+                cannon.CommitAim(cannon.SolveAimPoint(target, decision.StripLateralLead));
+                aimHeld = true;
+                pendingBurstShots = decision.BurstShots;
+                if (decision.TelegraphSeconds > 0f)
+                {
+                    AimTarget = target;
+                    fireAtTick = tick + SimulationDriver.SecondsToTicks(decision.TelegraphSeconds);
+                    return false;
+                }
             }
 
             float aggression = profile != null ? profile.aggression : 0.5f;
@@ -124,10 +139,9 @@ namespace RacingGame
             ShotsRequested++;
 
             var weapons = car.Weapons;
-            if (weapons != null && weapons.primaryType == PrimaryWeaponType.MachineGun)
+            if (weapons != null && weapons.primaryType == PrimaryWeaponType.MachineGun && pendingBurstShots > 1)
             {
-                int shots = director != null && director.Rng != null ? director.Rng.Range(RngStreams.Stream.Ai, 3, 6) : 3;
-                burstTicksRemaining = SimulationDriver.SecondsToTicks(cannon.fireInterval) * (shots - 1);
+                burstTicksRemaining = SimulationDriver.SecondsToTicks(cannon.fireInterval) * (pendingBurstShots - 1);
                 nextShotTick += burstTicksRemaining;
             }
             return true;
@@ -163,7 +177,44 @@ namespace RacingGame
 
         private void CancelAim() { AimTarget = null; fireAtTick = -1; }
 
-        private void OnDisable() { CancelAim(); }
+        private void ReleaseAim()
+        {
+            CancelAim();
+            aimHeld = false;
+            if (cannon != null) cannon.ClearAimCommit();
+        }
+
+        private void OnDisable() { ReleaseAim(); }
+
+        /// <summary>
+        /// Sideways speed of the current target in the shooter's frame, sampled on this tick.
+        /// The first sighting of a target reports 0 so the warning still freezes a full lead.
+        /// </summary>
+        private void SampleLateral(int tick)
+        {
+            var target = FindTarget();
+            sampledTarget = target;
+            sampledRate = 0f;
+            if (target == null)
+            {
+                lateralTarget = null;
+                lateralSampleTick = -1;
+                return;
+            }
+            Vector3 right = car.transform.right;
+            right.y = 0f;
+            if (right.sqrMagnitude < 1e-6f) right = Vector3.right;
+            else right.Normalize();
+            float offset = Vector3.Dot(target.transform.position - car.transform.position, right);
+            if (target == lateralTarget && lateralSampleTick >= 0 && tick > lateralSampleTick)
+            {
+                float dt = (tick - lateralSampleTick) * SimulationDriver.FixedStep;
+                if (dt > 1e-4f) sampledRate = (offset - lateralOffset) / dt;
+            }
+            lateralTarget = target;
+            lateralOffset = offset;
+            lateralSampleTick = tick;
+        }
 
         private CarController FindTarget()
         {

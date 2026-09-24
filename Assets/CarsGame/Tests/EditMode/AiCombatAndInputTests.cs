@@ -281,5 +281,124 @@ namespace RacingGame.Tests
 
             Object.DestroyImmediate(trackGo);
         }
+
+        [Test]
+        public void BotAim_CalmTarget_KeepsLeadAndBaseTelegraph()
+        {
+            var calm = BotAim.Evaluate(0.4f, 0.42f, machineGun: true, hardTier: false);
+            Assert.IsFalse(calm.StripLateralLead);
+            Assert.AreEqual(0.42f, calm.TelegraphSeconds, 0.001f);
+            Assert.AreEqual(2, calm.BurstShots);
+
+            var hard = BotAim.Evaluate(0f, BotAim.BaseTelegraph("hard"), machineGun: true, hardTier: true);
+            Assert.AreEqual(0.35f, hard.TelegraphSeconds, 0.001f);
+            Assert.AreEqual(3, hard.BurstShots);
+            Assert.AreEqual(0.55f, BotAim.BaseTelegraph("easy"), 0.001f);
+            Assert.AreEqual(0.42f, BotAim.BaseTelegraph("normal"), 0.001f);
+        }
+
+        [Test]
+        public void BotAim_LaneChange_StripsLateralLeadAndShortensBurst()
+        {
+            var change = BotAim.Evaluate(4f, 0.42f, machineGun: true, hardTier: true);
+            Assert.IsTrue(change.StripLateralLead);
+            Assert.AreEqual(0.42f * BotAim.LaneChangeTelegraphScale, change.TelegraphSeconds, 0.001f);
+            Assert.AreEqual(2, change.BurstShots);
+            Assert.AreEqual(0f, BotAim.Evaluate(4f, 0f, false, false).TelegraphSeconds, 0.001f);
+        }
+
+        [Test]
+        public void CarCannon_SolveAimPoint_DropsOnlySidewaysLead()
+        {
+            car.transform.position = Vector3.zero;
+            car.transform.rotation = Quaternion.identity;
+            rival.transform.position = new Vector3(0f, 0f, 20f);
+            rival.Body.linearVelocity = new Vector3(10f, 0f, 30f);
+
+            Vector3 full = cannon.SolveAimPoint(rival, false);
+            Vector3 stripped = cannon.SolveAimPoint(rival, true);
+            Assert.Greater(Mathf.Abs(full.x), Mathf.Abs(stripped.x) + 0.5f);
+            Assert.AreEqual(full.z, stripped.z, 0.05f);
+        }
+
+        [Test]
+        public void CarCannon_CommitAim_HoldsBarrelWhileLiveTurretFollows()
+        {
+            car.transform.position = new Vector3(0f, 200f, 0f);
+            car.transform.rotation = Quaternion.identity;
+            rival.transform.position = new Vector3(0f, 200f, 15f);
+            // The procedural turret build can fail in EditMode (shader). Give the cannon a plain mount.
+            var pivot = new GameObject("Turret").transform;
+            pivot.SetParent(car.transform, false);
+            var barrel = new GameObject("Barrel").transform;
+            barrel.SetParent(pivot, false);
+            var muzzle = new GameObject("Muzzle").transform;
+            muzzle.SetParent(barrel, false);
+            muzzle.localPosition = new Vector3(0f, 0f, 1.5f);
+            cannon.turret = pivot;
+            cannon.barrel = barrel;
+            cannon.muzzle = muzzle;
+            cannon.turretTurnSpeed = 20000f;
+
+            for (int t = 0; t < 10; t++) cannon.SimulationStep(t);
+            Assert.IsFalse(cannon.HasAimCommit);
+            Assert.Less(Mathf.Abs(cannon.TurretYaw), 1f);
+
+            rival.transform.position = new Vector3(2f, 200f, 15f);
+            for (int t = 10; t < 20; t++) cannon.SimulationStep(t);
+            Assert.Greater(cannon.TurretYaw, 4f);
+
+            rival.transform.position = new Vector3(0f, 200f, 15f);
+            cannon.CommitAim(cannon.SolveAimPoint(rival, false));
+            rival.transform.position = new Vector3(2f, 200f, 15f);
+            for (int t = 20; t < 30; t++) cannon.SimulationStep(t);
+            Assert.Less(Mathf.Abs(cannon.TurretYaw), 2f);
+        }
+
+        [Test]
+        public void AiGunner_Telegraph_FreezesAimPointWhileWarningStays()
+        {
+            car.transform.position = new Vector3(0f, 200f, 0f);
+            car.transform.rotation = Quaternion.identity;
+            rival.transform.position = new Vector3(0f, 200f, 15f);
+            gunner.startGraceSeconds = 0f;
+            gunner.telegraphSeconds = 0.42f;
+            gunner.fireCooldown = 1f;
+            cannon.RefillAmmo();
+
+            Assert.IsFalse(gunner.WantsFire(100));
+            Assert.IsTrue(cannon.HasAimCommit, $"ready={cannon.IsReady} ammo={cannon.Ammo} locked={cannon.locked} shots={gunner.ShotsRequested}");
+            Assert.AreSame(rival, gunner.AimTarget);
+            Assert.IsTrue(cannon.HasAimCommit);
+            Vector3 committed = cannon.AimCommitPoint;
+
+            rival.transform.position = new Vector3(4f, 200f, 15f);
+            Assert.IsFalse(gunner.WantsFire(101));
+            Assert.AreSame(rival, gunner.AimTarget);
+            Assert.AreEqual(committed, cannon.AimCommitPoint);
+        }
+
+        [Test]
+        public void AiGunner_LaneChange_CommitsAimWithoutSidewaysLead()
+        {
+            car.transform.position = new Vector3(0f, 200f, 0f);
+            car.transform.rotation = Quaternion.identity;
+            rival.transform.position = new Vector3(0f, 200f, 15f);
+            rival.Body.linearVelocity = new Vector3(8f, 0f, 20f);
+            gunner.startGraceSeconds = 0f;
+            gunner.telegraphSeconds = 0.42f;
+            cannon.RefillAmmo();
+            cannon.locked = true;
+            gunner.WantsFire(100);
+
+            rival.transform.position = new Vector3(1f, 200f, 15f);
+            cannon.locked = false;
+            Assert.IsFalse(gunner.WantsFire(110));
+            Assert.AreSame(rival, gunner.AimTarget);
+            Vector3 expected = cannon.SolveAimPoint(rival, true);
+            Assert.AreEqual(expected.x, cannon.AimCommitPoint.x, 0.05f);
+            Assert.AreEqual(expected.z, cannon.AimCommitPoint.z, 0.05f);
+            Assert.Less(Mathf.Abs(cannon.AimCommitPoint.x), Mathf.Abs(cannon.SolveAimPoint(rival, false).x) - 0.5f);
+        }
     }
 }

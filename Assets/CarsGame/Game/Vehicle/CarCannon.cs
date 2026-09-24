@@ -59,6 +59,8 @@ namespace RacingGame
         private Quaternion turretRestRotation, barrelRestRotation;
         private float turretYaw, barrelPitch;
         private CarController turretTarget;
+        private bool aimCommitted;
+        private Vector3 aimCommitPoint;
         private Material shellMaterial;
         private SpecialWeaponAttack specialAttack;
 
@@ -76,6 +78,43 @@ namespace RacingGame
         public float BarrelPitch => barrelPitch;
         /// <summary>The rival the turret is tracking, else null.</summary>
         public CarController TurretTarget => turretTarget;
+        /// <summary>True while an AI gunner holds the barrel on a frozen aim point.</summary>
+        public bool HasAimCommit => aimCommitted;
+        /// <summary>World point the barrel tracks while <see cref="HasAimCommit"/> is set.</summary>
+        public Vector3 AimCommitPoint => aimCommitPoint;
+
+        /// <summary>
+        /// Where to aim so a shell of <see cref="shellSpeed"/> meets <paramref name="target"/>.
+        /// Gravity drop is applied later, when the barrel tilts. <paramref name="stripLateral"/>
+        /// drops only the sideways part of the lead (the lane the target is already leaving).
+        /// </summary>
+        public Vector3 SolveAimPoint(CarController target, bool stripLateral)
+        {
+            Vector3 origin = barrel != null ? barrel.position : transform.position;
+            Vector3 aim = target.transform.position + Vector3.up * 0.5f;
+            float speed = Mathf.Max(1f, shellSpeed);
+            Vector3 relative = (target.Body != null ? target.Body.linearVelocity : Vector3.zero) - (rb != null ? rb.linearVelocity : Vector3.zero);
+            if (stripLateral)
+            {
+                Vector3 right = transform.right;
+                right.y = 0f;
+                if (right.sqrMagnitude > 1e-6f)
+                {
+                    right.Normalize();
+                    relative -= right * Vector3.Dot(relative, right);
+                }
+            }
+            return aim + relative * (Vector3.Distance(aim, origin) / speed);
+        }
+
+        /// <summary>Hold the barrel on a world point until <see cref="ClearAimCommit"/>. The player never calls this.</summary>
+        public void CommitAim(Vector3 worldPoint)
+        {
+            aimCommitted = true;
+            aimCommitPoint = worldPoint;
+        }
+
+        public void ClearAimCommit() { aimCommitted = false; }
 
         private void Awake()
         {
@@ -191,29 +230,48 @@ namespace RacingGame
         private void StepTurret(int tick)
         {
             if (turret == null || turretYawLimit <= 0f) return;
-            if (!enabled) turretTarget = null;
-            else if ((tick + (car != null ? car.CarId : 0)) % 5 == 0)   // re-acquire 10×/s, staggered per car
-                turretTarget = TargetFinder.Find(car, turret.position, transform.forward, turretYawLimit, turretMinRange, turretMaxRange, shellSpeed, closestToAxis: true);
+            Vector3 aim = default;
+            bool haveAim = false;
+            if (aimCommitted)
+            {
+                aim = aimCommitPoint;
+                haveAim = true;
+            }
+            else
+            {
+                if (!enabled) turretTarget = null;
+                else if ((tick + (car != null ? car.CarId : 0)) % 5 == 0)   // re-acquire 10×/s, staggered per car
+                {
+                    // From the muzzle, not the roof pivot: the pivot sits inside the hull, so a linecast from it
+                    // hits the car or the road and the turret never acquires.
+                    Vector3 origin = muzzle != null ? muzzle.position : turret.position;
+                    turretTarget = TargetFinder.Find(car, origin, transform.forward, turretYawLimit, turretMinRange, turretMaxRange, shellSpeed, closestToAxis: true);
+                }
+                if (turretTarget != null && turretTarget.isActiveAndEnabled)
+                {
+                    aim = SolveAimPoint(turretTarget, false);
+                    haveAim = true;
+                }
+            }
 
             float desiredYaw = 0f, desiredPitch = 0f;
-            if (turretTarget != null && turretTarget.isActiveAndEnabled)
-            {
-                Vector3 aim = turretTarget.transform.position + Vector3.up * 0.5f;
-                float speed = Mathf.Max(1f, shellSpeed);
-                // Lead by the target's velocity relative to ours: the shell inherits our velocity.
-                Vector3 relative = (turretTarget.Body != null ? turretTarget.Body.linearVelocity : Vector3.zero) - (rb != null ? rb.linearVelocity : Vector3.zero);
-                aim += relative * (Vector3.Distance(aim, barrel.position) / speed);
-                Vector3 local = turret.parent.InverseTransformDirection(aim - barrel.position);
-                float flat = Mathf.Sqrt(local.x * local.x + local.z * local.z), flight = flat / speed;
-                float drop = -0.5f * Physics.gravity.y * flight * flight;   // aim above the target by what the shell falls
-                desiredYaw = Mathf.Clamp(Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg, -turretYawLimit, turretYawLimit);
-                desiredPitch = Mathf.Clamp(-Mathf.Atan2(local.y + drop, flat) * Mathf.Rad2Deg, -barrelPitchLimit, barrelPitchLimit);
-            }
+            if (haveAim) DesiredAngles(aim, out desiredYaw, out desiredPitch);
             float step = turretTurnSpeed * SimulationDriver.FixedStep;
             turretYaw = Mathf.MoveTowards(turretYaw, desiredYaw, step);
             barrelPitch = Mathf.MoveTowards(barrelPitch, desiredPitch, step);
             turret.localRotation = turretRestRotation * Quaternion.Euler(0f, turretYaw, 0f);
             barrel.localRotation = barrelRestRotation * Quaternion.Euler(barrelPitch, 0f, 0f);
+        }
+
+        private void DesiredAngles(Vector3 aimPoint, out float desiredYaw, out float desiredPitch)
+        {
+            Vector3 local = turret.parent.InverseTransformDirection(aimPoint - barrel.position);
+            float flat = Mathf.Sqrt(local.x * local.x + local.z * local.z);
+            float speed = Mathf.Max(1f, shellSpeed);
+            float flight = flat / speed;
+            float drop = -0.5f * Physics.gravity.y * flight * flight;   // aim above the point by what the shell falls
+            desiredYaw = Mathf.Clamp(Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg, -turretYawLimit, turretYawLimit);
+            desiredPitch = Mathf.Clamp(-Mathf.Atan2(local.y + drop, flat) * Mathf.Rad2Deg, -barrelPitchLimit, barrelPitchLimit);
         }
 
         public bool TryFire() => TryFire(SimulationDriver.Instance.Tick);
@@ -251,7 +309,7 @@ namespace RacingGame
             var director = RaceDirector.Current ?? RaceDirector.Instance;
             if (director != null)
             {
-                var homingTarget = shot.Homing ? TargetFinder.Find(car, muzzlePos, direction, 35f, 1f, 80f) : null;
+                var homingTarget = shot.Homing && !aimCommitted ? TargetFinder.Find(car, muzzlePos, direction, 35f, 1f, 80f) : null;
                 for (int pellet = 0; pellet < shot.Pellets; pellet++)
                 {
                     float angle = shot.Pellets == 1 ? 0f : Mathf.Lerp(-shot.Spread * 0.5f, shot.Spread * 0.5f, pellet / (float)(shot.Pellets - 1));
