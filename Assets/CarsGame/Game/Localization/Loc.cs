@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
+using UnityEngine.Localization.Tables;
 using RacingGame.Core.Localization;
 
 namespace RacingGame
@@ -10,8 +11,7 @@ namespace RacingGame
     /// <summary>
     /// Thin facade over com.unity.localization: resolves the language (user override → platform →
     /// Yandex fallbacks), waits for initialization once, then serves strings synchronously from the
-    /// preloaded "Game" table. Missing keys return "[key]" and log once, so hardcoded/untranslated
-    /// text is visible in play, never silently blank.
+    /// preloaded "Game" table. Missing keys show a neutral placeholder and log once, so raw keys never reach players.
     /// </summary>
     public static class Loc
     {
@@ -41,6 +41,7 @@ namespace RacingGame
         }
 
         private static int loadGeneration;
+        private static StringTable loadedTable;
 
         public static void SetLanguage(string code)
         {
@@ -55,6 +56,7 @@ namespace RacingGame
             // Ready only once THIS locale's table is in memory: a locale switch starts a new async
             // table load, and reading before it lands yields "No translation" fallbacks.
             Ready = false;
+            loadedTable = null;
             int generation = ++loadGeneration;
             var op = LocalizationSettings.StringDatabase.GetTableAsync(Table, target);
             void Done()
@@ -62,6 +64,7 @@ namespace RacingGame
                 if (generation != loadGeneration) return;
                 if (op.Status != UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded || op.Result == null)
                 { Debug.LogError("[Loc] table load failed for " + code + ": " + op.OperationException); return; }
+                loadedTable = op.Result;
                 Ready = true; LanguageChanged?.Invoke();
             }
             if (op.IsDone) Done(); else op.Completed += _ => Done();
@@ -70,10 +73,8 @@ namespace RacingGame
         public static string Get(string key)
         {
             if (!Ready) return Fallback(key);
-            var db = LocalizationSettings.StringDatabase;
-            var op = db.GetLocalizedStringAsync(Table, key);
-            if (!op.IsDone || op.Result == null || op.Result.StartsWith("No translation")) return Fallback(key);
-            return op.Result;
+            var entry = loadedTable?.GetEntry(key);
+            return entry != null ? entry.GetLocalizedString() : Fallback(key);
         }
 
         /// <summary>Named placeholders: Format("menu.coins", "n", 120).</summary>
@@ -87,7 +88,7 @@ namespace RacingGame
         private static string Fallback(string key)
         {
             if (Ready && missingLogged.Add(key)) Debug.LogWarning("[Loc] missing key: " + key);
-            return "[" + key + "]";
+            return "…";
         }
     }
 }

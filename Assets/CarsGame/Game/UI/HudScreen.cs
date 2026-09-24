@@ -157,11 +157,13 @@ namespace RacingGame
 
         private void OnDisable()
         {
-            if (race == null) return;
-            race.OnCountdownTick -= OnCountdown;
-            race.OnRaceStarted -= OnStarted;
-            race.OnRaceFinished -= OnFinished;
-            race.OnPositionsChanged -= RefreshPosition;
+            if (race != null)
+            {
+                race.OnCountdownTick -= OnCountdown;
+                race.OnRaceStarted -= OnStarted;
+                race.OnRaceFinished -= OnFinished;
+                race.OnPositionsChanged -= RefreshPosition;
+            }
             PauseController.PausedChanged -= OnPaused;
             TouchControlsPresenter.ShownChanged -= OnTouchShown;
             Loc.LanguageChanged -= ApplyStaticTexts;
@@ -1218,8 +1220,9 @@ namespace RacingGame
 
         private void OnPaused(bool paused)
         {
+            if (pausePanel == null) return;
             pausePanel.gameObject.SetActive(paused);
-            if (paused) EventSystem.current?.SetSelectedGameObject(resumeButton.gameObject);
+            if (paused && resumeButton != null) EventSystem.current?.SetSelectedGameObject(resumeButton.gameObject);
             else EventSystem.current?.SetSelectedGameObject(null);
         }
 

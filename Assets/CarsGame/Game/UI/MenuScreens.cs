@@ -115,6 +115,7 @@ namespace RacingGame
             if (panel != null) { panel.gameObject.SetActive(false); Destroy(panel.gameObject); }
             rewardButton = null; rewardLabel = null; current = name;
             if (string.IsNullOrEmpty(name)) { EventSystem.current?.SetSelectedGameObject(null); return; }
+            if (!PlatformGlue.IsReady) return;
             var canvasRect = ((RectTransform)canvas.transform).rect;
             layoutWidth = canvasRect.width; layoutHeight = canvasRect.height;
             panel = UiFactory.Panel(canvas.transform, "Panel_" + name, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.015f, 0.025f, 0.045f, 0.82f), false);
