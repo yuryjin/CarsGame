@@ -236,3 +236,11 @@ livery.hood,livery name,14,Hood panel,Капот,Kaput,引擎盖,Motorhaube,Cap�
 livery.tail,livery name,14,Tail,Корма,Arka,车尾,Heck,Zaga,Arrière,Traseira,Корма
 events.e16.name,event name,32,Above the Abyss,Над пропастью,Uçurumun Üzerinde,高空赛道,Über dem Abgrund,Sobre el abismo,Au-dessus du gouffre,Sobre o abismo,Над прірвою
 events.e17.name,event name,32,Space Gates,Космические врата,Uzay Geçitleri,星空赛道,Weltraumtore,Portales espaciales,Portails spatiaux,Portais espaciais,Космічні брами
+weapon.shotgun,weapon wheel,32,Shotgun,Дробовик,Pompalı,霰弹枪,Schrotflinte,Escopeta,Fusil à pompe,Escopeta,Дробовик
+weapon.twin,weapon wheel,32,Twin cannon,Спаренная пушка,Çift top,双联炮,Zwillingskanone,Cañón doble,Canon jumelé,Canhão duplo,Спарена гармата
+weapon.autocannon,weapon wheel,32,Autocannon,Автопушка,Otomatik top,自动炮,Autokanone,Cañón automático,Canon automatique,Canhão automático,Автогармата
+weapon.sniper,weapon wheel,32,Sniper cannon,Снайперская пушка,Keskin nişancı topu,狙击炮,Präzisionskanone,Cañón de precisión,Canon de précision,Canhão de precisão,Снайперська гармата
+weapon.freeze,weapon wheel,32,Freeze gun,Замораживатель,Dondurucu,冰冻枪,Frostkanone,Congelador,Canon givrant,Congelador,Заморожувач
+weapon.emp,weapon wheel,32,EMP cannon,ЭМИ-пушка,EMP topu,电磁脉冲炮,EMP-Kanone,Cañón PEM,Canon IEM,Canhão PEM,ЕМІ-гармата
+weapon.spike,weapon wheel,32,Spike gun,Шипомёт,Çivi atıcı,尖刺枪,Nagelkanone,Lanzapúas,Lance-pointes,Lança-espinhos,Шипомет
+weapon.heavy,weapon wheel,32,Heavy cannon,Тяжёлая пушка,Ağır top,重型炮,Schwere Kanone,Cañón pesado,Canon lourd,Canhão pesado,Важка гармата

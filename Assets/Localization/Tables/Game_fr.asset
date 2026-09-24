@@ -899,6 +899,38 @@ MonoBehaviour:
     m_Localized: Portails spatiaux
     m_Metadata:
       m_Items: []
+  - m_Id: 7999237123645440
+    m_Localized: "Fusil \xE0 pompe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228352
+    m_Localized: "Canon jumel\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228353
+    m_Localized: Canon automatique
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228354
+    m_Localized: "Canon de pr\xE9cision"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228355
+    m_Localized: Canon givrant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228356
+    m_Localized: Canon IEM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228357
+    m_Localized: Lance-pointes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228358
+    m_Localized: Canon lourd
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

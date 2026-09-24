@@ -902,6 +902,38 @@ MonoBehaviour:
     m_Localized: Space Gates
     m_Metadata:
       m_Items: []
+  - m_Id: 7999237123645440
+    m_Localized: Shotgun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228352
+    m_Localized: Twin cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228353
+    m_Localized: Autocannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228354
+    m_Localized: Sniper cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228355
+    m_Localized: Freeze gun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228356
+    m_Localized: EMP cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228357
+    m_Localized: Spike gun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228358
+    m_Localized: Heavy cannon
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -901,6 +901,38 @@ MonoBehaviour:
     m_Localized: "Uzay Ge\xE7itleri"
     m_Metadata:
       m_Items: []
+  - m_Id: 7999237123645440
+    m_Localized: "Pompal\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228352
+    m_Localized: "\xC7ift top"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228353
+    m_Localized: Otomatik top
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228354
+    m_Localized: "Keskin ni\u015Fanc\u0131 topu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228355
+    m_Localized: Dondurucu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228356
+    m_Localized: EMP topu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228357
+    m_Localized: "\xC7ivi at\u0131c\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228358
+    m_Localized: "A\u011F\u0131r top"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

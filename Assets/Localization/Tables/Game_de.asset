@@ -898,6 +898,38 @@ MonoBehaviour:
     m_Localized: Weltraumtore
     m_Metadata:
       m_Items: []
+  - m_Id: 7999237123645440
+    m_Localized: Schrotflinte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228352
+    m_Localized: Zwillingskanone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228353
+    m_Localized: Autokanone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228354
+    m_Localized: "Pr\xE4zisionskanone"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228355
+    m_Localized: Frostkanone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228356
+    m_Localized: EMP-Kanone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228357
+    m_Localized: Nagelkanone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228358
+    m_Localized: Schwere Kanone
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -891,6 +891,38 @@ MonoBehaviour:
     m_Key: events.e17.name
     m_Metadata:
       m_Items: []
+  - m_Id: 7999237123645440
+    m_Key: weapon.shotgun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228352
+    m_Key: weapon.twin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228353
+    m_Key: weapon.autocannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228354
+    m_Key: weapon.sniper
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228355
+    m_Key: weapon.freeze
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228356
+    m_Key: weapon.emp
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228357
+    m_Key: weapon.spike
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7999237136228358
+    m_Key: weapon.heavy
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228
