@@ -15,6 +15,7 @@ namespace RacingGame
         public bool autoThrottle;
         [Tooltip("Automatically deploy secondary weapon when a rival tails closely behind.")]
         public bool autoSecondary;
+        [Range(0f, 1f)] public float touchSteeringAssist = 0.35f;
 
         private InputActionMap map;
         private InputAction throttleAction, steerAction, brakeAction, fireAction, secondaryAction, resetAction;
@@ -27,6 +28,8 @@ namespace RacingGame
         private static readonly Key[] NumpadKeys = { Key.Numpad1, Key.Numpad2, Key.Numpad3, Key.Numpad4, Key.Numpad5, Key.Numpad6, Key.Numpad7, Key.Numpad8, Key.Numpad9, Key.Numpad0 };
 
         private CarWeapons weapons;
+        private CarController car;
+        private RaceProgress progress;
         private Vector2 wheelPointer;
         public bool WeaponWheelOpen { get; private set; }
         public int WheelSelection { get; private set; }
@@ -41,6 +44,8 @@ namespace RacingGame
         private void OnEnable()
         {
             weapons = GetComponent<CarWeapons>();
+            car = GetComponent<CarController>();
+            progress = GetComponent<RaceProgress>();
             SelectionPage = weapons != null ? (int)weapons.PrimaryType / PrimaryWeaponCatalog.SlotsPerPage : 0;
             var asset = InputSystem.actions;
             map = asset != null ? asset.FindActionMap("Driving") : null;
@@ -174,6 +179,24 @@ namespace RacingGame
             }
         }
 
+        private float AssistedSteer()
+        {
+            if (!TouchControlsPresenter.IsShown || touchSteeringAssist <= 0f ||
+                PlatformGlue.Save == null || PlatformGlue.Save.Data.Races >= 3 ||
+                car == null || progress == null || progress.Path == null) return steer;
+            var path = progress.Path;
+            if (path.OnFork(transform.position)) return steer;
+            float speed = car.Body.linearVelocity.magnitude;
+            float ahead = path.Wrap(progress.Distance + Mathf.Clamp(speed * 0.5f, 6f, 14f));
+            Vector3 target = path.Position(ahead) + path.Right(ahead) * path.Profile.LaneAt(ahead);
+            Vector3 local = transform.InverseTransformPoint(target);
+            if (local.z <= 0f) return steer;
+            return BlendSteering(steer, Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg, touchSteeringAssist);
+        }
+
+        public static float BlendSteering(float input, float angleDegrees, float strength) =>
+            Mathf.Clamp(input + Mathf.Clamp(angleDegrees / 60f, -strength, strength) * (1f - Mathf.Clamp01(Mathf.Abs(input))), -1f, 1f);
+
         public DriveCommand Sample(int tick)
         {
             bool sec = secondary;
@@ -202,7 +225,7 @@ namespace RacingGame
             {
                 Tick = tick,
                 Throttle = throttle,
-                Steer = steer,
+                Steer = AssistedSteer(),
                 Brake = brake,
                 Fire = fire,
                 Secondary = sec,

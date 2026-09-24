@@ -199,11 +199,13 @@ namespace RacingGame
             var row = Item(content, "Home", Narrow ? 430f : 580f, false);
             var hero = UiFactory.Card(row, "RaceCard", Vector2.zero, new Vector2(Narrow ? 1f : 0.58f, 1f), Vector2.zero, new Vector2(Narrow ? 0f : -12f, 0f));
             var list = Events();
-            var ev = list.FindLast(e => flow.IsUnlocked(e));
+            var ev = FeaturedEvent(list);
             Label(hero, "Eyebrow", Loc.Get("events.title"), 24f, Top, Vector2.one, new Vector2(36f, -76f), new Vector2(-36f, -28f), UiFactory.Accent);
             var title = Label(hero, "EventName", ev != null ? Loc.Get(ev.nameKey) : Loc.Get("menu.play"), 64f, Top, Vector2.one, new Vector2(36f, -226f), new Vector2(-36f, -98f));
             title.fontStyle = FontStyles.Bold;
-            string detail = ev != null ? Loc.Format("events.laps", "n", ev.laps) + "  /  " + Loc.Format("events.rivals", "n", ev.aiCountOverride >= 0 ? ev.aiCountOverride : 3) : "";
+            var tiers = Tiers();
+            int rivals = ev != null && ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[ResolveTierIndex(tiers)].aiCount : 3;
+            string detail = ev != null ? Loc.Format("events.laps", "n", ev.laps) + "  /  " + Loc.Format("events.rivals", "n", rivals) : "";
             int maxStars = list.Count * 3;
             int earnedStars = PlatformGlue.Save != null ? PlatformGlue.Save.Data.TotalStars : 0;
             string stars = "<color=#FFCC40>" + Loc.Format("events.stars", "s", earnedStars, "max", maxStars) + "</color>";
@@ -216,7 +218,7 @@ namespace RacingGame
                 Label(hero, "Progress", list.FindAll(e => flow.IsUnlocked(e)).Count.ToString("00") + " <color=#8B9AAD>/ " + list.Count.ToString("00") + "</color>", 64f, Vector2.zero, new Vector2(1f, 0f), new Vector2(38f, 162f), new Vector2(-38f, 248f));
                 for (int i = 0; i < list.Count; i++) UiFactory.Panel(hero, "EventProgress" + i, new Vector2(i / (float)list.Count, 0f), new Vector2((i + 1f) / list.Count, 0f), new Vector2(i == 0 ? 38f : 5f, 148f), new Vector2(i == list.Count - 1 ? -38f : -5f, 152f), flow.IsUnlocked(list[i]) ? UiFactory.Accent : UiFactory.Raised, false);
             }
-            UiFactory.Button(hero, "Play", Loc.Get("menu.play") + "   ›", PlayFromMain, Vector2.zero, new Vector2(1f, 0f), new Vector2(36f, 32f), new Vector2(-36f, 116f), 34f);
+            UiFactory.Button(hero, "Play", Loc.Get(PlatformGlue.Save != null && PlatformGlue.Save.Data.Races == 0 ? "menu.play" : "events.title") + "   ›", PlayFromMain, Vector2.zero, new Vector2(1f, 0f), new Vector2(36f, 32f), new Vector2(-36f, 116f), 34f);
             var links = Narrow ? content : UiFactory.Panel(row, "Links", new Vector2(0.58f, 0f), Vector2.one, new Vector2(12f, 0f), Vector2.zero);
             var keys = new[] { "menu.garage", "menu.leaderboard", "menu.settings" };
             var targets = new[] { "garage", "leaders", "settings" };
@@ -232,6 +234,19 @@ namespace RacingGame
                 Label(button.transform, "Arrow", "›", 42f, new Vector2(1f, 0f), Vector2.one, new Vector2(-40f, 0f), new Vector2(-14f, 0f), UiFactory.Muted);
             }
             BuildDailyCard(content);
+        }
+
+        private RaceEventDefinition FeaturedEvent(List<RaceEventDefinition> list)
+        {
+            if (list.Count == 0) return null;
+            var ev = list[0];
+            for (int i = 1; i < list.Count; i++)
+            {
+                var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
+                if (best == null || best.bestTimeMs <= 0 || !flow.IsUnlocked(list[i])) break;
+                ev = list[i];
+            }
+            return ev;
         }
 
         private DifficultyTier[] Tiers() => Array.FindAll(flow.tiers ?? Array.Empty<DifficultyTier>(), t => t != null);
@@ -668,12 +683,13 @@ namespace RacingGame
             var actions = Item(content, "Actions", 172f, false);
             var keys = new[] { "results.next", "results.retry", "menu.garage" };
             var next = flow.NextEvent(flow.CurrentEvent);
-            Action[] clicks = { () => flow.StartRace(next, RaceSetup.Tier), () => flow.RetryRace(), () => GoTo("garage") };
+            bool canAdvance = next != null && next != flow.CurrentEvent;
+            Action[] clicks = { canAdvance ? () => flow.StartRace(next, RaceSetup.Tier) : () => flow.RetryRace(), canAdvance ? () => flow.RetryRace() : () => GoTo("events"), () => GoTo("garage") };
             int cheapest = CheapestUpgrade();
             bool canUpgrade = PlatformGlue.Save != null && cheapest < int.MaxValue && PlatformGlue.Save.Data.Coins >= cheapest;
-            UiFactory.Button(actions, "ResultAction0", Loc.Get(keys[0]) + "   ›", clicks[0], Top, Vector2.one, new Vector2(4f, -84f), new Vector2(-4f, 0f), 32f);
+            UiFactory.Button(actions, "ResultAction0", Loc.Get(canAdvance ? keys[0] : "results.retry") + "   ›", clicks[0], Top, Vector2.one, new Vector2(4f, -84f), new Vector2(-4f, 0f), 32f);
             for (int i = 1; i < keys.Length; i++)
-                UiFactory.Button(actions, "ResultAction" + i, Loc.Get(keys[i]), clicks[i], new Vector2((i - 1) * 0.5f, 0f), new Vector2(i * 0.5f, 0f), new Vector2(4f, 0f), new Vector2(-4f, 72f), 28f, UiFactory.Raised);
+                UiFactory.Button(actions, "ResultAction" + i, Loc.Get(i == 1 && !canAdvance ? "events.title" : keys[i]), clicks[i], new Vector2((i - 1) * 0.5f, 0f), new Vector2(i * 0.5f, 0f), new Vector2(4f, 0f), new Vector2(-4f, 72f), 28f, UiFactory.Raised);
             if (PlatformGlue.Save != null && cheapest < int.MaxValue)
             {
                 var nudge = Item(content, "GarageNudge", 44f, false);

@@ -9,6 +9,27 @@ namespace RacingGame.Tests
     public class GameplayImprovementsTests
     {
         [Test]
+        public void FirstRaceAndEasyTierUseShortFriendlySetup()
+        {
+            var first = UnityEditor.AssetDatabase.LoadAssetAtPath<RaceEventDefinition>("Assets/Data/Events/Event_e1.asset");
+            var easy = UnityEditor.AssetDatabase.LoadAssetAtPath<DifficultyTier>("Assets/Data/Difficulty/Difficulty_easy.asset");
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(easy);
+            Assert.AreEqual(2, first.laps);
+            Assert.AreEqual("Bolt", easy.profiles[0].rivalName);
+            Assert.AreEqual(3, easy.aiCount);
+        }
+
+        [Test]
+        public void TouchAssistPullsTowardLineButYieldsToFullSteering()
+        {
+            Assert.Greater(PlayerDriverInput.BlendSteering(0f, 30f, 0.35f), 0f);
+            Assert.Less(PlayerDriverInput.BlendSteering(0f, -30f, 0.35f), 0f);
+            Assert.AreEqual(-1f, PlayerDriverInput.BlendSteering(-1f, 30f, 0.35f));
+            Assert.AreEqual(1f, PlayerDriverInput.BlendSteering(1f, -30f, 0.35f));
+        }
+
+        [Test]
         public void LowSpeedSteeringMakesTightCornersReachableWithoutChangingFastTurns()
         {
             var go = new GameObject("SteeringModel");

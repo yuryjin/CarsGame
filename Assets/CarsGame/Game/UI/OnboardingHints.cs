@@ -20,7 +20,9 @@ namespace RacingGame
         private RaceManager race;
         private HudScreen hud;
         private HintTracker tracker;
-        private float grassTime, lockedTime;
+        private float grassTime, lockedTime, stuckTime;
+        private bool stuckShown, stuckReset;
+        private CarController watchedCar;
         private static readonly Color PickupColor = new Color(0.55f, 1f, 0.7f);
 
         private void Awake()
@@ -40,13 +42,18 @@ namespace RacingGame
             Pickup.PickedUp -= OnPickedUp;
             race.OnRaceStarted -= OnRaceStarted;
             var director = RaceDirector.Current; if (director != null) director.ShellHit -= OnShellHit;
+            if (watchedCar != null) watchedCar.Teleported -= OnTeleported;
         }
 
         private void OnRaceStarted()
         {
             var save = PlatformGlue.Save;
             tracker = new HintTracker(save != null ? save.Data.settings.hintsSeen : 0);
-            grassTime = lockedTime = 0f;
+            grassTime = lockedTime = stuckTime = 0f;
+            stuckShown = stuckReset = false;
+            if (watchedCar != null) watchedCar.Teleported -= OnTeleported;
+            watchedCar = race.Player != null ? race.Player.Car : null;
+            if (watchedCar != null) watchedCar.Teleported += OnTeleported;
             var director = RaceDirector.Instance;
             director.ShellHit -= OnShellHit;
             director.ShellHit += OnShellHit;
@@ -59,6 +66,20 @@ namespace RacingGame
             if (player == null || player.Car == null || (player.Health != null && player.Health.IsDead)) return;
             float dt = Time.unscaledDeltaTime;
 
+            if (Mathf.Abs(player.Car.SpeedKmh) < 3f) stuckTime += dt;
+            else { OnTeleported(); stuckReset = false; }
+            if (stuckTime >= 2f && !stuckShown)
+            {
+                stuckShown = true;
+                hud.ShowHint(Loc.Get("hint.stuck"), hintSeconds);
+            }
+            if (stuckTime >= 4f && !stuckReset && PlatformGlue.Save != null && PlatformGlue.Save.Data.Races < 3)
+            {
+                stuckReset = true;
+                player.Car.ResetCar();
+                if (player.Health != null) player.Health.SetInvulnerable(1.5f);
+            }
+
             grassTime = player.Car.Surface == GroundSurface.Ground ? grassTime + dt : 0f;
             if (grassTime > grassSeconds) Try(Hint.Grass, "hint.grass");
 
@@ -66,6 +87,13 @@ namespace RacingGame
             bool idleLock = hud.ReticleLocked && !player.Car.LastCommand.Fire;
             lockedTime = idleLock ? lockedTime + dt : 0f;
             if (lockedTime > lockedNoFireSeconds) Try(Hint.AimFire, hud.TouchLayout ? "hint.aim.touch" : "hint.aim.keys");
+        }
+
+        private void OnTeleported()
+        {
+            stuckTime = 0f;
+            stuckShown = stuckReset;
+            // Keep the automatic reset latched until the player moves away.
         }
 
         private void OnShellHit(GameObject shooter, GameObject victim)

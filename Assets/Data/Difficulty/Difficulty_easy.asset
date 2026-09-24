@@ -15,7 +15,7 @@ MonoBehaviour:
   tierId: easy
   aiCount: 3
   profiles:
-  - {fileID: 11400000, guid: d07918aff6541579f8658e8b45dd11b4, type: 2}
+  - {fileID: 11400000, guid: 4e9a2ada091b04b09a53be7cc571a99f, type: 2}
   - {fileID: 11400000, guid: 401f2c6bc4805cc2794d6620169fc63d, type: 2}
   - {fileID: 11400000, guid: 930748c3952cb6345a44345b411334b2, type: 2}
   - {fileID: 11400000, guid: 4e9a2ada091b04b09a53be7cc571a99f, type: 2}

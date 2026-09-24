@@ -66,7 +66,8 @@ namespace RacingGame
                 Arena = ArenaLayout.Create(renderer != null ? renderer.sharedMaterial : null);
             }
             int total = aiCount + 1;
-            int playerSlot = playerGridSlot < 0 ? total - 1 : Mathf.Clamp(playerGridSlot, 0, total - 1);
+            int playerSlot = RaceSetup.Event != null && RaceSetup.Event.eventId == "e1" ? Mathf.Min(1, total - 1)
+                : playerGridSlot < 0 ? total - 1 : Mathf.Clamp(playerGridSlot, 0, total - 1);
             int aiIndex = 0;
             for (int slot = 0; slot < total; slot++)
             {
@@ -119,6 +120,7 @@ namespace RacingGame
                     }
                     var gunner = go.GetComponent<AiGunner>() ?? go.AddComponent<AiGunner>();
                     gunner.Initialize(profile, aiFireCooldown);
+                    gunner.startGraceSeconds = RaceSetup.Event != null && RaceSetup.Event.eventId == "e1" ? 30f : 3f;
                     if (arena)
                     {
                         var ai = go.AddComponent<ArenaDriver>();

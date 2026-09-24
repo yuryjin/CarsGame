@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: RacingGame.Game::RacingGame.RaceEventDefinition
   eventId: e1
   nameKey: events.e1.name
-  laps: 3
+  laps: 2
   aiCountOverride: -1
   reversed: 0
   night: 0
