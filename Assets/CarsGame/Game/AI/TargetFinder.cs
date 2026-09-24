@@ -26,13 +26,14 @@ namespace RacingGame
         }
 
         /// <param name="leadShellSpeed">When &gt; 0, test the cone against where the target will be when a shell of this speed arrives.</param>
-        public static CarController Find(CarController self, Vector3 origin, Vector3 forward, float coneDegrees, float minRange, float maxRange, float leadShellSpeed = 0f)
+        /// <param name="closestToAxis">Rank by angle off <paramref name="forward"/> instead of distance (a turret keeps the car dead ahead).</param>
+        public static CarController Find(CarController self, Vector3 origin, Vector3 forward, float coneDegrees, float minRange, float maxRange, float leadShellSpeed = 0f, bool closestToAxis = false)
         {
             var director = RaceDirector.Current ?? Object.FindAnyObjectByType<RaceDirector>();
             if (director == null) return null;
             float cosCone = Mathf.Cos(coneDegrees * Mathf.Deg2Rad);
             int mask = ObstacleMask;
-            CarController best = null; float bestDist = float.MaxValue;
+            CarController best = null; float bestScore = float.MaxValue;
             var cars = director.Cars;
             for (int i = 0; i < cars.Count; i++)
             {
@@ -44,16 +45,21 @@ namespace RacingGame
                 Vector3 to = aim - origin;
                 float dist = to.magnitude;
                 if (dist < minRange || dist > maxRange) continue;
+                float dot;
                 if (leadShellSpeed > 0f && other.Body != null)
                 {
                     Vector3 lead = aim + other.Body.linearVelocity * (dist / leadShellSpeed);
                     Vector3 toLead = lead - origin;
                     float leadDist = toLead.magnitude;
-                    if (leadDist < 0.01f || Vector3.Dot(toLead / leadDist, forward) < cosCone) continue;
+                    if (leadDist < 0.01f) continue;
+                    dot = Vector3.Dot(toLead / leadDist, forward);
                 }
-                else if (Vector3.Dot(to / dist, forward) < cosCone) continue;
+                else dot = Vector3.Dot(to / dist, forward);
+                if (dot < cosCone) continue;
+                float score = closestToAxis ? -dot : dist;
+                if (score >= bestScore) continue;
                 if (mask != 0 && Physics.Linecast(origin, aim, mask, QueryTriggerInteraction.Ignore)) continue;
-                if (dist < bestDist) { bestDist = dist; best = other; }
+                bestScore = score; best = other;
             }
             return best;
         }

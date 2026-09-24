@@ -3,7 +3,9 @@ using UnityEngine;
 namespace RacingGame
 {
     /// <summary>
-    /// Roof-mounted cannon. Builds its own turret/barrel visuals at start. Firing intent comes
+    /// Roof-mounted cannon. Builds its own turret/barrel visuals at start. The turret swings and the
+    /// barrel tilts toward the rival closest to the car's nose inside a sector ahead (with lead and
+    /// shell drop), so shells leave along the barrel. Firing intent comes
     /// from the car's <see cref="Core.Sim.DriveCommand"/> (or an AI gunner via <see cref="TryFire"/>);
     /// the cooldown is counted in simulation ticks and shells are spawned through the
     /// <see cref="RaceDirector"/> pool.
@@ -26,7 +28,18 @@ namespace RacingGame
         [Tooltip("Event rule (mines only): the cannon never fires this race. Separate from enabled, which the wreck toggles.")]
         public bool locked;
 
+        [Header("Turret")]
+        [Tooltip("The turret turns toward a rival up to this many degrees off the car's nose. 0 = fixed forward.")]
+        public float turretYawLimit = 30f;
+        [Tooltip("Barrel tilt limit (deg, up and down): the muzzle sits above rivals' roofs, so a level barrel overshoots them.")]
+        public float barrelPitchLimit = 12f;
+        [Tooltip("Turret turn and barrel tilt speed (deg/s).")]
+        public float turretTurnSpeed = 180f;
+        public float turretMinRange = 4f, turretMaxRange = 45f;
+
         [Header("References (auto-created if empty)")]
+        [Tooltip("Yaw pivot; defaults to the barrel's parent.")]
+        public Transform turret;
         public Transform barrel;
         public Transform muzzle;
 
@@ -40,6 +53,9 @@ namespace RacingGame
         private bool wantsFire;
         private float recoilOffset;
         private Vector3 barrelRestPosition;
+        private Quaternion turretRestRotation, barrelRestRotation;
+        private float turretYaw, barrelPitch;
+        private CarController turretTarget;
         private Material shellMaterial;
 
         public int FireIntervalTicks => SimulationDriver.SecondsToTicks(fireInterval);
@@ -50,6 +66,12 @@ namespace RacingGame
         /// <summary>0..1 while reloading, 1 when ready.</summary>
         public float ReloadProgress(int tick) => reloadDoneTick < 0 ? 1f : 1f - Mathf.Clamp01((reloadDoneTick - tick) / (float)SimulationDriver.SecondsToTicks(reloadSeconds));
         public event System.Action<int, int> AmmoChanged;   // ammo, max
+        /// <summary>Turret yaw off the car's nose (deg, + = right).</summary>
+        public float TurretYaw => turretYaw;
+        /// <summary>Barrel tilt (deg, + = down).</summary>
+        public float BarrelPitch => barrelPitch;
+        /// <summary>The rival the turret is tracking, else null.</summary>
+        public CarController TurretTarget => turretTarget;
 
         private void Awake()
         {
@@ -61,6 +83,9 @@ namespace RacingGame
             if (weapons == null) weapons = gameObject.AddComponent<CarWeapons>();
             if (barrel == null || muzzle == null) BuildTurret();
             barrelRestPosition = barrel.localPosition;
+            barrelRestRotation = barrel.localRotation;
+            if (turret == null && barrel.parent != transform) turret = barrel.parent;
+            if (turret != null) turretRestRotation = turret.localRotation;
             ApplyPrimaryProfile(weapons != null ? weapons.primaryType : PrimaryWeaponType.Cannon);
         }
 
@@ -102,7 +127,7 @@ namespace RacingGame
         {
             // Barrel recoil spring-back (visual only)
             recoilOffset = Mathf.MoveTowards(recoilOffset, 0f, Time.deltaTime * 1.2f);
-            barrel.localPosition = barrelRestPosition - Vector3.forward * recoilOffset;
+            barrel.localPosition = barrelRestPosition - barrel.localRotation * Vector3.forward * recoilOffset;
         }
 
         /// <summary>Level input: true while the fire button is held. Set by the car every tick.</summary>
@@ -117,7 +142,37 @@ namespace RacingGame
         public void SimulationStep(int tick)
         {
             if (reloadDoneTick >= 0 && tick >= reloadDoneTick) RefillAmmo();
+            StepTurret(tick);
             if (wantsFire) TryFire(tick);
+        }
+
+        // Runs in the simulation step before firing, so the shell leaves along the turned barrel.
+        private void StepTurret(int tick)
+        {
+            if (turret == null || turretYawLimit <= 0f) return;
+            if (!enabled) turretTarget = null;
+            else if ((tick + (car != null ? car.CarId : 0)) % 5 == 0)   // re-acquire 10×/s, staggered per car
+                turretTarget = TargetFinder.Find(car, turret.position, transform.forward, turretYawLimit, turretMinRange, turretMaxRange, shellSpeed, closestToAxis: true);
+
+            float desiredYaw = 0f, desiredPitch = 0f;
+            if (turretTarget != null && turretTarget.isActiveAndEnabled)
+            {
+                Vector3 aim = turretTarget.transform.position + Vector3.up * 0.5f;
+                float speed = Mathf.Max(1f, shellSpeed);
+                // Lead by the target's velocity relative to ours: the shell inherits our velocity.
+                Vector3 relative = (turretTarget.Body != null ? turretTarget.Body.linearVelocity : Vector3.zero) - (rb != null ? rb.linearVelocity : Vector3.zero);
+                aim += relative * (Vector3.Distance(aim, barrel.position) / speed);
+                Vector3 local = turret.parent.InverseTransformDirection(aim - barrel.position);
+                float flat = Mathf.Sqrt(local.x * local.x + local.z * local.z), flight = flat / speed;
+                float drop = -0.5f * Physics.gravity.y * flight * flight;   // aim above the target by what the shell falls
+                desiredYaw = Mathf.Clamp(Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg, -turretYawLimit, turretYawLimit);
+                desiredPitch = Mathf.Clamp(-Mathf.Atan2(local.y + drop, flat) * Mathf.Rad2Deg, -barrelPitchLimit, barrelPitchLimit);
+            }
+            float step = turretTurnSpeed * SimulationDriver.FixedStep;
+            turretYaw = Mathf.MoveTowards(turretYaw, desiredYaw, step);
+            barrelPitch = Mathf.MoveTowards(barrelPitch, desiredPitch, step);
+            turret.localRotation = turretRestRotation * Quaternion.Euler(0f, turretYaw, 0f);
+            barrel.localRotation = barrelRestRotation * Quaternion.Euler(barrelPitch, 0f, 0f);
         }
 
         public bool TryFire() => TryFire(SimulationDriver.Instance.Tick);
