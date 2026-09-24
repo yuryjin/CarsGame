@@ -931,6 +931,34 @@ MonoBehaviour:
     m_Localized: Canon lourd
     m_Metadata:
       m_Items: []
+  - m_Id: 8003903006519296
+    m_Localized: Charge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907904
+    m_Localized: "Posez une charge et faites-la sauter pr\xE8s d'un rival"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907905
+    m_Localized: Charge {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907906
+    m_Localized: 'Charge : BOUM'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907907
+    m_Localized: CHARGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907908
+    m_Localized: BOUM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907909
+    m_Localized: GEL
+    m_Metadata:
+      m_Items: []
   - m_Id: 8003903014907910
     m_Localized: "Boxeur m\xE9canique"
     m_Metadata:
@@ -1093,6 +1121,194 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8003903019102213
     m_Localized: "{page}/{pages} \xB7 1\u20130\nQ + molette / Tab"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398785171456
+    m_Localized: CARROSSERIE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754368
+    m_Localized: Buggy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754369
+    m_Localized: Sportive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754370
+    m_Localized: "Blind\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754371
+    m_Localized: Char
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754372
+    m_Localized: "L\xE9ger et vif au d\xE9part, coupe par l'herbe. Fragile : \xE9vitez
+      les contacts, esquivez et driftez."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754373
+    m_Localized: "La polyvalente : vitesse, adh\xE9rence et blindage \xE9quilibr\xE9s.
+      Tenez la trajectoire, combattez quand \xE7a paie."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754374
+    m_Localized: "Lourd et robuste, gagne chaque bousculade. Freine long : ralentissez
+      t\xF4t, puis percutez."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754375
+    m_Localized: "Lent sur l'asphalte, mais ses chenilles ralentissent \xE0 peine
+      dans l'herbe. Blindage \xE9norme, tourelle deux fois plus mobile."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754376
+    m_Localized: Vitesse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754377
+    m_Localized: "Acc\xE9l\xE9ration"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754378
+    m_Localized: "Maniabilit\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754379
+    m_Localized: Blindage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754380
+    m_Localized: Tout-terrain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754381
+    m_Localized: '{kg} kg'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754382
+    m_Localized: "R\xE9sistance {hp}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754383
+    m_Localized: Dune
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754384
+    m_Localized: Puce
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754385
+    m_Localized: Scorpion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754386
+    m_Localized: Crotale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754387
+    m_Localized: Baja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754388
+    m_Localized: Standard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754389
+    m_Localized: "Fl\xE8che"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754390
+    m_Localized: "Vip\xE8re"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754391
+    m_Localized: "Com\xE8te"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754392
+    m_Localized: "Fant\xF4me"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754393
+    m_Localized: Rempart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754394
+    m_Localized: Rhino
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754395
+    m_Localized: Fourgon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754396
+    m_Localized: Gardien
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754397
+    m_Localized: Pillard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754398
+    m_Localized: Tortue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754399
+    m_Localized: Grizzly
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754400
+    m_Localized: Mammouth
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754401
+    m_Localized: Lynx
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754402
+    m_Localized: Titan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383412383744
+    m_Localized: "Bombe br\xFBlante"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966656
+    m_Localized: "M\xE8che de 18 s. Touchez pour transmettre. Le chrono continue."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966657
+    m_Localized: 'VOUS AVEZ LA BOMBE : {n} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966658
+    m_Localized: '{name} a la bombe : {n} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966659
+    m_Localized: Prochaine bombe...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966660
+    m_Localized: Touchez une autre voiture pour la transmettre !
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966661
+    m_Localized: "\xC9loignez-vous de la voiture avec la bombe !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966662
+    m_Localized: Transmission possible dans {n} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8017799678697472
+    m_Localized: Musique
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8017799678697473
+    m_Localized: "Bloqu\u00e9 ? Appuie sur \u21ba"
     m_Metadata:
       m_Items: []
   references:

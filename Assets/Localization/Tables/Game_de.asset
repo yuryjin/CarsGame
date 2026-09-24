@@ -930,6 +930,34 @@ MonoBehaviour:
     m_Localized: Schwere Kanone
     m_Metadata:
       m_Items: []
+  - m_Id: 8003903006519296
+    m_Localized: Sprengladung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907904
+    m_Localized: "Ladung legen und z\xFCnden, sobald ein Gegner nah ist"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907905
+    m_Localized: Ladung {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907906
+    m_Localized: "Ladung: Z\xDCNDEN"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907907
+    m_Localized: LADUNG
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907908
+    m_Localized: "Z\xDCNDEN"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907909
+    m_Localized: FROST
+    m_Metadata:
+      m_Items: []
   - m_Id: 8003903014907910
     m_Localized: Mechanischer Boxer
     m_Metadata:
@@ -1092,6 +1120,194 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8003903019102213
     m_Localized: "{page}/{pages} \xB7 1\u20130\nQ + Mausrad / Tab"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398785171456
+    m_Localized: KAROSSERIE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754368
+    m_Localized: Buggy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754369
+    m_Localized: Sportwagen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754370
+    m_Localized: Panzerwagen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754371
+    m_Localized: Panzer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754372
+    m_Localized: "Leicht und spritzig, k\xFCrzt \xFCber Gras ab. Zerbrechlich: Kontakt
+      meiden, ausweichen, driften."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754373
+    m_Localized: "Der Allrounder: Tempo, Grip und Panzerung im Gleichgewicht. Ideallinie
+      halten, k\xE4mpfen wenn es lohnt."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754374
+    m_Localized: "Schwer und z\xE4h, gewinnt jedes Rempeln. Langer Bremsweg: fr\xFCh
+      bremsen, dann rammen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754375
+    m_Localized: Auf Asphalt langsam, doch die Ketten verlieren auf Gras kaum Tempo.
+      Dicke Panzerung, Turm schwenkt doppelt so weit.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754376
+    m_Localized: Tempo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754377
+    m_Localized: Beschleunigung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754378
+    m_Localized: Handling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754379
+    m_Localized: Panzerung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754380
+    m_Localized: "Gel\xE4nde"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754381
+    m_Localized: '{kg} kg'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754382
+    m_Localized: Haltbarkeit {hp}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754383
+    m_Localized: "D\xFCne"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754384
+    m_Localized: Floh
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754385
+    m_Localized: Skorpion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754386
+    m_Localized: Seitenwinder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754387
+    m_Localized: Baja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754388
+    m_Localized: Standard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754389
+    m_Localized: Pfeil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754390
+    m_Localized: Viper
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754391
+    m_Localized: Komet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754392
+    m_Localized: Phantom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754393
+    m_Localized: Bollwerk
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754394
+    m_Localized: Nashorn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754395
+    m_Localized: Geldtransporter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754396
+    m_Localized: "W\xE4chter"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754397
+    m_Localized: "R\xE4uber"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754398
+    m_Localized: "Schildkr\xF6te"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754399
+    m_Localized: Grizzly
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754400
+    m_Localized: Mammut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754401
+    m_Localized: Luchs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754402
+    m_Localized: Titan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383412383744
+    m_Localized: "Hei\xDFe Bombe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966656
+    m_Localized: "18 s Z\xFCnder. Durch Ber\xFChrung weitergeben. Zeit l\xE4uft weiter."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966657
+    m_Localized: 'BOMBE BEI DIR: {n} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966658
+    m_Localized: '{name} hat die Bombe: {n} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966659
+    m_Localized: "N\xE4chste Bombe..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966660
+    m_Localized: "Ber\xFChre ein anderes Auto zum Weitergeben!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966661
+    m_Localized: Halte Abstand zum Auto mit der Bombe!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966662
+    m_Localized: "Weitergeben in {n} s m\xF6glich"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8017799678697472
+    m_Localized: Musik
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8017799678697473
+    m_Localized: "Festgefahren? Dr\u00fcck \u21ba"
     m_Metadata:
       m_Items: []
   references:

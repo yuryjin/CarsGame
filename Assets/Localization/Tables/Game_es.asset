@@ -935,6 +935,34 @@ MonoBehaviour:
     m_Localized: "Ca\xF1\xF3n pesado"
     m_Metadata:
       m_Items: []
+  - m_Id: 8003903006519296
+    m_Localized: Carga remota
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907904
+    m_Localized: "Coloca una carga y det\xF3nala cuando llegue un rival"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907905
+    m_Localized: Carga {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907906
+    m_Localized: 'Carga: DETONAR'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907907
+    m_Localized: CARGA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907908
+    m_Localized: BOOM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907909
+    m_Localized: HIELO
+    m_Metadata:
+      m_Items: []
   - m_Id: 8003903014907910
     m_Localized: "Boxeador mec\xE1nico"
     m_Metadata:
@@ -1097,6 +1125,194 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8003903019102213
     m_Localized: "{page}/{pages} \xB7 1\u20130\nQ + rueda / Tab"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398785171456
+    m_Localized: "CARROCER\xCDA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754368
+    m_Localized: Buggy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754369
+    m_Localized: Deportivo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754370
+    m_Localized: Blindado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754371
+    m_Localized: Tanque
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754372
+    m_Localized: "Ligero y r\xE1pido al salir, atajo por la hierba. Fr\xE1gil: evita
+      el contacto, esquiva y derrapa."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754373
+    m_Localized: 'El todoterreno: velocidad, agarre y blindaje equilibrados. Sigue
+      la trazada y lucha cuando convenga.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754374
+    m_Localized: "Pesado y duro, gana cada empuj\xF3n. Frena tarde: reduce antes
+      y luego embiste."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754375
+    m_Localized: Lento en asfalto, pero sus orugas apenas frenan en la hierba. Blindaje
+      enorme; la torreta gira el doble.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754376
+    m_Localized: Velocidad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754377
+    m_Localized: "Aceleraci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754378
+    m_Localized: Manejo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754379
+    m_Localized: Blindaje
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754380
+    m_Localized: Todoterreno
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754381
+    m_Localized: '{kg} kg'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754382
+    m_Localized: Resistencia {hp}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754383
+    m_Localized: Duna
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754384
+    m_Localized: Pulga
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754385
+    m_Localized: "Escorpi\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754386
+    m_Localized: "Cr\xF3talo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754387
+    m_Localized: Baja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754388
+    m_Localized: "Est\xE1ndar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754389
+    m_Localized: Flecha
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754390
+    m_Localized: "V\xEDbora"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754391
+    m_Localized: Cometa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754392
+    m_Localized: Fantasma
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754393
+    m_Localized: Baluarte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754394
+    m_Localized: Rinoceronte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754395
+    m_Localized: Blindado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754396
+    m_Localized: "Guardi\xE1n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754397
+    m_Localized: Asaltante
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754398
+    m_Localized: Tortuga
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754399
+    m_Localized: Grizzly
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754400
+    m_Localized: Mamut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754401
+    m_Localized: Lince
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754402
+    m_Localized: "Tit\xE1n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383412383744
+    m_Localized: Bomba caliente
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966656
+    m_Localized: Mecha de 18 s. Toca para pasarla. El tiempo no se reinicia.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966657
+    m_Localized: 'TIENES LA BOMBA: {n} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966658
+    m_Localized: '{name} tiene la bomba: {n} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966659
+    m_Localized: Siguiente bomba...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966660
+    m_Localized: "\xA1Toca otro coche para pasarla!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966661
+    m_Localized: "\xA1Al\xE9jate del coche con la bomba!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966662
+    m_Localized: "Podr\xE1s pasarla en {n} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8017799678697472
+    m_Localized: "M\xFAsica"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8017799678697473
+    m_Localized: "\u00bfAtascado? Pulsa \u21ba"
     m_Metadata:
       m_Items: []
   references:

@@ -35,7 +35,9 @@ namespace RacingGame.EditorTools
                 foreach (char c in line)
                     if ((c > 0x2E80 || (c >= 0x2190 && c <= 0x2BFF)) && chars.ToString().IndexOf(c) < 0) chars.Append(c);
 
-            var asset = TMP_FontAsset.CreateFontAsset(font, 36, 5, GlyphRenderMode.SDFAA, 1024, 1024, AtlasPopulationMode.Dynamic, false);
+            // A 36 px sample with 5 px padding fits ~480 glyphs in 1024²; past that the atlas doubles its width.
+            int width = chars.Length > 440 ? 2048 : 1024;
+            var asset = TMP_FontAsset.CreateFontAsset(font, 36, 5, GlyphRenderMode.SDFAA, width, 1024, AtlasPopulationMode.Dynamic, false);
             asset.name = "NotoSansSC-Subset SDF";
             asset.TryAddCharacters(chars.ToString(), out string missing);
             if (!string.IsNullOrEmpty(missing)) Debug.LogWarning("[FontAtlasBaker] glyphs missing in subset: " + missing);

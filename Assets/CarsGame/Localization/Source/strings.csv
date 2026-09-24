@@ -97,6 +97,7 @@ settings.title,,10,SETTINGS,НАСТРОЙКИ,AYARLAR,设置,EINSTELLUNGEN,AJUS
 settings.language,,12,Language,Язык,Dil,语言,Sprache,Idioma,Langue,Idioma,Мова
 settings.language.system,follow platform,20,As on platform,Как на платформе,Platformdaki gibi,跟随平台,Wie Plattform,Como la plataforma,Comme la plateforme,Como a plataforma,Як на платформі
 settings.sound,,10,Sound,Звук,Ses,声音,Ton,Sonido,Son,Som,Звук
+settings.music,,10,Music,Музыка,Müzik,音乐,Musik,Música,Musique,Música,Музика
 settings.auto_throttle,,16,Auto throttle,Автогаз,Otomatik gaz,自动油门,Auto-Gas,Acelerador auto,Accélération auto,Acelerador auto,Автогаз
 settings.on,,4,On,Вкл,Açık,开,An,Sí,Oui,Lig.,Увім
 settings.off,,4,Off,Выкл,Kapalı,关,Aus,No,Non,Desl.,Вимк
@@ -244,6 +245,13 @@ weapon.freeze,weapon wheel,32,Freeze gun,Замораживатель,Dondurucu,
 weapon.emp,weapon wheel,32,EMP cannon,ЭМИ-пушка,EMP topu,电磁脉冲炮,EMP-Kanone,Cañón PEM,Canon IEM,Canhão PEM,ЕМІ-гармата
 weapon.spike,weapon wheel,32,Spike gun,Шипомёт,Çivi atıcı,尖刺枪,Nagelkanone,Lanzapúas,Lance-pointes,Lança-espinhos,Шипомет
 weapon.heavy,weapon wheel,32,Heavy cannon,Тяжёлая пушка,Ağır top,重型炮,Schwere Kanone,Cañón pesado,Canon lourd,Canhão pesado,Важка гармата
+garage.remotecharge,weapon name,14,Remote Charge,Заряд,Patlayıcı,遥控炸药,Sprengladung,Carga remota,Charge,Carga remota,Заряд
+garage.remotecharge.desc,weapon description,60,Plant a charge behind you and blow it when a rival is close,"Заложите заряд позади и взорвите, когда соперник рядом","Arkana patlayıcı bırak, rakip yaklaşınca patlat",在车后放置炸药，对手靠近时引爆,"Ladung legen und zünden, sobald ein Gegner nah ist",Coloca una carga y detónala cuando llegue un rival,Posez une charge et faites-la sauter près d'un rival,Deixe uma carga e detone quando um rival chegar,"Закладіть заряд позаду і підірвіть, коли суперник поруч"
+hud.secondary.charge,secondary ammo counter,24,Charge {cur}/{max},Заряд {cur}/{max},Patlayıcı {cur}/{max},炸药 {cur}/{max},Ladung {cur}/{max},Carga {cur}/{max},Charge {cur}/{max},Carga {cur}/{max},Заряд {cur}/{max}
+hud.secondary.charge_live,planted charge: press to blow it,24,Charge: BLOW IT,Заряд: ВЗОРВАТЬ,Patlayıcı: PATLAT,炸药：引爆,Ladung: ZÜNDEN,Carga: DETONAR,Charge : BOUM,Carga: DETONAR,Заряд: ПІДІРВАТИ
+touch.charge,touch button,8,CHARGE,ЗАРЯД,BOMBA,炸药,LADUNG,CARGA,CHARGE,CARGA,ЗАРЯД
+touch.detonate,touch button: blow the planted charge,8,BOOM,ВЗРЫВ,PATLAT,引爆,ZÜNDEN,BOOM,BOUM,BUM,ВИБУХ
+touch.freeze,touch button,8,FREEZE,ЛЁД,BUZ,冰冻,FROST,HIELO,GEL,GELO,ЛІД
 weapon.boxer,arsenal,48,Mechanical boxer,Механический боксёр,Mekanik boksör,机械拳击手,Mechanischer Boxer,Boxeador mecánico,Boxeur mécanique,Boxeador mecânico,Механічний боксер
 weapon.circular_saw,arsenal,48,Circular saw,Дисковая пила,Daire testere,圆锯,Kreissäge,Sierra circular,Scie circulaire,Serra circular,Дискова пила
 weapon.drill,arsenal,48,Power drill,Боевая дрель,Savaş matkabı,战斗钻头,Kampfbohrer,Taladro de combate,Perceuse de combat,Furadeira de combate,Бойовий дриль
@@ -294,3 +302,48 @@ Q + rueda / Tab","{page}/{pages} · 1–0
 Q + molette / Tab","{page}/{pages} · 1–0
 Q + roda / Tab","{page}/{pages} · 1–0
 Q + колесо / Tab"
+garage.bodies,section title,16,BODY,КУЗОВ,GÖVDE,车身,KAROSSERIE,CARROCERÍA,CARROSSERIE,CARROCERIA,КУЗОВ
+body.class.buggy,body class tab,12,Buggy,Багги,Buggy,沙地车,Buggy,Buggy,Buggy,Buggy,Багі
+body.class.sport,body class tab,12,Sport,Спорткар,Spor,跑车,Sportwagen,Deportivo,Sportive,Esportivo,Спорткар
+body.class.armored,body class tab,12,Armored,Броневик,Zırhlı,装甲车,Panzerwagen,Blindado,Blindé,Blindado,Броньовик
+body.class.tank,body class tab,12,Tank,Танк,Tank,坦克,Panzer,Tanque,Char,Tanque,Танк
+body.class.buggy.desc,driving style of the class,130,"Light and quick off the line, cuts across grass. Fragile: avoid contact, dodge and drift.","Лёгкий и резвый со старта, срезает по траве. Хрупкий: избегай толчков, уворачивайся и дрифтуй.","Hafif ve çevik, çimden kestirme yapar. Kırılgan: temastan kaçın, sıyrıl ve drift at.",轻巧、起步快，能抄近路穿过草地。车身脆弱：避免碰撞，灵活闪避并漂移。,"Leicht und spritzig, kürzt über Gras ab. Zerbrechlich: Kontakt meiden, ausweichen, driften.","Ligero y rápido al salir, atajo por la hierba. Frágil: evita el contacto, esquiva y derrapa.","Léger et vif au départ, coupe par l'herbe. Fragile : évitez les contacts, esquivez et driftez.","Leve e rápido na largada, corta pela grama. Frágil: evite contato, desvie e drifte.","Легкий і жвавий зі старту, зрізає по траві. Крихкий: уникай поштовхів, ухиляйся і дрифтуй."
+body.class.sport.desc,driving style of the class,130,"The all-rounder: balanced speed, grip and armor. Hold the racing line and fight when it pays.","Универсал: скорость, сцепление и броня в балансе. Держи траекторию и вступай в бой, когда выгодно.","Her işe uygun: hız, yol tutuş ve zırh dengeli. Çizgini koru, fırsat olunca savaş.",全能型：速度、抓地力和装甲均衡。守住赛车线，有利时再出手。,"Der Allrounder: Tempo, Grip und Panzerung im Gleichgewicht. Ideallinie halten, kämpfen wenn es lohnt.","El todoterreno: velocidad, agarre y blindaje equilibrados. Sigue la trazada y lucha cuando convenga.","La polyvalente : vitesse, adhérence et blindage équilibrés. Tenez la trajectoire, combattez quand ça paie.","O versátil: velocidade, aderência e blindagem equilibradas. Mantenha a linha e lute quando valer a pena.","Універсал: швидкість, зчеплення і броня в балансі. Тримай траєкторію і бийся, коли вигідно."
+body.class.armored.desc,driving style of the class,130,"Heavy and tough, wins every shove. Slow to stop: brake early, then ram.","Тяжёлый и крепкий, побеждает в любой толкотне. Долго тормозит: сбрасывай скорость заранее, потом тарань.","Ağır ve sağlam, her itişmeyi kazanır. Geç durur: erken fren yap, sonra toslat.",沉重结实，推挤中稳占上风。刹车距离长：提前减速，然后撞过去。,"Schwer und zäh, gewinnt jedes Rempeln. Langer Bremsweg: früh bremsen, dann rammen.","Pesado y duro, gana cada empujón. Frena tarde: reduce antes y luego embiste.","Lourd et robuste, gagne chaque bousculade. Freine long : ralentissez tôt, puis percutez.","Pesado e resistente, vence qualquer empurrão. Freia devagar: reduza cedo e depois abalroe.","Важкий і міцний, перемагає в будь-якій штовханині. Довго гальмує: скидай швидкість заздалегідь, потім тарань."
+body.class.tank.desc,driving style of the class,130,"Slow on tarmac, but its tracks barely slow down on grass. Huge armor; the turret swings twice as wide.","Медленный на асфальте, но на гусеницах почти не теряет скорость на траве. Мощная броня, башня поворачивается вдвое шире.",Asfaltta yavaş ama paletleri çimde neredeyse yavaşlamaz. Dev zırh; taret iki kat geniş döner.,柏油路上较慢，但履带在草地上几乎不减速。装甲厚重，炮塔转动范围扩大一倍。,"Auf Asphalt langsam, doch die Ketten verlieren auf Gras kaum Tempo. Dicke Panzerung, Turm schwenkt doppelt so weit.","Lento en asfalto, pero sus orugas apenas frenan en la hierba. Blindaje enorme; la torreta gira el doble.","Lent sur l'asphalte, mais ses chenilles ralentissent à peine dans l'herbe. Blindage énorme, tourelle deux fois plus mobile.","Lento no asfalto, mas as esteiras quase não perdem velocidade na grama. Blindagem enorme; a torre gira o dobro.","Повільний на асфальті, але на гусеницях майже не втрачає швидкість на траві. Потужна броня, башта повертається вдвічі ширше."
+body.stat.speed,body rating bar,16,Speed,Скорость,Hız,速度,Tempo,Velocidad,Vitesse,Velocidade,Швидкість
+body.stat.accel,body rating bar,16,Acceleration,Разгон,İvme,加速,Beschleunigung,Aceleración,Accélération,Aceleração,Розгін
+body.stat.handling,body rating bar,16,Handling,Управление,Yol tutuş,操控,Handling,Manejo,Maniabilité,Dirigibilidade,Керування
+body.stat.armor,body rating bar,16,Armor,Броня,Zırh,装甲,Panzerung,Blindaje,Blindage,Blindagem,Броня
+body.stat.offroad,body rating bar,16,Off-road,Бездорожье,Arazi,越野,Gelände,Todoterreno,Tout-terrain,Fora de estrada,Бездоріжжя
+body.mass,{kg} = mass,16,{kg} kg,{kg} кг,{kg} kg,{kg} 公斤,{kg} kg,{kg} kg,{kg} kg,{kg} kg,{kg} кг
+body.hp,{hp} = hit points,20,Health {hp},Прочность {hp},Dayanıklılık {hp},耐久 {hp},Haltbarkeit {hp},Resistencia {hp},Résistance {hp},Resistência {hp},Міцність {hp}
+body.dune,car body name,16,Dune,Дюна,Kumul,沙丘,Düne,Duna,Dune,Duna,Дюна
+body.flea,car body name,16,Flea,Блоха,Pire,跳蚤,Floh,Pulga,Puce,Pulga,Блоха
+body.scorpion,car body name,16,Scorpion,Скорпион,Akrep,蝎子,Skorpion,Escorpión,Scorpion,Escorpião,Скорпіон
+body.sidewinder,car body name,16,Sidewinder,Гремучник,Çıngıraklı,响尾蛇,Seitenwinder,Crótalo,Crotale,Cascavel,Гримучник
+body.baja,car body name,16,Baja,Баха,Baja,巴哈,Baja,Baja,Baja,Baja,Баха
+body.classic,car body name,16,Standard,Стандарт,Standart,标准,Standard,Estándar,Standard,Padrão,Стандарт
+body.arrow,car body name,16,Arrow,Стрела,Ok,飞箭,Pfeil,Flecha,Flèche,Flecha,Стріла
+body.viper,car body name,16,Viper,Гадюка,Yılan,蝰蛇,Viper,Víbora,Vipère,Víbora,Гадюка
+body.comet,car body name,16,Comet,Комета,Kuyrukluyıldız,彗星,Komet,Cometa,Comète,Cometa,Комета
+body.phantom,car body name,16,Phantom,Фантом,Hayalet,幻影,Phantom,Fantasma,Fantôme,Fantasma,Фантом
+body.bulwark,car body name,16,Bulwark,Бастион,Siper,堡垒,Bollwerk,Baluarte,Rempart,Baluarte,Бастіон
+body.rhino,car body name,16,Rhino,Носорог,Gergedan,犀牛,Nashorn,Rinoceronte,Rhino,Rinoceronte,Носоріг
+body.hauler,car body name,16,Hauler,Инкассатор,Zırhlı Kamyon,运钞车,Geldtransporter,Blindado,Fourgon,Carro-forte,Інкасатор
+body.warden,car body name,16,Warden,Страж,Muhafız,守卫,Wächter,Guardián,Gardien,Guardião,Вартовий
+body.raider,car body name,16,Raider,Налётчик,Akıncı,突袭者,Räuber,Asaltante,Pillard,Saqueador,Нальотник
+body.tortoise,car body name,16,Tortoise,Черепаха,Kaplumbağa,陆龟,Schildkröte,Tortuga,Tortue,Tartaruga,Черепаха
+body.grizzly,car body name,16,Grizzly,Гризли,Boz Ayı,灰熊,Grizzly,Grizzly,Grizzly,Pardo,Грізлі
+body.mammoth,car body name,16,Mammoth,Мамонт,Mamut,猛犸,Mammut,Mamut,Mammouth,Mamute,Мамонт
+body.lynx,car body name,16,Lynx,Рысь,Vaşak,猞猁,Luchs,Lince,Lynx,Lince,Рись
+body.titan,car body name,16,Titan,Титан,Titan,泰坦,Titan,Titán,Titan,Titã,Титан
+events.e18.name,event,32,Hot Bomb,Горячая бомба,Sıcak Bomba,烫手炸弹,Heiße Bombe,Bomba caliente,Bombe brûlante,Bomba quente,Гаряча бомба
+bomb.rules,event,90,18 s fuse. Touch to pass. Timer never resets.,Запал 18 с. Передача касанием. Таймер не сбрасывается.,18 sn fitil. Dokunarak aktar. Süre sıfırlanmaz.,18秒引信。碰撞传递，倒计时不重置。,18 s Zünder. Durch Berührung weitergeben. Zeit läuft weiter.,Mecha de 18 s. Toca para pasarla. El tiempo no se reinicia.,Mèche de 18 s. Touchez pour transmettre. Le chrono continue.,Pavio de 18 s. Toque para passar. O tempo não reinicia.,Запал 18 с. Передача дотиком. Таймер не скидається.
+bomb.yours,hud,60,BOMB ON YOU: {n} s,БОМБА У ТЕБЯ: {n} с,BOMBA SENDE: {n} sn,炸弹在你身上：{n}秒,BOMBE BEI DIR: {n} s,TIENES LA BOMBA: {n} s,VOUS AVEZ LA BOMBE : {n} s,BOMBA COM VOCÊ: {n} s,БОМБА В ТЕБЕ: {n} с
+bomb.owner,hud,80,{name} has the bomb: {n} s,Бомба у {name}: {n} с,Bomba {name} adlı araçta: {n} sn,{name}持有炸弹：{n}秒,{name} hat die Bombe: {n} s,{name} tiene la bomba: {n} s,{name} a la bombe : {n} s,{name} tem a bomba: {n} s,Бомба у {name}: {n} с
+bomb.wait,hud,45,Next bomb...,Следующая бомба...,Sıradaki bomba...,下一枚炸弹……,Nächste Bombe...,Siguiente bomba...,Prochaine bombe...,Próxima bomba...,Наступна бомба...
+bomb.pass,hud,80,Touch another car to pass it!,"Коснись другой машины, чтобы передать!",Aktarmak için başka bir araca dokun!,碰撞另一辆车来传递炸弹！,Berühre ein anderes Auto zum Weitergeben!,¡Toca otro coche para pasarla!,Touchez une autre voiture pour la transmettre !,Toque em outro carro para passar!,"Торкнися іншої машини, щоб передати!"
+bomb.avoid,hud,70,Keep away from the bomb carrier!,Держись подальше от машины с бомбой!,Bombalı araçtan uzak dur!,远离携带炸弹的车辆！,Halte Abstand zum Auto mit der Bombe!,¡Aléjate del coche con la bomba!,Éloignez-vous de la voiture avec la bombe !,Fique longe do carro com a bomba!,Тримайся подалі від машини з бомбою!
+bomb.locked,hud,65,Pass unlocks in {n} s,Передача доступна через {n} с,Aktarmaya {n} sn kaldı,{n}秒后可传递,Weitergeben in {n} s möglich,Podrás pasarla en {n} s,Transmission possible dans {n} s,Você pode passar em {n} s,Передача доступна через {n} с
+hint.stuck,stopped for 2 seconds,40,Stuck? Tap ↺,Застрял? Жми ↺,Takıldın mı? ↺ tuşuna bas,卡住了？点按 ↺,Festgefahren? Drück ↺,¿Atascado? Pulsa ↺,Bloqué ? Appuie sur ↺,Preso? Toque em ↺,Застряг? Натисни ↺

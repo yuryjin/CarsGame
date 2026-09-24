@@ -923,6 +923,34 @@ MonoBehaviour:
     m_Key: weapon.heavy
     m_Metadata:
       m_Items: []
+  - m_Id: 8003903006519296
+    m_Key: garage.remotecharge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907904
+    m_Key: garage.remotecharge.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907905
+    m_Key: hud.secondary.charge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907906
+    m_Key: hud.secondary.charge_live
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907907
+    m_Key: touch.charge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907908
+    m_Key: touch.detonate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907909
+    m_Key: touch.freeze
+    m_Metadata:
+      m_Items: []
   - m_Id: 8003903014907910
     m_Key: weapon.boxer
     m_Metadata:
@@ -1085,6 +1113,190 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8003903019102213
     m_Key: weapon.page
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398785171456
+    m_Key: garage.bodies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754368
+    m_Key: body.class.buggy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754369
+    m_Key: body.class.sport
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754370
+    m_Key: body.class.armored
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754371
+    m_Key: body.class.tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754372
+    m_Key: body.class.buggy.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754373
+    m_Key: body.class.sport.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754374
+    m_Key: body.class.armored.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754375
+    m_Key: body.class.tank.desc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754376
+    m_Key: body.stat.speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754377
+    m_Key: body.stat.accel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754378
+    m_Key: body.stat.handling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754379
+    m_Key: body.stat.armor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754380
+    m_Key: body.stat.offroad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754381
+    m_Key: body.mass
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754382
+    m_Key: body.hp
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754383
+    m_Key: body.dune
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754384
+    m_Key: body.flea
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754385
+    m_Key: body.scorpion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754386
+    m_Key: body.sidewinder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754387
+    m_Key: body.baja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754388
+    m_Key: body.classic
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754389
+    m_Key: body.arrow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754390
+    m_Key: body.viper
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754391
+    m_Key: body.comet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754392
+    m_Key: body.phantom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754393
+    m_Key: body.bulwark
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754394
+    m_Key: body.rhino
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754395
+    m_Key: body.hauler
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754396
+    m_Key: body.warden
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754397
+    m_Key: body.raider
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754398
+    m_Key: body.tortoise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754399
+    m_Key: body.grizzly
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754400
+    m_Key: body.mammoth
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754401
+    m_Key: body.lynx
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754402
+    m_Key: body.titan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383412383744
+    m_Key: events.e18.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966656
+    m_Key: bomb.rules
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966657
+    m_Key: bomb.yours
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966658
+    m_Key: bomb.owner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966659
+    m_Key: bomb.wait
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966660
+    m_Key: bomb.pass
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966661
+    m_Key: bomb.avoid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966662
+    m_Key: bomb.locked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8017799678697472
+    m_Key: settings.music
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8017799678697473
+    m_Key: hint.stuck
     m_Metadata:
       m_Items: []
   m_Metadata:

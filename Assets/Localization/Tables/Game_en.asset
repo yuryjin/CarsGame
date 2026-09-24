@@ -934,6 +934,34 @@ MonoBehaviour:
     m_Localized: Heavy cannon
     m_Metadata:
       m_Items: []
+  - m_Id: 8003903006519296
+    m_Localized: Remote Charge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907904
+    m_Localized: Plant a charge behind you and blow it when a rival is close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907905
+    m_Localized: Charge {cur}/{max}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907906
+    m_Localized: 'Charge: BLOW IT'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907907
+    m_Localized: CHARGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907908
+    m_Localized: BOOM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907909
+    m_Localized: FREEZE
+    m_Metadata:
+      m_Items: []
   - m_Id: 8003903014907910
     m_Localized: Mechanical boxer
     m_Metadata:
@@ -1096,6 +1124,194 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8003903019102213
     m_Localized: "{page}/{pages} \xB7 1\u20130\nQ + wheel / Tab"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398785171456
+    m_Localized: BODY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754368
+    m_Localized: Buggy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754369
+    m_Localized: Sport
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754370
+    m_Localized: Armored
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754371
+    m_Localized: Tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754372
+    m_Localized: 'Light and quick off the line, cuts across grass. Fragile: avoid
+      contact, dodge and drift.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754373
+    m_Localized: 'The all-rounder: balanced speed, grip and armor. Hold the racing
+      line and fight when it pays.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754374
+    m_Localized: 'Heavy and tough, wins every shove. Slow to stop: brake early, then
+      ram.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754375
+    m_Localized: Slow on tarmac, but its tracks barely slow down on grass. Huge armor;
+      the turret swings twice as wide.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754376
+    m_Localized: Speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754377
+    m_Localized: Acceleration
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754378
+    m_Localized: Handling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754379
+    m_Localized: Armor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754380
+    m_Localized: Off-road
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754381
+    m_Localized: '{kg} kg'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754382
+    m_Localized: Health {hp}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754383
+    m_Localized: Dune
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754384
+    m_Localized: Flea
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754385
+    m_Localized: Scorpion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754386
+    m_Localized: Sidewinder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754387
+    m_Localized: Baja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754388
+    m_Localized: Standard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754389
+    m_Localized: Arrow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754390
+    m_Localized: Viper
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754391
+    m_Localized: Comet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754392
+    m_Localized: Phantom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754393
+    m_Localized: Bulwark
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754394
+    m_Localized: Rhino
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754395
+    m_Localized: Hauler
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754396
+    m_Localized: Warden
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754397
+    m_Localized: Raider
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754398
+    m_Localized: Tortoise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754399
+    m_Localized: Grizzly
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754400
+    m_Localized: Mammoth
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754401
+    m_Localized: Lynx
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8006398797754402
+    m_Localized: Titan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383412383744
+    m_Localized: Hot Bomb
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966656
+    m_Localized: 18 s fuse. Touch to pass. Timer never resets.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966657
+    m_Localized: 'BOMB ON YOU: {n} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966658
+    m_Localized: '{name} has the bomb: {n} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966659
+    m_Localized: Next bomb...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966660
+    m_Localized: Touch another car to pass it!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966661
+    m_Localized: Keep away from the bomb carrier!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8008383424966662
+    m_Localized: Pass unlocks in {n} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8017799678697472
+    m_Localized: Music
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8017799678697473
+    m_Localized: "Stuck? Tap \u21ba"
     m_Metadata:
       m_Items: []
   references:
