@@ -1299,6 +1299,10 @@ MonoBehaviour:
     m_Key: hint.stuck
     m_Metadata:
       m_Items: []
+  - m_Id: 8017799678697474
+    m_Key: ui.rotate_phone
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

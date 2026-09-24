@@ -1314,6 +1314,10 @@ MonoBehaviour:
     m_Localized: "Stuck? Tap \u21ba"
     m_Metadata:
       m_Items: []
+  - m_Id: 8017799678697474
+    m_Localized: "Rotate your phone"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

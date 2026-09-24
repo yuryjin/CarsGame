@@ -1311,6 +1311,10 @@ MonoBehaviour:
     m_Localized: "Preso? Toque em \u21ba"
     m_Metadata:
       m_Items: []
+  - m_Id: 8017799678697474
+    m_Localized: "Gire o telem\u00f3vel"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

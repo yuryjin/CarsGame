@@ -1310,6 +1310,10 @@ MonoBehaviour:
     m_Localized: "Festgefahren? Dr\u00fcck \u21ba"
     m_Metadata:
       m_Items: []
+  - m_Id: 8017799678697474
+    m_Localized: "Drehe dein Handy"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

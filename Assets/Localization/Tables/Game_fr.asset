@@ -1311,6 +1311,10 @@ MonoBehaviour:
     m_Localized: "Bloqu\u00e9 ? Appuie sur \u21ba"
     m_Metadata:
       m_Items: []
+  - m_Id: 8017799678697474
+    m_Localized: "Tournez votre t\u00e9l\u00e9phone"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

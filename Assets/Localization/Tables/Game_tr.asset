@@ -1314,6 +1314,10 @@ MonoBehaviour:
     m_Localized: "Tak\u0131ld\u0131n m\u0131? \u21ba tu\u015funa bas"
     m_Metadata:
       m_Items: []
+  - m_Id: 8017799678697474
+    m_Localized: "Telefonu yan \u00e7evirin"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

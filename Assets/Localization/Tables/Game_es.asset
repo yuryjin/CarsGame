@@ -1315,6 +1315,10 @@ MonoBehaviour:
     m_Localized: "\u00bfAtascado? Pulsa \u21ba"
     m_Metadata:
       m_Items: []
+  - m_Id: 8017799678697474
+    m_Localized: "Gira el tel\u00e9fono"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
