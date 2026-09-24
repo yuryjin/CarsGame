@@ -17,10 +17,11 @@ namespace RacingGame
         public bool autoSecondary;
 
         private InputActionMap map;
-        private InputAction throttleAction, steerAction, brakeAction, fireAction, secondaryAction, resetAction;
+        private InputAction throttleAction, steerAction, brakeAction, fireAction, secondaryAction, resetAction, cannonAction, machineGunAction;
         private float throttle, steer;
         private bool brake, fire, secondary;
         private readonly EdgeLatch resetLatch = new EdgeLatch();
+        private int pendingPrimary;   // last primary picked (1/2) since the previous tick, 0 = none
 
         public bool UsingActionMap => map != null;
         /// <summary>Current throttle level (0..1 forward) even while the car ignores commands (countdown revving).</summary>
@@ -40,6 +41,8 @@ namespace RacingGame
                 fireAction = map.FindAction("Fire");
                 secondaryAction = map.FindAction("Secondary");
                 resetAction = map.FindAction("Reset");
+                cannonAction = map.FindAction("PrimaryCannon");
+                machineGunAction = map.FindAction("PrimaryMachineGun");
                 map.Enable();
             }
             else
@@ -50,7 +53,7 @@ namespace RacingGame
 
         private void OnDisable()
         {
-            throttle = steer = 0f; brake = fire = secondary = false; resetLatch.Clear();
+            throttle = steer = 0f; brake = fire = secondary = false; resetLatch.Clear(); pendingPrimary = 0;
         }
 
         private void Update()
@@ -69,6 +72,8 @@ namespace RacingGame
             fire = fireAction != null && fireAction.IsPressed();
             secondary = secondaryAction != null && secondaryAction.IsPressed();
             if (resetAction != null && resetAction.WasPressedThisFrame()) resetLatch.Press();
+            if (cannonAction != null && cannonAction.WasPressedThisFrame()) pendingPrimary = 1;
+            if (machineGunAction != null && machineGunAction.WasPressedThisFrame()) pendingPrimary = 2;
         }
 
         private void PollDevices()
@@ -85,6 +90,8 @@ namespace RacingGame
                 fire = k.leftCtrlKey.isPressed || k.rightCtrlKey.isPressed;
                 secondary = k.leftShiftKey.isPressed || k.rightShiftKey.isPressed || k.eKey.isPressed;
                 if (k.rKey.wasPressedThisFrame) resetLatch.Press();
+                if (k.digit1Key.wasPressedThisFrame || k.numpad1Key.wasPressedThisFrame) pendingPrimary = 1;
+                if (k.digit2Key.wasPressedThisFrame || k.numpad2Key.wasPressedThisFrame) pendingPrimary = 2;
             }
             var m = Mouse.current;
             if (m != null)
@@ -103,6 +110,8 @@ namespace RacingGame
                 if (g.rightShoulder.isPressed || g.buttonWest.isPressed) fire = true;
                 if (g.leftShoulder.isPressed || g.buttonEast.isPressed) secondary = true;
                 if (g.buttonNorth.wasPressedThisFrame) resetLatch.Press();
+                if (g.dpad.down.wasPressedThisFrame) pendingPrimary = 1;
+                if (g.dpad.up.wasPressedThisFrame) pendingPrimary = 2;
             }
         }
 
@@ -125,6 +134,8 @@ namespace RacingGame
                 }
             }
 
+            int select = pendingPrimary;
+            pendingPrimary = 0;
             return new DriveCommand
             {
                 Tick = tick,
@@ -133,6 +144,7 @@ namespace RacingGame
                 Brake = brake,
                 Fire = fire,
                 Secondary = sec,
+                SelectPrimary = select,
                 ResetEdge = resetLatch.ConsumeAll()
             }.Clamped();
         }

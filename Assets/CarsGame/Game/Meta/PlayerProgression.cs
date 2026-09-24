@@ -38,8 +38,11 @@ namespace RacingGame
         {
             if (weapons == null) return;
 
+            int mgLevel = WeaponCatalog.Level(weaponLevels, (int)WeaponKind.MachineGun);
+            weapons.machineGunUnlocked = mgLevel > 0;   // lets the driver swap to it mid-race (key 2)
+            weapons.machineGunHeatFactor = WeaponCatalog.For(mgLevel).HeatFactor;
             var primaryType = (PrimaryWeaponType)Mathf.Clamp(equippedPrimary, 0, 1);
-            if (primaryType == PrimaryWeaponType.MachineGun && WeaponCatalog.Level(weaponLevels, (int)WeaponKind.MachineGun) == 0) primaryType = PrimaryWeaponType.Cannon;
+            if (primaryType == PrimaryWeaponType.MachineGun && mgLevel == 0) primaryType = PrimaryWeaponType.Cannon;
             weapons.SetPrimaryType(primaryType);
 
             var secondaryType = (SecondaryWeaponType)Mathf.Clamp(equippedSecondary, 0, 2);
@@ -66,14 +69,6 @@ namespace RacingGame
             {
                 weapons.secondaryAmmoMax = 0;
                 weapons.RefillSecondaryAmmo();
-            }
-
-            if (primaryType == PrimaryWeaponType.MachineGun)
-            {
-                int lvl = WeaponCatalog.Level(weaponLevels, (int)WeaponKind.MachineGun);
-                var fx = WeaponCatalog.For(lvl);
-                weapons.heatCooldownRate = 20f / fx.HeatFactor;
-                weapons.heatPerShot = 2.5f * fx.HeatFactor;
             }
         }
     }

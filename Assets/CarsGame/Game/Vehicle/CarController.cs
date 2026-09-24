@@ -308,6 +308,8 @@ namespace RacingGame
 
             if (cannon != null && !cannon.locked)   // locked by the mines-only rule
             {
+                if (command.SelectPrimary != 0 && weapons != null)
+                    weapons.TrySwitchPrimary(command.SelectPrimary == 2 ? PrimaryWeaponType.MachineGun : PrimaryWeaponType.Cannon, tick);
                 cannon.SetWantsFire(command.Fire);
                 cannon.SimulationStep(tick);
             }

@@ -37,6 +37,12 @@ namespace RacingGame
         public float overheatThreshold = 100f;
         [Tooltip("Heat must drop to or below this threshold to clear overheat.")]
         public float overheatRecoveryThreshold = 40f;
+        [Tooltip("The driver may swap to the machine gun mid-race (bought in the garage).")]
+        public bool machineGunUnlocked;
+        [Tooltip("Machine gun heat upgrade: scales heat per shot, divides the cooling rate (<1 = cooler).")]
+        public float machineGunHeatFactor = 1f;
+        [Tooltip("Seconds after a mid-race swap before the new primary can fire.")]
+        public float primarySwitchSeconds = 0.3f;
 
         [Header("Secondary Weapon Configuration")]
         public SecondaryWeaponType secondaryType = SecondaryWeaponType.Mines;
@@ -50,6 +56,8 @@ namespace RacingGame
         public event Action<float, float> HeatChanged; // current, max
         public event Action<int, int> SecondaryAmmoChanged; // current, max
         public event Action<bool> OverheatChanged; // isOverheated
+        public event Action<PrimaryWeaponType> PrimarySwitched; // mid-race swap done
+        public event Action PrimarySwitchDenied; // asked for the machine gun without owning it
 
         private CarController car;
         private CarStatus status;
@@ -81,25 +89,48 @@ namespace RacingGame
         public void SetPrimaryType(PrimaryWeaponType type)
         {
             primaryType = type;
-            if (primaryType == PrimaryWeaponType.MachineGun)
-            {
-                heatPerShot = 2.5f;
-                heatCooldownRate = 20f;
-                overheatThreshold = 100f;
-                overheatRecoveryThreshold = 40f;
-            }
-            else // Cannon
-            {
-                heatPerShot = 15f;
-                heatCooldownRate = 20f;
-                overheatThreshold = 100f;
-                overheatRecoveryThreshold = 40f;
-            }
+            ApplyHeatProfile();
             var cannon = GetComponent<CarCannon>();
             if (cannon != null)
             {
                 cannon.ApplyPrimaryProfile(primaryType);
             }
+        }
+
+        /// <summary>
+        /// Mid-race swap (keys 1 / 2). Unlike <see cref="SetPrimaryType"/> it keeps the upgrade multipliers,
+        /// the heat and the cannon's half-used magazine, and holds fire for <see cref="primarySwitchSeconds"/>.
+        /// </summary>
+        public bool TrySwitchPrimary(PrimaryWeaponType type, int tick)
+        {
+            if (type == primaryType) return false;
+            if (type == PrimaryWeaponType.MachineGun && !machineGunUnlocked)
+            {
+                PrimarySwitchDenied?.Invoke();
+                return false;
+            }
+            primaryType = type;
+            ApplyHeatProfile();
+            var cannon = GetComponent<CarCannon>();
+            if (cannon != null) cannon.SwitchPrimaryProfile(type, tick + SimulationDriver.SecondsToTicks(primarySwitchSeconds));
+            PrimarySwitched?.Invoke(type);
+            return true;
+        }
+
+        private void ApplyHeatProfile()
+        {
+            if (primaryType == PrimaryWeaponType.MachineGun)
+            {
+                heatPerShot = 2.5f * machineGunHeatFactor;
+                heatCooldownRate = 20f / machineGunHeatFactor;
+            }
+            else // Cannon
+            {
+                heatPerShot = 15f;
+                heatCooldownRate = 20f;
+            }
+            overheatThreshold = 100f;
+            overheatRecoveryThreshold = 40f;
         }
 
         private void OnEnable()

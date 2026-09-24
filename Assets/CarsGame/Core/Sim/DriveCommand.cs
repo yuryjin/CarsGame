@@ -15,6 +15,7 @@ namespace RacingGame.Core.Sim
         public bool Fire;        // fire button held; the cannon's tick cooldown limits the rate
         public bool Secondary;   // secondary weapon (mines / freeze) trigger
         public bool UseItem;     // item / consumable trigger
+        public int SelectPrimary; // edge: 0 = keep, 1 = cannon, 2 = machine gun
         public bool ResetEdge;   // "put me back on the track" pressed since the last sample
 
         public static DriveCommand None(int tick) => new DriveCommand { Tick = tick };

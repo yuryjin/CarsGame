@@ -580,10 +580,12 @@ namespace RacingGame
                 playerCar = race.Player.Car;
                 if (playerHealth != null) playerHealth.OnHealthChanged -= OnHealth;
                 if (playerCannon != null) playerCannon.AmmoChanged -= OnAmmo;
+                if (playerWeapons != null) { playerWeapons.PrimarySwitched -= OnPrimarySwitched; playerWeapons.PrimarySwitchDenied -= OnPrimarySwitchDenied; }
                 playerHealth = race.Player.Health;
                 playerCannon = playerCar.GetComponent<CarCannon>();
                 playerStatus = playerCar.GetComponent<CarStatus>();
                 playerWeapons = playerCar.GetComponent<CarWeapons>();
+                if (playerWeapons != null) { playerWeapons.PrimarySwitched += OnPrimarySwitched; playerWeapons.PrimarySwitchDenied += OnPrimarySwitchDenied; }
                 if (playerCannon != null) { playerCannon.AmmoChanged += OnAmmo; BuildAmmoPips(playerCannon.AmmoMax); OnAmmo(playerCannon.Ammo, playerCannon.AmmoMax); }
 
 
@@ -900,10 +902,21 @@ namespace RacingGame
         private void OnAmmo(int ammo, int max)
         {
             lastReloadPct = -1;
+            if (ammoPips.Length != Mathf.Clamp(max, 0, 12)) BuildAmmoPips(max);   // swapped between cannon and machine gun
             bool primary = max > 0 && (playerCannon == null || !playerCannon.locked);   // mines-only events lock the cannon
             ammoPanel.gameObject.SetActive(primary);
             if (!primary) { ammoText.text = ""; return; }
             ammoText.text = ammo > 0 ? Loc.Format("hud.ammo", "cur", ammo, "max", max) : Loc.Format("hud.reload", "p", 0);
+        }
+
+        private void OnPrimarySwitched(PrimaryWeaponType type)
+        {
+            ShowHint(Loc.Get(type == PrimaryWeaponType.MachineGun ? "garage.machinegun" : "garage.cannon"), 1.2f);
+        }
+
+        private void OnPrimarySwitchDenied()
+        {
+            ShowHint(Loc.Get("garage.machinegun") + " — " + Loc.Get("garage.locked"), 1.5f);
         }
 
         public void ShowCombatHit(RaceParticipant victim, HitInfo hit, HitResult result)
@@ -1226,6 +1239,7 @@ namespace RacingGame
         {
             if (playerHealth != null) playerHealth.OnHealthChanged -= OnHealth;
             if (playerCannon != null) playerCannon.AmmoChanged -= OnAmmo;
+            if (playerWeapons != null) { playerWeapons.PrimarySwitched -= OnPrimarySwitched; playerWeapons.PrimarySwitchDenied -= OnPrimarySwitchDenied; }
             var director = RaceDirector.Current;
             if (director != null)
             {

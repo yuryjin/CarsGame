@@ -48,6 +48,8 @@ namespace RacingGame
         private CarStatus status;
         private CarWeapons weapons;
         private int ammo;
+        private PrimaryWeaponType profile;
+        private int parkedAmmo, parkedReloadDoneTick = -1;   // the cannon magazine while the machine gun is out
         private int reloadDoneTick = -1;
         private int nextFireTick;
         private bool wantsFire;
@@ -89,13 +91,20 @@ namespace RacingGame
             ApplyPrimaryProfile(weapons != null ? weapons.primaryType : PrimaryWeaponType.Cannon);
         }
 
+        private const float CannonInterval = 0.4f, CannonDamage = 25f, MachineGunInterval = 0.125f, MachineGunDamage = 8f;
+        private const int CannonMagazine = 5;
+
+        /// <summary>Resets the stats to the base of the primary (before upgrades). Refills the magazine.</summary>
         public void ApplyPrimaryProfile(PrimaryWeaponType type)
         {
+            profile = type;
+            parkedAmmo = CannonMagazine;
+            parkedReloadDoneTick = -1;
             if (type == PrimaryWeaponType.MachineGun)
             {
-                fireInterval = 0.125f; // 8 shots/sec
+                fireInterval = MachineGunInterval; // 8 shots/sec
                 shellSpeed = 120f;
-                shellDamage = 8f;
+                shellDamage = MachineGunDamage;
                 recoilForce = 300f;
                 magazineSize = 0; // heat/overheat governed
                 reloadSeconds = 0f;
@@ -104,11 +113,11 @@ namespace RacingGame
             }
             else // Cannon
             {
-                fireInterval = 0.4f;
+                fireInterval = CannonInterval;
                 shellSpeed = 70f;
-                shellDamage = 25f;
+                shellDamage = CannonDamage;
                 recoilForce = 1500f;
-                magazineSize = 5;
+                magazineSize = CannonMagazine;
                 reloadSeconds = 4f;
                 ammo = magazineSize;
                 reloadDoneTick = -1;
@@ -116,10 +125,33 @@ namespace RacingGame
             AmmoChanged?.Invoke(Ammo, AmmoMax);
         }
 
+        /// <summary>
+        /// Mid-race swap: carries the upgrade and build multipliers over to the new primary, parks the cannon's
+        /// magazine (its reload keeps counting) instead of refilling it, and holds fire until <paramref name="readyTick"/>.
+        /// </summary>
+        public void SwitchPrimaryProfile(PrimaryWeaponType type, int readyTick)
+        {
+            if (type == profile) return;
+            bool fromCannon = profile == PrimaryWeaponType.Cannon;
+            float damageScale = shellDamage / (fromCannon ? CannonDamage : MachineGunDamage);
+            float intervalScale = fireInterval / (fromCannon ? CannonInterval : MachineGunInterval);
+            int keptAmmo = fromCannon ? ammo : parkedAmmo;
+            int keptReload = fromCannon ? reloadDoneTick : parkedReloadDoneTick;
+            ApplyPrimaryProfile(type);
+            shellDamage *= damageScale;
+            fireInterval *= intervalScale;
+            if (type == PrimaryWeaponType.Cannon) { ammo = keptAmmo; reloadDoneTick = keptReload; }
+            else { parkedAmmo = keptAmmo; parkedReloadDoneTick = keptReload; }
+            nextFireTick = Mathf.Max(nextFireTick, readyTick);
+            AmmoChanged?.Invoke(Ammo, AmmoMax);
+        }
+
         public void RefillAmmo()
         {
             ammo = magazineSize;
             reloadDoneTick = -1;
+            parkedAmmo = CannonMagazine;
+            parkedReloadDoneTick = -1;
             AmmoChanged?.Invoke(Ammo, AmmoMax);
         }
 

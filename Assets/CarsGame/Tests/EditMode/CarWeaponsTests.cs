@@ -229,6 +229,84 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void TrySwitchPrimary_ToMachineGun_IsDeniedUntilBought()
+        {
+            var cannon = testGo.AddComponent<CarCannon>();
+            weapons.SetPrimaryType(PrimaryWeaponType.Cannon);
+            int denied = 0;
+            weapons.PrimarySwitchDenied += () => denied++;
+
+            Assert.IsFalse(weapons.TrySwitchPrimary(PrimaryWeaponType.MachineGun, 10));
+            Assert.AreEqual(PrimaryWeaponType.Cannon, weapons.primaryType);
+            Assert.AreEqual(5, cannon.magazineSize);
+            Assert.AreEqual(1, denied);
+
+            weapons.machineGunUnlocked = true;
+            Assert.IsTrue(weapons.TrySwitchPrimary(PrimaryWeaponType.MachineGun, 10));
+            Assert.AreEqual(PrimaryWeaponType.MachineGun, weapons.primaryType);
+            Assert.IsFalse(weapons.TrySwitchPrimary(PrimaryWeaponType.MachineGun, 11), "already out");
+        }
+
+        [Test]
+        public void TrySwitchPrimary_KeepsUpgradesAndParksTheCannonMagazine()
+        {
+            var cannon = testGo.AddComponent<CarCannon>();
+            weapons.SetPrimaryType(PrimaryWeaponType.Cannon);
+            weapons.machineGunUnlocked = true;
+            weapons.machineGunHeatFactor = 0.8f;
+            cannon.shellDamage *= 1.5f;   // what PlayerProgression.ApplyTo does with upgrades and build
+            cannon.fireInterval *= 0.9f;
+
+            Assert.IsTrue(cannon.TryFire(0));
+            Assert.IsTrue(cannon.TryFire(cannon.FireIntervalTicks));
+            Assert.AreEqual(3, cannon.Ammo);
+
+            int swapTick = 100;
+            Assert.IsTrue(weapons.TrySwitchPrimary(PrimaryWeaponType.MachineGun, swapTick));
+            Assert.AreEqual(8f * 1.5f, cannon.shellDamage, 1e-4f);
+            Assert.AreEqual(0.125f * 0.9f, cannon.fireInterval, 1e-4f);
+            Assert.AreEqual(0, cannon.magazineSize);
+            Assert.AreEqual(2.5f * 0.8f, weapons.heatPerShot, 1e-4f);
+            int ready = swapTick + SimulationDriver.SecondsToTicks(weapons.primarySwitchSeconds);
+            Assert.IsFalse(cannon.TryFire(ready - 1), "the swap holds fire for a moment");
+            Assert.IsTrue(cannon.TryFire(ready));
+
+            Assert.IsTrue(weapons.TrySwitchPrimary(PrimaryWeaponType.Cannon, 200));
+            Assert.AreEqual(25f * 1.5f, cannon.shellDamage, 1e-4f);
+            Assert.AreEqual(0.4f * 0.9f, cannon.fireInterval, 1e-4f);
+            Assert.AreEqual(3, cannon.Ammo, "swapping back does not reload the cannon");
+            Assert.AreEqual(15f, weapons.heatPerShot, 1e-4f);
+        }
+
+        [Test]
+        public void DriveCommand_SelectPrimary_SwapsThroughCarControllerSimulationStep()
+        {
+            var director = RaceDirector.Instance;
+            director.ResetRace();
+
+            var carGo = new GameObject("TestCar_Swap");
+            _ = carGo.AddComponent<Rigidbody>();
+            var controller = carGo.AddComponent<CarController>();
+            controller.playerControlled = false;
+            controller.SetInputSource(null);
+            _ = carGo.AddComponent<CarCannon>();
+            var carWeapons = controller.Weapons;
+            carWeapons.machineGunUnlocked = true;
+            director.RegisterCar(controller);
+
+            controller.ApplyCommand(new RacingGame.Core.Sim.DriveCommand { Tick = 1, SelectPrimary = 2 });
+            controller.SimulationStep(1);
+            Assert.AreEqual(PrimaryWeaponType.MachineGun, carWeapons.primaryType);
+
+            controller.ApplyCommand(new RacingGame.Core.Sim.DriveCommand { Tick = 2, SelectPrimary = 1 });
+            controller.SimulationStep(2);
+            Assert.AreEqual(PrimaryWeaponType.Cannon, carWeapons.primaryType);
+
+            director.ResetRace();
+            Object.DestroyImmediate(carGo);
+        }
+
+        [Test]
         public void DriveCommand_Secondary_FiresSecondaryWeaponThroughCarControllerSimulationStep()
         {
             var director = RaceDirector.Instance;
