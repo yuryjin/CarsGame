@@ -52,6 +52,7 @@ namespace RacingGame.Core.Save
             m.progress.cosmetics.Sort(StringComparer.Ordinal);
             m.progress.paint = newer.progress.paint ?? "";
             m.progress.livery = newer.progress.livery ?? "";
+            m.progress.body = newer.progress.body ?? "";
             m.progress.stripe = newer.progress.stripe ?? "";
             m.progress.daily = MergeDaily(a.progress.daily, b.progress.daily);
 

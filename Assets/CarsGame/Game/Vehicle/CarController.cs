@@ -30,6 +30,8 @@ namespace RacingGame
         public float maxSteerAngle = 32f;
         [Tooltip("Extra steering authority below 12 m/s, so cars can negotiate the track's tight hairpin.")]
         public float lowSpeedSteeringBoost = 3f;
+        [Tooltip("Multiplier on the steering yaw torque. Car bodies raise it with their yaw inertia, so a heavy hull still turns at its own agility.")]
+        public float steerTorqueScale = 1f;
         public float steerSpeed = 6f;
         public float grip = 0.85f; // Lateral grip factor
         public float downforce = 60f;
@@ -121,7 +123,7 @@ namespace RacingGame
         private float SteeringGain(float speedMs) => Mathf.Lerp(Mathf.Max(1f, lowSpeedSteeringBoost), 1f, Mathf.Clamp01(Mathf.Abs(speedMs) / 12f));
 
         private float AngleForCurvature(float curvature, float speedMs) =>
-            curvature * rb.inertiaTensor.y * Mathf.Max(0.1f, rb.angularDamping) / (15f * SteeringGain(speedMs));
+            curvature * rb.inertiaTensor.y * Mathf.Max(0.1f, rb.angularDamping) / (15f * SteeringGain(speedMs) * Mathf.Max(0.01f, steerTorqueScale));
 
         /// <summary>Steering input (-1..1) that holds a steady turn of this signed curvature (rad/m, +right).</summary>
         public float SteerForCurvature(float curvature, float speedMs)
@@ -461,7 +463,7 @@ namespace RacingGame
                 float direction = Vector3.Dot(rb.linearVelocity, transform.forward) >= 0 ? 1f : -1f;
                 float turnTorque = currentSteerAngle * direction * (speedMagnitude / 8f);
                 turnTorque = Mathf.Clamp(turnTorque, -effectiveMaxSteer * 2.5f, effectiveMaxSteer * 2.5f);
-                rb.AddTorque(Vector3.up * (turnTorque * 120f * SteeringGain(speedMagnitude)), ForceMode.Force);
+                rb.AddTorque(Vector3.up * (turnTorque * 120f * SteeringGain(speedMagnitude) * steerTorqueScale), ForceMode.Force);
                 if (drift.Drifting)
                 {
                     // Hold a slide angle of ~30°: push the tail out below it, stop pushing beyond it.

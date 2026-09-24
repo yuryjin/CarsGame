@@ -38,6 +38,9 @@ namespace RacingGame
 
         public void SetColor(Color c) { color = c; Apply(); }
 
+        /// <summary>Pick up paint renderers added after Awake (car bodies) and repaint.</summary>
+        public void Refresh() { Collect(); Apply(); }
+
         public void Apply() { ApplyColor(color); }
 
         private void ApplyColor(Color c)

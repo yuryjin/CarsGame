@@ -316,6 +316,7 @@ namespace RacingGame
             var content = UiFactory.Scroll(Header(root, "garage.title"), "GarageScroll", Vector2.zero, Vector2.zero);
             var save = PlatformGlue.Save;
 
+            BuildBodies(content);
             Section(content, "BuildsTitle", Loc.Get("garage.builds"));
             foreach (var build in new[] { CarBuild.Balanced, CarBuild.Speed, CarBuild.Survival, CarBuild.Firepower })
             {

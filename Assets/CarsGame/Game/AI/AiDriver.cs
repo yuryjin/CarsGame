@@ -20,6 +20,9 @@ namespace RacingGame
         public float speedMultiplier = 1f;
         [Tooltip("Comfortable braking deceleration used to plan corner entry (m/s^2).")]
         public float plannedDeceleration = 6f;
+        private CarBody body;
+        /// <summary>Heavy bodies carry more into the corner than the tyres admit: they plan gentler braking (CarBody.AiBrakePlan).</summary>
+        private float PlannedDecel => plannedDeceleration * (body != null || (body = GetComponent<CarBody>()) != null ? body.AiBrakePlan : 1f);
         [Tooltip("Use TrackPath.Profile (local curvature + braking pass) for speed and the racing line instead of the averaged-curvature estimate.")]
         public bool useSpeedProfile = true;
         [Tooltip("How far the racing line pulls the driver (0 = keep the spawn lane).")]
@@ -214,17 +217,17 @@ namespace RacingGame
             }
             else
             {
-                float brakeWindow = speedMs * speedMs / (2f * plannedDeceleration) + 10f;
+                float brakeWindow = speedMs * speedMs / (2f * PlannedDecel) + 10f;
                 curvature = path.CurvatureAhead(d, brakeWindow);           // deg per metre
                 float corner = Mathf.InverseLerp(0.6f, 3.5f, curvature);
                 desired = Mathf.Lerp(top, top * 0.45f, corner) * P.corneringConfidence;
             }
             // What the car can physically turn: brake in time for every bend inside the braking window.
-            float window = speedMs * speedMs / (2f * plannedDeceleration) + 15f;
+            float window = speedMs * speedMs / (2f * PlannedDecel) + 15f;
             for (float x = 0f; x <= window; x += 4f)
             {
                 float vCorner = car.MaxSpeedForCurvature(Mathf.Abs(SignedCurvature(d + x, 6f))) * cornerSpeedMargin * P.corneringConfidence;
-                float vAllowed = Mathf.Sqrt(vCorner * vCorner + 2f * plannedDeceleration * x);
+                float vAllowed = Mathf.Sqrt(vCorner * vCorner + 2f * PlannedDecel * x);
                 desired = Mathf.Min(desired, vAllowed * 3.6f);
             }
             // Sharp heading error right now also means slow down.

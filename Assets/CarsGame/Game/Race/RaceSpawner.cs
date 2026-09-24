@@ -31,6 +31,12 @@ namespace RacingGame
         public Color playerPaint = new Color(0.8f, 0.1f, 0.1f);
         public string playerName = "You";
 
+        [Header("Bodies")]
+        [Tooltip("Player body id (CarBodies). Empty = the one selected in the save, else the standard car.")]
+        public string playerBodyId = "";
+        [Tooltip("Rivals drive bodies that fit their role (seeded by the event). Off = everyone in the standard car.")]
+        public bool aiBodyVariety = true;
+
         public RaceParticipant Player { get; private set; }
         public IReadOnlyList<RaceParticipant> Participants => participants;
         public ArenaLayout Arena { get; private set; }
@@ -70,6 +76,7 @@ namespace RacingGame
                 else grid.GetSlot(slot, track, out pos, out rot, out lane);
                 var go = Instantiate(raceCarPrefab, pos, rot);
                 go.name = isPlayer ? "Player_Car" : $"AI_Car_{aiIndex + 1}";
+                CarBody.Apply(go, isPlayer ? PlayerBody() : RivalBody(aiIndex));   // before drivers and upgrades, which build on it
                 var car = go.GetComponent<CarController>();
                 var participant = go.GetComponent<RaceParticipant>() ?? go.AddComponent<RaceParticipant>();
                 var paint = go.GetComponent<CarPaint>() ?? go.AddComponent<CarPaint>();
@@ -136,6 +143,23 @@ namespace RacingGame
             foreach (var p in participants) if (p.Progress != null) p.Progress.BeginRace();
             if (Player == null || participants.Count == 0) { Clear(); return false; }
             return true;
+        }
+
+        private Core.Economy.BodyDef PlayerBody()
+        {
+            if (!string.IsNullOrEmpty(playerBodyId)) return Core.Economy.CarBodies.Get(playerBodyId);
+            var progress = PlatformGlue.Save?.Data.progress;
+            return Core.Economy.CarBodies.Get(progress != null ? Core.Economy.CarBodies.Selected(progress.cosmetics, progress.body) : null);
+        }
+
+        private Core.Economy.BodyDef RivalBody(int aiIndex)
+        {
+            if (!aiBodyVariety) return Core.Economy.CarBodies.Default;
+            var profile = profiles != null && profiles.Length > 0 ? profiles[aiIndex % profiles.Length] : null;
+            string eventId = RaceSetup.Event != null ? RaceSetup.Event.eventId : "";
+            int seed = 17;
+            foreach (char ch in eventId) seed = seed * 31 + ch;   // stable across runs, unlike string.GetHashCode
+            return Core.Economy.CarBodies.ForRival(profile != null ? (int)profile.role : 0, aiIndex, seed);
         }
 
         public void Clear()

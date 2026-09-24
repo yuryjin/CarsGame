@@ -44,7 +44,8 @@ namespace RacingGame.Tests
     /// (<see cref="Time.captureDeltaTime"/>), so a race runs as fast as the CPU allows.
     /// Knobs for tuning runs come from environment variables:
     /// CG_EVENT (e1), CG_TIER (normal), CG_AI (rival count, -1 = event default), CG_LAPS,
-    /// CG_SEED (12345), CG_PARAMS ("field=value ..." applied to every AiDriver), CG_OUT (JSON path).
+    /// CG_SEED (12345), CG_PARAMS ("field=value ..." applied to every AiDriver), CG_OUT (JSON path),
+    /// CG_BODY (player body id), CG_AI_BODIES (0 = every rival in the standard car).
     /// </summary>
     public sealed class RaceHarness
     {
@@ -52,7 +53,7 @@ namespace RacingGame.Tests
 
         [Serializable] public class CarReport
         {
-            public string name; public bool player, finished;
+            public string name, body; public bool player, finished;
             public int laps, deaths, kills, autoResets, aiResets, wallImpacts;
             public float offTrackSeconds, worstImpact, maxLateral, finishSeconds;
             public float distance, speed, desiredSpeed, stuckSeconds; public int nextGate;
@@ -105,6 +106,8 @@ namespace RacingGame.Tests
             var director = RaceDirector.Instance;
             director.raceSeed = seed;
             typeof(RaceDirector).GetProperty("Rng").SetValue(director, new RngStreams(seed));
+            race.spawner.playerBodyId = Env("CG_BODY", "");
+            race.spawner.aiBodyVariety = Env("CG_AI_BODIES", "1") != "0";
             flow.StartRace(ev, tier);
             bus.Execute("autopilot", "on");
 
@@ -209,7 +212,7 @@ namespace RacingGame.Tests
                 for (int i = 1; i < ticks.Count; i++) lapsSec[i - 1] = (ticks[i] - ticks[i - 1]) * SimulationDriver.FixedStep;
                 cars.Add(new CarReport
                 {
-                    name = p.name, player = p.isPlayer, finished = finishTick.ContainsKey(p),
+                    name = p.name, body = p.GetComponent<CarBody>() != null ? p.GetComponent<CarBody>().BodyId : "", player = p.isPlayer, finished = finishTick.ContainsKey(p),
                     finishSeconds = finishTick.TryGetValue(p, out int ft) ? (ft - startTick) * SimulationDriver.FixedStep : -1f,
                     laps = p.Progress.LapsCompleted, deaths = p.Deaths, kills = p.Kills, autoResets = p.AutoResets,
                     aiResets = ai != null ? ai.ResetCount : 0, wallImpacts = wc != null ? wc.Impacts : 0,

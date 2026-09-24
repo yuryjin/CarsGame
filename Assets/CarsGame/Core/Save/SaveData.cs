@@ -76,6 +76,8 @@ namespace RacingGame.Core.Save
         public string livery = "";
         /// <summary>Stripe colour as a paint id; "" = automatic contrast.</summary>
         public string stripe = "";
+        /// <summary>Selected car body id (<c>CarBodies</c>); "" = the standard car. Bought bodies live in <see cref="cosmetics"/> as "body:id".</summary>
+        public string body = "";
         public DailyData daily = new DailyData();
     }
 
