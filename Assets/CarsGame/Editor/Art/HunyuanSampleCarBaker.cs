@@ -64,6 +64,10 @@ namespace RacingGame.EditorTools.Art
                 var barrel = Require(turret, "Cannon_Barrel");
                 var muzzle = Require(barrel, "Muzzle");
 
+                // Blender's FBX exporter bakes the axis conversion into meshes but not into empties: an empty (the
+                // Muzzle) arrives with the conversion rotation. Its only meaning is "+Z along the barrel", so reset it.
+                foreach (var t in root.GetComponentsInChildren<Transform>(true))
+                    if (t != root.transform && t.GetComponent<MeshFilter>() == null && t.childCount == 0) t.localRotation = Quaternion.identity;
                 foreach (var t in root.GetComponentsInChildren<Transform>(true))
                 {
                     if (Quaternion.Angle(t.localRotation, Quaternion.identity) > 0.5f || (t.localScale - Vector3.one).sqrMagnitude > 1e-4f)
@@ -95,7 +99,9 @@ namespace RacingGame.EditorTools.Art
                 foreach (var src in template.GetComponents<Component>())
                 {
                     if (src == null || src is Transform) continue;
-                    var dst = root.GetComponent(src.GetType()) ?? root.AddComponent(src.GetType());
+                    // Not `??`: in the Editor GetComponent returns a fake-null object for a missing component.
+                    var dst = root.GetComponent(src.GetType());
+                    if (dst == null) dst = root.AddComponent(src.GetType());
                     EditorUtility.CopySerialized(src, dst);
                     ClearTemplateReferences(dst, templateObjects, log);
                 }

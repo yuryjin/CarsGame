@@ -26,6 +26,7 @@ os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
 import numpy as np  # noqa: E402
 import torch  # noqa: E402
+torch.set_grad_enabled(False)   # inference only: without this autograd keeps every denoising step alive (8+ GB)
 from PIL import Image  # noqa: E402
 
 ap = argparse.ArgumentParser()

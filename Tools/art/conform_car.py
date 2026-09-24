@@ -112,7 +112,12 @@ if front_top > rear_top:
     transform(body, Matrix.Rotation(math.radians(180), 4, "Z"))
 report["orientation"] = {"front_end_top": front_top, "rear_end_top": rear_top, "swapped_long_axis": bool(ext.x > ext.y)}
 lo, hi = bbox(body)
-s = (ref_max.y - ref_min.y) / (hi.y - lo.y)
+# Uniform scale to the reference length, unless that breaks the width or height limits (Hunyuan bodies
+# come out chunkier than the reference): then the tightest limit wins, with 2 % headroom.
+_b = SPEC["bounds_m"]
+s = min(min(ref_max.y - ref_min.y, _b["length_max"] * 0.98) / (hi.y - lo.y),
+        _b["width_max"] * 0.98 / (hi.x - lo.x),
+        _b["height_without_turret_max"] * 0.98 / (hi.z - lo.z))
 transform(body, Matrix.Scale(s, 4))
 lo, hi = bbox(body)
 ref_c = (ref_min + ref_max) * 0.5
@@ -393,6 +398,7 @@ report.update({
     "turret_unity": [0, turret_z, TURRET_Y],
 })
 b = SPEC["bounds_m"]
+bpy.context.view_layer.update()   # matrix_world of freshly parented wheel pivots is stale until the depsgraph runs
 checks = {
     "body_tris_in_budget": SPEC["tri_budget"]["body_min"] <= tris["Body"] <= SPEC["tri_budget"]["body_max"],
     "total_tris_in_budget": report["tris_total"] <= SPEC["tri_budget"]["total_max"],
@@ -400,7 +406,8 @@ checks = {
     "width_ok": hi.x - lo.x <= b["width_max"],
     "length_ok": hi.y - lo.y <= b["length_max"],
     "height_ok": hi.z <= b["height_max"],
-    "on_ground": abs(lo.z) < 0.02,
+    # The wheels carry the car: the lowest point of any mesh (a tyre) sits on the ground, the body above it.
+    "on_ground": abs(min((o.matrix_world @ v.co).z for o in scene.objects if o.type == "MESH" for v in o.data.vertices)) < 0.02,
     "symmetric": abs(lo.x + hi.x) < 0.01,
     "wheels_named": all(scene.objects.get(k) for k in WHEELS),
     "paint_faces_present": counts.get("paint", 0) > 0.3 * sum(counts.values()),
