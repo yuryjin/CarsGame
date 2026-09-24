@@ -106,22 +106,24 @@ namespace RacingGame
         public void Show(string name)
         {
             string selected = current == name ? EventSystem.current?.currentSelectedGameObject?.name : null;
-            float scrollPosition = 1f;
+            var scrollPositions = new Dictionary<string, float>();
             if (current == name && panel != null)
             {
-                var oldScroll = panel.GetComponentInChildren<ScrollRect>();
-                if (oldScroll != null) scrollPosition = oldScroll.verticalNormalizedPosition;
+                foreach (var oldScroll in panel.GetComponentsInChildren<ScrollRect>())
+                    scrollPositions[oldScroll.name] = oldScroll.verticalNormalizedPosition;
             }
             if (panel != null) { panel.gameObject.SetActive(false); Destroy(panel.gameObject); }
             rewardButton = null; rewardLabel = null; current = name;
             if (string.IsNullOrEmpty(name)) { EventSystem.current?.SetSelectedGameObject(null); return; }
             var canvasRect = ((RectTransform)canvas.transform).rect;
             layoutWidth = canvasRect.width; layoutHeight = canvasRect.height;
-            panel = UiFactory.Panel(canvas.transform, "Panel_" + name, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.015f, 0.025f, 0.045f, 0.68f), false);
+            panel = UiFactory.Panel(canvas.transform, "Panel_" + name, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.015f, 0.025f, 0.045f, 0.82f), false);
             panel.GetComponent<Image>().raycastTarget = true;
             transition = panel.gameObject.AddComponent<CanvasGroup>(); transition.alpha = 0f;
-            float width = Mathf.Min(1360f, layoutWidth - 80f);
-            var frame = UiFactory.Panel(panel, "Frame", new Vector2(0.5f, 0f), new Vector2(0.5f, 1f), new Vector2(-width * 0.5f, 40f), new Vector2(width * 0.5f, -40f));
+            float width = Mathf.Min(1640f, layoutWidth - 64f);
+            var shell = UiFactory.Card(panel, "Shell", new Vector2(0.5f, 0f), new Vector2(0.5f, 1f), new Vector2(-width * 0.5f, 32f), new Vector2(width * 0.5f, -32f));
+            shell.GetComponent<Image>().color = new Color(0.035f, 0.05f, 0.08f, 0.96f);
+            var frame = UiFactory.Panel(shell, "Frame", Vector2.zero, Vector2.one, new Vector2(32f, 16f), new Vector2(-32f, -24f));
             switch (name)
             {
                 case "main": BuildMain(frame); break;
@@ -134,8 +136,8 @@ namespace RacingGame
             if (toastPanel != null) toastPanel.SetAsLastSibling();
             Canvas.ForceUpdateCanvases();
             if (panel == null) return;
-            var scroll = panel.GetComponentInChildren<ScrollRect>();
-            if (scroll != null) scroll.verticalNormalizedPosition = scrollPosition;
+            foreach (var scroll in panel.GetComponentsInChildren<ScrollRect>())
+                scroll.verticalNormalizedPosition = scrollPositions.TryGetValue(scroll.name, out float position) ? position : 1f;
             var buttons = panel.GetComponentsInChildren<Button>();
             Button focus = Array.Find(buttons, b => b.interactable && b.name == selected)
                 ?? Array.Find(buttons, b => b.interactable && b.name != "Back");
@@ -168,7 +170,7 @@ namespace RacingGame
             UiFactory.Panel(root, "Accent", Top, Top, new Vector2(0f, -113f), new Vector2(90f, -109f), UiFactory.Accent, false);
             var player = PlatformGlue.Platform?.Player;
             Label(root, "Player", player != null ? UiFactory.Escape(player.Value.Name) : "", 20f, Vector2.zero, new Vector2(1f, 0f), Vector2.zero, new Vector2(0f, 30f), UiFactory.Muted, TextAlignmentOptions.BottomRight);
-            return UiFactory.Panel(root, "Body", Vector2.zero, Vector2.one, new Vector2(0f, 54f), new Vector2(0f, -144f));
+            return UiFactory.Panel(root, "Body", Vector2.zero, Vector2.one, new Vector2(0f, 38f), new Vector2(0f, -138f));
         }
 
         private static RectTransform Item(Transform content, string name, float height, bool card = true)
@@ -605,11 +607,17 @@ namespace RacingGame
         {
             var results = race.Results;
             if (results == null) { Show("main"); return; }
-            var content = UiFactory.Scroll(Header(root, "results.title"), "ResultsScroll", Vector2.zero, Vector2.zero);
+            var body = Header(root, "results.title");
+            bool columns = root.rect.width >= 1280f;
+            var overview = columns ? UiFactory.Panel(body, "Overview", Vector2.zero, new Vector2(0.48f, 1f), Vector2.zero, new Vector2(-16f, 0f)) : body;
+            var content = UiFactory.Scroll(overview, "ResultsScroll", Vector2.zero, Vector2.zero);
             int reward = flow.LastReward * (flow.LastRewardDoubled ? 2 : 1);
-            var summary = Item(content, "Summary", 196f);
+            var summary = Item(content, "Summary", 216f);
+            summary.GetComponent<Image>().color = new Color(0.12f, 0.16f, 0.22f);
+            UiFactory.Panel(summary, "GoldRule", Top, Vector2.one, new Vector2(28f, -4f), new Vector2(-28f, -1f), UiFactory.Accent, false);
+            var medal = UiFactory.Panel(summary, "Medal", Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(194f, -24f), new Color(1f, 0.8f, 0.25f, 0.08f));
             var me = results.Player;
-            Label(summary, "Place", me != null ? "#" + me.Position : "—", 80f, Vector2.zero, new Vector2(0f, 1f), new Vector2(28f, 18f), new Vector2(198f, -18f), PlaceColor(me), TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
+            Label(medal, "Place", me != null ? "#" + me.Position : "—", 86f, Vector2.zero, Vector2.one, new Vector2(8f, 8f), new Vector2(-8f, -8f), PlaceColor(me), TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
             var rewardText = Label(summary, "Reward", Loc.Format("results.reward", "n", reward), 40f, Top, Vector2.one, new Vector2(234f, -80f), new Vector2(-28f, -20f), UiFactory.Accent);
             rewardText.fontStyle = FontStyles.Bold;
             if (Time.unscaledTime - rewardShownAt < RewardCountSeconds) rewardLabel = rewardText;   // count up once, not on every rebuild
@@ -617,7 +625,7 @@ namespace RacingGame
             string record = RecordLine(me);
             if (record.Length > 0) Label(summary, "Record", record, 24f, Top, Vector2.one, new Vector2(234f, -170f), new Vector2(-28f, -128f), flow.LastWasPersonalBest ? UiFactory.Positive : UiFactory.Muted);
 
-            var starsCard = Item(content, "StarsCard", Narrow ? 164f : 112f);
+            var starsCard = Item(content, "StarsCard", 184f);
             Label(starsCard, "StarsTitle", Loc.Get("results.stars"), 22f, Top, Vector2.one, new Vector2(24f, -38f), new Vector2(-24f, -8f), UiFactory.Accent).fontStyle = FontStyles.Bold;
             int currentStars = flow.LastStarsEarned;
             var bestEntry = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == (flow.CurrentEvent != null ? flow.CurrentEvent.eventId : ""));
@@ -629,29 +637,20 @@ namespace RacingGame
                 bool wonThisRace = (currentStars & bit) != 0;
                 bool wonOverall = (totalEventStars & bit) != 0;
                 string starIcon = wonThisRace ? "<color=#FFCC40>★</color>" : wonOverall ? "<color=#FFD870>★</color>" : "<color=#455568>★</color>";
-                if (Narrow)
-                {
-                    // Three 36-unit rows under the 40-unit heading of the 164-unit card.
-                    float bottom = 10f + (2 - s) * 38f;
-                    var starRow = UiFactory.Panel(starsCard, "Star" + s, Vector2.zero, new Vector2(1f, 0f), new Vector2(24f, bottom), new Vector2(-24f, bottom + 36f), Color.clear, false);
-                    Label(starRow, "StarIcon", starIcon, 24f, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(28f, 0f), null, TextAlignmentOptions.MidlineLeft);
-                    Label(starRow, "StarDesc", StarGoalText.Description(flow.CurrentEvent, s), 19f, new Vector2(0f, 0f), Vector2.one, new Vector2(32f, 0f), Vector2.zero, wonOverall ? Color.white : UiFactory.Muted, TextAlignmentOptions.MidlineLeft);
-                }
-                else
-                {
-                    float xMin = s / 3f, xMax = (s + 1f) / 3f;
-                    var starCol = UiFactory.Panel(starsCard, "Star" + s, new Vector2(xMin, 0f), new Vector2(xMax, 1f), new Vector2(24f, 8f), new Vector2(-12f, -40f), Color.clear, false);
-                    Label(starCol, "StarIcon", starIcon, 26f, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(30f, 0f), null, TextAlignmentOptions.MidlineLeft);
-                    Label(starCol, "StarDesc", StarGoalText.Description(flow.CurrentEvent, s), 19f, new Vector2(0f, 0f), Vector2.one, new Vector2(32f, 0f), Vector2.zero, wonOverall ? Color.white : UiFactory.Muted, TextAlignmentOptions.MidlineLeft);
-                }
+                float bottom = 12f + (2 - s) * 42f;
+                var starRow = UiFactory.Panel(starsCard, "Star" + s, Vector2.zero, new Vector2(1f, 0f), new Vector2(24f, bottom), new Vector2(-24f, bottom + 40f));
+                Label(starRow, "StarIcon", starIcon, 30f, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(34f, 0f));
+                Label(starRow, "StarDesc", StarGoalText.Description(flow.CurrentEvent, s), 25f, Vector2.zero, Vector2.one, new Vector2(46f, 0f), Vector2.zero, wonOverall ? Color.white : UiFactory.Muted);
             }
-            var actions = Item(content, "Actions", 76f, false);
+            var actions = Item(content, "Actions", 172f, false);
             var keys = new[] { "results.next", "results.retry", "menu.garage" };
             var next = flow.NextEvent(flow.CurrentEvent);
             Action[] clicks = { () => flow.StartRace(next, RaceSetup.Tier), () => flow.RetryRace(), () => GoTo("garage") };
             int cheapest = CheapestUpgrade();
             bool canUpgrade = PlatformGlue.Save != null && cheapest < int.MaxValue && PlatformGlue.Save.Data.Coins >= cheapest;
-            for (int i = 0; i < keys.Length; i++) UiFactory.Button(actions, "ResultAction" + i, Loc.Get(keys[i]), clicks[i], new Vector2(i / 3f, 0f), new Vector2((i + 1f) / 3f, 1f), new Vector2(4f, 0f), new Vector2(-8f, 0f), 28f, i == 0 || (i == 2 && canUpgrade) ? UiFactory.Accent : UiFactory.Raised);
+            UiFactory.Button(actions, "ResultAction0", Loc.Get(keys[0]) + "   ›", clicks[0], Top, Vector2.one, new Vector2(4f, -84f), new Vector2(-4f, 0f), 32f);
+            for (int i = 1; i < keys.Length; i++)
+                UiFactory.Button(actions, "ResultAction" + i, Loc.Get(keys[i]), clicks[i], new Vector2((i - 1) * 0.5f, 0f), new Vector2(i * 0.5f, 0f), new Vector2(4f, 0f), new Vector2(-4f, 72f), 28f, UiFactory.Raised);
             if (PlatformGlue.Save != null && cheapest < int.MaxValue)
             {
                 var nudge = Item(content, "GarageNudge", 44f, false);
@@ -662,16 +661,21 @@ namespace RacingGame
             if (!flow.LastRewardDoubled && flow.LastRewardFinished && flow.LastReward > 0 && ads != null && ads.IsRewardedAvailable)
             {
                 var ad = Item(content, "RewardAction", 68f, false);
-                rewardButton = UiFactory.Button(ad, "Double", Loc.Get("results.double"), () => flow.DoubleReward(), Vector2.zero, Vector2.one, new Vector2(4f, 0f), new Vector2(-8f, 0f), 26f, UiFactory.Positive);
+                rewardButton = UiFactory.Button(ad, "Double", Loc.Get("results.double"), () => flow.DoubleReward(), Vector2.zero, Vector2.one, new Vector2(4f, 0f), new Vector2(-8f, 0f), 26f, UiFactory.Raised);
+                rewardButton.GetComponentInChildren<TextMeshProUGUI>().color = UiFactory.Positive;
             }
+            var standings = columns ? UiFactory.Panel(body, "Standings", new Vector2(0.48f, 0f), Vector2.one, new Vector2(16f, 0f), Vector2.zero) : null;
+            var board = columns ? UiFactory.Scroll(standings, "StandingsScroll", Vector2.zero, Vector2.zero) : content;
+            Section(board, "StandingsTitle", Loc.Get("lb.title"));
             foreach (var entry in results.Entries)
             {
-                var row = Item(content, "Result" + entry.Position, Narrow ? 156f : 126f);
+                var row = Item(board, "Result" + entry.Position, 154f);
+                if (entry.IsPlayer) row.GetComponent<Image>().color = new Color(0.19f, 0.17f, 0.105f);
                 if (entry.IsPlayer) UiFactory.Panel(row, "Accent", Vector2.zero, new Vector2(0f, 1f), new Vector2(0f, 14f), new Vector2(4f, -14f), UiFactory.Accent, false);
                 Label(row, "Rank", entry.Position.ToString("00"), 42f, Vector2.zero, new Vector2(0f, 1f), new Vector2(22f, 18f), new Vector2(112f, -18f), entry.IsPlayer ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
-                Label(row, "Name", UiFactory.Escape(entry.Name), 30f, Top, Vector2.one, new Vector2(140f, -62f), new Vector2(-244f, -16f)).fontStyle = FontStyles.Bold;
-                Label(row, "Detail", Loc.Format("results.best_lap", "t", UiFactory.FormatTime(entry.BestLap)) + "   /   " + Loc.Format("results.kills", "k", entry.Kills, "d", entry.Deaths), 22f, Vector2.zero, Vector2.one, new Vector2(140f, 16f), new Vector2(-244f, -68f), UiFactory.Muted);
-                Label(row, "Time", entry.Finished ? UiFactory.FormatTime(entry.TotalTime) : Loc.Get("results.dnf"), 30f, new Vector2(1f, 0f), Vector2.one, new Vector2(-238f, 18f), new Vector2(-26f, -18f), entry.IsPlayer ? UiFactory.Positive : Color.white, TextAlignmentOptions.MidlineRight);
+                Label(row, "Name", UiFactory.Escape(HudScreen.GetLocalizedRacerName(entry.Name, entry.IsPlayer)), 30f, Top, Vector2.one, new Vector2(120f, -66f), new Vector2(-26f, -14f)).fontStyle = FontStyles.Bold;
+                Label(row, "Detail", Loc.Format("results.best_lap", "t", UiFactory.FormatTime(entry.BestLap)) + "   /   " + Loc.Format("results.kills", "k", entry.Kills, "d", entry.Deaths), 22f, Vector2.zero, Vector2.one, new Vector2(120f, 16f), new Vector2(-224f, -76f), UiFactory.Muted);
+                Label(row, "Time", entry.Finished ? UiFactory.FormatTime(entry.TotalTime) : Loc.Get("results.dnf"), 30f, new Vector2(1f, 0f), Vector2.one, new Vector2(-214f, 16f), new Vector2(-26f, -76f), entry.IsPlayer ? UiFactory.Positive : Color.white, TextAlignmentOptions.MidlineRight);
             }
         }
     }
