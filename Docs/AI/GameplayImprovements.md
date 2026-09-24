@@ -31,3 +31,27 @@ Final browser logs contain no C# exceptions, missing localization keys or missin
 Persistent evidence: `Builds/GameplayImprovements/qa/` (test XML, race JSON, browser logs, screenshots and size report). Earlier temporary baseline files were removed when the environment restarted; their measurements above were recorded before that restart.
 
 The shared working tree is being edited by other sessions. The archived build is the tested snapshot; a concurrent mines-only targeting-range change in `AiGunner.cs` / `EventRules.cs` arrived afterward and is not included in that archive.
+
+## Варианты будущих карт и режимов — 2026-09-24
+
+Статус: идеи для обсуждения, не утверждённый план реализации. Сохранены по просьбе пользователя.
+
+Карты:
+
+- **Вулкан:** дорога над лавой; извержения временно перекрывают отдельные полосы.
+- **Ледяная станция:** скользкие повороты, снежные заносы и тоннели с хорошим сцеплением для разгона.
+- **Крыши мегаполиса:** прыжки между зданиями, короткие опасные маршруты и длинные безопасные объезды.
+- **Орбитальное кольцо:** участки пониженной гравитации позволяют перепрыгивать разрывы, но усложняют приземление.
+
+Режимы:
+
+- **На выбывание:** после каждого круга последний участник покидает гонку.
+- **Горячая бомба:** бомба передаётся при столкновении; нужно избавиться от неё до взрыва.
+- **Погоня:** игрок убегает, остальные пытаются остановить его до финиша.
+- **Заезд на время:** без оружия, с призраком своего лучшего результата.
+
+Предложенный первый кандидат для обсуждения — **«Горячая бомба»**: использует существующие машины, столкновения и трассы, добавляя новую причину догонять соперников и уворачиваться. Приоритет пользователем пока не выбран.
+
+## Режим «Арена»
+
+Дизайн скоростной арены на дюне (очки из пяти долей, «Угар», бомба с моста, налёты) ведётся в одном документе: [ArenaMode.md](ArenaMode.md).
