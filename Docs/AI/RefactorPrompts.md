@@ -78,9 +78,11 @@
 
 1. git status в основном дереве. Если есть незакоммиченные изменения, ОСТАНОВИСЬ. Спроси пользователя, чьи они
    и кто их коммитит. Сам не коммить и не откатывай: это работа других сессий.
-2. Когда main чистый: git worktree add .worktrees/refactor -b refactor/code-health main.
-3. Проверь, что Tools/qa/edit-tests.sh с PROJECT=<worktree> проходит на копии. Запиши число тестов.
-4. Отчёт: хэш main, путь worktree, число тестов.
+2. Docs/AI/RefactorPlan.md и Docs/AI/RefactorPrompts.md должны быть в main, иначе их не будет в worktree.
+   Если они не закоммичены, спроси пользователя и закоммить только эти два файла: «docs(refactor): plan and prompts».
+3. Когда main чистый: git worktree add .worktrees/refactor -b refactor/code-health main.
+4. Проверь, что Tools/qa/edit-tests.sh с PROJECT=<worktree> проходит на копии. Запиши число тестов.
+5. Отчёт: хэш main, путь worktree, число тестов.
 ```
 
 ---
