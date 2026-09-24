@@ -17,5 +17,8 @@ namespace RacingGame
         public StatusKind Status;
         public float StatusDuration;
         public Transform HomingTarget;
+        public PrimaryWeaponType Weapon;
+        public float Impact;
+        public int Ricochets;
     }
 }

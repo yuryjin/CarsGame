@@ -934,6 +934,170 @@ MonoBehaviour:
     m_Localized: Heavy cannon
     m_Metadata:
       m_Items: []
+  - m_Id: 8003903014907910
+    m_Localized: Mechanical boxer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907911
+    m_Localized: Circular saw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907912
+    m_Localized: Power drill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907913
+    m_Localized: Sledgehammer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907914
+    m_Localized: Battle axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907915
+    m_Localized: Chainsaw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907916
+    m_Localized: Laser saw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907917
+    m_Localized: Arc welder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907918
+    m_Localized: Spring spear
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907919
+    m_Localized: Wrecking ball
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907920
+    m_Localized: Flamethrower
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907921
+    m_Localized: Tesla coil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907922
+    m_Localized: Harpoon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907923
+    m_Localized: Tractor beam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907924
+    m_Localized: Repulsor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907925
+    m_Localized: Sonic cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907926
+    m_Localized: Plasma cutter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907927
+    m_Localized: Acid sprayer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907928
+    m_Localized: Cryo jet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907929
+    m_Localized: Nail fan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907930
+    m_Localized: Giant banana
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907931
+    m_Localized: Rubber chicken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907932
+    m_Localized: Glove launcher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907933
+    m_Localized: Anvil launcher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907934
+    m_Localized: Bowling cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907935
+    m_Localized: Disco pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907936
+    m_Localized: Confetti cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907937
+    m_Localized: Giant boot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907938
+    m_Localized: Frying pan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907939
+    m_Localized: Giant plunger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907940
+    m_Localized: Mine dispenser
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907941
+    m_Localized: Bear trap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907942
+    m_Localized: Glue trap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907943
+    m_Localized: Ice trap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907944
+    m_Localized: EMP mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102208
+    m_Localized: Spring trap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102209
+    m_Localized: Cactus mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102210
+    m_Localized: Water cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102211
+    m_Localized: Ricochet saw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102212
+    m_Localized: Homing rocket
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102213
+    m_Localized: "{page}/{pages} \xB7 1\u20130\nQ + wheel / Tab"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

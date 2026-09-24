@@ -933,6 +933,170 @@ MonoBehaviour:
     m_Localized: "A\u011F\u0131r top"
     m_Metadata:
       m_Items: []
+  - m_Id: 8003903014907910
+    m_Localized: "Mekanik boks\xF6r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907911
+    m_Localized: Daire testere
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907912
+    m_Localized: "Sava\u015F matkab\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907913
+    m_Localized: Balyoz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907914
+    m_Localized: "Sava\u015F baltas\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907915
+    m_Localized: Motorlu testere
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907916
+    m_Localized: Lazer testere
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907917
+    m_Localized: Kaynak makinesi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907918
+    m_Localized: "Yayl\u0131 m\u0131zrak"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907919
+    m_Localized: "Y\u0131k\u0131m topu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907920
+    m_Localized: Alev makinesi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907921
+    m_Localized: Tesla bobini
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907922
+    m_Localized: "Z\u0131pk\u0131n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907923
+    m_Localized: "\xC7ekim \u0131\u015F\u0131n\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907924
+    m_Localized: "\u0130tici"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907925
+    m_Localized: Ses topu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907926
+    m_Localized: Plazma kesici
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907927
+    m_Localized: "Asit p\xFCsk\xFCrt\xFCc\xFC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907928
+    m_Localized: Kriyo jet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907929
+    m_Localized: "\xC7ivi yelpazesi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907930
+    m_Localized: Dev muz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907931
+    m_Localized: Lastik tavuk
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907932
+    m_Localized: "Eldiven f\u0131rlat\u0131c\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907933
+    m_Localized: "\xD6rs f\u0131rlat\u0131c\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907934
+    m_Localized: Bowling topu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907935
+    m_Localized: Disko darbesi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907936
+    m_Localized: Konfeti topu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907937
+    m_Localized: "Dev \xE7izme"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907938
+    m_Localized: "K\u0131zartma tavas\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907939
+    m_Localized: Dev pompa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907940
+    m_Localized: "May\u0131n d\xF6\u015Feyici"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907941
+    m_Localized: "Ay\u0131 kapan\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907942
+    m_Localized: "Tutkal tuza\u011F\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907943
+    m_Localized: "Buz tuza\u011F\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907944
+    m_Localized: "EMP may\u0131n\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102208
+    m_Localized: "Yayl\u0131 tuzak"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102209
+    m_Localized: "Kakt\xFCs may\u0131n\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102210
+    m_Localized: Su topu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102211
+    m_Localized: Seken testere
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102212
+    m_Localized: "G\xFCd\xFCml\xFC roket"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102213
+    m_Localized: "{page}/{pages} \xB7 1\u20130\nQ + tekerlek / Tab"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

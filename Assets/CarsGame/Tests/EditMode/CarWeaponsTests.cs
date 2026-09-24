@@ -31,14 +31,14 @@ namespace RacingGame.Tests
         public void TenSlots_MatchWheelDirectionsAndWrap_RejectInvalidSelection()
         {
             Assert.AreEqual(0, WeaponWheelGraphic.SlotAt(Vector2.zero));
-            for (int slot = 1; slot <= PrimaryWeaponCatalog.Count; slot++)
+            for (int slot = 1; slot <= PrimaryWeaponCatalog.SlotsPerPage; slot++)
                 Assert.AreEqual(slot, WeaponWheelGraphic.SlotAt(WeaponWheelGraphic.SlotDirection(slot) * 100f));
-            Assert.AreEqual(10, weapons.CyclePrimarySlot(1, -1));
-            Assert.AreEqual(1, weapons.CyclePrimarySlot(10, 1));
+            Assert.AreEqual(50, weapons.CyclePrimarySlot(1, -1));
+            Assert.AreEqual(1, weapons.CyclePrimarySlot(50, 1));
             Assert.AreEqual(3, weapons.CyclePrimarySlot(1, 1), "Locked machine gun is skipped.");
-            Assert.IsFalse(weapons.TrySwitchPrimary((PrimaryWeaponType)10, 0));
+            Assert.IsFalse(weapons.TrySwitchPrimary((PrimaryWeaponType)50, 0));
             Assert.IsFalse(weapons.TrySwitchPrimary((PrimaryWeaponType)(-1), 0));
-            Assert.AreEqual(0, new RacingGame.Core.Sim.DriveCommand { SelectPrimary = 11 }.Clamped().SelectPrimary);
+            Assert.AreEqual(0, new RacingGame.Core.Sim.DriveCommand { SelectPrimary = 51 }.Clamped().SelectPrimary);
             Assert.AreEqual(10, new RacingGame.Core.Sim.DriveCommand { SelectPrimary = 10 }.Clamped().SelectPrimary);
         }
 
@@ -52,7 +52,7 @@ namespace RacingGame.Tests
             cannon.fireInterval *= 0.9f;
             var director = RaceDirector.Instance;
             director.ResetRace();
-            for (int slot = 0; slot < PrimaryWeaponCatalog.Count; slot++)
+            for (int slot = 0; slot < PrimaryWeaponCatalog.SlotsPerPage; slot++)
             {
                 var type = (PrimaryWeaponType)slot;
                 var stats = PrimaryWeaponCatalog.Get(type);
@@ -65,7 +65,7 @@ namespace RacingGame.Tests
                 Assert.AreEqual(stats.Damage * 1.5f, cannon.shellDamage, 0.001f);
                 Assert.AreEqual(stats.Interval * 0.9f, cannon.fireInterval, 0.001f);
             }
-            for (int slot = 0; slot < PrimaryWeaponCatalog.Count; slot++)
+            for (int slot = 0; slot < PrimaryWeaponCatalog.SlotsPerPage; slot++)
             {
                 var type = (PrimaryWeaponType)slot;
                 weapons.TrySwitchPrimary(type, 20000 + slot);

@@ -86,7 +86,7 @@ namespace RacingGame.Tests
                 InputSystem.QueueStateEvent(mouse, new MouseState { scroll = new Vector2(0f, -120f) });
                 InputSystem.Update();
                 typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
-                Assert.AreEqual(10, input.Sample(5).SelectPrimary, "Scrolling backward wraps to key 0.");
+                Assert.AreEqual(50, input.Sample(5).SelectPrimary, "Scrolling backward wraps to the final arsenal page.");
                 weapons.machineGunUnlocked = false;
                 InputSystem.QueueStateEvent(mouse, new MouseState { scroll = new Vector2(0f, 120f) });
                 InputSystem.Update();
@@ -97,6 +97,17 @@ namespace RacingGame.Tests
                 InputSystem.QueueStateEvent(mouse, new MouseState());
                 InputSystem.Update();
                 typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Q));
+                InputSystem.QueueStateEvent(mouse, new MouseState { scroll = new Vector2(0f, 120f) });
+                InputSystem.Update();
+                typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+                Assert.AreEqual(1, input.SelectionPage);
+                Assert.AreEqual(0, input.WheelSelection, "Changing page never confirms an unseen weapon.");
+                InputSystem.QueueStateEvent(mouse, new MouseState { delta = WeaponWheelGraphic.SlotDirection(2) * 100f });
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Q));
+                InputSystem.Update();
+                typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+                Assert.AreEqual(12, input.WheelSelection);
                 PauseController.Set(RacingGame.Core.Platform.PauseReason.User, true);
                 typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
                 Assert.IsFalse(input.WeaponWheelOpen);

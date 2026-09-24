@@ -37,7 +37,11 @@ namespace RacingGame
         private int deathTick;
         private int ownerImmunityTick;
 
-        private Renderer mineRenderer;
+        private MineVisual visual;
+        private float customBlastRadius, customImpulse, activeStatusDuration;
+        private StatusKind activeStatus;
+        public MineSkin Skin { get; private set; }
+        public float BlastRadius => customBlastRadius > 0f ? customBlastRadius : explosionRadius;
 
         public GameObject Owner => owner;
         public int OwnerId => ownerId;
@@ -49,29 +53,12 @@ namespace RacingGame
 
         public static MineHazard CreatePooled(Transform parent)
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            go.name = "Mine_Hazard";
+            var go = new GameObject("Mine_Hazard");
             go.transform.SetParent(parent, false);
-            go.transform.localScale = new Vector3(1.1f, 0.18f, 1.1f);
-            int layer = LayerMask.NameToLayer("Track");
-            go.layer = layer >= 0 ? layer : 0;
-
-            // Remove physics collider since detection is done deterministically in tick simulation
-            var collider = go.GetComponent<Collider>();
-            if (collider != null)
-            {
-                collider.isTrigger = true;
-            }
-
             var mine = go.AddComponent<MineHazard>();
-            mine.mineRenderer = go.GetComponent<Renderer>();
+            mine.visual = MineVisual.Build(go.transform);
             go.SetActive(false);
             return mine;
-        }
-
-        private void Awake()
-        {
-            if (mineRenderer == null) mineRenderer = GetComponent<Renderer>();
         }
 
         public void Activate(RaceDirector owningDirector, in MineSpawn spawn)
@@ -79,6 +66,11 @@ namespace RacingGame
             director = owningDirector;
             owner = spawn.Owner;
             ownerId = spawn.OwnerId;
+            Skin = spawn.Skin;
+            customBlastRadius = Mathf.Max(0f, spawn.BlastRadius);
+            customImpulse = spawn.Impulse;
+            activeStatus = spawn.OverrideStatus ? spawn.Status : statusApplied;
+            activeStatusDuration = spawn.OverrideStatus ? spawn.StatusDuration : statusDuration;
             damage = spawn.Damage > 0f ? spawn.Damage : 25f;
             spawnTick = spawn.Tick;
             live = true;
@@ -94,10 +86,7 @@ namespace RacingGame
             transform.position = spawn.Position;
             transform.rotation = spawn.Rotation;
 
-            if (spawn.Material != null && mineRenderer != null)
-            {
-                mineRenderer.sharedMaterial = spawn.Material;
-            }
+            if (visual != null) visual.Show(MineKind.Contact, false, spawn.Material, Skin);
 
             gameObject.SetActive(true);
         }
@@ -124,7 +113,7 @@ namespace RacingGame
                     if (car == null || !car.gameObject.activeInHierarchy) continue;
 
                     var health = car.GetComponent<CarHealth>();
-                    if (health != null && health.IsDead) continue;
+                    if (health == null || health.IsDead) continue;
 
                     bool isOwner = car.gameObject == owner;
                     if (isOwner && tick < ownerImmunityTick) continue;
@@ -144,6 +133,9 @@ namespace RacingGame
             if (!live) return;
 
             Vector3 blastCenter = transform.position;
+            float radius = BlastRadius;
+            float floor = Mathf.Min(damage, minDamage);
+            float impulse = customImpulse != 0f ? customImpulse : explosionImpulse;
 
             if (director != null && director.Cars != null)
             {
@@ -154,13 +146,13 @@ namespace RacingGame
                     if (car == null || !car.gameObject.activeInHierarchy) continue;
 
                     var health = car.GetComponent<CarHealth>();
-                    if (health != null && health.IsDead) continue;
+                    if (health == null || health.IsDead) continue;
 
                     float dist = Vector3.Distance(blastCenter, car.transform.position);
-                    if (dist <= explosionRadius)
+                    if (dist <= radius)
                     {
-                        float t = Mathf.Clamp01(dist / explosionRadius);
-                        float dealDamage = Mathf.Lerp(damage, minDamage, t);
+                        float t = Mathf.Clamp01(dist / radius);
+                        float dealDamage = Mathf.Lerp(damage, floor, t);
 
                         Vector3 diff = car.transform.position - blastCenter;
                         Vector3 dir = diff.sqrMagnitude > 0.01f ? diff.normalized : Vector3.up;
@@ -172,9 +164,9 @@ namespace RacingGame
                             Point = blastCenter,
                             Normal = Vector3.up,
                             HitType = HitType.Hazard,
-                            Impulse = dir * explosionImpulse,
-                            Status = statusApplied,
-                            StatusDuration = statusDuration
+                            Impulse = dir * impulse,
+                            Status = activeStatus,
+                            StatusDuration = activeStatusDuration
                         };
 
                         var hitResult = health.ApplyHit(in hit);
@@ -186,7 +178,7 @@ namespace RacingGame
                         var carRb = car.GetComponent<Rigidbody>();
                         if (carRb != null && !carRb.isKinematic && hitResult.DamageApplied)
                         {
-                            Vector3 liftImpulse = (dir + Vector3.up * 0.35f).normalized * explosionImpulse;
+                            Vector3 liftImpulse = (dir + Vector3.up * 0.35f).normalized * impulse;
                             carRb.AddForceAtPosition(liftImpulse, blastCenter, ForceMode.Impulse);
                         }
                     }
@@ -213,6 +205,13 @@ namespace RacingGame
             owner = null;
             gameObject.SetActive(false);
             if (director != null) director.ReturnToPool(this);
+        }
+        private void LateUpdate()
+        {
+            if (!live || visual == null) return;
+            var driver = SimulationDriver.Current;
+            int tick = driver != null ? driver.Tick : spawnTick;
+            visual.Blink(tick, armTick, deathTick, MineKind.Contact, Time.time);
         }
     }
 }

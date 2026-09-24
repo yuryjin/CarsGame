@@ -15,7 +15,7 @@ namespace RacingGame.Core.Sim
         public bool Fire;        // fire button held; the cannon's tick cooldown limits the rate
         public bool Secondary;   // secondary weapon (mines / freeze) trigger
         public bool UseItem;     // item / consumable trigger
-        public int SelectPrimary; // edge: 0 = keep, 1..10 = weapon slot (10 is keyboard 0)
+        public int SelectPrimary; // edge: 0 = keep, 1..50 = weapon slot (five pages of ten)
         public bool ResetEdge;   // "put me back on the track" pressed since the last sample
 
         public static DriveCommand None(int tick) => new DriveCommand { Tick = tick };
@@ -25,7 +25,7 @@ namespace RacingGame.Core.Sim
             var c = this;
             c.Throttle = c.Throttle < -1f ? -1f : (c.Throttle > 1f ? 1f : c.Throttle);
             c.Steer = c.Steer < -1f ? -1f : (c.Steer > 1f ? 1f : c.Steer);
-            if (c.SelectPrimary < 0 || c.SelectPrimary > 10) c.SelectPrimary = 0;
+            if (c.SelectPrimary < 0 || c.SelectPrimary > 50) c.SelectPrimary = 0;
             return c;
         }
     }

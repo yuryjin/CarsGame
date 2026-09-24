@@ -60,6 +60,7 @@ namespace RacingGame
         private float turretYaw, barrelPitch;
         private CarController turretTarget;
         private Material shellMaterial;
+        private SpecialWeaponAttack specialAttack;
 
         public int FireIntervalTicks => SimulationDriver.SecondsToTicks(fireInterval);
         public bool IsReady => SimulationDriver.Instance.Tick >= nextFireTick && (magazineSize <= 0 || ammo > 0);
@@ -116,7 +117,13 @@ namespace RacingGame
             recoilForce = stats.Recoil;
             magazineSize = stats.Magazine;
             reloadSeconds = stats.Reload;
+            if (specialAttack == null) specialAttack = new SpecialWeaponAttack(gameObject);
+            specialAttack.Configure(profile);
+            if (turret != null) turret.gameObject.SetActive(stats.Mode == WeaponMode.Projectile);
         }
+
+        // Banana is a skin: changing its appearance must not grant another magazine.
+        private static int MagazineSlot(PrimaryWeaponType type) => (int)(type == PrimaryWeaponType.GiantBanana ? PrimaryWeaponType.MineDispenser : type);
 
         /// <summary>Preserves upgrades and each weapon's magazine and reload deadline.</summary>
         public void SwitchPrimaryProfile(PrimaryWeaponType type, int readyTick)
@@ -125,13 +132,13 @@ namespace RacingGame
             var previous = PrimaryWeaponCatalog.Get(profile);
             float damageScale = shellDamage / previous.Damage;
             float intervalScale = fireInterval / previous.Interval;
-            parkedAmmo[(int)profile] = ammo;
-            parkedReloadDoneTick[(int)profile] = reloadDoneTick;
+            parkedAmmo[MagazineSlot(profile)] = ammo;
+            parkedReloadDoneTick[MagazineSlot(profile)] = reloadDoneTick;
             ConfigurePrimary(type);
             shellDamage *= damageScale;
             fireInterval *= intervalScale;
-            ammo = parkedAmmo[(int)profile];
-            reloadDoneTick = parkedReloadDoneTick[(int)profile];
+            ammo = parkedAmmo[MagazineSlot(profile)];
+            reloadDoneTick = parkedReloadDoneTick[MagazineSlot(profile)];
             nextFireTick = Mathf.Max(nextFireTick, readyTick);
             AmmoChanged?.Invoke(Ammo, AmmoMax);
         }
@@ -157,8 +164,11 @@ namespace RacingGame
         {
             // Barrel recoil spring-back (visual only)
             recoilOffset = Mathf.MoveTowards(recoilOffset, 0f, Time.deltaTime * 1.2f);
-            barrel.localPosition = barrelRestPosition - barrel.localRotation * Vector3.forward * recoilOffset;
+            if (barrel != null) barrel.localPosition = barrelRestPosition - barrel.localRotation * Vector3.forward * recoilOffset;
+            specialAttack?.UpdateVisual();
         }
+
+        private void OnDisable() { wantsFire = false; specialAttack?.Cancel(); }
 
         /// <summary>Level input: true while the fire button is held. Set by the car every tick.</summary>
         public void SetWantsFire(bool value)
@@ -172,7 +182,8 @@ namespace RacingGame
         public void SimulationStep(int tick)
         {
             if (reloadDoneTick >= 0 && tick >= reloadDoneTick) ReloadCurrentMagazine();
-            StepTurret(tick);
+            specialAttack?.Step(tick);
+            if (PrimaryWeaponCatalog.Get(profile).Mode == WeaponMode.Projectile) StepTurret(tick);
             if (wantsFire) TryFire(tick);
         }
 
@@ -226,6 +237,12 @@ namespace RacingGame
             if (weapons != null) weapons.AddHeat(weapons.heatPerShot);
 
             var shot = PrimaryWeaponCatalog.Get(profile);
+            if (shot.Mode != WeaponMode.Projectile)
+            {
+                if (specialAttack == null) { specialAttack = new SpecialWeaponAttack(gameObject); specialAttack.Configure(profile); }
+                specialAttack.Fire(shot, shellDamage, tick);
+                return true;
+            }
 
             Vector3 direction = muzzle != null ? muzzle.forward : transform.forward;
             Vector3 inherited = rb != null ? rb.linearVelocity : Vector3.zero;
@@ -234,6 +251,7 @@ namespace RacingGame
             var director = RaceDirector.Current ?? RaceDirector.Instance;
             if (director != null)
             {
+                var homingTarget = shot.Homing ? TargetFinder.Find(car, muzzlePos, direction, 35f, 1f, 80f) : null;
                 for (int pellet = 0; pellet < shot.Pellets; pellet++)
                 {
                     float angle = shot.Pellets == 1 ? 0f : Mathf.Lerp(-shot.Spread * 0.5f, shot.Spread * 0.5f, pellet / (float)(shot.Pellets - 1));
@@ -247,6 +265,10 @@ namespace RacingGame
                         Damage = shellDamage,
                         Tick = tick,
                         Kind = shot.Kind,
+                        Weapon = profile,
+                        Impact = shot.Impact,
+                        Ricochets = shot.Ricochets,
+                        HomingTarget = homingTarget != null ? homingTarget.transform : null,
                         Status = shot.Status,
                         StatusDuration = shot.StatusSeconds,
                         Material = shellMaterial

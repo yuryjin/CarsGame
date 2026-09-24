@@ -20,7 +20,7 @@ namespace RacingGame
 
         public static Vector2 SlotDirection(int slot)
         {
-            float angle = (90f - (slot - 1) * 360f / PrimaryWeaponCatalog.Count) * Mathf.Deg2Rad;
+            float angle = (90f - (slot - 1) * 360f / PrimaryWeaponCatalog.SlotsPerPage) * Mathf.Deg2Rad;
             return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
         }
 
@@ -36,7 +36,7 @@ namespace RacingGame
             vh.Clear();
             Vector2 center = rectTransform.rect.center;
             float radius = Mathf.Min(rectTransform.rect.width, rectTransform.rect.height) * 0.5f;
-            for (int sector = 1; sector <= PrimaryWeaponCatalog.Count; sector++)
+            for (int sector = 1; sector <= PrimaryWeaponCatalog.SlotsPerPage; sector++)
             {
                 Color tint = sector == selection ? new Color(0.34f, 0.28f, 0.1f, 0.96f) : UiFactory.Surface;
                 Color edge = sector == selection ? UiFactory.Accent : UiFactory.Raised;

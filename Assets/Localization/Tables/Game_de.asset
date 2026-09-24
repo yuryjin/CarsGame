@@ -930,6 +930,170 @@ MonoBehaviour:
     m_Localized: Schwere Kanone
     m_Metadata:
       m_Items: []
+  - m_Id: 8003903014907910
+    m_Localized: Mechanischer Boxer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907911
+    m_Localized: "Kreiss\xE4ge"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907912
+    m_Localized: Kampfbohrer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907913
+    m_Localized: Vorschlaghammer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907914
+    m_Localized: Streitaxt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907915
+    m_Localized: "Kettens\xE4ge"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907916
+    m_Localized: "Lasers\xE4ge"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907917
+    m_Localized: "Schwei\xDFger\xE4t"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907918
+    m_Localized: Federspeer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907919
+    m_Localized: Abrissbirne
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907920
+    m_Localized: Flammenwerfer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907921
+    m_Localized: Teslaspule
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907922
+    m_Localized: Harpune
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907923
+    m_Localized: Traktorstrahl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907924
+    m_Localized: Repulsor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907925
+    m_Localized: Schallkanone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907926
+    m_Localized: Plasmaschneider
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907927
+    m_Localized: "S\xE4urespr\xFCher"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907928
+    m_Localized: Kryostrahl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907929
+    m_Localized: "Nagelf\xE4cher"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907930
+    m_Localized: Riesenbanane
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907931
+    m_Localized: Gummihuhn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907932
+    m_Localized: Handschuhwerfer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907933
+    m_Localized: Ambosswerfer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907934
+    m_Localized: Bowlingkanone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907935
+    m_Localized: Discoimpuls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907936
+    m_Localized: Konfettikanone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907937
+    m_Localized: Riesenstiefel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907938
+    m_Localized: Bratpfanne
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907939
+    m_Localized: "Riesenp\xF6mpel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907940
+    m_Localized: Minenleger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907941
+    m_Localized: "B\xE4renfalle"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907942
+    m_Localized: Klebefalle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907943
+    m_Localized: Eisfalle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907944
+    m_Localized: EMP-Mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102208
+    m_Localized: Sprungfalle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102209
+    m_Localized: Kaktusmine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102210
+    m_Localized: Wasserwerfer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102211
+    m_Localized: "Abpralls\xE4ge"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102212
+    m_Localized: Lenkrakete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102213
+    m_Localized: "{page}/{pages} \xB7 1\u20130\nQ + Mausrad / Tab"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -30,8 +30,8 @@ namespace RacingGame
         private PlayerDriverInput playerInput;
         private RectTransform weaponWheel;
         private WeaponWheelGraphic weaponWheelGraphic;
-        private readonly TextMeshProUGUI[] wheelLabels = new TextMeshProUGUI[PrimaryWeaponCatalog.Count];
-        private TextMeshProUGUI wheelCenter;
+        private readonly TextMeshProUGUI[] wheelLabels = new TextMeshProUGUI[PrimaryWeaponCatalog.SlotsPerPage];
+        private TextMeshProUGUI wheelCenter, wheelPage;
         private float hitMarkerUntil;
         private RectTransform goalsPanel;
         private TextMeshProUGUI goalsText, combatText, incomingArrow, incomingText;
@@ -281,8 +281,8 @@ namespace RacingGame
             wheelCenter.enableAutoSizing = true;
             wheelCenter.fontSizeMin = 16f;
             wheelCenter.fontSizeMax = 26f;
-            UiFactory.Text(weaponWheel, "Key", "Q  ·  1–0", 24f, TextAlignmentOptions.Center,
-                center, center, new Vector2(-100f, -120f), new Vector2(100f, -75f), UiFactory.Muted);
+            wheelPage = UiFactory.Text(weaponWheel, "Key", "", 19f, TextAlignmentOptions.Center,
+                center, center, new Vector2(-145f, -130f), new Vector2(145f, -75f), UiFactory.Muted);
             weaponWheel.gameObject.SetActive(false);
         }
 
@@ -295,13 +295,17 @@ namespace RacingGame
             float scale = Mathf.Min(1f, Mathf.Min(hudRoot.rect.width - 40f, hudRoot.rect.height - 40f) / 720f);
             weaponWheel.localScale = Vector3.one * Mathf.Max(0.1f, scale);
             int selected = playerInput.WheelSelection;
-            weaponWheelGraphic.SetSelection(selected, playerWeapons.machineGunUnlocked);
+            int page = playerInput.SelectionPage;
+            int pageStart = page * PrimaryWeaponCatalog.SlotsPerPage;
+            int localSelection = selected > pageStart && selected <= pageStart + PrimaryWeaponCatalog.SlotsPerPage ? selected - pageStart : 0;
+            weaponWheelGraphic.SetSelection(localSelection, page != 0 || playerWeapons.machineGunUnlocked);
+            wheelPage.text = Loc.Format("weapon.page", "page", page + 1, "pages", PrimaryWeaponCatalog.PageCount);
             for (int i = 0; i < wheelLabels.Length; i++)
             {
-                var type = (PrimaryWeaponType)i;
+                var type = (PrimaryWeaponType)(pageStart + i);
                 bool available = playerWeapons.IsPrimaryAvailable(type);
                 wheelLabels[i].text = ((i + 1) % 10) + "\n" + Loc.Get(PrimaryWeaponCatalog.Get(type).NameKey);
-                wheelLabels[i].color = !available ? UiFactory.Muted : selected == i + 1 ? UiFactory.Accent : Color.white;
+                wheelLabels[i].color = !available ? UiFactory.Muted : selected == pageStart + i + 1 ? UiFactory.Accent : Color.white;
             }
             var shown = selected == 0 ? playerWeapons.PrimaryType : (PrimaryWeaponType)(selected - 1);
             wheelCenter.text = Loc.Get(PrimaryWeaponCatalog.Get(shown).NameKey)

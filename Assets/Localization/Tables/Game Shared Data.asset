@@ -923,6 +923,170 @@ MonoBehaviour:
     m_Key: weapon.heavy
     m_Metadata:
       m_Items: []
+  - m_Id: 8003903014907910
+    m_Key: weapon.boxer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907911
+    m_Key: weapon.circular_saw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907912
+    m_Key: weapon.drill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907913
+    m_Key: weapon.sledgehammer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907914
+    m_Key: weapon.battle_axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907915
+    m_Key: weapon.chainsaw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907916
+    m_Key: weapon.laser_saw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907917
+    m_Key: weapon.welder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907918
+    m_Key: weapon.spring_spear
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907919
+    m_Key: weapon.wrecking_ball
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907920
+    m_Key: weapon.flamethrower
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907921
+    m_Key: weapon.tesla_coil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907922
+    m_Key: weapon.harpoon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907923
+    m_Key: weapon.tractor_beam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907924
+    m_Key: weapon.repulsor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907925
+    m_Key: weapon.sonic_cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907926
+    m_Key: weapon.plasma_cutter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907927
+    m_Key: weapon.acid_sprayer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907928
+    m_Key: weapon.cryo_jet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907929
+    m_Key: weapon.nail_fan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907930
+    m_Key: weapon.giant_banana
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907931
+    m_Key: weapon.rubber_chicken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907932
+    m_Key: weapon.glove_launcher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907933
+    m_Key: weapon.anvil_launcher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907934
+    m_Key: weapon.bowling_ball
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907935
+    m_Key: weapon.disco_pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907936
+    m_Key: weapon.confetti_cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907937
+    m_Key: weapon.giant_boot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907938
+    m_Key: weapon.frying_pan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907939
+    m_Key: weapon.plunger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907940
+    m_Key: weapon.mine_dispenser
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907941
+    m_Key: weapon.bear_trap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907942
+    m_Key: weapon.glue_trap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907943
+    m_Key: weapon.ice_trap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903014907944
+    m_Key: weapon.emp_mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102208
+    m_Key: weapon.spring_trap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102209
+    m_Key: weapon.cactus_mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102210
+    m_Key: weapon.water_cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102211
+    m_Key: weapon.ricochet_saw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102212
+    m_Key: weapon.homing_rocket
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8003903019102213
+    m_Key: weapon.page
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

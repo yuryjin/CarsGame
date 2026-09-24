@@ -244,3 +244,53 @@ weapon.freeze,weapon wheel,32,Freeze gun,Замораживатель,Dondurucu,
 weapon.emp,weapon wheel,32,EMP cannon,ЭМИ-пушка,EMP topu,电磁脉冲炮,EMP-Kanone,Cañón PEM,Canon IEM,Canhão PEM,ЕМІ-гармата
 weapon.spike,weapon wheel,32,Spike gun,Шипомёт,Çivi atıcı,尖刺枪,Nagelkanone,Lanzapúas,Lance-pointes,Lança-espinhos,Шипомет
 weapon.heavy,weapon wheel,32,Heavy cannon,Тяжёлая пушка,Ağır top,重型炮,Schwere Kanone,Cañón pesado,Canon lourd,Canhão pesado,Важка гармата
+weapon.boxer,arsenal,48,Mechanical boxer,Механический боксёр,Mekanik boksör,机械拳击手,Mechanischer Boxer,Boxeador mecánico,Boxeur mécanique,Boxeador mecânico,Механічний боксер
+weapon.circular_saw,arsenal,48,Circular saw,Дисковая пила,Daire testere,圆锯,Kreissäge,Sierra circular,Scie circulaire,Serra circular,Дискова пила
+weapon.drill,arsenal,48,Power drill,Боевая дрель,Savaş matkabı,战斗钻头,Kampfbohrer,Taladro de combate,Perceuse de combat,Furadeira de combate,Бойовий дриль
+weapon.sledgehammer,arsenal,48,Sledgehammer,Кувалда,Balyoz,大锤,Vorschlaghammer,Mazo,Masse,Marreta,Кувалда
+weapon.battle_axe,arsenal,48,Battle axe,Секира,Savaş baltası,战斧,Streitaxt,Hacha de guerra,Hache de guerre,Machado de guerra,Сокира
+weapon.chainsaw,arsenal,48,Chainsaw,Бензопила,Motorlu testere,电锯,Kettensäge,Motosierra,Tronçonneuse,Motosserra,Бензопила
+weapon.laser_saw,arsenal,48,Laser saw,Лазерная пила,Lazer testere,激光锯,Lasersäge,Sierra láser,Scie laser,Serra laser,Лазерна пила
+weapon.welder,arsenal,48,Arc welder,Сварочный аппарат,Kaynak makinesi,电焊机,Schweißgerät,Soldador,Poste à souder,Soldador,Зварювальний апарат
+weapon.spring_spear,arsenal,48,Spring spear,Пружинное копьё,Yaylı mızrak,弹簧长矛,Federspeer,Lanza de resorte,Lance à ressort,Lança de mola,Пружинний спис
+weapon.wrecking_ball,arsenal,48,Wrecking ball,Шар-разрушитель,Yıkım topu,破坏铁球,Abrissbirne,Bola de demolición,Boule de démolition,Bola de demolição,Куля-руйнівник
+weapon.flamethrower,arsenal,48,Flamethrower,Огнемёт,Alev makinesi,喷火器,Flammenwerfer,Lanzallamas,Lance-flammes,Lança-chamas,Вогнемет
+weapon.tesla_coil,arsenal,48,Tesla coil,Катушка Теслы,Tesla bobini,特斯拉线圈,Teslaspule,Bobina Tesla,Bobine Tesla,Bobina Tesla,Котушка Тесли
+weapon.harpoon,arsenal,48,Harpoon,Гарпун,Zıpkın,鱼叉,Harpune,Arpón,Harpon,Arpão,Гарпун
+weapon.tractor_beam,arsenal,48,Tractor beam,Притягивающий луч,Çekim ışını,牵引光束,Traktorstrahl,Rayo tractor,Rayon tracteur,Raio trator,Притягувальний промінь
+weapon.repulsor,arsenal,48,Repulsor,Отталкиватель,İtici,排斥器,Repulsor,Repulsor,Répulseur,Repulsor,Відштовхувач
+weapon.sonic_cannon,arsenal,48,Sonic cannon,Звуковая пушка,Ses topu,声波炮,Schallkanone,Cañón sónico,Canon sonique,Canhão sônico,Звукова гармата
+weapon.plasma_cutter,arsenal,48,Plasma cutter,Плазморез,Plazma kesici,等离子切割器,Plasmaschneider,Cortador de plasma,Découpeur plasma,Cortador de plasma,Плазморіз
+weapon.acid_sprayer,arsenal,48,Acid sprayer,Кислотный распылитель,Asit püskürtücü,酸液喷射器,Säuresprüher,Rociador de ácido,Pulvérisateur d’acide,Pulverizador de ácido,Кислотний розпилювач
+weapon.cryo_jet,arsenal,48,Cryo jet,Криоструя,Kriyo jet,冰冻喷流,Kryostrahl,Chorro criogénico,Jet cryogénique,Jato criogênico,Кріострумінь
+weapon.nail_fan,arsenal,48,Nail fan,Веер гвоздей,Çivi yelpazesi,扇形钉弹,Nagelfächer,Abanico de clavos,Éventail de clous,Leque de pregos,Віяло цвяхів
+weapon.giant_banana,arsenal,48,Giant banana,Огромный банан,Dev muz,巨大香蕉,Riesenbanane,Banana gigante,Banane géante,Banana gigante,Величезний банан
+weapon.rubber_chicken,arsenal,48,Rubber chicken,Резиновая курица,Lastik tavuk,橡皮鸡,Gummihuhn,Pollo de goma,Poulet en caoutchouc,Galinha de borracha,Гумова курка
+weapon.glove_launcher,arsenal,48,Glove launcher,Перчаткомёт,Eldiven fırlatıcı,拳套发射器,Handschuhwerfer,Lanzaguantes,Lance-gants,Lança-luvas,Рукавичкомет
+weapon.anvil_launcher,arsenal,48,Anvil launcher,Метатель наковален,Örs fırlatıcı,铁砧发射器,Ambosswerfer,Lanzayunques,Lance-enclumes,Lança-bigornas,Метальник ковадел
+weapon.bowling_ball,arsenal,48,Bowling cannon,Боулинг-пушка,Bowling topu,保龄球炮,Bowlingkanone,Cañón de bolos,Canon de bowling,Canhão de boliche,Боулінг-гармата
+weapon.disco_pulse,arsenal,48,Disco pulse,Диско-импульс,Disko darbesi,迪斯科脉冲,Discoimpuls,Pulso disco,Impulsion disco,Pulso disco,Диско-імпульс
+weapon.confetti_cannon,arsenal,48,Confetti cannon,Конфетти-пушка,Konfeti topu,彩纸炮,Konfettikanone,Cañón de confeti,Canon à confettis,Canhão de confete,Конфеті-гармата
+weapon.giant_boot,arsenal,48,Giant boot,Огромный ботинок,Dev çizme,巨型靴子,Riesenstiefel,Bota gigante,Botte géante,Bota gigante,Величезний черевик
+weapon.frying_pan,arsenal,48,Frying pan,Сковородка,Kızartma tavası,平底锅,Bratpfanne,Sartén,Poêle,Frigideira,Сковорідка
+weapon.plunger,arsenal,48,Giant plunger,Гигантский вантуз,Dev pompa,巨型吸盘,Riesenpömpel,Desatascador gigante,Ventouse géante,Desentupidor gigante,Гігантський вантуз
+weapon.mine_dispenser,arsenal,48,Mine dispenser,Минный заградитель,Mayın döşeyici,布雷器,Minenleger,Minador,Poseur de mines,Lançador de minas,Мінний загороджувач
+weapon.bear_trap,arsenal,48,Bear trap,Капкан,Ayı kapanı,捕兽夹,Bärenfalle,Cepo,Piège à mâchoires,Armadilha de urso,Капкан
+weapon.glue_trap,arsenal,48,Glue trap,Клеевая ловушка,Tutkal tuzağı,胶水陷阱,Klebefalle,Trampa de pegamento,Piège à colle,Armadilha de cola,Клейова пастка
+weapon.ice_trap,arsenal,48,Ice trap,Ледяная ловушка,Buz tuzağı,冰冻陷阱,Eisfalle,Trampa de hielo,Piège de glace,Armadilha de gelo,Крижана пастка
+weapon.emp_mine,arsenal,48,EMP mine,ЭМИ-мина,EMP mayını,电磁脉冲地雷,EMP-Mine,Mina PEM,Mine IEM,Mina PEM,ЕМІ-міна
+weapon.spring_trap,arsenal,48,Spring trap,Пружинная ловушка,Yaylı tuzak,弹簧陷阱,Sprungfalle,Trampa de resorte,Piège à ressort,Armadilha de mola,Пружинна пастка
+weapon.cactus_mine,arsenal,48,Cactus mine,Кактус-мина,Kaktüs mayını,仙人掌地雷,Kaktusmine,Mina cactus,Mine cactus,Mina cacto,Кактус-міна
+weapon.water_cannon,arsenal,48,Water cannon,Водомёт,Su topu,水炮,Wasserwerfer,Cañón de agua,Canon à eau,Canhão de água,Водомет
+weapon.ricochet_saw,arsenal,48,Ricochet saw,Пила-рикошет,Seken testere,反弹飞锯,Abprallsäge,Sierra rebotadora,Scie à ricochets,Serra ricochete,Пила-рикошет
+weapon.homing_rocket,arsenal,48,Homing rocket,Самонаводящаяся ракета,Güdümlü roket,追踪火箭,Lenkrakete,Cohete guiado,Roquette guidée,Foguete guiado,Самонавідна ракета
+weapon.page,weapon wheel paging,90,"{page}/{pages} · 1–0
+Q + wheel / Tab","{page}/{pages} · 1–0
+Q + колесо / Tab","{page}/{pages} · 1–0
+Q + tekerlek / Tab","{page}/{pages} · 1–0
+Q + 滚轮 / Tab","{page}/{pages} · 1–0
+Q + Mausrad / Tab","{page}/{pages} · 1–0
+Q + rueda / Tab","{page}/{pages} · 1–0
+Q + molette / Tab","{page}/{pages} · 1–0
+Q + roda / Tab","{page}/{pages} · 1–0
+Q + колесо / Tab"

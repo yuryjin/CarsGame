@@ -21,8 +21,8 @@ namespace RacingGame
         private float throttle, steer;
         private bool brake, fire, secondary;
         private readonly EdgeLatch resetLatch = new EdgeLatch();
-        private int pendingPrimary;   // last slot picked (1..10), 0 = none
-        private readonly InputAction[] primaryActions = new InputAction[PrimaryWeaponCatalog.Count];
+        private int pendingPrimary;   // last slot picked (1..50), 0 = none
+        private readonly InputAction[] primaryActions = new InputAction[PrimaryWeaponCatalog.SlotsPerPage];
         private static readonly Key[] NumberKeys = { Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5, Key.Digit6, Key.Digit7, Key.Digit8, Key.Digit9, Key.Digit0 };
         private static readonly Key[] NumpadKeys = { Key.Numpad1, Key.Numpad2, Key.Numpad3, Key.Numpad4, Key.Numpad5, Key.Numpad6, Key.Numpad7, Key.Numpad8, Key.Numpad9, Key.Numpad0 };
 
@@ -30,6 +30,7 @@ namespace RacingGame
         private Vector2 wheelPointer;
         public bool WeaponWheelOpen { get; private set; }
         public int WheelSelection { get; private set; }
+        public int SelectionPage { get; private set; }
 
         public bool UsingActionMap => map != null;
         /// <summary>Current throttle level (0..1 forward) even while the car ignores commands (countdown revving).</summary>
@@ -40,6 +41,7 @@ namespace RacingGame
         private void OnEnable()
         {
             weapons = GetComponent<CarWeapons>();
+            SelectionPage = weapons != null ? (int)weapons.PrimaryType / PrimaryWeaponCatalog.SlotsPerPage : 0;
             var asset = InputSystem.actions;
             map = asset != null ? asset.FindActionMap("Driving") : null;
             if (map != null)
@@ -92,21 +94,31 @@ namespace RacingGame
             if (held && mouse != null)
             {
                 wheelPointer = Vector2.ClampMagnitude(wheelPointer + mouse.delta.ReadValue(), 180f);
-                WheelSelection = WeaponWheelGraphic.SlotAt(wheelPointer);
+                int localSlot = WeaponWheelGraphic.SlotAt(wheelPointer);
+                WheelSelection = localSlot == 0 ? 0 : SelectionPage * PrimaryWeaponCatalog.SlotsPerPage + localSlot;
             }
 
             if (held || wasOpen) fire = secondary = false;
 
-            // Wheel and number keys use the same simulation command.
-            if (mouse != null && mouse.scroll.y.ReadValue() != 0f)
+            float scroll = mouse != null ? mouse.scroll.y.ReadValue() : 0f;
+            bool tab = held && Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame;
+            if (held && (scroll != 0f || tab))
+            {
+                int step = scroll != 0f ? (scroll > 0f ? 1 : -1) : Keyboard.current.leftShiftKey.isPressed ? -1 : 1;
+                SelectionPage = (SelectionPage + step + PrimaryWeaponCatalog.PageCount) % PrimaryWeaponCatalog.PageCount;
+                WheelSelection = pendingPrimary = 0;
+                wheelPointer = Vector2.zero;
+            }
+            else if (!held && scroll != 0f)
             {
                 int current = pendingPrimary != 0 ? pendingPrimary : (int)weapons.PrimaryType + 1;
-                pendingPrimary = weapons.CyclePrimarySlot(current, mouse.scroll.y.ReadValue() > 0f ? 1 : -1);
+                pendingPrimary = weapons.CyclePrimarySlot(current, scroll > 0f ? 1 : -1);
+                SelectionPage = (pendingPrimary - 1) / PrimaryWeaponCatalog.SlotsPerPage;
             }
             if (pendingPrimary != 0 && held)
             {
                 WheelSelection = pendingPrimary;
-                wheelPointer = WeaponWheelGraphic.SlotDirection(pendingPrimary) * 100f;
+                wheelPointer = WeaponWheelGraphic.SlotDirection((pendingPrimary - 1) % PrimaryWeaponCatalog.SlotsPerPage + 1) * 100f;
             }
             if (wasOpen && !held && pendingPrimary == 0) pendingPrimary = WheelSelection;
         }
@@ -120,7 +132,7 @@ namespace RacingGame
             secondary = secondaryAction != null && secondaryAction.IsPressed();
             if (resetAction != null && resetAction.WasPressedThisFrame()) resetLatch.Press();
             for (int i = 0; i < primaryActions.Length; i++)
-                if (primaryActions[i] != null && primaryActions[i].WasPressedThisFrame()) pendingPrimary = i + 1;
+                if (primaryActions[i] != null && primaryActions[i].WasPressedThisFrame()) pendingPrimary = SelectionPage * PrimaryWeaponCatalog.SlotsPerPage + i + 1;
         }
 
         private void PollDevices()
@@ -138,7 +150,7 @@ namespace RacingGame
                 secondary = k.leftShiftKey.isPressed || k.rightShiftKey.isPressed || k.eKey.isPressed;
                 if (k.rKey.wasPressedThisFrame) resetLatch.Press();
                 for (int i = 0; i < NumberKeys.Length; i++)
-                    if (k[NumberKeys[i]].wasPressedThisFrame || k[NumpadKeys[i]].wasPressedThisFrame) pendingPrimary = i + 1;
+                    if (k[NumberKeys[i]].wasPressedThisFrame || k[NumpadKeys[i]].wasPressedThisFrame) pendingPrimary = SelectionPage * PrimaryWeaponCatalog.SlotsPerPage + i + 1;
             }
             var m = Mouse.current;
             if (m != null)
