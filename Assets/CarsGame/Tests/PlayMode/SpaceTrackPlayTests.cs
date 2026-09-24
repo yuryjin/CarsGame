@@ -34,10 +34,8 @@ namespace RacingGame.Tests
             var gate = gates[0];
             var car = race.Player.Car;
             car.SetInputSource(car.gameObject.AddComponent<ScriptedDriverInput>());
-            car.Body.position = gate.transform.position - gate.transform.forward * 7f - Vector3.up * 2.5f;
-            car.Body.rotation = gate.transform.rotation;
+            car.Teleport(gate.transform.position - gate.transform.forward * 7f - Vector3.up * 2.5f, gate.transform.rotation);
             car.Body.linearVelocity = gate.transform.forward * 20f;
-            race.Player.Progress.NotifyTeleport();
             Physics.SyncTransforms();
             for (int i = 0; i < 30 && !car.IsBoosting; i++) yield return new WaitForFixedUpdate();
             Assert.IsTrue(car.IsBoosting, "driving through the aperture enables nitro");
@@ -51,15 +49,16 @@ namespace RacingGame.Tests
             Assert.IsNotNull(rival);
             rival.SetInputSource(rival.gameObject.AddComponent<ScriptedDriverInput>());
             var collider = rival.GetComponentInChildren<Collider>();
-            rival.Body.position = gate.transform.position;
+            rival.Teleport(gate.transform.position, gate.transform.rotation);
             rival.Body.linearVelocity = -gate.transform.forward * 20f;
             gate.SendMessage("OnTriggerEnter", collider);
             Assert.AreEqual(-gate.transform.forward * 20f, rival.Body.linearVelocity, "reverse passage gives no impulse");
-            rival.Body.position = gate.transform.position + gate.transform.right * 7f;
+            rival.Teleport(gate.transform.position + gate.transform.right * 7f, gate.transform.rotation);
             rival.Body.linearVelocity = gate.transform.forward * 20f;
             gate.SendMessage("OnTriggerEnter", collider);
             Assert.AreEqual(gate.transform.forward * 20f, rival.Body.linearVelocity, "outside the round aperture gives no impulse");
-            rival.Body.position = gate.transform.position;
+            rival.Teleport(gate.transform.position, gate.transform.rotation);
+            rival.Body.linearVelocity = gate.transform.forward * 20f;
             gate.SendMessage("OnTriggerEnter", collider);
             Assert.Greater(Vector3.Dot(rival.Body.linearVelocity, gate.transform.forward), 25f, "AI receives the same boost");
 
