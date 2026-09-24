@@ -383,7 +383,10 @@ namespace RacingGame
 
             if (groundSurface == GroundSurface.Ground)
             {
-                ApplyOffTrackDrag(forwardSpeed, speedKmh);
+                // The full grass drag (3.5 m/s²) outweighs the reverse motor (2.8 m/s²): a car nosed into a
+                // barrier on the verge could not back out at all. Reversing on grass gets a lighter drag.
+                bool reversingOnGrass = moveInput < -0.05f && forwardSpeed < 0.5f;
+                ApplyOffTrackDrag(forwardSpeed, speedKmh, reversingOnGrass ? 0.4f : 1f);
                 if (speedKmh >= offTrackMaxSpeedKmh && moveInput > 0.05f) { return; }
             }
 
@@ -432,9 +435,9 @@ namespace RacingGame
         }
 
         // Grass is slow: extra rolling drag plus a speed cap, so cutting corners never pays.
-        private void ApplyOffTrackDrag(float forwardSpeed, float speedKmh)
+        private void ApplyOffTrackDrag(float forwardSpeed, float speedKmh, float scale = 1f)
         {
-            float maxDeltaV = offTrackDeceleration * Time.fixedDeltaTime;
+            float maxDeltaV = offTrackDeceleration * scale * Time.fixedDeltaTime;
             float deltaV = Mathf.Clamp(-forwardSpeed, -maxDeltaV, maxDeltaV);
             rb.AddForce(transform.forward * (deltaV * rb.mass), ForceMode.Impulse);
         }

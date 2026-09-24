@@ -123,6 +123,32 @@ namespace RacingGame.Tests
             var finishTick = new Dictionary<RaceParticipant, int>();
             foreach (var p in drivers) { lapTicks[p] = new List<int>(); lastLaps[p] = 0; off[p] = 0f; maxLat[p] = 0f; }
 
+            // CG_TRACE="from to" (metres along the loop, may wrap): track geometry there plus every car inside
+            // the zone twice a second, written next to CG_OUT as *.trace.txt.
+            string traceZone = Env("CG_TRACE", "");
+            StringBuilder trace = null; float traceFrom = 0f, traceTo = 0f;
+            var tracePath = TrackPath.Instance;
+            if (traceZone.Length > 0 && tracePath != null)
+            {
+                var z = traceZone.Split(' ');
+                traceFrom = float.Parse(z[0], CultureInfo.InvariantCulture); traceTo = float.Parse(z[1], CultureInfo.InvariantCulture);
+                trace = new StringBuilder();
+                trace.AppendLine($"# length={tracePath.Length:F1} halfWidth={tracePath.halfWidth:F2}");
+                trace.AppendLine("# d  kappa(rad/m,+right)  profileKmh  lane  pos");
+                float span = tracePath.SignedDelta(traceFrom, traceTo); if (span < 0f) span += tracePath.Length;
+                for (float x = 0f; x <= span; x += 2f)
+                {
+                    float d = tracePath.Wrap(traceFrom + x);
+                    Vector3 a = tracePath.Tangent(tracePath.Wrap(d - 3f)); a.y = 0f;
+                    Vector3 b = tracePath.Tangent(tracePath.Wrap(d + 3f)); b.y = 0f;
+                    float k = Vector3.SignedAngle(a, b, Vector3.up) * Mathf.Deg2Rad / 6f;
+                    Vector3 pos = tracePath.Position(d);
+                    trace.AppendLine(string.Format(CultureInfo.InvariantCulture, "G {0,6:F1} {1,7:F4} {2,6:F1} {3,5:F2} ({4:F1},{5:F1})",
+                        d, k, tracePath.Profile.SpeedAt(d) * 3.6f, tracePath.Profile.LaneAt(d), pos.x, pos.z));
+                }
+                trace.AppendLine("# tick car d lat(+right) kmh along thr steer brk stuck rev resets deaths yawDegS pathCurv(rad/m) x z surface");
+            }
+
             while (race.State == RaceState.Countdown) yield return null;
             int startTick = SimulationDriver.Instance.Tick;
             foreach (var p in drivers) lapTicks[p].Add(startTick);
@@ -142,6 +168,25 @@ namespace RacingGame.Tests
                     int l = p.Progress.LapsCompleted;
                     if (l > lastLaps[p]) { lapTicks[p].Add(tick); lastLaps[p] = l; }
                     if (!finishTick.ContainsKey(p) && race.HasFinished(p)) finishTick[p] = tick;
+                    if (trace != null && (tick - startTick) % 25 == 0)
+                    {
+                        float into = p.Progress.Path.SignedDelta(traceFrom, p.Progress.Distance);
+                        float span = p.Progress.Path.SignedDelta(traceFrom, traceTo); if (span < 0f) span += p.Progress.Path.Length;
+                        if (into < 0f) into += p.Progress.Path.Length;
+                        if (into <= span)
+                        {
+                            var ai = p.GetComponent<AiDriver>(); var cmd = p.Car.LastCommand;
+                            float signedLat = p.Progress.Path.Spline.LateralOffset(p.transform.position, p.Progress.Distance);
+                            float yawDeg = p.Car.Body.angularVelocity.y * Mathf.Rad2Deg;
+                            float speedMs = p.Car.Body.linearVelocity.magnitude;
+                            trace.AppendLine(string.Format(CultureInfo.InvariantCulture,
+                                "C {0} {1} {2:F1} {3:F2} {4:F1} {5:F1} {6:F2} {7:F2} {8} {9:F2} {10} {11} {12} {13:F1} {14:F3} {15:F1} {16:F1} {17}",
+                                tick - startTick, p.name, p.Progress.Distance, signedLat, Mathf.Abs(p.Car.SpeedKmh), p.Progress.SpeedAlongTrack,
+                                cmd.Throttle, cmd.Steer, cmd.Brake ? 1 : 0, ai != null ? ai.StuckTime : 0f, ai != null && ai.Reversing ? 1 : 0,
+                                ai != null ? ai.ResetCount : 0, p.Deaths, yawDeg, speedMs > 1f ? yawDeg * Mathf.Deg2Rad / speedMs : 0f,
+                                p.transform.position.x, p.transform.position.z, p.Car.Surface));
+                        }
+                    }
                 }
                 if (tick - startTick > TickLimit) break;
             }
@@ -178,6 +223,7 @@ namespace RacingGame.Tests
             string json = JsonUtility.ToJson(report, true);
             string outPath = Env("CG_OUT", "");
             if (!string.IsNullOrEmpty(outPath)) File.WriteAllText(outPath, json);
+            if (trace != null && !string.IsNullOrEmpty(outPath)) File.WriteAllText(Path.ChangeExtension(outPath, ".trace.txt"), trace.ToString());
             Debug.Log("[RaceHarness] " + json);
             Time.captureDeltaTime = 0f;
             Assert.Greater(report.ticks, 0);
