@@ -1407,6 +1407,10 @@ MonoBehaviour:
     m_Key: mission.unit.armored
     m_Metadata:
       m_Items: []
+  - m_Id: 8416702429306880
+    m_Key: settings.auto_aim
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

@@ -62,6 +62,7 @@ namespace RacingGame
         private MissionUnit turretUnit;
         private bool aimCommitted, aimAllowsHoming;
         private Vector3 aimCommitPoint;
+        private float aimCommitYawLimit;
         private Material shellMaterial;
         private SpecialWeaponAttack specialAttack;
 
@@ -119,13 +120,20 @@ namespace RacingGame
             return aim + relative * (Vector3.Distance(aim, origin) / Mathf.Max(1f, shellSpeed));
         }
 
-        /// <summary>Hold the barrel on a world point until <see cref="ClearAimCommit"/>.</summary>
-        public void CommitAim(Vector3 worldPoint, bool allowHoming = false)
+        /// <summary>
+        /// Hold the barrel on a world point until <see cref="ClearAimCommit"/>. <paramref name="yawLimit"/>
+        /// widens the turret sector while the commit lasts (player mouse aim); it never narrows it.
+        /// </summary>
+        public void CommitAim(Vector3 worldPoint, bool allowHoming = false, float yawLimit = 0f)
         {
             aimCommitted = true;
             aimAllowsHoming = allowHoming;
             aimCommitPoint = worldPoint;
+            aimCommitYawLimit = yawLimit;
         }
+
+        /// <summary>Turret sector right now: the body's arc, widened by an aim commit that asks for more.</summary>
+        public float CurrentYawLimit => aimCommitted ? Mathf.Max(turretYawLimit, aimCommitYawLimit) : turretYawLimit;
 
         public void ClearAimCommit() { aimCommitted = false; }
 
@@ -242,7 +250,7 @@ namespace RacingGame
         // Runs in the simulation step before firing, so the shell leaves along the turned barrel.
         private void StepTurret(int tick)
         {
-            if (turret == null || turretYawLimit <= 0f) return;
+            if (turret == null || CurrentYawLimit <= 0f) return;
             Vector3 aim = default;
             bool haveAim = false;
             if (aimCommitted)
@@ -289,7 +297,8 @@ namespace RacingGame
             float speed = Mathf.Max(1f, shellSpeed);
             float flight = flat / speed;
             float drop = -0.5f * Physics.gravity.y * flight * flight;   // aim above the point by what the shell falls
-            desiredYaw = Mathf.Clamp(Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg, -turretYawLimit, turretYawLimit);
+            float yawLimit = CurrentYawLimit;
+            desiredYaw = Mathf.Clamp(Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg, -yawLimit, yawLimit);
             desiredPitch = Mathf.Clamp(-Mathf.Atan2(local.y + drop, flat) * Mathf.Rad2Deg, -barrelPitchLimit, barrelPitchLimit);
         }
 

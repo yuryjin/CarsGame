@@ -1423,6 +1423,10 @@ MonoBehaviour:
     m_Localized: Blindado
     m_Metadata:
       m_Items: []
+  - m_Id: 8416702429306880
+    m_Localized: Apuntado auto
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -536,6 +536,9 @@ namespace RacingGame
             { if (save == null) return; save.Data.settings.music = enabled ? 1f : 0f; save.MarkDirty(); Show("settings"); });
             ToggleRow(content, "AutoThrottle", "settings.auto_throttle", save != null && save.Data.settings.autoThrottle, enabled =>
             { if (save == null) return; save.Data.settings.autoThrottle = enabled; save.MarkDirty(); Show("settings"); });
+            if (!PlatformGlue.IsMobileDevice)
+                ToggleRow(content, "AutoAim", "settings.auto_aim", save == null || save.Data.settings.autoAim, enabled =>
+                { if (save == null) return; save.Data.settings.autoAim = enabled; save.MarkDirty(); Show("settings"); });
             if (PlatformGlue.HasQualityChoice && save != null)
             {
                 var settings = save.Data.settings;

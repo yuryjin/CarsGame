@@ -17,6 +17,8 @@ namespace RacingGame.Core.Save
         public bool qualityAuto = true;
         public bool autoThrottle = false;
         public bool cameraShake = true;
+        /// <summary>Turret tracks rivals by itself; off = the mouse aims (desktop only, touch always auto).</summary>
+        public bool autoAim = true;
         /// <summary>Last difficulty the player raced ("" = pick by experience).</summary>
         public string tier = "";
         /// <summary>Contextual tips already shown (bit per <c>Core.Onboarding.Hint</c>).</summary>

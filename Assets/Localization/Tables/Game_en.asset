@@ -1422,6 +1422,10 @@ MonoBehaviour:
     m_Localized: Armoured car
     m_Metadata:
       m_Items: []
+  - m_Id: 8416702429306880
+    m_Localized: Auto-aim
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

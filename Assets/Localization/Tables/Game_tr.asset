@@ -1422,6 +1422,10 @@ MonoBehaviour:
     m_Localized: "Z\u0131rhl\u0131 ara\xE7"
     m_Metadata:
       m_Items: []
+  - m_Id: 8416702429306880
+    m_Localized: "Otomatik ni\u015Fan"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

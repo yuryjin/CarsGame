@@ -87,12 +87,13 @@ namespace RacingGame.Tests
         {
             var a = Make(100, 0, 0); a.settings.lang = "ru";
             var b = Make(200, 0, 0); b.settings.lang = "tr";
-            b.settings.cameraShake = false; b.settings.qualityAuto = false; b.settings.quality = 0; b.settings.tier = "hard"; b.settings.hintsSeen = 5;
+            b.settings.cameraShake = false; b.settings.autoAim = false; b.settings.qualityAuto = false; b.settings.quality = 0; b.settings.tier = "hard"; b.settings.hintsSeen = 5;
             Assert.AreEqual("tr", SaveMerge.Merge(a, b).settings.lang);
             Assert.AreEqual("tr", SaveMerge.Merge(b, a).settings.lang);
             // Every settings field comes from the newer save, not just the ones the merge used to copy.
             var merged = SaveMerge.Merge(a, b);
             Assert.IsFalse(merged.settings.cameraShake);
+            Assert.IsFalse(merged.settings.autoAim);
             Assert.IsFalse(merged.settings.qualityAuto);
             Assert.AreEqual(0, merged.settings.quality);
             Assert.AreEqual("hard", merged.settings.tier);

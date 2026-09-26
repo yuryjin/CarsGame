@@ -121,7 +121,7 @@ namespace RacingGame.Core.Save
         private static SettingsData Clone(SettingsData s) => new SettingsData
         {
             lang = s.lang, sfx = s.sfx, music = s.music, quality = s.quality, qualityAuto = s.qualityAuto,
-            autoThrottle = s.autoThrottle, cameraShake = s.cameraShake, tier = s.tier, hintsSeen = s.hintsSeen
+            autoThrottle = s.autoThrottle, cameraShake = s.cameraShake, autoAim = s.autoAim, tier = s.tier, hintsSeen = s.hintsSeen
         };
     }
 }

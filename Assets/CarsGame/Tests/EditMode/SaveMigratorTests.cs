@@ -49,6 +49,7 @@ namespace RacingGame.Tests
             Assert.AreEqual(SaveData.CurrentVersion, data.version);
             Assert.AreEqual("d1", data.deviceId);
             Assert.NotNull(data.settings);
+            Assert.IsTrue(data.settings.autoAim, "old saves keep automatic aiming by default");
             Assert.NotNull(data.progress);
             Assert.NotNull(data.progress.upgrades);
             Assert.AreEqual(3, data.progress.upgrades.Length);

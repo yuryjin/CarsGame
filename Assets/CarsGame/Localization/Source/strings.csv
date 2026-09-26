@@ -99,6 +99,7 @@ settings.language.system,follow platform,20,As on platform,Как на плат�
 settings.sound,,10,Sound,Звук,Ses,声音,Ton,Sonido,Son,Som,Звук
 settings.music,,10,Music,Музыка,Müzik,音乐,Musik,Música,Musique,Música,Музика
 settings.auto_throttle,,16,Auto throttle,Автогаз,Otomatik gaz,自动油门,Auto-Gas,Acelerador auto,Accélération auto,Acelerador auto,Автогаз
+settings.auto_aim,turret aims by itself (off = mouse aims),16,Auto-aim,Автонаведение,Otomatik nişan,自动瞄准,Auto-Zielen,Apuntado auto,Visée auto,Mira automática,Автонаведення
 settings.on,,4,On,Вкл,Açık,开,An,Sí,Oui,Lig.,Увім
 settings.off,,4,Off,Выкл,Kapalı,关,Aus,No,Non,Desl.,Вимк
 settings.graphics,,14,Graphics,Графика,Grafik,画面,Grafik,Gráficos,Graphismes,Gráficos,Графіка

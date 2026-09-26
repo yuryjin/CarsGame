@@ -123,12 +123,38 @@ namespace RacingGame.Tests
         }
 
         [Test]
-        public void PlayerDriverInput_MousePointsCannonAtCursorAndLeftClickFires()
+        public void PlayerDriverInput_ManualAim_PointsCannonAtCursor()
+        {
+            AimMouseAtTarget(autoAim: false, (input, cannon) =>
+            {
+                input.Sample(1);
+                Assert.IsTrue(cannon.HasAimCommit);
+                Assert.That(cannon.AimCommitPoint.x, Is.InRange(4f, 6f));
+                Assert.AreEqual(input.manualAimYawLimit, cannon.CurrentYawLimit, 0.01f, "mouse aim widens the turret sector");
+            });
+        }
+
+        [Test]
+        public void PlayerDriverInput_AutoAim_IgnoresMouseAndKeepsBodyArc()
+        {
+            AimMouseAtTarget(autoAim: true, (input, cannon) =>
+            {
+                input.Sample(1);
+                Assert.IsFalse(cannon.HasAimCommit);
+                Assert.AreEqual(cannon.turretYawLimit, cannon.CurrentYawLimit, 0.01f);
+            });
+        }
+
+        private void AimMouseAtTarget(bool autoAim, System.Action<PlayerDriverInput, CarCannon> check)
         {
             var mouse = InputSystem.AddDevice<Mouse>();
+            // Camera.main must be the test camera, not a scene one left by other fixtures.
+            var otherCameras = System.Array.FindAll(Camera.allCameras, c => c.CompareTag("MainCamera"));
+            foreach (var c in otherCameras) c.enabled = false;
             var cameraGo = new GameObject("AimCamera", typeof(Camera));
             var target = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            var input = carGo.GetComponent<PlayerDriverInput>();
+            var input = carGo.AddComponent<PlayerDriverInput>();
+            input.autoAim = autoAim;
             typeof(PlayerDriverInput).GetMethod("OnEnable", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
             try
             {
@@ -145,13 +171,12 @@ namespace RacingGame.Tests
                 InputSystem.QueueStateEvent(mouse, new MouseState { position = new Vector2(screen.x, screen.y), delta = Vector2.one * 4f, buttons = 1 });
                 InputSystem.Update();
                 typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
-
-                Assert.IsTrue(input.Sample(1).Fire);
-                Assert.IsTrue(cannon.HasAimCommit);
-                Assert.That(cannon.AimCommitPoint.x, Is.InRange(4f, 6f));
+                check(input, cannon);
             }
             finally
             {
+                cannon.ClearAimCommit();
+                foreach (var c in otherCameras) if (c != null) c.enabled = true;
                 Object.DestroyImmediate(target);
                 Object.DestroyImmediate(cameraGo);
                 InputSystem.RemoveDevice(mouse);

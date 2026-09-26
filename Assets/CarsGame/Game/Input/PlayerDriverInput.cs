@@ -15,6 +15,10 @@ namespace RacingGame
         public bool autoThrottle;
         [Tooltip("Automatically deploy secondary weapon when a rival tails closely behind.")]
         public bool autoSecondary;
+        [Tooltip("Turret tracks rivals by itself. Off = the mouse aims. Follows the saved setting when a save is loaded.")]
+        public bool autoAim = true;
+        [Tooltip("Turret sector (deg off the nose) while the mouse aims; the body's own arc applies if wider.")]
+        public float manualAimYawLimit = 90f;
         [Range(0f, 1f)] public float touchSteeringAssist = 0.35f;
 
         private InputActionMap map;
@@ -83,6 +87,7 @@ namespace RacingGame
             if (map != null) ReadActions(); else PollDevices();
 
             ReadWeaponSelection();
+            if (PlatformGlue.Save != null && PlatformGlue.Save.Loaded) autoAim = PlatformGlue.Save.Data.settings.autoAim;
             var mouse = Mouse.current;
             if (mouse != null && (mouse.delta.ReadValue().sqrMagnitude > 0.01f || mouse.leftButton.isPressed)) mouseAimActive = true;
             var gamepad = Gamepad.current;
@@ -250,7 +255,7 @@ namespace RacingGame
             if (cannon == null) return;
             var mouse = Mouse.current;
             var camera = Camera.main;
-            if (!mouseAimActive || mouse == null || camera == null || TouchControlsPresenter.IsShown || WeaponWheelOpen || PauseController.IsPaused)
+            if (autoAim || !mouseAimActive || mouse == null || camera == null || TouchControlsPresenter.IsShown || WeaponWheelOpen || PauseController.IsPaused)
             {
                 cannon.ClearAimCommit();
                 return;
@@ -279,7 +284,7 @@ namespace RacingGame
                 float flight = Vector3.Distance(origin, point) / Mathf.Max(1f, cannon.shellSpeed);
                 point -= car.Body.linearVelocity * flight;
             }
-            cannon.CommitAim(point, allowHoming: true);
+            cannon.CommitAim(point, allowHoming: true, yawLimit: manualAimYawLimit);
         }
     }
 }
