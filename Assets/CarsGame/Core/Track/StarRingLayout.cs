@@ -7,7 +7,7 @@ namespace RacingGame.Core.Track
     /// <summary>
     /// The "Star Ring" space circuit as pure data: straights and arcs (two straights are solved so the loop
     /// closes), sampled every <see cref="Step"/> metres with an elevation profile, plus the distances of
-    /// its features (broken bridge, boost pad, tunnel, semi-sharp corner). Distances use the same XZ
+    /// its features (broken bridge, boost pad, tunnels, semi-sharp corner). Distances use the same XZ
     /// chord length as <see cref="TrackSpline"/>, so they index the spline built from <see cref="Points"/>.
     /// </summary>
     public sealed class StarRingLayout
@@ -58,6 +58,8 @@ namespace RacingGame.Core.Track
         public float BoostPad => Range("approach").x + 25f;
         public float TunnelStart => Range("tunnel").x;
         public float TunnelEnd => Range("tunnel").y;
+        public float RuinTunnelStart => Range("sweep3").x;
+        public float RuinTunnelEnd => Range("sweep3").y;
         public Vector2 Hairpin => Range("hairpin");
 
         public StarRingLayout()
@@ -148,12 +150,14 @@ namespace RacingGame.Core.Track
         /// <summary>Tunnel shape at a distance: fillet rise (0..1) and wall/ceiling reveal (0..1).</summary>
         public void TunnelShape(float d, out float fillet, out float reveal)
         {
-            float into = Mathf.Min(d - TunnelStart, TunnelEnd - d);
+            bool ruins = d >= RuinTunnelStart && d <= RuinTunnelEnd;
+            float into = ruins ? Mathf.Min(d - RuinTunnelStart, RuinTunnelEnd - d)
+                : Mathf.Min(d - TunnelStart, TunnelEnd - d);
             fillet = Mathf.Clamp01(into / TunnelFlare);
             reveal = Mathf.Clamp01((into - TunnelFlare) / TunnelFlare);
         }
 
-        public bool InTunnel(float d) => d >= TunnelStart && d <= TunnelEnd;
+        public bool InTunnel(float d) => d >= TunnelStart && d <= TunnelEnd || d >= RuinTunnelStart && d <= RuinTunnelEnd;
 
         /// <summary>
         /// Where a car that left the road near d may reappear: never over the gap, and with enough run-up to

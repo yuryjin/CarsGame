@@ -353,6 +353,7 @@ namespace RacingGame
             entry.BestLap = p.Progress != null ? p.Progress.BestLapTime : double.PositiveInfinity;
             entry.Laps = p.Progress != null ? p.Progress.LapsCompleted : 0;
             entry.Kills = finishedEntry != null ? finishedEntry.Kills : p.Kills;
+            entry.TurretPoints = finishedEntry != null ? finishedEntry.TurretPoints : p.TurretPoints;
             entry.Deaths = finishedEntry != null ? finishedEntry.Deaths : p.Deaths;
             entry.RepairsUsed = finishedEntry != null ? finishedEntry.RepairsUsed : p.Health != null ? p.Health.RepairsUsed : 0;
             entry.Survived = p.Deaths == 0;

@@ -13,6 +13,7 @@ namespace RacingGame
         public double BestLap;      // seconds, +inf if none
         public int Laps;
         public int Kills;
+        public int TurretPoints;
         public int Deaths;
         public int RepairsUsed;
     }

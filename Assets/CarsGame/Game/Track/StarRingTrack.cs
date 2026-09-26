@@ -8,12 +8,13 @@ namespace RacingGame
     /// <summary>
     /// "Star Ring": a wide neon circuit floating in space, generated from <see cref="StarRingLayout"/> and driven through
     /// the scene's <see cref="TrackPath"/> (AI, laps, respawn and the grid follow it). A broken bridge to jump, a boost
-    /// pad in the middle of the road before it, a tunnel whose walls and ceiling can be driven at speed
+    /// pad in the middle of the road before it, two tunnels whose walls and ceilings can be driven at speed
     /// (<see cref="GravitySurface"/>), one semi-sharp corner with an open edge, and neutral turrets.
     /// </summary>
     public sealed class StarRingTrack : MonoBehaviour
     {
         public const float RailHeight = 1f, RailWidth = 0.5f, SkinDepth = 1.2f;
+        public const float NarrowHalfWidth = 6f;
         public const float PadHalfWidth = 2f, PadLength = 6f, PadRadius = 2.2f;
         /// <summary>Tunnel cross-section: flat floor ±<see cref="TubeFloor"/>, fillets of <see cref="TubeFillet"/>, walls at the road edge.</summary>
         public const float TubeFloor = 5f, TubeFillet = 4f, TubeWallTop = 7f, TubeHeight = 11f;
@@ -27,6 +28,9 @@ namespace RacingGame
         private readonly List<Mesh> meshes = new List<Mesh>();
         private readonly List<SpaceTurret> turrets = new List<SpaceTurret>();
         private readonly List<BoostGate> pads = new List<BoostGate>();
+        private readonly List<RaceProgress> observed = new List<RaceProgress>();
+        private GameObject railsGroup, shouldersGroup, warningGroup, narrowEdgeGroup;
+        public int Stage { get; private set; }
 
         public StarRingLayout Layout => layout;
         public IReadOnlyList<SpaceTurret> Turrets => turrets;
@@ -78,7 +82,9 @@ namespace RacingGame
             var list = new List<float>(n + 16);
             for (int i = 0; i < n; i++) list.Add(i * layout.Length / n);
             float t0 = layout.TunnelStart, t1 = layout.TunnelEnd, f = StarRingLayout.TunnelFlare;
-            foreach (float d in new[] { layout.GapStart, layout.GapEnd, t0, t0 + f, t0 + 2f * f, t1 - 2f * f, t1 - f, t1 })
+            float u0 = layout.RuinTunnelStart, u1 = layout.RuinTunnelEnd;
+            foreach (float d in new[] { layout.GapStart, layout.GapEnd, t0, t0 + f, t0 + 2f * f, t1 - 2f * f, t1 - f, t1,
+                u0, u0 + f, u0 + 2f * f, u1 - 2f * f, u1 - f, u1 })
                 if (!list.Exists(x => Mathf.Abs(x - d) < 0.05f)) list.Add(d);
             list.Sort();
             list.Add(layout.Length);   // closes the loop onto ring 0
@@ -136,18 +142,25 @@ namespace RacingGame
         {
             BuildTubeStrip();
             var road = new MeshChunkWriter("StarRoad");
+            var shoulders = new MeshChunkWriter("StarShoulders");
             var tube = new MeshChunkWriter("StarTube");
             var skin = new MeshChunkWriter("StarSkin");
+            var shoulderSkin = new MeshChunkWriter("StarShoulderSkin");
             var rails = new MeshChunkWriter("StarRails");
             var lights = new MeshChunkWriter("StarLights");
+            var shoulderLights = new MeshChunkWriter("StarShoulderLights");
+            var railLights = new MeshChunkWriter("StarRailLights");
+            var warnings = new MeshChunkWriter("StarWarnings");
+            var narrowEdge = new MeshChunkWriter("StarNarrowEdge");
+            var structures = new MeshChunkWriter("StarRuins");
 
-            var asphalt = new Color32(46, 44, 78, 0);
-            var band = new Color32(58, 54, 96, 0);
-            var underside = new Color32(30, 28, 52, 0);
-            var panel = new Color32(62, 58, 104, 0);
-            var edgeGlow = new Color32(70, 200, 255, 255);
-            var railColor = new Color32(88, 82, 130, 0);
-            var railGlow = new Color32(200, 90, 255, 255);
+            var asphalt = new Color32(51, 48, 48, 0);
+            var band = new Color32(68, 55, 49, 0);
+            var underside = new Color32(31, 28, 31, 0);
+            var panel = new Color32(76, 62, 55, 0);
+            var edgeGlow = new Color32(255, 119, 50, 255);
+            var railColor = new Color32(101, 77, 63, 0);
+            var railGlow = new Color32(255, 85, 46, 255);
 
             var distances = RingDistances();
             Vector2 hairpin = layout.Hairpin;
@@ -173,50 +186,72 @@ namespace RacingGame
                     }
                     // Glowing hoops every 12 m, the last 25 m red: time to come down before the exit.
                     if (ra >= 1f && rb >= 1f && Mathf.Repeat(mid, 12f) < d1 - d0)
-                        Hoop(lights, a, b, layout.TunnelEnd - mid < 25f ? new Color32(255, 70, 70, 255) : edgeGlow);
+                        Hoop(lights, a, b, (mid < layout.TunnelEnd ? layout.TunnelEnd - mid : layout.RuinTunnelEnd - mid) < 25f
+                            ? new Color32(255, 70, 70, 255) : edgeGlow);
                     continue;
                 }
 
-                // Flat road deck in four panels (±TubeFloor meets the tunnel strip's floor points).
+                // Flat road deck: the outer panels can disappear without changing the tunnel floor.
                 float h = StarRingLayout.HalfWidth, f = TubeFloor;
-                float[] xs = { -h, -f, 0f, f, h };
+                float n = NarrowHalfWidth;
+                float[] xs = { -h, -n, -f, 0f, f, n, h };
                 for (int k = 0; k + 1 < xs.Length; k++)
-                    road.AddQuad(At(a, xs[k], 0f), At(b, xs[k], 0f), At(b, xs[k + 1], 0f), At(a, xs[k + 1], 0f), stripe ? asphalt : band);
-                // Underside and sides: the deck is a slab floating in the void.
-                skin.AddQuad(At(a, -h, 0f), At(a, -h, -SkinDepth), At(b, -h, -SkinDepth), At(b, -h, 0f), underside);
-                skin.AddQuad(At(b, h, 0f), At(b, h, -SkinDepth), At(a, h, -SkinDepth), At(a, h, 0f), underside);
-                skin.AddQuad(At(a, h, -SkinDepth), At(b, h, -SkinDepth), At(b, -h, -SkinDepth), At(a, -h, -SkinDepth), underside);
+                {
+                    var writer = k == 0 || k == xs.Length - 2 ? shoulders : road;
+                    writer.AddQuad(At(a, xs[k], 0f), At(b, xs[k], 0f), At(b, xs[k + 1], 0f), At(a, xs[k + 1], 0f), stripe ? asphalt : band);
+                }
+                // The removable shoulders have their own colliders; the core stays solid on lap three.
+                skin.AddQuad(At(a, -n, 0f), At(a, -n, -SkinDepth), At(b, -n, -SkinDepth), At(b, -n, 0f), underside);
+                skin.AddQuad(At(b, n, 0f), At(b, n, -SkinDepth), At(a, n, -SkinDepth), At(a, n, 0f), underside);
+                skin.AddQuad(At(a, n, -SkinDepth), At(b, n, -SkinDepth), At(b, -n, -SkinDepth), At(a, -n, -SkinDepth), underside);
+                foreach (float side in new[] { -1f, 1f })
+                {
+                    float inner = side * n, outer = side * h;
+                    shoulderSkin.AddQuad(At(a, inner, -SkinDepth), At(b, inner, -SkinDepth), At(b, outer, -SkinDepth), At(a, outer, -SkinDepth), underside);
+                    Strip(warnings, a, b, Mathf.Min(outer - side * 1.1f, outer), Mathf.Max(outer - side * 1.1f, outer), 0.035f,
+                        Mathf.FloorToInt(mid / 3f) % 2 == 0 ? new Color32(255, 50, 38, 140) : new Color32(115, 28, 29, 65));
+                    Strip(narrowEdge, a, b, Mathf.Min(inner - side * 0.35f, inner), Mathf.Max(inner - side * 0.35f, inner), 0.035f, new Color32(255, 56, 38, 255));
+                }
                 if (Mathf.Abs(d1 - layout.GapStart) < 0.01f) Cap(skin, b, true, underside);
                 if (Mathf.Abs(d0 - layout.GapEnd) < 0.01f) Cap(skin, a, false, underside);
 
                 // Edge lights on the deck.
-                Strip(lights, a, b, -h + 0.25f, -h + 0.45f, 0.02f, edgeGlow);
-                Strip(lights, a, b, h - 0.45f, h - 0.25f, 0.02f, edgeGlow);
+                Strip(shoulderLights, a, b, -h + 0.25f, -h + 0.45f, 0.02f, edgeGlow);
+                Strip(shoulderLights, a, b, h - 0.45f, h - 0.25f, 0.02f, edgeGlow);
 
                 // Rails, except over the tunnel mouths, the gap and the outside of the semi-sharp corner.
                 bool open = mid > hairpin.x - 10f && mid < hairpin.y + 15f;
                 foreach (float side in new[] { -1f, 1f })
-                    if (!open || side != openSide) Rail(rails, lights, a, b, side, railColor, railGlow);
+                    if (!open || side != openSide) Rail(rails, railLights, a, b, side, railColor, railGlow);
                 if (open)
                 {
                     // A red and white kerb warns of the open edge.
                     var kerb = Mathf.FloorToInt(mid / 2f) % 2 == 0 ? new Color32(235, 50, 60, 120) : new Color32(240, 240, 240, 60);
                     float edge = openSide * h;
-                    Strip(lights, a, b, Mathf.Min(edge, edge - openSide * 1.2f), Mathf.Max(edge, edge - openSide * 1.2f), 0.025f, kerb);
+                    Strip(shoulderLights, a, b, Mathf.Min(edge, edge - openSide * 1.2f), Mathf.Max(edge, edge - openSide * 1.2f), 0.025f, kerb);
                 }
             }
 
             DecorateBridge(lights);
+            DecorateRuins(structures);
             BuildPads(lights);
-            BuildStartLine(lights, rails);
+            BuildStartLine(lights, structures);
             SpaceTrack.AddStars(lights, Centre(), 320, 420f);
             AddPlanet(lights);
 
             Add("Road", road, solid, true, false);
+            shouldersGroup = Add("Shoulders", shoulders, solid, true, false);
+            Add("ShoulderSkin", shoulderSkin, solid, false, false).transform.SetParent(shouldersGroup.transform, true);
+            Add("ShoulderLights", shoulderLights, glow, false, false).transform.SetParent(shouldersGroup.transform, true);
             Add("Tube", tube, solid, true, true);
             Add("Skin", skin, solid, false, false);
-            Add("Rails", rails, solid, true, false);
+            railsGroup = Add("Rails", rails, solid, true, false);
+            Add("RailLights", railLights, glow, false, false).transform.SetParent(railsGroup.transform, true);
+            Add("Ruins", structures, solid, false, false);
             Add("Lights", lights, glow, false, false);
+            warningGroup = Add("Warnings", warnings, glow, false, false);
+            narrowEdgeGroup = Add("NarrowEdge", narrowEdge, glow, false, false);
+            SetStage(1);
             PlaceTurrets(race);
         }
 
@@ -349,7 +384,7 @@ namespace RacingGame
             return bounds.center;
         }
 
-        // A ringed planet below the circuit: stacked frustums, flat-shaded like the rest of the art.
+        // A shattered ringed planet below the circuit, flat-shaded like the rest of the art.
         private void AddPlanet(MeshChunkWriter w)
         {
             Vector3 c = Centre() + new Vector3(-260f, -150f, 180f);
@@ -359,19 +394,69 @@ namespace RacingGame
             {
                 float a0 = Mathf.PI * i / bands - Mathf.PI * 0.5f, a1 = Mathf.PI * (i + 1) / bands - Mathf.PI * 0.5f;
                 float y0 = Mathf.Sin(a0) * radius, y1 = Mathf.Sin(a1) * radius;
-                var tint = i % 3 == 0 ? new Color32(120, 70, 190, 110) : i % 3 == 1 ? new Color32(90, 60, 170, 90) : new Color32(150, 90, 210, 120);
+                var tint = i % 3 == 0 ? new Color32(116, 69, 52, 80) : i % 3 == 1 ? new Color32(65, 56, 55, 60) : new Color32(145, 104, 73, 80);
                 LowPoly.Cylinder(w, Matrix4x4.identity, c + Vector3.up * y0, Mathf.Cos(a0) * radius, Mathf.Cos(a1) * radius, y1 - y0, 16, tint, false);
             }
             var tilt = Matrix4x4.TRS(c, Quaternion.Euler(18f, 0f, 12f), Vector3.one);
-            var ringColor = new Color32(255, 190, 120, 140);
+            var ringColor = new Color32(225, 112, 61, 140);
             for (int k = 0; k < 32; k++)
             {
                 float a0 = k * Mathf.PI * 2f / 32f, a1 = (k + 1) * Mathf.PI * 2f / 32f;
+                if (k % 9 == 2 || k % 9 == 3) continue; // shattered ring
                 Vector3 P(float a, float r) => tilt.MultiplyPoint3x4(new Vector3(Mathf.Cos(a) * r, 0f, Mathf.Sin(a) * r));
                 // Both faces: the ring is seen from above and below.
                 w.AddQuad(P(a0, 130f), P(a1, 130f), P(a1, 175f), P(a0, 175f), ringColor);
                 w.AddQuad(P(a0, 175f), P(a1, 175f), P(a1, 130f), P(a0, 130f), ringColor);
             }
+        }
+
+        // Rusted gantries, collapsed hulls and stranded pylons beyond the drivable edge.
+        private void DecorateRuins(MeshChunkWriter w)
+        {
+            var rust = new Color32(104, 65, 48, 0);
+            var dark = new Color32(39, 38, 39, 0);
+            var pale = new Color32(124, 110, 89, 0);
+            foreach (float d in new[] { 115f, layout.TunnelEnd + 35f, layout.Hairpin.y + 20f, layout.GapEnd + 55f, layout.RuinTunnelEnd + 25f })
+            {
+                Ring r = RingAt(d);
+                Quaternion rot = Quaternion.LookRotation(Vector3.Cross(r.right, r.up), Vector3.up);
+                foreach (float side in new[] { -1f, 1f })
+                {
+                    Vector3 basePoint = At(r, side * (StarRingLayout.HalfWidth + 13f), -2f);
+                    LowPoly.Box(w, Matrix4x4.TRS(basePoint, rot * Quaternion.Euler(0f, side * 18f, side * 9f), Vector3.one),
+                        Vector3.up * 2.5f, new Vector3(2.5f, 5f, 6f), rust);
+                    LowPoly.Box(w, Matrix4x4.TRS(basePoint + Vector3.up * 4f, rot, Vector3.one),
+                        Vector3.zero, new Vector3(3f, 0.35f, 7f), pale);
+                    LowPoly.Box(w, Matrix4x4.TRS(basePoint + Vector3.up * 6.4f, rot * Quaternion.Euler(0f, 0f, side * 24f), Vector3.one),
+                        Vector3.zero, new Vector3(0.35f, 4f, 0.5f), dark);
+                }
+            }
+        }
+
+        public void Follow(RaceManager race)
+        {
+            foreach (var progress in observed) if (progress != null) progress.LapCompleted -= OnLapCompleted;
+            observed.Clear();
+            if (race == null) return;
+            foreach (var participant in race.Participants)
+                if (participant != null && participant.Progress != null)
+                {
+                    observed.Add(participant.Progress);
+                    participant.Progress.LapCompleted += OnLapCompleted;
+                }
+        }
+
+        private void OnLapCompleted(int completed, double seconds) => SetStage(completed + 1);
+
+        public void SetStage(int stage)
+        {
+            if (stage <= Stage) return;
+            Stage = Mathf.Clamp(stage, 1, 3);
+            railsGroup.SetActive(Stage == 1);
+            shouldersGroup.SetActive(Stage < 3);
+            warningGroup.SetActive(Stage == 2);
+            narrowEdgeGroup.SetActive(Stage == 3);
+            path.halfWidth = Stage < 3 ? StarRingLayout.HalfWidth : NarrowHalfWidth;
         }
 
         private void PlaceTurrets(RaceManager race)
@@ -389,14 +474,14 @@ namespace RacingGame
             {
                 Ring r = RingAt(spots[i].x);
                 float side = spots[i].y;
-                Vector3 position = At(r, side * (StarRingLayout.HalfWidth + 7f), 3f);
+                Vector3 position = At(r, side * (StarRingLayout.HalfWidth + 4f), 3f);
                 turrets.Add(SpaceTurret.Create(transform, position, -r.right * side, i, race, solid, glow, shells));
             }
         }
 
         private float Mid(string name) { var r = layout.Range(name); return (r.x + r.y) * 0.5f; }
 
-        private void Add(string groupName, MeshChunkWriter writer, Material material, bool collide, bool gravity)
+        private GameObject Add(string groupName, MeshChunkWriter writer, Material material, bool collide, bool gravity)
         {
             var group = new GameObject(groupName);
             group.transform.SetParent(transform, false);
@@ -414,10 +499,12 @@ namespace RacingGame
                 if (collide) go.AddComponent<MeshCollider>().sharedMesh = mesh;
                 if (gravity) go.AddComponent<GravitySurface>();
             }
+            return group;
         }
 
         public void Restore()
         {
+            Follow(null);
             if (path != null) { path.ClearLayout(); path = null; }
             foreach (var go in hidden) if (go != null) go.SetActive(true);
             hidden.Clear();

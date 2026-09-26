@@ -1411,6 +1411,14 @@ MonoBehaviour:
     m_Key: settings.auto_aim
     m_Metadata:
       m_Items: []
+  - m_Id: 8422648324988928
+    m_Key: hud.wasteland.rails_off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8422648379514880
+    m_Key: hud.wasteland.narrowing
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

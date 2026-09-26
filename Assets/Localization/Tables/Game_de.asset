@@ -1422,6 +1422,14 @@ MonoBehaviour:
     m_Localized: Auto-Zielen
     m_Metadata:
       m_Items: []
+  - m_Id: 8422648324988928
+    m_Localized: LEITPLANKEN WEG!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8422648379514880
+    m_Localized: DIE STRASSE BRICHT WEG!
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

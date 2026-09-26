@@ -1427,6 +1427,14 @@ MonoBehaviour:
     m_Localized: Apuntado auto
     m_Metadata:
       m_Items: []
+  - m_Id: 8422648324988928
+    m_Localized: "\xA1SIN VALLAS!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8422648379514880
+    m_Localized: "\xA1LA PISTA SE DERRUMBA!"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

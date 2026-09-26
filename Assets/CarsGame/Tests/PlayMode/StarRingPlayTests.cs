@@ -49,6 +49,14 @@ namespace RacingGame.Tests
             Assert.AreEqual(RaceState.Countdown, race.State);
             Assert.IsFalse(ground.activeSelf);
             Assert.AreEqual(layout.Length, path.Length, 0.5f, "the field races the generated loop");
+            Assert.AreEqual(1, map.Stage);
+            Assert.IsTrue(map.transform.Find("Rails").gameObject.activeSelf);
+            Assert.IsTrue(layout.InTunnel((layout.RuinTunnelStart + layout.RuinTunnelEnd) * 0.5f), "the second tunnel is on the return leg");
+            Physics.SyncTransforms();
+            float ruinMid = (layout.RuinTunnelStart + layout.RuinTunnelEnd) * 0.5f;
+            Assert.IsTrue(Physics.Raycast(path.Position(ruinMid) + Vector3.up * 4f, Vector3.up, out var roof, 12f,
+                1 << LayerMask.NameToLayer("Track")));
+            Assert.IsNotNull(roof.collider.GetComponent<GravitySurface>(), "the second tunnel roof supports wall riding");
             Assert.AreEqual(ev.ramPush, CarController.RamPushScale);
             while (race.State == RaceState.Countdown) yield return null;
 
@@ -166,8 +174,61 @@ namespace RacingGame.Tests
                 $"race {race.State} laps {race.Player.Progress.LapsCompleted} input {car.inputEnabled}/{victim.inputEnabled} enabled {car.isActiveAndEnabled}/{victim.isActiveAndEnabled}");
             Assert.GreaterOrEqual(gunner.ShotsFired, SpaceTurret.Burst);
 
+            // A shot can destroy a turret once, crediting the shooter and the race reward.
+            Assert.IsTrue(gunner.GetComponentsInChildren<Collider>().Length > 0, "turret has a projectile target");
+            float approach = turretAt - 25f;
+            Vector3 muzzleOnRoad = path.Position(approach) - path.Right(approach) * 6f + Vector3.up * 1.5f;
+            Vector3 sight = gunner.AimPoint - muzzleOnRoad;
+            float sightAngle = Vector3.Angle(path.Tangent(approach), sight);
+            bool sightBlocked = Physics.Linecast(muzzleOnRoad, gunner.AimPoint, TargetFinder.ObstacleMask);
+            Assert.AreEqual(gunner, TargetFinder.FindTurret(muzzleOnRoad, path.Tangent(approach), 30f, 4f, 45f),
+                $"the car can acquire the turret from the road (distance {sight.magnitude:F1}, angle {sightAngle:F1}, blocked {sightBlocked}, active {SpaceTurret.All.Count})");
+            var shell = RaceDirector.Current.RequestProjectile(new ProjectileSpawn
+            {
+                Owner = car.gameObject,
+                OwnerId = car.CarId,
+                Position = gunner.AimPoint - gunner.transform.forward * 4f,
+                Velocity = gunner.transform.forward * 70f,
+                Damage = SpaceTurret.MaxHealth,
+                Tick = SimulationDriver.Instance.Tick,
+                Kind = ProjectileKind.Shell,
+                Weapon = PrimaryWeaponType.Cannon
+            });
+            Assert.IsNotNull(shell);
+            for (int i = 0; i < 15 && gunner.IsAlive; i++) yield return new WaitForFixedUpdate();
+            Assert.IsFalse(gunner.IsAlive, "a real shell can destroy the turret");
+            Assert.AreEqual(SpaceTurret.DestroyPoints, race.Player.TurretPoints);
+            Assert.IsFalse(gunner.TakeHit(car.gameObject, SpaceTurret.MaxHealth), "wreck gives no duplicate points");
+            Assert.AreEqual(SpaceTurret.DestroyPoints, race.Player.TurretPoints);
+
+            // Any racer can remove the rails, then the shoulder collider, for the entire field.
+            var rivalProgress = rivals[0].GetComponent<RaceProgress>();
+            float distance = path.startLineDistance + 1f;
+            rivalProgress.transform.position = path.Position(distance);
+            rivalProgress.BeginRace();
+            int steps = Mathf.CeilToInt(path.Length / 5f);
+            for (int lap = 1; lap <= 2; lap++)
+            {
+                for (int i = 0; i < steps; i++)
+                {
+                    distance += path.Length / steps;
+                    rivalProgress.transform.position = path.Position(distance);
+                    rivalProgress.SimulationStep(lap * steps + i);
+                }
+                Assert.AreEqual(lap + 1, map.Stage);
+                Assert.IsFalse(map.transform.Find("Rails").gameObject.activeSelf);
+                Assert.AreEqual(lap == 1, map.transform.Find("Shoulders").gameObject.activeSelf);
+                Assert.AreEqual(lap == 1, map.transform.Find("Warnings").gameObject.activeSelf);
+            }
+            Assert.AreEqual(StarRingTrack.NarrowHalfWidth, path.halfWidth);
+            Physics.SyncTransforms();
+            Assert.IsFalse(Physics.Raycast(path.Position(110f) + path.Right(110f) * 8f + Vector3.up * 3f,
+                Vector3.down, 8f, 1 << LayerMask.NameToLayer("Track")), "the outer road has no collider");
+
             flow.RetryRace();
             Assert.AreEqual(1, Object.FindObjectsByType<StarRingTrack>(FindObjectsInactive.Exclude).Length, "retry builds one ring");
+            Assert.AreEqual(1, Object.FindAnyObjectByType<StarRingTrack>().Stage, "retry restores full width and rails");
+            Assert.AreEqual(0, race.Player.TurretPoints, "retry clears turret points");
             flow.EnterMenu();
             Assert.IsNull(Object.FindAnyObjectByType<StarRingTrack>());
             Assert.IsTrue(ground.activeSelf);

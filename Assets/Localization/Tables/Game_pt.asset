@@ -1423,6 +1423,14 @@ MonoBehaviour:
     m_Localized: "Mira autom\xE1tica"
     m_Metadata:
       m_Items: []
+  - m_Id: 8422648324988928
+    m_Localized: SEM GUARDAS!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8422648379514880
+    m_Localized: "A PISTA EST\xC1 DESABANDO!"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

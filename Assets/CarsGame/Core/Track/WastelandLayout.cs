@@ -7,13 +7,18 @@ namespace RacingGame.Core.Track
     /// <summary>
     /// A separate wasteland circuit as pure data: straights and arcs (two straights are solved so the loop
     /// closes), sampled every <see cref="Step"/> metres with an elevation profile, plus the distances of
-    /// its features (broken bridge, boost pad, tunnel, semi-sharp corner). Distances use the same XZ
+    /// its features (broken bridge, boost pad, three tunnels, semi-sharp corner) and the lap rules that strip the
+    /// rails and then narrow the road. Distances use the same XZ
     /// chord length as <see cref="TrackSpline"/>, so they index the spline built from <see cref="Points"/>.
     /// </summary>
     public sealed class WastelandLayout
     {
         public const float Step = 2f;
         public const float HalfWidth = 10f;
+        /// <summary>Half width after the edges collapse (the leader has finished <see cref="NarrowAfterLaps"/> laps).</summary>
+        public const float NarrowHalfWidth = 7f;
+        /// <summary>Leader laps after which the rails retract (and the doomed edges glow red), then the edges fall.</summary>
+        public const int RailsOffAfterLaps = 1, NarrowAfterLaps = 2;
         public const float DeckHeight = 10f, LandingHeight = 8f;
         public const float TakeoffDeck = 42f, GapLength = 17f;
         /// <summary>Length of the kicker in front of the gap and its slope at the lip (tan 6°).</summary>
@@ -39,7 +44,7 @@ namespace RacingGame.Core.Track
         {
             S(90f, "start"), A(90f, 90f, "sweep1"), S(65f, "approach"), S(105f, "bridge"), A(95f, 90f, "sweep2"),
             S(40f), A(75f, -35f, "esse1"), A(75f, 35f, "esse2"), S(150f, "tunnel"), A(90f, 90f, "sweep3"),
-            S(0f, "west"), A(HairpinRadius, 90f, "hairpin"), S(70f), A(160f, 20f, "kink1"), A(160f, -20f, "kink2"), S(0f, "home"),
+            S(0f, "west"), A(HairpinRadius, 90f, "hairpin"), S(70f, "exit"), A(160f, 20f, "kink1"), A(160f, -20f, "kink2"), S(0f, "home"),
         };
 
         public Vector3[] Points { get; }
@@ -55,6 +60,11 @@ namespace RacingGame.Core.Track
         public float BoostPad => Range("approach").x + 30f;
         public float TunnelStart => Range("tunnel").x;
         public float TunnelEnd => Range("tunnel").y;
+        /// <summary>
+        /// Every tube as [start, end): the straight one, one on the long west straight (it ends with room to brake
+        /// for the hairpin) and an S-bend after the hairpin.
+        /// </summary>
+        public Vector2[] Tunnels { get; private set; }
         public Vector2 Hairpin => Range("hairpin");
 
         public WastelandLayout()
@@ -76,6 +86,12 @@ namespace RacingGame.Core.Track
             Length = distances[distances.Count - 1] + Vector2.Distance(flat[flat.Count - 1], flat[0]);
             Points = new Vector3[flat.Count];
             for (int i = 0; i < flat.Count; i++) Points[i] = new Vector3(flat[i].x, Height(distances[i]), flat[i].y);
+            Tunnels = new[]
+            {
+                Range("tunnel"),
+                new Vector2(Range("west").x + 12f, Range("hairpin").x - 100f),
+                new Vector2(Range("exit").x + 12f, Range("kink2").y + 3f),
+            };
         }
 
         private static Vector2 Heading(float radians) => new Vector2(Mathf.Sin(radians), Mathf.Cos(radians));
@@ -142,15 +158,29 @@ namespace RacingGame.Core.Track
 
         public bool InGap(float d) => d > GapStart && d < GapEnd;
 
-        /// <summary>Tunnel shape at a distance: fillet rise (0..1) and wall/ceiling reveal (0..1).</summary>
+        /// <summary>Tunnel shape at a distance: fillet rise (0..1) and wall/ceiling reveal (0..1); zero outside the tubes.</summary>
         public void TunnelShape(float d, out float fillet, out float reveal)
         {
-            float into = Mathf.Min(d - TunnelStart, TunnelEnd - d);
+            fillet = reveal = 0f;
+            int t = TunnelIndex(d);
+            if (t < 0) return;
+            float into = Mathf.Min(d - Tunnels[t].x, Tunnels[t].y - d);
             fillet = Mathf.Clamp01(into / TunnelFlare);
             reveal = Mathf.Clamp01((into - TunnelFlare) / TunnelFlare);
         }
 
-        public bool InTunnel(float d) => d >= TunnelStart && d <= TunnelEnd;
+        /// <summary>Index into <see cref="Tunnels"/> of the tube around d, or -1.</summary>
+        public int TunnelIndex(float d)
+        {
+            for (int i = 0; i < Tunnels.Length; i++)
+                if (d >= Tunnels[i].x && d <= Tunnels[i].y) return i;
+            return -1;
+        }
+
+        public bool InTunnel(float d) => TunnelIndex(d) >= 0;
+
+        /// <summary>Track stage for the laps the leader has completed: 0 = rails up, 1 = rails gone and edges marked, 2 = narrow.</summary>
+        public static int StageFor(int leaderLaps) => leaderLaps >= NarrowAfterLaps ? 2 : leaderLaps >= RailsOffAfterLaps ? 1 : 0;
 
         /// <summary>
         /// Where a car that left the road near d may reappear: never over the gap, and with enough run-up to

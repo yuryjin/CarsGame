@@ -15,6 +15,10 @@ namespace RacingGame
         public const float Range = 45f, AimSeconds = 1.1f, CooldownSeconds = 4f;
         public const float ShellSpeed = 70f, ShellDamage = 6f, ShellImpact = 2500f;
         public const int Burst = 2;
+        public const int DestroyPoints = 50;
+        public const float MaxHealth = 50f;
+        private static readonly List<SpaceTurret> all = new List<SpaceTurret>();
+        public static IReadOnlyList<SpaceTurret> All => all;
         private const float BurstGapSeconds = 0.12f, TurnDegreesPerSecond = 150f, FireCone = 8f;
 
         private enum Phase { Idle, Aiming, Firing, Cooling }
@@ -29,6 +33,7 @@ namespace RacingGame
         private int phaseTick, shotsLeft, lastTargetId;
         private Vector3 aimPoint;
         private int trackMask;
+        private float health = MaxHealth;
         private readonly List<Mesh> meshes = new List<Mesh>();
 
         public CarController Target => target;
@@ -36,6 +41,8 @@ namespace RacingGame
         public int ShotsFired { get; private set; }
         public int SimulationOrder => int.MaxValue - 1000 + order;   // after every car, before the director moves the shells
         public Vector3 MuzzlePosition => muzzle.position;
+        public Vector3 AimPoint => head.position;
+        public bool IsAlive => health > 0f;
 
         public static SpaceTurret Create(Transform parent, Vector3 position, Vector3 facing, int index, RaceManager race, Material solid, Material glow, Material shells)
         {
@@ -71,7 +78,7 @@ namespace RacingGame
             LowPoly.Cylinder(gun, barrel, Vector3.zero, 0.22f, 0.18f, 1.9f, 6, new Color32(45, 42, 60, 0));
             var eye = new MeshChunkWriter("TurretEye");
             LowPoly.Box(eye, Matrix4x4.identity, new Vector3(0f, 0.2f, 0.86f), new Vector3(0.9f, 0.18f, 0.05f), new Color32(255, 50, 80, 255));
-            Add(head, gun, solid, false);
+            Add(head, gun, solid, true);
             Add(head, eye, glow, false);
             muzzle = new GameObject("Muzzle").transform;
             muzzle.SetParent(head, false);
@@ -102,8 +109,36 @@ namespace RacingGame
             }
         }
 
-        private void OnEnable() => SimulationDriver.Instance.Register(this);
-        private void OnDisable() { var driver = SimulationDriver.Current; if (driver != null) driver.Unregister(this); }
+        private void OnEnable()
+        {
+            if (!all.Contains(this)) all.Add(this);
+            SimulationDriver.Instance.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            all.Remove(this);
+            var driver = SimulationDriver.Current;
+            if (driver != null) driver.Unregister(this);
+        }
+
+        public bool TakeHit(GameObject attacker, float damage)
+        {
+            var participant = attacker != null ? attacker.GetComponent<RaceParticipant>() : null;
+            if (!IsAlive || damage <= 0f || participant == null || race == null ||
+                (race.State != RaceState.Racing && race.State != RaceState.Finishing)) return false;
+            health = Mathf.Max(0f, health - damage);
+            if (health > 0f) return true;
+            participant.TurretPoints += DestroyPoints;
+            if (participant.isPlayer)
+            {
+                var hud = race.GetComponent<HudScreen>();
+                if (hud != null) hud.ShowEvent(Loc.Get("combat.destroyed") + "  +" + DestroyPoints, new Color(1f, 0.45f, 0.2f));
+            }
+            if (EffectPool.Current != null) EffectPool.Current.PlayFlash(head.position, new Color(1f, 0.35f, 0.1f), 0.4f, 2f, 12f, 8f);
+            gameObject.SetActive(false);
+            return true;
+        }
 
         public void SimulationStep(int tick)
         {
@@ -117,7 +152,8 @@ namespace RacingGame
             if (!Valid(target)) { target = Pick(); phase = target != null ? Phase.Aiming : Phase.Idle; phaseTick = tick + SimulationDriver.SecondsToTicks(AimSeconds); }
             if (target == null) return;
 
-            aimPoint = Lead(target);
+            // Last 0.35 s of the laser is a fixed shot line: a quick lane change can dodge it.
+            if (phase == Phase.Aiming && tick < phaseTick - SimulationDriver.SecondsToTicks(0.35f)) aimPoint = Lead(target);
             var want = Quaternion.LookRotation(aimPoint - head.position, Vector3.up);
             head.rotation = Quaternion.RotateTowards(head.rotation, want, TurnDegreesPerSecond * SimulationDriver.FixedStep);
             bool onTarget = Quaternion.Angle(head.rotation, want) < FireCone;
@@ -204,7 +240,7 @@ namespace RacingGame
             laser.enabled = show;
             if (!show) return;
             laser.SetPosition(0, muzzle.position);
-            laser.SetPosition(1, BodyCentre(target));
+            laser.SetPosition(1, aimPoint);
             float width = phase == Phase.Firing ? 0.16f : 0.05f + 0.05f * Mathf.PingPong(Time.time * 8f, 1f);
             laser.startWidth = laser.endWidth = width;
         }

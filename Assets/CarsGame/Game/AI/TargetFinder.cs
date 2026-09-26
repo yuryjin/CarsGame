@@ -134,6 +134,29 @@ namespace RacingGame
             return best;
         }
 
+        /// <summary>Nearest exposed track turret in the firing cone.</summary>
+        public static SpaceTurret FindTurret(Vector3 origin, Vector3 forward, float coneDegrees, float minRange, float maxRange)
+        {
+            float cosCone = Mathf.Cos(coneDegrees * Mathf.Deg2Rad);
+            SpaceTurret best = null;
+            float bestScore = float.MaxValue;
+            foreach (var turret in SpaceTurret.All)
+            {
+                if (turret == null || !turret.IsAlive) continue;
+                Vector3 aim = turret.AimPoint;
+                Vector3 to = aim - origin;
+                float distance = to.magnitude;
+                if (distance < minRange || distance > maxRange) continue;
+                float dot = Vector3.Dot(to / distance, forward);
+                if (dot < cosCone || Physics.Linecast(origin, aim, ObstacleMask, QueryTriggerInteraction.Ignore)) continue;
+                float score = -dot;
+                if (score >= bestScore) continue;
+                bestScore = score;
+                best = turret;
+            }
+            return best;
+        }
+
         /// <summary>
         /// Worth setting off this charge now: it is armed, a live rival is well inside the blast
         /// (<paramref name="reach"/> of its radius) and the owner is clear of it. Shared by the AI and touch auto-fire.

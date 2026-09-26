@@ -205,6 +205,7 @@ namespace RacingGame
             race.StartRace();
             if (race.State == RaceState.Idle) { EnterMenu(); return; }
             if (abyssTrack != null && spaceTrack == null && race.Player != null) abyssTrack.Follow(race.Player.Progress);
+            if (starRing != null) starRing.Follow(race);
             if (pickups != null && mission == null && (ev == null || ev.mode != EventMode.Arena)) pickups.Spawn(ev != null ? ev.pickupCount : 9);
             LayMineField(ev);
             if (hud != null) hud.SetVisible(true);
@@ -476,6 +477,7 @@ namespace RacingGame
             int[] killsPerVictim = me != null && me.Kills > 0 ? KillsPerVictim(race.Player) : null;
             LastReward = me != null ? Economy.RaceReward(me.Position, me.Finished, me.Laps, race.laps, killsPerVictim, mult) : 0;
             if (mission != null) LastReward = mission.Reward(me, mult);
+            if (me != null && starRing != null) LastReward += Mathf.RoundToInt(me.TurretPoints * mult);
             // The floor is for the first FINISHED race (a DNF before it must not use it up); a finish always leaves a timed best.
             bool firstFinish = save != null && !save.Data.progress.bests.Exists(b => b != null && b.bestTimeMs > 0);
             if (me != null && save != null) LastReward = Economy.WithFirstRaceFloor(LastReward, me.Finished, firstFinish);

@@ -24,7 +24,7 @@ MonoBehaviour:
   wastelandTrack: 1
   ramPush: 2.6
   night: 0
-  sky: {fileID: 11400000, guid: ed31c2cf4ce213d7b9c521d9fd395721, type: 2}
+  sky: {fileID: 11400000, guid: 1a609ed3420148fa9c93755b9c821a84, type: 2}
   damageMultiplier: 1
   pickupCount: 5
   mineFieldCount: 0

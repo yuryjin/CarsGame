@@ -207,6 +207,8 @@ daily.ghosts,hint under the daily card,48,Race against the ghosts of other playe
 hud.drift_boost,{n} = stage 1-3,20,DRIFT BOOST {n},ДРИФТ-БУСТ {n},DRİFT BOOST {n},漂移加速 {n},DRIFT-BOOST {n},TURBO DERRAPE {n},BOOST DÉRAPAGE {n},TURBO DRIFT {n},ДРИФТ-БУСТ {n}
 hud.aimed,"warning, a rival is aiming at the player",16,IN SIGHTS!,НА ПРИЦЕЛЕ!,NİŞANDASIN!,被瞄准！,IM VISIER!,¡EN LA MIRA!,DANS LE VISEUR !,NA MIRA!,НА ПРИЦІЛІ!
 hud.eliminated,"one-life race, player out",16,ELIMINATED,ВЫБЫЛ,ELENDİN,已淘汰,AUSGESCHIEDEN,ELIMINADO,ÉLIMINÉ,ELIMINADO,ВИБУВ
+hud.wasteland.rails_off,"wasteland map: the rails retract after the leader's lap 1",24,RAILS ARE DOWN!,БОРТИКИ СНЯТЫ!,BARİYERLER İNDİ!,护栏已撤除！,LEITPLANKEN WEG!,¡SIN VALLAS!,PLUS DE RAILS !,SEM GUARDAS!,БОРТИКИ ЗНЯТО!
+hud.wasteland.narrowing,"wasteland map: the red edges fall off after the leader's lap 2",24,THE ROAD IS COLLAPSING!,ТРАССА СУЖАЕТСЯ!,YOL ÇÖKÜYOR!,赛道正在坍塌！,DIE STRASSE BRICHT WEG!,¡LA PISTA SE DERRUMBA!,LA ROUTE S'EFFONDRE !,A PISTA ESTÁ DESABANDO!,ТРАСА ЗВУЖУЄТЬСЯ!
 continue.title,"one-life race, after a wreck",32,Continue the race?,Продолжить гонку?,Yarışa devam?,继续比赛？,Rennen fortsetzen?,¿Seguir en carrera?,Continuer la course ?,Continuar a corrida?,Продовжити гонку?
 continue.watch,rewarded ad button,22,Continue (ad),Продолжить (реклама),Devam (reklam),继续（广告）,Weiter (Werbung),Seguir (anuncio),Continuer (pub),Continuar (anúncio),Продовжити (реклама)
 continue.give_up,button,16,Give up,Сдаться,Pes et,放弃,Aufgeben,Rendirse,Abandonner,Desistir,Здатися

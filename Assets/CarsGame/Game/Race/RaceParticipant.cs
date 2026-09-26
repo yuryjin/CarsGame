@@ -31,6 +31,7 @@ namespace RacingGame
         /// <summary>Kills this race, per victim (the payout shrinks for repeat kills of the same rival).</summary>
         public KillTally KillTally { get; } = new KillTally();
         public int Kills => KillTally.Total;
+        public int TurretPoints { get; internal set; }
         public int Deaths { get; set; }
         public int EliminatedAtTick { get; private set; } = int.MaxValue;
         public ArenaLayout Arena { get; set; }

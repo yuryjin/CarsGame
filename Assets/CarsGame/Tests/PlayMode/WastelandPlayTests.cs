@@ -10,7 +10,7 @@ namespace RacingGame.Tests
     public sealed class WastelandPlayTests
     {
         [UnityTest, Timeout(180000)]
-        public IEnumerator BridgeBoostWallsAndRamWorkInOwnEvent()
+        public IEnumerator BridgeBoostWallsRamAndCollapseWorkInOwnEvent()
         {
             yield return SceneManager.LoadSceneAsync("SampleScene");
             float deadline = Time.realtimeSinceStartup + 60f;
@@ -74,6 +74,17 @@ namespace RacingGame.Tests
             bool shoved = false;
             for (int i = 0; i < 40 && !shoved; i++) { yield return new WaitForFixedUpdate(); shoved = victim.IsStaggered; }
             Assert.IsTrue(shoved, "ramming pushes a rival harder");
+
+            // Stage 2 (the leader finished lap 2): the edges break off after the warning and a car left there falls.
+            map.SetStage(2);
+            Assert.AreEqual(WastelandLayout.NarrowHalfWidth, path.halfWidth);
+            float collapse = Time.time + WastelandTrack.CollapseDelay + WastelandTrack.CollapseSpread + 0.3f;
+            while (Time.time < collapse) yield return null;
+            Assert.IsTrue(map.EdgesGone);
+            input.Set(0f, 0f);
+            Place(car, layout.StartLine + 25f, 8.5f, 0.5f, Vector3.up, 2f);
+            for (int i = 0; i < 40; i++) yield return new WaitForFixedUpdate();
+            Assert.Less(car.transform.position.y, -1f, "a car on a broken edge falls");
 
             flow.EnterMenu();
             Assert.IsNull(Object.FindAnyObjectByType<WastelandTrack>());

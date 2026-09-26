@@ -249,6 +249,16 @@ namespace RacingGame
                 Deactivate();
                 return;
             }
+            var turret = health == null ? collision.collider.GetComponentInParent<SpaceTurret>() : null;
+            if (turret != null)
+            {
+                consumed = true;
+                Vector3 point = collision.contactCount > 0 ? collision.GetContact(0).point : transform.position;
+                if (turret.TakeHit(owner, damage) && director != null) director.CountHit(owner, turret.gameObject);
+                if (EffectPool.Instance != null) EffectPool.Instance.PlayShellImpact(point);
+                Deactivate();
+                return;
+            }
             if (health == null && collision.contactCount > 0 && TryRicochet(collision.GetContact(0).normal)) return;
             consumed = true;
             // Same side of a co-op mission: no friendly fire (untagged cars and owner-less shells stay hostile to all).

@@ -60,6 +60,7 @@ namespace RacingGame
         private float turretYaw, barrelPitch;
         private CarController turretTarget;
         private MissionUnit turretUnit;
+        private SpaceTurret turretHazard;
         private bool aimCommitted, aimAllowsHoming;
         private Vector3 aimCommitPoint;
         private float aimCommitYawLimit;
@@ -260,7 +261,7 @@ namespace RacingGame
             }
             else
             {
-                if (!enabled) { turretTarget = null; turretUnit = null; }
+                if (!enabled) { turretTarget = null; turretUnit = null; turretHazard = null; }
                 else if ((tick + (car != null ? car.CarId : 0)) % 5 == 0)   // re-acquire 10×/s, staggered per car
                 {
                     // From the muzzle, not the roof pivot: the pivot sits inside the hull, so a linecast from it
@@ -268,6 +269,8 @@ namespace RacingGame
                     Vector3 origin = muzzle != null ? muzzle.position : turret.position;
                     turretTarget = TargetFinder.Find(car, origin, transform.forward, turretYawLimit, turretMinRange, turretMaxRange, shellSpeed, closestToAxis: true);
                     turretUnit = turretTarget == null ? TargetFinder.FindUnit(car, origin, transform.forward, turretYawLimit, turretMinRange, turretMaxRange, closestToAxis: true) : null;
+                    turretHazard = turretTarget == null && turretUnit == null
+                        ? TargetFinder.FindTurret(origin, transform.forward, turretYawLimit, turretMinRange, turretMaxRange) : null;
                 }
                 if (turretTarget != null && turretTarget.isActiveAndEnabled)
                 {
@@ -277,6 +280,11 @@ namespace RacingGame
                 else if (turretUnit != null && turretUnit.Targetable)
                 {
                     aim = SolveAimPoint(turretUnit);
+                    haveAim = true;
+                }
+                else if (turretHazard != null && turretHazard.IsAlive)
+                {
+                    aim = turretHazard.AimPoint;
                     haveAim = true;
                 }
             }
