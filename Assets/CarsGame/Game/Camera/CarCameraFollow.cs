@@ -43,6 +43,7 @@ namespace RacingGame
         private CarController car;
         private Transform carFor;
         private float roll, turn;
+        private Vector3 up = Vector3.up;
 
         public float CurrentRoll => roll;
 
@@ -60,22 +61,24 @@ namespace RacingGame
             float dt = Time.deltaTime;
             if (carFor != target) { carFor = target; car = target.GetComponent<CarController>(); }
 
+            // The car's own "up": world up, or the wall/ceiling normal while it wall rides; eased so the view rolls over smoothly.
+            up = Vector3.Slerp(up, car != null ? car.GravityUp : Vector3.up, Smooth(5f, dt)).normalized;
             Vector3 velocity = targetRigidbody != null ? targetRigidbody.linearVelocity : Vector3.zero;
-            Vector3 flatVel = new Vector3(velocity.x, 0f, velocity.z);
+            Vector3 flatVel = Vector3.ProjectOnPlane(velocity, up);
             float speed = flatVel.magnitude;
             float top = car != null ? Mathf.Max(1f, car.maxSpeed / 3.6f) : 33f;
             float speedNorm = Mathf.Clamp01(speed / top);
 
             // Heading used for framing: the bonnet, pulled towards the direction of travel while sliding.
-            Vector3 fwd = target.forward; fwd.y = 0f;
-            if (fwd.sqrMagnitude < 1e-4f) fwd = Vector3.forward;
+            Vector3 fwd = Vector3.ProjectOnPlane(target.forward, up);
+            if (fwd.sqrMagnitude < 1e-4f) fwd = Vector3.ProjectOnPlane(Vector3.forward, up);
             fwd.Normalize();
             if (speed > 8f && Vector3.Dot(flatVel, fwd) > 0f) fwd = Vector3.Slerp(fwd, flatVel / speed, followVelocity).normalized;
-            var frame = Quaternion.LookRotation(fwd, Vector3.up);
+            var frame = Quaternion.LookRotation(fwd, up);
             Vector3 right = frame * Vector3.right;
 
             // Yaw rate → turn amount (−1..1) and cornering load for the lean.
-            float yawRate = targetRigidbody != null ? targetRigidbody.angularVelocity.y : 0f;              // rad/s, + = right
+            float yawRate = targetRigidbody != null ? Vector3.Dot(targetRigidbody.angularVelocity, up) : 0f;   // rad/s, + = right
             float targetTurn = Mathf.Clamp(yawRate * Mathf.Rad2Deg / 90f, -1f, 1f);
             turn = Mathf.Lerp(turn, targetTurn, Smooth(4f, dt));
             float targetRoll = Mathf.Clamp(-speed * yawRate * rollPerAccel, -maxRoll, maxRoll);          // v·ω = lateral accel
@@ -87,8 +90,8 @@ namespace RacingGame
             Vector3 desiredPosition = target.position + frame * localOffset - right * (turn * shiftAgainstTurn);
             transform.position = Vector3.Lerp(transform.position, desiredPosition, Smooth(positionSmoothSpeed, dt));
 
-            Vector3 lookTarget = target.position + Vector3.up * lookAtHeightOffset + fwd * 1.5f + right * (turn * lookIntoTurn);
-            Quaternion desiredRotation = Quaternion.LookRotation(lookTarget - transform.position, Vector3.up) * Quaternion.AngleAxis(roll, Vector3.forward);
+            Vector3 lookTarget = target.position + up * lookAtHeightOffset + fwd * 1.5f + right * (turn * lookIntoTurn);
+            Quaternion desiredRotation = Quaternion.LookRotation(lookTarget - transform.position, up) * Quaternion.AngleAxis(roll, Vector3.forward);
             transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, Smooth(rotationSmoothSpeed, dt));
 
             if (cam == null) return;

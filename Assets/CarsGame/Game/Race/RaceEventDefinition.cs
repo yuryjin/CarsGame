@@ -24,6 +24,10 @@ namespace RacingGame
         public bool abyssTrack;
         [Tooltip("Suspended space circuit with circular boost gates.")]
         public bool spaceTrack;
+        [Tooltip("Star Ring: its own space circuit (bridge jump, boost pad, drivable tunnel walls, turrets).")]
+        public bool starRingTrack;
+        [Tooltip("Ramming shoves the other car this much harder (1 = plain physics).")]
+        [Range(1f, 4f)] public float ramPush = 1f;
         [Tooltip("Legacy: night look when no sky preset is assigned.")] public bool night;
         [Tooltip("Time-of-day look for this event (null = day / legacy night flag).")] public RacingGame.World.SkyPreset sky;
         [Range(0.5f, 3f)] public float damageMultiplier = 1f;

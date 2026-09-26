@@ -50,6 +50,7 @@ namespace RacingGame
         private TrackPath track;
         private AbyssTrack abyssTrack;
         private SpaceTrack spaceTrack;
+        private StarRingTrack starRing;
         private TrackFork trackFork;
         private HotBombRace hotBomb;
         private PickupSpawner pickups;
@@ -130,6 +131,8 @@ namespace RacingGame
             if (pickups != null) pickups.Clear();
             if (trackFork != null) { trackFork.Restore(); Destroy(trackFork.gameObject); trackFork = null; }
             if (spaceTrack != null) { spaceTrack.Restore(); Destroy(spaceTrack.gameObject); spaceTrack = null; }
+            if (starRing != null) { starRing.Restore(); Destroy(starRing.gameObject); starRing = null; }
+            CarController.RamPushScale = 1f;
             if (abyssTrack != null) { abyssTrack.Restore(); Destroy(abyssTrack.gameObject); abyssTrack = null; }
             var director = RaceDirector.Current; if (director != null) director.ResetRace();   // no shell survives into the next race
             if (sky != null) sky.ApplyDefault();
@@ -175,14 +178,16 @@ namespace RacingGame
             race.laps = ev != null ? ev.laps : 3;
             race.aiCountOverride = ev != null ? ev.aiCountOverride : -1;
             if (track != null) { track.reversed = ev != null && ev.reversed; track.Build(); }
-            if (ev != null && (ev.abyssTrack || ev.spaceTrack) && track != null)
+            if (ev != null && ev.starRingTrack && track != null) starRing = StarRingTrack.Create(track, race);
+            else if (ev != null && (ev.abyssTrack || ev.spaceTrack) && track != null)
             {
                 abyssTrack = AbyssTrack.Create(track);
                 if (ev.spaceTrack) spaceTrack = SpaceTrack.Create(track, abyssTrack);
             }
-            if (track != null && abyssTrack == null && (ev == null || ev.mode != EventMode.Arena))
+            if (track != null && abyssTrack == null && starRing == null && (ev == null || ev.mode != EventMode.Arena))
                 trackFork = TrackFork.Create(track);
             CarHealth.GlobalDamageMultiplier = ev != null ? ev.damageMultiplier : 1f;
+            CarController.RamPushScale = ev != null ? ev.ramPush : 1f;
             // Look before the field spawns so the first frame of the countdown is already correct.
             if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
 

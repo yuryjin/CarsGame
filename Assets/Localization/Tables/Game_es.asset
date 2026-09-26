@@ -1312,11 +1312,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697473
-    m_Localized: "\u00bfAtascado? Pulsa \u21ba"
+    m_Localized: "\xBFAtascado? Pulsa \u21BA"
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697474
-    m_Localized: "Gira el tel\u00e9fono"
+    m_Localized: "Gira el tel\xE9fono"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8403702163779584
+    m_Localized: Carrera del Yermo
     m_Metadata:
       m_Items: []
   references:

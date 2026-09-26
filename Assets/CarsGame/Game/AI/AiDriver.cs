@@ -283,7 +283,7 @@ namespace RacingGame
             if (stuckTime > 6f) { reset = true; stuckTime = 0f; reversing = false; resetCount++; }
 
             // --- Overturned or fallen off the world.
-            bool overturned = transform.position.y < -5f || Vector3.Dot(transform.up, Vector3.up) < 0.2f;
+            bool overturned = transform.position.y < -5f || (!car.WallRiding && Vector3.Dot(transform.up, Vector3.up) < 0.2f);
             overturnedTime = overturned ? overturnedTime + dt : 0f;
             if (overturnedTime > 2f) { reset = true; overturnedTime = 0f; resetCount++; }
 
@@ -356,6 +356,7 @@ namespace RacingGame
                 if (clearTime > 3f) targetLane = Mathf.Clamp(homeLane, -limit, limit);
             }
 
+            FollowLures(limit);
             AvoidMines(Mathf.Max(limit, halfWidth - 1.2f));
 
             bombSpeedLimit = float.PositiveInfinity;
@@ -426,6 +427,19 @@ namespace RacingGame
             }
             targetLane = best;
             clearTime = 0f;
+        }
+
+        // Head for a road feature ahead (a boost pad in the middle of the road): rivals converge and fight for it.
+        // A pass in progress keeps its lane, so the lure never steers into the car being overtaken.
+        private void FollowLures(float limit)
+        {
+            var lures = path.Lures;
+            if (lures == null || passDirection != 0 || progress == null) return;
+            foreach (var lure in lures)
+            {
+                float ahead = path.SignedDelta(progress.Distance, lure.distance);
+                if (ahead > -2f && ahead < lure.reach) { targetLane = Mathf.Clamp(lure.lane, -limit, limit); clearTime = 0f; return; }
+            }
         }
 
         private float MinePenalty(float lane)

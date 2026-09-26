@@ -1308,11 +1308,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697473
-    m_Localized: "Preso? Toque em \u21ba"
+    m_Localized: "Preso? Toque em \u21BA"
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697474
-    m_Localized: "Gire o telem\u00f3vel"
+    m_Localized: "Gire o telem\xF3vel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8403702163779584
+    m_Localized: Corrida no Ermo
     m_Metadata:
       m_Items: []
   references:

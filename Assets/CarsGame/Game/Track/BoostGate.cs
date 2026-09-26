@@ -8,6 +8,8 @@ namespace RacingGame
     {
         public const float Radius = 6f;
         public const float BoostSeconds = 2.5f;
+        [Tooltip("Aperture around the local Z axis the car's centre must pass through (a flat pad uses a small one).")]
+        public float radius = Radius;
         private readonly Dictionary<int, int> nextBoostTick = new Dictionary<int, int>();
 
         private void OnTriggerEnter(Collider other)
@@ -17,7 +19,7 @@ namespace RacingGame
             var health = car.GetComponent<CarHealth>();
             if (health != null && health.IsDead) return;
             Vector3 local = transform.InverseTransformPoint(car.Body.worldCenterOfMass);
-            if (local.x * local.x + local.y * local.y > Radius * Radius) return;
+            if (local.x * local.x + local.y * local.y > radius * radius) return;
             float speed = Vector3.Dot(car.Body.linearVelocity, transform.forward);
             if (speed <= 1f) return; // Only a forward passage activates the gate.
             int tick = SimulationDriver.Instance.Tick;

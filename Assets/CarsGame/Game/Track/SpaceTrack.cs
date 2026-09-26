@@ -62,17 +62,22 @@ namespace RacingGame
                     lights.AddQuad(p - path.Right(a) * 0.08f, q - path.Right(b) * 0.08f,
                         q + path.Right(b) * 0.08f, p + path.Right(a) * 0.08f, new Color32(45, 175, 255, 255));
                 }
-            // Stars below and around the road make the void readable from the chase camera too.
+            AddStars(lights, Vector3.zero);
+            AddMeshes(lights);
+        }
+
+        /// <summary>Stars below and around the road make the void readable from the chase camera too.</summary>
+        public static void AddStars(MeshChunkWriter writer, Vector3 centre, int count = 240, float radius = 400f)
+        {
             var random = new System.Random(1701);
-            for (int i = 0; i < 240; i++)
+            for (int i = 0; i < count; i++)
             {
                 float y = (float)random.NextDouble() * 2f - 1f;
                 float angle = (float)random.NextDouble() * Mathf.PI * 2f;
                 float horizontal = Mathf.Sqrt(1f - y * y);
-                var position = new Vector3(Mathf.Cos(angle) * horizontal, y, Mathf.Sin(angle) * horizontal) * 400f;
-                LowPoly.Box(lights, Matrix4x4.identity, position, Vector3.one * 0.7f, new Color32(170, 195, 255, 255));
+                var position = centre + new Vector3(Mathf.Cos(angle) * horizontal, y, Mathf.Sin(angle) * horizontal) * radius;
+                LowPoly.Box(writer, Matrix4x4.identity, position, Vector3.one * (radius / 570f), new Color32(170, 195, 255, 255));
             }
-            AddMeshes(lights);
         }
 
         private void AddMeshes(MeshChunkWriter writer)

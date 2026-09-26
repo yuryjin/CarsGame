@@ -106,7 +106,9 @@ namespace RacingGame
             // Ignore landings / driving over the road step: only mostly-horizontal impacts hurt.
             Vector3 avgNormal = Vector3.zero;
             for (int i = 0; i < collision.contactCount; i++) avgNormal += collision.GetContact(i).normal;
-            bool vertical = collision.contactCount > 0 && Vector3.Dot(avgNormal.normalized, Vector3.up) > 0.7f;
+            // "Vertical" is along the car's own gravity, so touching down on a tunnel wall while wall riding is a landing too.
+            Vector3 up = controller != null ? controller.GravityUp : Vector3.up;
+            bool vertical = collision.contactCount > 0 && Vector3.Dot(avgNormal.normalized, up) > 0.7f;
 
             // impulse / mass = change of velocity caused by this impact
             float impactSpeed = collision.impulse.magnitude / rb.mass;

@@ -22,20 +22,33 @@ namespace RacingGame
             var map = new GameObject("AbyssTrack").AddComponent<AbyssTrack>();
             map.path = track;
             map.originalWidth = track.halfWidth;
-            // Reuse the baked environment's vertex-colour material, including its build-time shader reference.
-            var terrain = GameObject.Find("Environment/Terrain");
-            var renderer = terrain != null ? terrain.GetComponentInChildren<Renderer>() : null;
-            if (renderer == null) renderer = GameObject.Find("RaceTrack/Track_Road")?.GetComponent<Renderer>();
-            var material = renderer != null ? renderer.sharedMaterial : null;
-            foreach (string name in new[] { "Ground_Terrain", "Environment/Colliders", "Environment/Props", "Environment/Terrain",
-                "RaceTrack/Track_Road", "RaceTrack/Track_LeftKerb", "RaceTrack/Track_RightKerb", "RaceTrack/Barriers", "RaceTrack/Track_Decor", "RaceTrack/StartFinish_Gantry" })
-            {
-                var go = GameObject.Find(name);
-                if (go != null) { map.hidden.Add(go); go.SetActive(false); }
-            }
+            var material = SceneryMaterial();
+            HideScenery(map.hidden, Scenery);
             map.Build(material);
             map.SetLap(1);
             return map;
+        }
+
+        /// <summary>The ground circuit's road, terrain and decor; a track built over the void hides them.</summary>
+        public static readonly string[] Scenery = { "Ground_Terrain", "Environment/Colliders", "Environment/Props", "Environment/Terrain",
+            "RaceTrack/Track_Road", "RaceTrack/Track_LeftKerb", "RaceTrack/Track_RightKerb", "RaceTrack/Barriers", "RaceTrack/Track_Decor", "RaceTrack/StartFinish_Gantry" };
+
+        /// <summary>The baked environment's vertex-colour material, including its build-time shader reference. Call before hiding it.</summary>
+        public static Material SceneryMaterial()
+        {
+            var terrain = GameObject.Find("Environment/Terrain");
+            var renderer = terrain != null ? terrain.GetComponentInChildren<Renderer>() : null;
+            if (renderer == null) renderer = GameObject.Find("RaceTrack/Track_Road")?.GetComponent<Renderer>();
+            return renderer != null ? renderer.sharedMaterial : null;
+        }
+
+        public static void HideScenery(List<GameObject> hidden, IEnumerable<string> paths)
+        {
+            foreach (string name in paths)
+            {
+                var go = GameObject.Find(name);
+                if (go != null) { hidden.Add(go); go.SetActive(false); }
+            }
         }
 
         public void Follow(RaceProgress player)

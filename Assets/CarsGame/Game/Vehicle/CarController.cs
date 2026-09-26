@@ -52,6 +52,14 @@ namespace RacingGame
         [Tooltip("Throttle held during a drift even when auto-throttle lifts for the brake.")]
         public float driftThrottle = 0.75f;
 
+        [Header("Wall ride (GravitySurface)")]
+        [Tooltip("Speed (km/h) at which a car on a GravitySurface starts sticking to it.")]
+        public float wallRideAttachKmh = 55f;
+        [Tooltip("Below this speed (km/h) the car lets go and ordinary gravity takes over again.")]
+        public float wallRideDetachKmh = 38f;
+        [Tooltip("Roll/pitch acceleration (rad/s² per unit of misalignment) that keeps the wheels on the surface.")]
+        public float wallRideAlign = 20f;
+
         [Header("Audio (Optional)")]
         public AudioSource engineAudio;
 
@@ -95,6 +103,16 @@ namespace RacingGame
         public float DriftCharge01 => drift.Drifting ? Mathf.Clamp01(drift.Charge / drift.StageCharge[drift.StageCharge.Length - 1]) : 0f;
         /// <summary>Raised on the tick a drift ends in a boost: stage (1–3) and boost seconds.</summary>
         public event System.Action<int, float> DriftBoosted;
+
+        /// <summary>"Up" for this car: the surface normal while wall riding, else world up. Steering and the camera use it.</summary>
+        public Vector3 GravityUp { get; private set; } = Vector3.up;
+        public bool WallRiding { get; private set; }
+
+        /// <summary>Event rule: a car driven into another shoves it this much harder (1 = plain physics). Reset by the flow.</summary>
+        public static float RamPushScale = 1f;
+        private int shoveReadyTick, staggerUntilTick;
+        /// <summary>Lateral grip left while staggered by a ram.</summary>
+        private const float StaggerGrip = 0.25f;
 
         public bool IsBoosting { get; private set; }
         /// <summary>Nitro: more top speed and torque for a few seconds.</summary>
@@ -196,6 +214,7 @@ namespace RacingGame
             var driver = SimulationDriver.Current; if (driver != null) driver.Unregister(this);
             moveInput = 0f; steerInput = 0f; isBraking = false;
             draftCharge = 0f;
+            Unstick();   // a wreck on the ceiling must fall
             IsBoosting = false;
             if (cannon != null) cannon.SetWantsFire(false);
             if (weapons != null) weapons.SetWantsSecondary(false);
@@ -303,6 +322,7 @@ namespace RacingGame
 
             if (command.ResetEdge || transform.position.y < -10f) ResetCar();
 
+            StepSurfaceGravity();
             GroundQuery();
             CalculateSpeed();
             UpdateDraft();
@@ -362,10 +382,65 @@ namespace RacingGame
         // off-track drag and later respawn logic. Never hits cars or shells.
         private void GroundQuery()
         {
-            isGrounded = Physics.Raycast(transform.position + Vector3.up * 0.3f, -Vector3.up, out RaycastHit hit, 0.9f, groundMask, QueryTriggerInteraction.Ignore);
+            Vector3 up = GravityUp;
+            isGrounded = Physics.Raycast(transform.position + up * 0.3f, -up, out RaycastHit hit, 0.9f, groundMask, QueryTriggerInteraction.Ignore);
             if (!isGrounded) { groundSurface = GroundSurface.None; return; }
             int layer = hit.collider.gameObject.layer;
             groundSurface = layer == trackLayer ? GroundSurface.Track : (layer == groundLayer ? GroundSurface.Ground : GroundSurface.Other);
+        }
+
+        // Wall ride: on a GravitySurface and fast enough, gravity points into the surface under the wheels.
+        // Hysteresis between attach and detach speed; leaving the surface or slowing down drops the car.
+        private void StepSurfaceGravity()
+        {
+            if (GravitySurface.ActiveCount <= 0) { if (WallRiding) Unstick(); return; }
+            float kmh = rb.linearVelocity.magnitude * 3.6f;
+            bool onSurface = Physics.Raycast(transform.position + transform.up * 0.3f, -transform.up, out RaycastHit hit, 1.4f, groundMask, QueryTriggerInteraction.Ignore)
+                && hit.collider.TryGetComponent<GravitySurface>(out _);
+            if (!onSurface || kmh < (WallRiding ? wallRideDetachKmh : wallRideAttachKmh)) { if (WallRiding) Unstick(); return; }
+            // The tube is faceted: blend the face normals so crossing an edge does not jerk the car. On attaching,
+            // take the normal as is (world up and a ceiling normal are opposite, where a slerp has no defined path).
+            GravityUp = WallRiding ? Vector3.Slerp(GravityUp, hit.normal, 0.5f).normalized : hit.normal;
+            WallRiding = true;
+            rb.useGravity = false;
+            rb.AddForce(-GravityUp * Physics.gravity.magnitude, ForceMode.Acceleration);
+            rb.AddTorque(Vector3.Cross(transform.up, GravityUp) * wallRideAlign, ForceMode.Acceleration);
+        }
+
+        private void Unstick()
+        {
+            WallRiding = false;
+            GravityUp = Vector3.up;
+            if (rb != null) rb.useGravity = true;
+        }
+
+        /// <summary>Knock the car: a velocity change plus a moment of lost lateral grip so the shove actually carries.</summary>
+        public void Shove(Vector3 deltaV, float staggerSeconds)
+        {
+            if (rb == null || rb.isKinematic) return;
+            rb.AddForce(deltaV, ForceMode.VelocityChange);
+            staggerUntilTick = Mathf.Max(staggerUntilTick, SimulationDriver.Instance.Tick + SimulationDriver.SecondsToTicks(staggerSeconds));
+        }
+
+        public bool IsStaggered => SimulationDriver.Current != null && SimulationDriver.Current.Tick < staggerUntilTick;
+
+        // Stronger ramming (event rule): of the two cars in a contact, the one driving into the other shoves it.
+        // (v_this + v_other)·n > 0 holds for exactly one side of the pair, so a hit never shoves both ways.
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (RamPushScale <= 1f || rb == null || !inputEnabled || collision.rigidbody == null) return;
+            if (!collision.rigidbody.TryGetComponent(out CarController other) || other == this || other.Body.isKinematic) return;
+            int tick = SimulationDriver.Instance.Tick;
+            if (tick < shoveReadyTick) return;
+            Vector3 n = Vector3.ProjectOnPlane(other.Body.worldCenterOfMass - rb.worldCenterOfMass, GravityUp);
+            if (n.sqrMagnitude < 1e-4f) return;
+            n.Normalize();
+            Vector3 mine = rb.linearVelocity, theirs = other.Body.linearVelocity;
+            float closing = Vector3.Dot(mine - theirs, n);
+            if (closing < 1.5f || Vector3.Dot(mine + theirs, n) <= 0f) return;
+            shoveReadyTick = tick + SimulationDriver.SecondsToTicks(0.3f);
+            float kick = Mathf.Min(closing * (RamPushScale - 1f) * 0.6f * Mathf.Clamp(rb.mass / other.Body.mass, 0.5f, 2f), 9f);
+            other.Shove(n * kick + GravityUp * (kick * 0.15f), 0.45f);
         }
 
         private void CalculateSpeed()
@@ -503,13 +578,14 @@ namespace RacingGame
                 float direction = Vector3.Dot(rb.linearVelocity, transform.forward) >= 0 ? 1f : -1f;
                 float turnTorque = currentSteerAngle * direction * (speedMagnitude / 8f);
                 turnTorque = Mathf.Clamp(turnTorque, -effectiveMaxSteer * 2.5f, effectiveMaxSteer * 2.5f);
-                rb.AddTorque(Vector3.up * (turnTorque * 120f * SteeringGain(speedMagnitude) * steerTorqueScale), ForceMode.Force);
+                Vector3 up = GravityUp;   // world up except while wall riding
+                rb.AddTorque(up * (turnTorque * 120f * SteeringGain(speedMagnitude) * steerTorqueScale), ForceMode.Force);
                 if (drift.Drifting)
                 {
                     // Hold a slide angle of ~30°: push the tail out below it, stop pushing beyond it.
-                    float slip = Vector3.SignedAngle(transform.forward, new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z), Vector3.up) * -drift.Direction;
+                    float slip = Vector3.SignedAngle(transform.forward, Vector3.ProjectOnPlane(rb.linearVelocity, up), up) * -drift.Direction;
                     float want = Mathf.Clamp01((32f - slip) / 20f);
-                    rb.AddTorque(Vector3.up * (drift.Direction * driftYawTorque * speedMagnitude * want), ForceMode.Force);
+                    rb.AddTorque(up * (drift.Direction * driftYawTorque * speedMagnitude * want), ForceMode.Force);
                 }
             }
         }
@@ -522,6 +598,7 @@ namespace RacingGame
             Vector3 sideVelocity = Vector3.Dot(rb.linearVelocity, transform.right) * transform.right;
             float statusGripMul = status != null ? status.GripMultiplier : 1f;
             float currentGrip = (drift.Drifting ? grip * driftGrip : isBraking ? grip * 0.4f : grip) * statusGripMul;
+            if (SimulationDriver.Instance.Tick < staggerUntilTick) currentGrip *= StaggerGrip;
             Vector3 lateralFrictionForce = -sideVelocity * (rb.mass * 8f * currentGrip);
             rb.AddForce(lateralFrictionForce * Time.fixedDeltaTime, ForceMode.Impulse);
         }
@@ -582,6 +659,8 @@ namespace RacingGame
             currentSteerAngle = 0f;
             drift.Cancel();
             draftCharge = 0f;
+            staggerUntilTick = 0;
+            Unstick();
             transform.SetPositionAndRotation(position, rotation);
             rb.position = position;
             rb.rotation = rotation;

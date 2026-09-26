@@ -120,6 +120,7 @@ namespace RacingGame
             if (path == null || Progress == null) return false;
 
             float d = Progress.Distance;
+            if (path.RespawnGuard != null) d = path.RespawnGuard(d);   // e.g. never over a bridge gap
             for (int attempt = 0; attempt < 5; attempt++)
             {
                 float candidate = path.Wrap(d - respawnSetback * (attempt + 1));

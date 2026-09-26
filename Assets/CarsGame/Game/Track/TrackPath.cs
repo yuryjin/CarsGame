@@ -25,6 +25,16 @@ namespace RacingGame
         private static TrackPath instance;
         public TrackFork Fork { get; internal set; }
 
+        /// <summary>A lane the AI heads for when a road feature (a boost pad) is within <c>reach</c> metres ahead.</summary>
+        public struct LaneLure { public float distance, lane, reach; }
+        /// <summary>Lures of the current layout (null = none). Set by a generated track, cleared with it.</summary>
+        public LaneLure[] Lures;
+        /// <summary>Maps the distance a car left the road at to a safe respawn distance (null = unchanged).</summary>
+        public System.Func<float, float> RespawnGuard;
+
+        private Vector3[] layout;
+        private float authoredHalfWidth, authoredStartLine;
+
         public static TrackPath Instance
         {
             get
@@ -49,11 +59,38 @@ namespace RacingGame
 
         private void OnDestroy() { if (instance == this) instance = null; }
 
+        /// <summary>Drive a generated loop instead of the scene's markers until <see cref="ClearLayout"/>.</summary>
+        public void UseLayout(Vector3[] points, float width, float startLine)
+        {
+            if (layout == null) { authoredHalfWidth = halfWidth; authoredStartLine = startLineDistance; }
+            layout = points;
+            halfWidth = width;
+            startLineDistance = startLine;
+            Build();
+        }
+
+        public void ClearLayout()
+        {
+            Lures = null;
+            RespawnGuard = null;
+            if (layout == null) return;
+            layout = null;
+            halfWidth = authoredHalfWidth;
+            startLineDistance = authoredStartLine;
+            Build();
+        }
+
+        public bool HasLayout => layout != null;
+
         public void Build()
         {
-            int n = transform.childCount;
-            var pts = new Vector3[n];
-            for (int i = 0; i < n; i++) pts[i] = transform.GetChild(i).position;
+            Vector3[] pts = layout;
+            if (pts == null)
+            {
+                int n = transform.childCount;
+                pts = new Vector3[n];
+                for (int i = 0; i < n; i++) pts[i] = transform.GetChild(i).position;
+            }
             var s = new TrackSpline(pts);
             spline = reversed ? s.Reversed() : s;
             profile = new TrackProfile(spline, profileSettings);

@@ -1303,6 +1303,10 @@ MonoBehaviour:
     m_Key: ui.rotate_phone
     m_Metadata:
       m_Items: []
+  - m_Id: 8403702163779584
+    m_Key: events.e19.name
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228
