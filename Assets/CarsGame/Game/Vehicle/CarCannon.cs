@@ -4,7 +4,7 @@ namespace RacingGame
 {
     /// <summary>
     /// Roof-mounted cannon. Builds its own turret/barrel visuals at start. The turret swings and the
-    /// barrel tilts toward the rival closest to the car's nose inside a sector ahead (with lead and
+    /// barrel tilts toward the mouse point for the player, or a rival in front for AI (with lead and
     /// shell drop), so shells leave along the barrel. Firing intent comes
     /// from the car's <see cref="Core.Sim.DriveCommand"/> (or an AI gunner via <see cref="TryFire"/>);
     /// the cooldown is counted in simulation ticks and shells are spawned through the
@@ -60,7 +60,7 @@ namespace RacingGame
         private float turretYaw, barrelPitch;
         private CarController turretTarget;
         private MissionUnit turretUnit;
-        private bool aimCommitted;
+        private bool aimCommitted, aimAllowsHoming;
         private Vector3 aimCommitPoint;
         private Material shellMaterial;
         private SpecialWeaponAttack specialAttack;
@@ -81,7 +81,7 @@ namespace RacingGame
         public CarController TurretTarget => turretTarget;
         /// <summary>The mission unit the turret is tracking when no car is in its sector, else null.</summary>
         public MissionUnit TurretUnit => turretUnit;
-        /// <summary>True while an AI gunner holds the barrel on a frozen aim point.</summary>
+        /// <summary>True while an AI gunner or mouse holds the barrel on a world point.</summary>
         public bool HasAimCommit => aimCommitted;
         /// <summary>World point the barrel tracks while <see cref="HasAimCommit"/> is set.</summary>
         public Vector3 AimCommitPoint => aimCommitPoint;
@@ -119,10 +119,11 @@ namespace RacingGame
             return aim + relative * (Vector3.Distance(aim, origin) / Mathf.Max(1f, shellSpeed));
         }
 
-        /// <summary>Hold the barrel on a world point until <see cref="ClearAimCommit"/>. The player never calls this.</summary>
-        public void CommitAim(Vector3 worldPoint)
+        /// <summary>Hold the barrel on a world point until <see cref="ClearAimCommit"/>.</summary>
+        public void CommitAim(Vector3 worldPoint, bool allowHoming = false)
         {
             aimCommitted = true;
+            aimAllowsHoming = allowHoming;
             aimCommitPoint = worldPoint;
         }
 
@@ -328,7 +329,7 @@ namespace RacingGame
             var director = RaceDirector.Current ?? RaceDirector.Instance;
             if (director != null)
             {
-                var homingTarget = shot.Homing && !aimCommitted ? TargetFinder.Find(car, muzzlePos, direction, 35f, 1f, 80f) : null;
+                var homingTarget = shot.Homing && (!aimCommitted || aimAllowsHoming) ? TargetFinder.Find(car, muzzlePos, direction, aimCommitted ? 5f : 35f, 1f, 80f) : null;
                 for (int pellet = 0; pellet < shot.Pellets; pellet++)
                 {
                     float angle = shot.Pellets == 1 ? 0f : Mathf.Lerp(-shot.Spread * 0.5f, shot.Spread * 0.5f, pellet / (float)(shot.Pellets - 1));

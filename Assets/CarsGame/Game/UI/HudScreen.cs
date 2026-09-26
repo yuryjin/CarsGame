@@ -535,7 +535,8 @@ namespace RacingGame
 
             var muzzle = playerCannon.muzzle;
             Vector3 velocity = muzzle.forward * playerCannon.shellSpeed + playerCar.Body.linearVelocity;
-            float t = aimDistance / Mathf.Max(1f, playerCannon.shellSpeed);
+            float distance = playerCannon.HasAimCommit ? Vector3.Distance(muzzle.position, playerCannon.AimCommitPoint) : aimDistance;
+            float t = distance / Mathf.Max(1f, playerCannon.shellSpeed);
             Vector3 aim = muzzle.position + velocity * t + 0.5f * t * t * Physics.gravity;
             Vector3 sp = cam.WorldToScreenPoint(aim);
             if (sp.z <= 0f) { reticle.gameObject.SetActive(false); ClearLock(); return; }

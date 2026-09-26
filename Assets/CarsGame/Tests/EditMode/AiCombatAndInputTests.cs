@@ -123,6 +123,42 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void PlayerDriverInput_MousePointsCannonAtCursorAndLeftClickFires()
+        {
+            var mouse = InputSystem.AddDevice<Mouse>();
+            var cameraGo = new GameObject("AimCamera", typeof(Camera));
+            var target = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var input = carGo.GetComponent<PlayerDriverInput>();
+            typeof(PlayerDriverInput).GetMethod("OnEnable", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+            try
+            {
+                car.transform.position = new Vector3(0f, 200f, 0f);
+                target.transform.position = new Vector3(5f, 200.5f, 20f);
+                target.transform.localScale = Vector3.one * 2f;
+                var camera = cameraGo.GetComponent<Camera>();
+                camera.tag = "MainCamera";
+                camera.pixelRect = new Rect(0f, 0f, 800f, 600f);
+                camera.transform.position = new Vector3(0f, 204f, -8f);
+                camera.transform.LookAt(new Vector3(0f, 200f, 20f));
+                Physics.SyncTransforms();
+                Vector3 screen = camera.WorldToScreenPoint(target.transform.position);
+                InputSystem.QueueStateEvent(mouse, new MouseState { position = new Vector2(screen.x, screen.y), delta = Vector2.one * 4f, buttons = 1 });
+                InputSystem.Update();
+                typeof(PlayerDriverInput).GetMethod("Update", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(input, null);
+
+                Assert.IsTrue(input.Sample(1).Fire);
+                Assert.IsTrue(cannon.HasAimCommit);
+                Assert.That(cannon.AimCommitPoint.x, Is.InRange(4f, 6f));
+            }
+            finally
+            {
+                Object.DestroyImmediate(target);
+                Object.DestroyImmediate(cameraGo);
+                InputSystem.RemoveDevice(mouse);
+            }
+        }
+
+        [Test]
         public void AiGunner_WantsFire_BlockedWhenJammedOrOverheated()
         {
             // Position rival in front of car within cone

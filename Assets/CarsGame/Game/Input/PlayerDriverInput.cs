@@ -20,7 +20,7 @@ namespace RacingGame
         private InputActionMap map;
         private InputAction throttleAction, steerAction, brakeAction, fireAction, secondaryAction, resetAction;
         private float throttle, steer;
-        private bool brake, fire, secondary;
+        private bool brake, fire, secondary, mouseAimActive;
         private readonly EdgeLatch resetLatch = new EdgeLatch();
         private int pendingPrimary;   // last slot picked (1..50), 0 = none
         private readonly InputAction[] primaryActions = new InputAction[PrimaryWeaponCatalog.SlotsPerPage];
@@ -30,6 +30,9 @@ namespace RacingGame
         private CarWeapons weapons;
         private CarController car;
         private RaceProgress progress;
+        private CarCannon cannon;
+        // ponytail: 32 ray hits cover normal sightlines; grow this buffer if dense scenery hides targets.
+        private readonly RaycastHit[] aimHits = new RaycastHit[32];
         private Vector2 wheelPointer;
         public bool WeaponWheelOpen { get; private set; }
         public int WheelSelection { get; private set; }
@@ -45,6 +48,7 @@ namespace RacingGame
         {
             weapons = GetComponent<CarWeapons>();
             car = GetComponent<CarController>();
+            cannon = GetComponent<CarCannon>();
             progress = GetComponent<RaceProgress>();
             SelectionPage = weapons != null ? (int)weapons.PrimaryType / PrimaryWeaponCatalog.SlotsPerPage : 0;
             var asset = InputSystem.actions;
@@ -69,7 +73,8 @@ namespace RacingGame
 
         private void OnDisable()
         {
-            throttle = steer = 0f; brake = fire = secondary = false; resetLatch.Clear(); pendingPrimary = 0;
+            if (cannon != null) cannon.ClearAimCommit();
+            throttle = steer = 0f; brake = fire = secondary = mouseAimActive = false; resetLatch.Clear(); pendingPrimary = 0;
             WeaponWheelOpen = false; WheelSelection = 0;
         }
 
@@ -78,6 +83,10 @@ namespace RacingGame
             if (map != null) ReadActions(); else PollDevices();
 
             ReadWeaponSelection();
+            var mouse = Mouse.current;
+            if (mouse != null && (mouse.delta.ReadValue().sqrMagnitude > 0.01f || mouse.leftButton.isPressed)) mouseAimActive = true;
+            var gamepad = Gamepad.current;
+            if (gamepad != null && (gamepad.rightShoulder.isPressed || gamepad.buttonWest.isPressed)) mouseAimActive = false;
             RawThrottle = Mathf.Max(0f, throttle);
             if (autoThrottle && Mathf.Abs(throttle) < 0.05f) throttle = brake ? 0f : 1f;
         }
@@ -199,6 +208,7 @@ namespace RacingGame
 
         public DriveCommand Sample(int tick)
         {
+            UpdateMouseAim();
             bool sec = secondary;
             // Touch auto-fire of a planted charge: blow it the moment a rival rolls over it (every tick, not every 10th).
             if (!WeaponWheelOpen && !sec && autoSecondary && weapons != null && weapons.PlantedCharge != null)
@@ -232,6 +242,44 @@ namespace RacingGame
                 SelectPrimary = select,
                 ResetEdge = resetLatch.ConsumeAll()
             }.Clamped();
+        }
+
+        private void UpdateMouseAim()
+        {
+            if (cannon == null) cannon = GetComponent<CarCannon>();
+            if (cannon == null) return;
+            var mouse = Mouse.current;
+            var camera = Camera.main;
+            if (!mouseAimActive || mouse == null || camera == null || TouchControlsPresenter.IsShown || WeaponWheelOpen || PauseController.IsPaused)
+            {
+                cannon.ClearAimCommit();
+                return;
+            }
+
+            Ray ray = camera.ScreenPointToRay(mouse.position.ReadValue());
+            float distance = float.PositiveInfinity;
+            Vector3 point = default;
+            int count = Physics.RaycastNonAlloc(ray, aimHits, 200f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < count; i++)
+            {
+                var hit = aimHits[i];
+                if (hit.distance >= distance || hit.collider.transform.IsChildOf(transform)) continue;
+                distance = hit.distance;
+                point = hit.point;
+            }
+            if (distance == float.PositiveInfinity)
+            {
+                var plane = new Plane(Vector3.up, transform.position + Vector3.up * 0.5f);
+                point = plane.Raycast(ray, out float groundDistance) && groundDistance > 0f
+                    ? ray.GetPoint(groundDistance) : ray.GetPoint(cannon.turretMaxRange);
+            }
+            if (car != null && car.Body != null)
+            {
+                Vector3 origin = cannon.muzzle != null ? cannon.muzzle.position : transform.position;
+                float flight = Vector3.Distance(origin, point) / Mathf.Max(1f, cannon.shellSpeed);
+                point -= car.Body.linearVelocity * flight;
+            }
+            cannon.CommitAim(point, allowHoming: true);
         }
     }
 }
