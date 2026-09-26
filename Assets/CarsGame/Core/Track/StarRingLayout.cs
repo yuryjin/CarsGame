@@ -5,7 +5,7 @@ using UnityEngine;
 namespace RacingGame.Core.Track
 {
     /// <summary>
-    /// The "Star Ring" circuit as pure data: straights and arcs (two straights are solved so the loop
+    /// The "Star Ring" space circuit as pure data: straights and arcs (two straights are solved so the loop
     /// closes), sampled every <see cref="Step"/> metres with an elevation profile, plus the distances of
     /// its features (broken bridge, boost pad, tunnel, semi-sharp corner). Distances use the same XZ
     /// chord length as <see cref="TrackSpline"/>, so they index the spline built from <see cref="Points"/>.
@@ -19,6 +19,8 @@ namespace RacingGame.Core.Track
         /// <summary>Length of the kicker in front of the gap and its slope at the lip (tan 6°).</summary>
         public const float KickLength = 8f, KickSlope = 0.105f;
         public const float HairpinRadius = 32f;
+        /// <summary>The semi-sharp corner turns left, so its open outside edge is on the right (+1).</summary>
+        public const float HairpinOutside = 1f;
         /// <summary>Tunnel: fillet rise and then the walls/ceiling reveal, each this long, at both ends.</summary>
         public const float TunnelFlare = 15f;
         /// <summary>Run-up a car needs from standstill to clear the gap (checked in the tests).</summary>
@@ -34,12 +36,13 @@ namespace RacingGame.Core.Track
         private static Segment S(float length, string name = "") => new Segment { kind = Kind.Straight, length = length, name = name };
         private static Segment A(float radius, float degrees, string name = "") => new Segment { kind = Kind.Arc, radius = radius, degrees = degrees, name = name };
 
-        // Clockwise seen from above (+ = right turn). "west" and "home" are solved so the loop closes.
+        // Anticlockwise seen from above (+ = right turn): tunnel after the start, the semi-sharp left after it, then the
+        // climb to the broken bridge. "west" and "home" are solved so the loop closes.
         private static Segment[] Plan() => new[]
         {
-            S(70f, "start"), A(75f, 90f, "sweep1"), S(55f, "approach"), S(95f, "bridge"), A(85f, 90f, "sweep2"),
-            S(30f), A(70f, -40f, "esse1"), A(70f, 40f, "esse2"), S(130f, "tunnel"), A(80f, 90f, "sweep3"),
-            S(0f, "west"), A(HairpinRadius, 90f, "hairpin"), S(60f), A(150f, 20f, "kink1"), A(150f, -20f, "kink2"), S(0f, "home"),
+            S(80f, "start"), A(90f, -60f, "sweep1"), S(140f, "tunnel"), A(75f, -60f, "sweep2"), S(40f, "pre"),
+            A(HairpinRadius, -90f, "hairpin"), S(60f, "rise"), A(100f, 30f, "kink"), S(55f, "approach"), S(95f, "bridge"),
+            A(85f, -90f, "drop"), S(0f, "west"), A(80f, -60f, "sweep3"), A(120f, -30f, "sweep4"), S(0f, "home"),
         };
 
         public Vector3[] Points { get; }
@@ -124,7 +127,7 @@ namespace RacingGame.Core.Track
         /// <summary>Road height at a distance: climb to the bridge, kicker, lower landing deck, descent, then flat.</summary>
         public float Height(float d)
         {
-            Vector2 climb = Range("sweep1"), bridge = Range("bridge"), descent = Range("sweep2");
+            Vector2 climb = new Vector2(Range("rise").x, Range("kink").y), bridge = Range("bridge"), descent = Range("drop");
             if (d < climb.x) return 0f;
             if (d < climb.y) return DeckHeight * Mathf.SmoothStep(0f, 1f, (d - climb.x) / (climb.y - climb.x));
             if (d < GapStart)

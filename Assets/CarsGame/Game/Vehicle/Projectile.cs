@@ -238,9 +238,21 @@ namespace RacingGame
         {
             if (consumed || !live) return;
             var health = collision.collider.GetComponentInParent<CarHealth>();
+            // Mission units (drones, troopers, the boss) keep their own HP; a same-side shell just stops on them.
+            var unit = health == null && MissionUnit.All.Count > 0 ? collision.collider.GetComponentInParent<MissionUnit>() : null;
+            if (unit != null)
+            {
+                consumed = true;
+                Vector3 point = collision.contactCount > 0 ? collision.GetContact(0).point : transform.position;
+                if (unit.TakeHit(owner, damage, point) && director != null) director.CountHit(owner, unit.gameObject);
+                if (EffectPool.Instance != null) EffectPool.Instance.PlayShellImpact(point);
+                Deactivate();
+                return;
+            }
             if (health == null && collision.contactCount > 0 && TryRicochet(collision.GetContact(0).normal)) return;
             consumed = true;
-            bool isCarTarget = health != null && health.gameObject != owner;
+            // Same side of a co-op mission: no friendly fire (untagged cars and owner-less shells stay hostile to all).
+            bool isCarTarget = health != null && health.gameObject != owner && Teams.Hostile(owner, health.gameObject);
             HitResult hitResult = default;
 
             if (isCarTarget)

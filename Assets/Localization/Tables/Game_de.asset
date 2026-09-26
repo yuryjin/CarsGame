@@ -1315,7 +1315,107 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8403702163779584
+    m_Localized: Sternenring
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8407536768462848
     m_Localized: "\xD6dlandrennen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662261374976
+    m_Localized: Leviathan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346496
+    m_Localized: "Boss-Mission / {n} Verb\xFCndete"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346497
+    m_Localized: ROST-LEVIATHAN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346498
+    m_Localized: '{m} m bis zum Letzten Brunnen'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346499
+    m_Localized: 'Feinde: {n}   Deine Kills: {k}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346500
+    m_Localized: Stoppt die Festung vor dem Letzten Brunnen!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346501
+    m_Localized: Cyborgs kommen die Rampen herunter!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346502
+    m_Localized: LUFTANGRIFF! Raus aus den roten Ringen!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346503
+    m_Localized: Ein Panzer rollt aus der Festung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346504
+    m_Localized: "Ein Panzerwagen verst\xE4rkt die Eskorte"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346505
+    m_Localized: 'Der Leviathan tobt: Truppen landen!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346506
+    m_Localized: "Letzte Runde! Der Kern \xFCberhitzt!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346507
+    m_Localized: "Hauptgesch\xFCtz zerst\xF6rt!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346508
+    m_Localized: "Alle Gesch\xFCtze verstummt!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346509
+    m_Localized: "Flak zerst\xF6rt!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346510
+    m_Localized: "M\xF6rser zerst\xF6rt!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346511
+    m_Localized: "Drohnenhangar zerst\xF6rt!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346512
+    m_Localized: Bomber abgeschossen!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346513
+    m_Localized: DER LEVIATHAN IST GEFALLEN!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346514
+    m_Localized: "Die Festung erreichte den Brunnen\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346515
+    m_Localized: "Zerst\xF6re die Festung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346516
+    m_Localized: "Zerst\xF6re {n} Feinde"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346517
+    m_Localized: Panzer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346518
+    m_Localized: Panzerwagen
     m_Metadata:
       m_Items: []
   references:

@@ -97,7 +97,7 @@ namespace RacingGame
             }
         }
 
-        /// <summary>True when an announced blast will land within <paramref name="radius"/> + its own radius of the point.</summary>
+        /// <summary>True when an announced blast will land within its radius plus <paramref name="margin"/> of the point.</summary>
         public bool Threatens(Vector3 point, float margin)
         {
             foreach (var s in live)

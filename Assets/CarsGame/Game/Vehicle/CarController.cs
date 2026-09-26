@@ -111,6 +111,8 @@ namespace RacingGame
         /// <summary>Event rule: a car driven into another shoves it this much harder (1 = plain physics). Reset by the flow.</summary>
         public static float RamPushScale = 1f;
         private int shoveReadyTick, staggerUntilTick;
+        /// <summary>Velocity before this tick's physics step: contact callbacks only see the velocities after the solver.</summary>
+        private Vector3 preStepVelocity;
         /// <summary>Lateral grip left while staggered by a ram.</summary>
         private const float StaggerGrip = 0.25f;
 
@@ -313,6 +315,7 @@ namespace RacingGame
             if (weapons == null) weapons = GetComponent<CarWeapons>();
             if (cannon == null) cannon = GetComponent<CarCannon>();
             if (status == null) status = GetComponent<CarStatus>();
+            preStepVelocity = rb.linearVelocity;
 
             var command = inputEnabled && inputSource != null
                 ? inputSource.Sample(tick)
@@ -428,14 +431,15 @@ namespace RacingGame
         // (v_this + v_other)·n > 0 holds for exactly one side of the pair, so a hit never shoves both ways.
         private void OnCollisionEnter(Collision collision)
         {
-            if (RamPushScale <= 1f || rb == null || !inputEnabled || collision.rigidbody == null) return;
-            if (!collision.rigidbody.TryGetComponent(out CarController other) || other == this || other.Body.isKinematic) return;
+            if (RamPushScale <= 1f || rb == null || !inputEnabled || !isActiveAndEnabled || collision.rigidbody == null) return;
+            // A wreck's controller is disabled and its stored velocity stale: it neither shoves nor gets shoved.
+            if (!collision.rigidbody.TryGetComponent(out CarController other) || other == this || !other.isActiveAndEnabled || other.Body.isKinematic) return;
             int tick = SimulationDriver.Instance.Tick;
             if (tick < shoveReadyTick) return;
             Vector3 n = Vector3.ProjectOnPlane(other.Body.worldCenterOfMass - rb.worldCenterOfMass, GravityUp);
             if (n.sqrMagnitude < 1e-4f) return;
             n.Normalize();
-            Vector3 mine = rb.linearVelocity, theirs = other.Body.linearVelocity;
+            Vector3 mine = preStepVelocity, theirs = other.preStepVelocity;
             float closing = Vector3.Dot(mine - theirs, n);
             if (closing < 1.5f || Vector3.Dot(mine + theirs, n) <= 0f) return;
             shoveReadyTick = tick + SimulationDriver.SecondsToTicks(0.3f);

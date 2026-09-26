@@ -157,6 +157,7 @@ namespace RacingGame
 
                     bool isOwner = owner != null && car.gameObject == owner;
                     if (isOwner && tick < ownerImmunityTick) continue;
+                    if (owner != null && !isOwner && !Teams.Hostile(owner, car.gameObject)) continue;   // mission team-mates roll over it
 
                     float dist = Vector3.Distance(transform.position, car.transform.position);
                     if (dist <= radius)
@@ -195,6 +196,7 @@ namespace RacingGame
 
                     var health = car.GetComponent<CarHealth>();
                     if (health == null || health.IsDead) continue;
+                    if (owner != null && car.gameObject != owner && !Teams.Hostile(owner, car.gameObject)) continue;
 
                     float dist = Vector3.Distance(blastCenter, car.transform.position);
                     if (dist <= radius)
@@ -231,6 +233,18 @@ namespace RacingGame
                         }
                     }
                 }
+            }
+
+            // Mission units in the blast (troopers, a low drone, the boss's hull).
+            var units = MissionUnit.All;
+            for (int i = units.Count - 1; i >= 0; i--)
+            {
+                if (i >= units.Count) continue;
+                var u = units[i];
+                if (u == null || !u.Targetable) continue;
+                float d = Vector3.Distance(blastCenter, u.AimPointFrom(blastCenter));
+                if (d > radius) continue;
+                if (u.TakeHit(owner, Mathf.Lerp(damage, floor, Mathf.Clamp01(d / radius)), blastCenter) && director != null) director.CountMineHit(owner, u.gameObject);
             }
 
             if (EffectPool.Instance != null)

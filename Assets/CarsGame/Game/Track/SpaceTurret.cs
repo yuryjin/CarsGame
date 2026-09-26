@@ -11,9 +11,10 @@ namespace RacingGame
     /// </summary>
     public sealed class SpaceTurret : MonoBehaviour, ISimulated
     {
-        public const float Range = 55f, AimSeconds = 0.9f, CooldownSeconds = 2.4f;
-        public const float ShellSpeed = 70f, ShellDamage = 9f, ShellImpact = 3500f;
-        public const int Burst = 3;
+        // A hazard, not a killer: in a 3-lap autopilot race 9 dmg × 3 every 2.4 s at 55 m cost each car 5–10 wrecks.
+        public const float Range = 45f, AimSeconds = 1.1f, CooldownSeconds = 4f;
+        public const float ShellSpeed = 70f, ShellDamage = 6f, ShellImpact = 2500f;
+        public const int Burst = 2;
         private const float BurstGapSeconds = 0.12f, TurnDegreesPerSecond = 150f, FireCone = 8f;
 
         private enum Phase { Idle, Aiming, Firing, Cooling }
@@ -132,12 +133,15 @@ namespace RacingGame
             phaseTick = tick + SimulationDriver.SecondsToTicks(CooldownSeconds);
         }
 
+        /// <summary>Whether the turret could lock onto this car now (alive, in range, in sight).</summary>
+        public bool CanTarget(CarController car) => Valid(car);
+
         private bool Valid(CarController car)
         {
             if (car == null || !car.isActiveAndEnabled || !car.inputEnabled) return false;
             var health = car.GetComponent<CarHealth>();
             if (health != null && health.IsDead) return false;
-            Vector3 centre = car.Body.worldCenterOfMass;
+            Vector3 centre = BodyCentre(car);
             if ((centre - muzzle.position).sqrMagnitude > Range * Range) return false;
             // The road deck and the tunnel shell hide a car.
             return !Physics.Linecast(muzzle.position, centre, trackMask, QueryTriggerInteraction.Ignore);
@@ -153,16 +157,19 @@ namespace RacingGame
             {
                 if (!Valid(car)) continue;
                 // Everyone is a target: the car shot last is only picked when nobody else is in sight.
-                float score = (car.Body.worldCenterOfMass - muzzle.position).sqrMagnitude + (car.CarId == lastTargetId ? 1e6f : 0f);
+                float score = (BodyCentre(car) - muzzle.position).sqrMagnitude + (car.CarId == lastTargetId ? 1e6f : 0f);
                 if (score < bestScore || (score == bestScore && best != null && car.CarId < best.CarId)) { best = car; bestScore = score; }
             }
             return best;
         }
 
+        /// <summary>Middle of the body. The centre of mass sits low (about level with the road), so sighting it is blocked by the deck.</summary>
+        private static Vector3 BodyCentre(CarController car) => car.transform.position + car.transform.up * 0.5f;
+
         // Where to shoot so a shell meets a car holding its velocity, lifted by the drop the shell has on the way.
         private Vector3 Lead(CarController car)
         {
-            Vector3 point = car.Body.worldCenterOfMass;
+            Vector3 point = BodyCentre(car);
             float t = Vector3.Distance(point, muzzle.position) / ShellSpeed;
             point += car.Body.linearVelocity * t;
             t = Vector3.Distance(point, muzzle.position) / ShellSpeed;
@@ -197,7 +204,7 @@ namespace RacingGame
             laser.enabled = show;
             if (!show) return;
             laser.SetPosition(0, muzzle.position);
-            laser.SetPosition(1, target.Body.worldCenterOfMass);
+            laser.SetPosition(1, BodyCentre(target));
             float width = phase == Phase.Firing ? 0.16f : 0.05f + 0.05f * Mathf.PingPong(Time.time * 8f, 1f);
             laser.startWidth = laser.endWidth = width;
         }

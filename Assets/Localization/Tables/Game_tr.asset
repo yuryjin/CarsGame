@@ -1319,7 +1319,107 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8403702163779584
+    m_Localized: "Y\u0131ld\u0131z Halkas\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8407536768462848
     m_Localized: "\xC7orak Toprak Yar\u0131\u015F\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662261374976
+    m_Localized: Leviathan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346496
+    m_Localized: "Boss g\xF6revi / {n} m\xFCttefik"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346497
+    m_Localized: "PAS LEV\u0130ATAN"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346498
+    m_Localized: Son Kuyu'ya {m} m
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346499
+    m_Localized: "D\xFC\u015Fman: {n}   Le\u015Flerin: {k}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346500
+    m_Localized: Kale Son Kuyu'ya varmadan onu durdur!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346501
+    m_Localized: Siborglar rampalardan iniyor!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346502
+    m_Localized: "HAVA SALDIRISI! K\u0131rm\u0131z\u0131 halkalardan \xE7\u0131k!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346503
+    m_Localized: "Kaleden bir tank \xE7\u0131kt\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346504
+    m_Localized: "Eskorta bir z\u0131rhl\u0131 ara\xE7 kat\u0131ld\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346505
+    m_Localized: "Leviatan \xF6fkeli: asker iniyor!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346506
+    m_Localized: "Son direni\u015F! \xC7ekirdek a\u015F\u0131r\u0131 \u0131s\u0131n\u0131yor!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346507
+    m_Localized: Ana top yok edildi!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346508
+    m_Localized: "T\xFCm toplar susturuldu!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346509
+    m_Localized: "U\xE7aksavar yok edildi!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346510
+    m_Localized: Havan yok edildi!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346511
+    m_Localized: "Drone hangar\u0131 yok edildi!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346512
+    m_Localized: "Bombard\u0131man u\xE7a\u011F\u0131 d\xFC\u015F\xFCr\xFCld\xFC!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346513
+    m_Localized: "LEV\u0130ATAN D\xDC\u015ET\xDC!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346514
+    m_Localized: "Kale Son Kuyu'ya ula\u015Ft\u0131\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346515
+    m_Localized: Kaleyi yok et
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346516
+    m_Localized: "{n} d\xFC\u015Fman yok et"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346517
+    m_Localized: Tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346518
+    m_Localized: "Z\u0131rhl\u0131 ara\xE7"
     m_Metadata:
       m_Items: []
   references:

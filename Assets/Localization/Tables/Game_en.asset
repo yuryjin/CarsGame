@@ -1319,7 +1319,107 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8403702163779584
+    m_Localized: Star Ring
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8407536768462848
     m_Localized: Wasteland Run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662261374976
+    m_Localized: Leviathan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346496
+    m_Localized: Boss mission / {n} allies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346497
+    m_Localized: RUST LEVIATHAN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346498
+    m_Localized: '{m} m to the Last Well'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346499
+    m_Localized: 'Enemies: {n}   Your kills: {k}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346500
+    m_Localized: Stop the fortress before it reaches the Last Well!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346501
+    m_Localized: Troopers are coming down the ramps!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346502
+    m_Localized: AIR RAID! Get out of the red rings!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346503
+    m_Localized: A tank rolls out of the fortress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346504
+    m_Localized: An armoured car joins the escort
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346505
+    m_Localized: 'The Leviathan is enraged: troops deploying!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346506
+    m_Localized: Last stand! The core is overheating!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346507
+    m_Localized: Main gun destroyed!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346508
+    m_Localized: All main guns silenced!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346509
+    m_Localized: Flak turret destroyed!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346510
+    m_Localized: Mortar destroyed!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346511
+    m_Localized: Drone hangar destroyed!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346512
+    m_Localized: Bomber shot down!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346513
+    m_Localized: THE LEVIATHAN IS DOWN!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346514
+    m_Localized: "The fortress reached the Last Well\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346515
+    m_Localized: Destroy the fortress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346516
+    m_Localized: Destroy {n} enemies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346517
+    m_Localized: Tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346518
+    m_Localized: Armoured car
     m_Metadata:
       m_Items: []
   references:

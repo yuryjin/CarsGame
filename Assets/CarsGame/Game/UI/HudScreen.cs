@@ -546,7 +546,8 @@ namespace RacingGame
             if (++lockCheckFrame >= 5)
             {
                 lockCheckFrame = 0;
-                bool locked = TargetFinder.Find(playerCar, muzzle.position, muzzle.forward, lockConeDegrees, lockMinRange, lockMaxRange) != null;
+                bool locked = TargetFinder.Find(playerCar, muzzle.position, muzzle.forward, lockConeDegrees, lockMinRange, lockMaxRange) != null
+                    || TargetFinder.FindUnit(playerCar, muzzle.position, muzzle.forward, lockConeDegrees, lockMinRange, lockMaxRange * 1.5f) != null;
                 if (locked != ReticleLocked)
                 {
                     ReticleLocked = locked;

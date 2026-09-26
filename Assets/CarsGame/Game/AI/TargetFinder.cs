@@ -39,6 +39,7 @@ namespace RacingGame
             {
                 var other = cars[i];
                 if (other == null || other == self || !other.isActiveAndEnabled) continue;
+                if (self != null && !Teams.Hostile(self.gameObject, other.gameObject)) continue;   // mission team-mates
                 var h = other.GetComponent<CarHealth>();
                 if (h != null && (h.IsDead || h.IsInvulnerable)) continue;
                 Vector3 aim = other.transform.position + Vector3.up * 0.5f;
@@ -80,6 +81,7 @@ namespace RacingGame
             {
                 var other = cars[i];
                 if (other == null || other == self || !other.isActiveAndEnabled) continue;
+                if (self != null && !Teams.Hostile(self.gameObject, other.gameObject)) continue;
                 var h = other.GetComponent<CarHealth>();
                 if (h != null && (h.IsDead || h.IsInvulnerable)) continue;
                 Vector3 aim = other.transform.position + Vector3.up * 0.5f;
@@ -95,6 +97,39 @@ namespace RacingGame
                     bestDist = distRear;
                     best = other;
                 }
+            }
+            return best;
+        }
+
+        /// <summary>
+        /// Mission units (drones, troopers, turrets, the boss) of the other side inside the cone, same rules as
+        /// <see cref="Find"/>. Returns null at once outside a mission (no units registered).
+        /// </summary>
+        public static MissionUnit FindUnit(CarController self, Vector3 origin, Vector3 forward, float coneDegrees, float minRange, float maxRange, bool closestToAxis = false)
+        {
+            var units = MissionUnit.All;
+            if (units.Count == 0) return null;
+            float cosCone = Mathf.Cos(coneDegrees * Mathf.Deg2Rad);
+            int mask = ObstacleMask;
+            GameObject me = self != null ? self.gameObject : null;
+            MissionUnit best = null; float bestScore = float.MaxValue;
+            for (int i = 0; i < units.Count; i++)
+            {
+                var u = units[i];
+                if (u == null || !u.Targetable || !Teams.Hostile(me, u.gameObject)) continue;
+                Vector3 aim = u.AimPointFrom(origin);
+                Vector3 to = aim - origin;
+                float dist = to.magnitude;
+                if (dist < minRange || dist > maxRange + u.Radius) continue;
+                float dot = Vector3.Dot(to / Mathf.Max(0.01f, dist), forward);
+                // A big target fills more of the cone: widen it by the unit's angular radius.
+                float widened = Mathf.Cos(Mathf.Min(89f, coneDegrees + Mathf.Atan2(u.Radius, Mathf.Max(1f, dist)) * Mathf.Rad2Deg) * Mathf.Deg2Rad);
+                if (dot < Mathf.Min(cosCone, widened)) continue;
+                // Weapon stations before the hull: the hull only wins when nothing else is in the cone.
+                float score = (closestToAxis ? -dot : dist) + (u.Kind == UnitKind.BossHull ? 1000f : 0f);
+                if (score >= bestScore) continue;
+                if (mask != 0 && Physics.Linecast(origin, aim, mask, QueryTriggerInteraction.Ignore)) continue;
+                bestScore = score; best = u;
             }
             return best;
         }
@@ -117,6 +152,7 @@ namespace RacingGame
             {
                 var other = cars[i];
                 if (other == null || other == owner || !other.isActiveAndEnabled) continue;
+                if (owner != null && !Teams.Hostile(owner.gameObject, other.gameObject)) continue;
                 var h = other.GetComponent<CarHealth>();
                 if (h != null && (h.IsDead || h.IsInvulnerable)) continue;
                 if ((other.transform.position - centre).sqrMagnitude <= hit * hit) return true;

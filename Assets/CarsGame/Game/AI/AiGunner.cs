@@ -117,7 +117,7 @@ namespace RacingGame
             {
                 if (tick % 10 != 0) return false;
                 var target = sampledTarget;
-                if (target == null) return false;
+                if (target == null) return FireAtUnit(tick);
                 var weaponsNow = car.Weapons;
                 bool machineGun = weaponsNow != null && weaponsNow.primaryType == PrimaryWeaponType.MachineGun;
                 var decision = BotAim.Evaluate(sampledRate, telegraphSeconds, machineGun, hardTier);
@@ -182,6 +182,21 @@ namespace RacingGame
             float scale = Mathf.Lerp(1.5f, 0.8f, aggression) * randScale;
             nextSecondaryTick = tick + SimulationDriver.SecondsToTicks(weapons.secondaryCooldown * scale);
             SecondaryRequested++;
+            return true;
+        }
+
+        // Mission: no car in the cone, but a drone, trooper or the boss is. No telegraph (units have no HUD to warn).
+        private bool FireAtUnit(int tick)
+        {
+            var muzzle = cannon.muzzle != null ? cannon.muzzle : transform;
+            var unit = TargetFinder.FindUnit(car, muzzle.position, muzzle.forward, coneDegrees * 1.6f, minRange * 0.5f, maxRange);
+            if (unit == null) return false;
+            cannon.CommitAim(cannon.SolveAimPoint(unit));
+            aimHeld = true;
+            if (director == null) director = RaceDirector.Current ?? RaceDirector.Instance;
+            float randScale = director != null && director.Rng != null ? director.Rng.Range(RngStreams.Stream.Ai, 0.8f, 1.2f) : 1f;
+            nextShotTick = tick + SimulationDriver.SecondsToTicks(fireCooldown * 0.8f * randScale);
+            ShotsRequested++;
             return true;
         }
 

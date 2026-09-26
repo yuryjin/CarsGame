@@ -6,7 +6,7 @@ using RacingGame.World.Gen;
 namespace RacingGame
 {
     /// <summary>
-    /// A wide post-apocalyptic circuit above a ruined wasteland, generated from <see cref="StarRingLayout"/> and driven through
+    /// "Star Ring": a wide neon circuit floating in space, generated from <see cref="StarRingLayout"/> and driven through
     /// the scene's <see cref="TrackPath"/> (AI, laps, respawn and the grid follow it). A broken bridge to jump, a boost
     /// pad in the middle of the road before it, a tunnel whose walls and ceiling can be driven at speed
     /// (<see cref="GravitySurface"/>), one semi-sharp corner with an open edge, and neutral turrets.
@@ -15,7 +15,7 @@ namespace RacingGame
     {
         public const float RailHeight = 1f, RailWidth = 0.5f, SkinDepth = 1.2f;
         public const float PadHalfWidth = 2f, PadLength = 6f, PadRadius = 2.2f;
-        /// <summary>Tunnel cross-section: flat floor ±<see cref="TubeFloor"/>, fillets of <see cref="TubeFillet"/>, walls to the road edge.</summary>
+        /// <summary>Tunnel cross-section: flat floor ±<see cref="TubeFloor"/>, fillets of <see cref="TubeFillet"/>, walls at the road edge.</summary>
         public const float TubeFloor = 5f, TubeFillet = 4f, TubeWallTop = 7f, TubeHeight = 11f;
         private const int FilletSteps = 6;
 
@@ -125,7 +125,7 @@ namespace RacingGame
         private static Vector2 TubePoint(int index, float fillet)
         {
             Vector2 p = tubeStrip[index];
-            // Lower fillet rises with the flare: at 0 the floor is still the flat road.
+            // The lower fillet rises with the flare: at 0 the floor is still the flat road.
             if (tubeReveal[index] < 0f) p.y *= fillet;
             return p;
         }
@@ -141,16 +141,17 @@ namespace RacingGame
             var rails = new MeshChunkWriter("StarRails");
             var lights = new MeshChunkWriter("StarLights");
 
-            var asphalt = new Color32(57, 53, 48, 0);
-            var band = new Color32(68, 61, 51, 0);
-            var underside = new Color32(68, 42, 32, 0);
-            var panel = new Color32(87, 64, 45, 0);
-            var edgeGlow = new Color32(255, 149, 46, 255);
-            var railColor = new Color32(112, 63, 39, 0);
-            var railGlow = new Color32(255, 92, 34, 255);
+            var asphalt = new Color32(46, 44, 78, 0);
+            var band = new Color32(58, 54, 96, 0);
+            var underside = new Color32(30, 28, 52, 0);
+            var panel = new Color32(62, 58, 104, 0);
+            var edgeGlow = new Color32(70, 200, 255, 255);
+            var railColor = new Color32(88, 82, 130, 0);
+            var railGlow = new Color32(200, 90, 255, 255);
 
             var distances = RingDistances();
             Vector2 hairpin = layout.Hairpin;
+            float openSide = StarRingLayout.HairpinOutside;
             for (int i = 0; i + 1 < distances.Count; i++)
             {
                 float d0 = distances[i], d1 = distances[i + 1], mid = (d0 + d1) * 0.5f;
@@ -193,21 +194,23 @@ namespace RacingGame
                 Strip(lights, a, b, h - 0.45f, h - 0.25f, 0.02f, edgeGlow);
 
                 // Rails, except over the tunnel mouths, the gap and the outside of the semi-sharp corner.
-                bool openLeft = mid > hairpin.x - 10f && mid < hairpin.y + 15f;   // right-hand corner: the outside is the left
-                if (!openLeft) Rail(rails, lights, a, b, -1f, railColor, railGlow);
-                Rail(rails, lights, a, b, 1f, railColor, railGlow);
-                if (openLeft)
+                bool open = mid > hairpin.x - 10f && mid < hairpin.y + 15f;
+                foreach (float side in new[] { -1f, 1f })
+                    if (!open || side != openSide) Rail(rails, lights, a, b, side, railColor, railGlow);
+                if (open)
                 {
-                    // Red and white kerb warns of the open edge.
+                    // A red and white kerb warns of the open edge.
                     var kerb = Mathf.FloorToInt(mid / 2f) % 2 == 0 ? new Color32(235, 50, 60, 120) : new Color32(240, 240, 240, 60);
-                    Strip(lights, a, b, -h, -h + 1.2f, 0.025f, kerb);
+                    float edge = openSide * h;
+                    Strip(lights, a, b, Mathf.Min(edge, edge - openSide * 1.2f), Mathf.Max(edge, edge - openSide * 1.2f), 0.025f, kerb);
                 }
             }
 
             DecorateBridge(lights);
             BuildPads(lights);
             BuildStartLine(lights, rails);
-            BuildWasteland();
+            SpaceTrack.AddStars(lights, Centre(), 320, 420f);
+            AddPlanet(lights);
 
             Add("Road", road, solid, true, false);
             Add("Tube", tube, solid, true, true);
@@ -239,7 +242,7 @@ namespace RacingGame
         private static void Rail(MeshChunkWriter solidW, MeshChunkWriter glowW, Ring a, Ring b, float side, Color32 color, Color32 top)
         {
             float inner = side * StarRingLayout.HalfWidth, outer = side * (StarRingLayout.HalfWidth + RailWidth);
-            // Inner face looks at the road, outer face away; the top carries a glowing line.
+            // The inner face looks at the road, the outer face away; the top carries a glowing line.
             if (side < 0f)
             {
                 solidW.AddQuad(At(a, inner, 0f), At(a, inner, RailHeight), At(b, inner, RailHeight), At(b, inner, 0f), color);
@@ -250,8 +253,7 @@ namespace RacingGame
                 solidW.AddQuad(At(b, inner, 0f), At(b, inner, RailHeight), At(a, inner, RailHeight), At(a, inner, 0f), color);
                 solidW.AddQuad(At(a, outer, 0f), At(a, outer, RailHeight), At(b, outer, RailHeight), At(b, outer, 0f), color);
             }
-            float lo = Mathf.Min(inner, outer), hi = Mathf.Max(inner, outer);
-            Strip(glowW, a, b, lo, hi, RailHeight, top);
+            Strip(glowW, a, b, Mathf.Min(inner, outer), Mathf.Max(inner, outer), RailHeight, top);
         }
 
         private static void Hoop(MeshChunkWriter w, Ring a, Ring b, Color32 color)
@@ -280,8 +282,8 @@ namespace RacingGame
                 Ring a = RingAt(edge), b = RingAt(edge + 1.5f);
                 for (int k = 0; k < 9; k++)
                 {
-                    float x0 = -h + k * 2f, x1 = x0 + 2f;
-                    Strip(w, a, b, x0, x1, 0.03f, k % 2 == 0 ? yellow : dark);
+                    float x0 = -h + k * 2f;
+                    Strip(w, a, b, x0, x0 + 2f, 0.03f, k % 2 == 0 ? yellow : dark);
                 }
             }
             for (int k = 1; k <= 3; k++) Arrow(w, RingAt(layout.GapStart - 10f - k * 9f), 0f, 1.6f, 0.03f, yellow, false);
@@ -297,9 +299,9 @@ namespace RacingGame
             else { w.AddTriangle(left, tip, notch, color); w.AddTriangle(notch, tip, right, color); }
         }
 
+        // The contested pad in the middle of the road before the jump, and a reward strip on the tunnel ceiling.
         private void BuildPads(MeshChunkWriter w)
         {
-            // The contested pad in the middle of the road before the jump, and a reward strip on the tunnel ceiling.
             AddPad(w, layout.BoostPad, false);
             AddPad(w, (layout.TunnelStart + layout.TunnelEnd) * 0.5f, true);
         }
@@ -311,10 +313,7 @@ namespace RacingGame
             var orange = new Color32(255, 140, 30, 255);
             var gold = new Color32(255, 225, 80, 255);
             for (int k = 0; k < 3; k++)
-            {
-                Ring at = RingAt(d - PadLength * 0.5f + 1f + k * 2f);
-                Arrow(w, at, 0f, PadHalfWidth * 0.9f, 0.035f, k % 2 == 0 ? orange : gold, ceiling);
-            }
+                Arrow(w, RingAt(d - PadLength * 0.5f + 1f + k * 2f), 0f, PadHalfWidth * 0.9f, 0.035f, k % 2 == 0 ? orange : gold, ceiling);
             float surface = ceiling ? TubeHeight : 0f;
             Vector3 up = ceiling ? -Vector3.up : Vector3.up;
             var go = new GameObject(ceiling ? "CeilingBoostPad" : "BoostPad", typeof(BoostGate), typeof(BoxCollider));
@@ -331,64 +330,48 @@ namespace RacingGame
         private void BuildStartLine(MeshChunkWriter w, MeshChunkWriter rails)
         {
             float h = StarRingLayout.HalfWidth;
-            Ring a = RingAt(layout.StartLine - 0.6f), b = RingAt(layout.StartLine + 0.6f);
+            Ring a = RingAt(layout.StartLine - 0.6f), line = RingAt(layout.StartLine), b = RingAt(layout.StartLine + 0.6f);
             for (int k = 0; k < 18; k++)
                 for (int row = 0; row < 2; row++)
-                {
-                    Ring ra = row == 0 ? a : RingAt(layout.StartLine), rb = row == 0 ? RingAt(layout.StartLine) : b;
-                    Strip(w, ra, rb, -h + k, -h + k + 1f, 0.03f, (k + row) % 2 == 0 ? new Color32(240, 240, 250, 90) : new Color32(25, 25, 35, 0));
-                }
+                    Strip(w, row == 0 ? a : line, row == 0 ? line : b, -h + k, -h + k + 1f, 0.03f,
+                        (k + row) % 2 == 0 ? new Color32(240, 240, 250, 90) : new Color32(25, 25, 35, 0));
             // A glowing arch over the line.
-            Ring s = RingAt(layout.StartLine);
-            var rotation = Quaternion.LookRotation(Vector3.Cross(s.right, s.up), Vector3.up);
+            var rotation = Quaternion.LookRotation(Vector3.Cross(line.right, line.up), Vector3.up);
             foreach (float side in new[] { -1f, 1f })
-                LowPoly.Box(rails, Matrix4x4.TRS(At(s, side * (h + 1.2f), 0f), rotation, Vector3.one), Vector3.up * 3.5f, new Vector3(0.8f, 7f, 0.8f), new Color32(112, 63, 39, 0));
-            LowPoly.Box(w, Matrix4x4.TRS(At(s, 0f, 7f), rotation, Vector3.one), Vector3.zero, new Vector3(2f * h + 3.2f, 0.7f, 0.9f), new Color32(255, 153, 54, 255));
+                LowPoly.Box(rails, Matrix4x4.TRS(At(line, side * (h + 1.2f), 0f), rotation, Vector3.one), Vector3.up * 3.5f, new Vector3(0.8f, 7f, 0.8f), new Color32(88, 82, 130, 0));
+            LowPoly.Box(w, Matrix4x4.TRS(At(line, 0f, 7f), rotation, Vector3.one), Vector3.zero, new Vector3(2f * h + 3.2f, 0.7f, 0.9f), new Color32(120, 80, 255, 255));
         }
 
-        // Dust far below the road has no collider: falling off the bridge or the open corner still costs a reset.
-        private void BuildWasteland()
+        private Vector3 Centre()
         {
-            var dust = new MeshChunkWriter("WastelandDust");
-            var scrap = new MeshChunkWriter("WastelandScrap");
             var bounds = new Bounds(layout.Points[0], Vector3.zero);
-            foreach (var point in layout.Points) bounds.Encapsulate(point);
-            var random = new System.Random(1937);
-            float x0 = Mathf.Floor((bounds.min.x - 150f) / 60f) * 60f;
-            float x1 = Mathf.Ceil((bounds.max.x + 150f) / 60f) * 60f;
-            float z0 = Mathf.Floor((bounds.min.z - 150f) / 60f) * 60f;
-            float z1 = Mathf.Ceil((bounds.max.z + 150f) / 60f) * 60f;
-            for (float x = x0; x < x1; x += 60f)
-                for (float z = z0; z < z1; z += 60f)
-                {
-                    var tint = random.Next(3) == 0 ? new Color32(88, 60, 42, 0) : new Color32(105, 72, 47, 0);
-                    dust.AddQuad(new Vector3(x, -35f, z), new Vector3(x, -35f, z + 60f),
-                        new Vector3(x + 60f, -35f, z + 60f), new Vector3(x + 60f, -35f, z), tint);
-                }
-            // Rusted bridge supports and broken roadside silhouettes stay clear of the drivable width.
-            foreach (float d in new[] { layout.GapStart - 6f, layout.GapEnd + 7f })
-                foreach (float side in new[] { -1f, 1f })
-                {
-                    Ring r = RingAt(d);
-                    float top = r.centre.y - 1f;
-                    Vector3 centre = At(r, side * (StarRingLayout.HalfWidth + 2.5f), (-35f + top) * 0.5f - r.centre.y);
-                    LowPoly.Box(scrap, Matrix4x4.identity, centre, new Vector3(2f, top + 35f, 2f), new Color32(100, 54, 35, 0));
-                }
-            for (int i = 0; i < 38; i++)
+            foreach (var p in layout.Points) bounds.Encapsulate(p);
+            return bounds.center;
+        }
+
+        // A ringed planet below the circuit: stacked frustums, flat-shaded like the rest of the art.
+        private void AddPlanet(MeshChunkWriter w)
+        {
+            Vector3 c = Centre() + new Vector3(-260f, -150f, 180f);
+            const float radius = 90f;
+            const int bands = 10;
+            for (int i = 0; i < bands; i++)
             {
-                float d = (i + 0.5f) * layout.Length / 38f;
-                Ring r = RingAt(d);
-                float side = i % 2 == 0 ? -1f : 1f;
-                float distance = 22f + (float)random.NextDouble() * 30f;
-                float height = 6f + (float)random.NextDouble() * 17f;
-                Vector3 basePoint = At(r, side * distance, -3f);
-                var rotation = Quaternion.Euler(0f, random.Next(0, 180), random.Next(-12, 13));
-                LowPoly.Box(scrap, Matrix4x4.TRS(basePoint, rotation, Vector3.one), Vector3.up * (height * 0.5f),
-                    new Vector3(3f + random.Next(0, 4), height, 3f + random.Next(0, 4)),
-                    i % 3 == 0 ? new Color32(105, 58, 37, 0) : new Color32(88, 79, 65, 0));
+                float a0 = Mathf.PI * i / bands - Mathf.PI * 0.5f, a1 = Mathf.PI * (i + 1) / bands - Mathf.PI * 0.5f;
+                float y0 = Mathf.Sin(a0) * radius, y1 = Mathf.Sin(a1) * radius;
+                var tint = i % 3 == 0 ? new Color32(120, 70, 190, 110) : i % 3 == 1 ? new Color32(90, 60, 170, 90) : new Color32(150, 90, 210, 120);
+                LowPoly.Cylinder(w, Matrix4x4.identity, c + Vector3.up * y0, Mathf.Cos(a0) * radius, Mathf.Cos(a1) * radius, y1 - y0, 16, tint, false);
             }
-            Add("Dust", dust, solid, false, false);
-            Add("Scrap", scrap, solid, false, false);
+            var tilt = Matrix4x4.TRS(c, Quaternion.Euler(18f, 0f, 12f), Vector3.one);
+            var ringColor = new Color32(255, 190, 120, 140);
+            for (int k = 0; k < 32; k++)
+            {
+                float a0 = k * Mathf.PI * 2f / 32f, a1 = (k + 1) * Mathf.PI * 2f / 32f;
+                Vector3 P(float a, float r) => tilt.MultiplyPoint3x4(new Vector3(Mathf.Cos(a) * r, 0f, Mathf.Sin(a) * r));
+                // Both faces: the ring is seen from above and below.
+                w.AddQuad(P(a0, 130f), P(a1, 130f), P(a1, 175f), P(a0, 175f), ringColor);
+                w.AddQuad(P(a0, 175f), P(a1, 175f), P(a1, 130f), P(a0, 130f), ringColor);
+            }
         }
 
         private void PlaceTurrets(RaceManager race)
@@ -396,11 +379,11 @@ namespace RacingGame
             // (distance, side): +1 right of the direction of travel. Beside the road, never over it.
             var spots = new List<Vector2>
             {
-                new Vector2(Mid("sweep1"), 1f),
-                new Vector2(layout.GapEnd + 22f, 1f),
-                new Vector2(layout.Range("esse1").y, -1f),
+                new Vector2(Mid("sweep1"), -1f),
+                new Vector2(layout.TunnelEnd + 20f, 1f),
+                new Vector2(Mid("hairpin"), -StarRingLayout.HairpinOutside),
+                new Vector2(layout.GapEnd + 22f, -1f),
                 new Vector2(Mid("west"), 1f),
-                new Vector2(Mid("hairpin"), 1f),
             };
             for (int i = 0; i < spots.Count; i++)
             {

@@ -168,7 +168,10 @@ namespace RacingGame
             }
             float edge = Mathf.Max(Mathf.Abs(x), Mathf.Abs(z));
             float rim = TerrainMeshGen.SmoothStep(Playable - 20f, HalfSize - 30f, edge);
-            float jag = Mathf.Abs(Mathf.Sin(x * 0.031f) * Mathf.Cos(z * 0.027f)) * 35f + Mathf.Abs(Mathf.Sin((x - z) * 0.013f)) * 25f;
+            // Several unrelated frequencies, so the rim reads as a range of peaks and saddles, not a row of equal humps.
+            float jag = Mathf.Abs(Mathf.Sin(x * 0.031f + Mathf.Sin(z * 0.009f) * 2.3f) * Mathf.Cos(z * 0.027f - x * 0.006f)) * 30f
+                      + Mathf.Abs(Mathf.Sin((x - z) * 0.013f + 0.7f)) * 22f + Mathf.Max(0f, Mathf.Sin(x * 0.0047f + z * 0.0061f + 1.9f)) * 34f
+                      + Mathf.Abs(Mathf.Sin(x * 0.083f) * Mathf.Sin(z * 0.071f)) * 8f;
             return h + rim * (38f + jag);
         }
 

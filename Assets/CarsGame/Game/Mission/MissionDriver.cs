@@ -22,7 +22,7 @@ namespace RacingGame
         private int slot;
         private Vector3 goal;
         private float goalSpeedKmh = 90f;
-        private int nextPlanTick, reverseUntilTick, stuckTicks, flippedTicks;
+        private int nextPlanTick, reverseUntilTick, stuckTicks, flippedTicks, lastReverseTick = -100000;
         private float orbitSign = 1f;
         private int obstacleMask;
 
@@ -47,7 +47,7 @@ namespace RacingGame
 
         public DriveCommand Sample(int tick)
         {
-            if (mission == null || car == null || !car.isActiveAndEnabled || !car.inputEnabled) return DriveCommand.None(tick);
+            if (mission == null || car == null || !car.isActiveAndEnabled || !car.inputEnabled || !MissionUnit.Running) return DriveCommand.None(tick);
             if (gunner == null) gunner = GetComponent<AiGunner>();
             if (tick >= nextPlanTick) { Plan(); nextPlanTick = tick + 12 + slot; }
 
@@ -74,6 +74,9 @@ namespace RacingGame
             if (stuckTicks > SimulationDriver.SecondsToTicks(1.6f))
             {
                 stuckTicks = 0;
+                // Backing out did not free it last time (wedged on a hulk or a rock): put it back on the sand.
+                if (tick - lastReverseTick < SimulationDriver.SecondsToTicks(6f)) { lastReverseTick = -100000; return new DriveCommand { Tick = tick, ResetEdge = true }; }
+                lastReverseTick = tick;
                 reverseUntilTick = tick + SimulationDriver.SecondsToTicks(1.1f);
             }
             return new DriveCommand
@@ -132,9 +135,9 @@ namespace RacingGame
             // 3) Circle the fortress, away from the wheel, keeping speed.
             if (boss != null && !boss.Defeated)
             {
-                Vector3 centre = boss.transform.position;
+                Vector3 centre = boss.transform.position - boss.transform.forward * 14f;   // biased to the stern, where the core is
                 Vector3 from = pos - centre; from.y = 0f;
-                float radius = 40f + slot * 4f;
+                float radius = 36f + slot * 3f;
                 float a = Mathf.Atan2(from.x, from.z) + orbitSign * 0.55f;
                 Vector3 g = centre + new Vector3(Mathf.Sin(a), 0f, Mathf.Cos(a)) * radius;
                 Vector3 localGoal = boss.transform.InverseTransformPoint(g);
@@ -145,7 +148,7 @@ namespace RacingGame
                     g = centre + new Vector3(Mathf.Sin(a), 0f, Mathf.Cos(a)) * radius;
                 }
                 goal = g;
-                goalSpeedKmh = 85f;
+                goalSpeedKmh = 78f;
                 KeepOffBossFront(boss);
                 return;
             }
@@ -160,7 +163,7 @@ namespace RacingGame
             if (prey != null && (prey.transform.position - anchor).sqrMagnitude < 170f * 170f)
             {
                 Vector3 v = prey.Body != null ? prey.Body.linearVelocity : Vector3.zero;
-                goal = prey.transform.position + v * 0.8f;
+                goal = prey.transform.position + v * 0.8f + prey.transform.right * (orbitSign * 6f);   // pass alongside and shoot
                 goalSpeedKmh = 100f;
                 return;
             }

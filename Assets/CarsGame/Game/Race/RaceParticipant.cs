@@ -34,6 +34,8 @@ namespace RacingGame
         public int Deaths { get; set; }
         public int EliminatedAtTick { get; private set; } = int.MaxValue;
         public ArenaLayout Arena { get; set; }
+        /// <summary>A map other than the circuit (the boss mission): it owns respawn poses; no track auto-reset.</summary>
+        public IBattleSite Site { get; set; }
         public HotBombRace HotBomb { get; internal set; }
         [Tooltip("Seconds off the asphalt before the car is put back on the track automatically.")]
         public float offTrackResetSeconds = 5f;
@@ -70,7 +72,7 @@ namespace RacingGame
         // grass must never have to find the track again (and AI reuse the same rule).
         private void FixedUpdate()
         {
-            if (Arena != null) return;
+            if (Arena != null || Site != null) return;
             if (Car == null || !Car.inputEnabled || Progress == null || Progress.Path == null) return;
             if (Health != null && Health.IsDead) return;
             bool offAsphalt = Car.Surface == GroundSurface.Ground || (Car.Surface == GroundSurface.None && Car.IsGrounded == false && transform.position.y > -5f);
@@ -115,6 +117,7 @@ namespace RacingGame
         public bool TryGetRespawnPose(out Vector3 position, out Quaternion rotation)
         {
             if (Arena != null) return Arena.TryGetRecoveryPose(Car, out position, out rotation);
+            if (Site != null) return Site.TryGetRecoveryPose(Car, out position, out rotation);
             position = default; rotation = default;
             var path = Progress != null ? Progress.Path : TrackPath.Instance;
             if (path == null || Progress == null) return false;

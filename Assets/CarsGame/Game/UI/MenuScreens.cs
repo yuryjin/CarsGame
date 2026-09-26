@@ -218,7 +218,8 @@ namespace RacingGame
             title.fontStyle = FontStyles.Bold;
             var tiers = Tiers();
             int rivals = ev != null && ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[ResolveTierIndex(tiers)].aiCount : 3;
-            string detail = ev != null ? Loc.Format("events.laps", "n", ev.laps) + "  /  " + Loc.Format("events.rivals", "n", rivals) : "";
+            string detail = ev == null ? "" : ev.mode == EventMode.Mission ? Loc.Format("mission.detail", "n", rivals)
+                : Loc.Format("events.laps", "n", ev.laps) + "  /  " + Loc.Format("events.rivals", "n", rivals);
             int maxStars = list.Count * 3;
             int earnedStars = PlatformGlue.Save != null ? PlatformGlue.Save.Data.TotalStars : 0;
             string stars = "<color=#FFCC40>" + Loc.Format("events.stars", "s", earnedStars, "max", maxStars) + "</color>";
@@ -325,7 +326,8 @@ namespace RacingGame
                 Label(row, "Number", (i + 1).ToString("00"), 52f, Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(116f, -24f), unlocked ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
                 Label(row, "Name", Loc.Get(ev.nameKey), 34f, Top, Vector2.one, new Vector2(144f, -60f), new Vector2(-236f, -12f)).fontStyle = FontStyles.Bold;
                 int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[tierIndex].aiCount : 3;
-                string detail = Loc.Format("events.laps", "n", ev.laps) + "   /   " + Loc.Format("events.rivals", "n", rivals) + TwistSuffix(ev);
+                string detail = ev.mode == EventMode.Mission ? Loc.Format("mission.detail", "n", rivals)
+                    : Loc.Format("events.laps", "n", ev.laps) + "   /   " + Loc.Format("events.rivals", "n", rivals) + TwistSuffix(ev);
                 Label(row, "Stats", detail, 23f, Top, Vector2.one, new Vector2(144f, -96f), new Vector2(-236f, -58f), UiFactory.Muted);
                 var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
                 int starMask = best != null ? best.stars : 0;
@@ -672,7 +674,9 @@ namespace RacingGame
             var rewardText = Label(summary, "Reward", Loc.Format("results.reward", "n", reward), 40f, Top, Vector2.one, new Vector2(234f, -80f), new Vector2(-28f, -20f), UiFactory.Accent);
             rewardText.fontStyle = FontStyles.Bold;
             if (Time.unscaledTime - rewardShownAt < RewardCountSeconds) rewardLabel = rewardText;   // count up once, not on every rebuild
-            Label(summary, "Detail", flow.LastRewardDoubled ? Loc.Get("results.doubled") : flow.CurrentEvent != null ? Loc.Get(flow.CurrentEvent.nameKey) : Loc.Get("results.title"), 26f, Top, Vector2.one, new Vector2(234f, -124f), new Vector2(-28f, -84f), UiFactory.Muted);
+            bool missionEvent = flow.CurrentEvent != null && flow.CurrentEvent.mode == EventMode.Mission;
+            Label(summary, "Detail", flow.LastRewardDoubled ? Loc.Get("results.doubled") : missionEvent ? Loc.Get(MissionDirector.LastVictory ? "mission.victory" : "mission.defeat")
+                : flow.CurrentEvent != null ? Loc.Get(flow.CurrentEvent.nameKey) : Loc.Get("results.title"), 26f, Top, Vector2.one, new Vector2(234f, -124f), new Vector2(-28f, -84f), UiFactory.Muted);
             string record = RecordLine(me);
             if (record.Length > 0) Label(summary, "Record", record, 24f, Top, Vector2.one, new Vector2(234f, -170f), new Vector2(-28f, -128f), flow.LastWasPersonalBest ? UiFactory.Positive : UiFactory.Muted);
 

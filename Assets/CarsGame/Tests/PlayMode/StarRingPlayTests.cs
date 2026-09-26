@@ -13,12 +13,13 @@ namespace RacingGame.Tests
         private TrackPath path;
         private StarRingLayout layout;
 
-        private void Place(CarController car, float d, float lane, float height, Vector3 up, float speed, float verticalOffset = 0f)
+        /// <summary>Car at a lane and a height above the road (world up), its own up along <paramref name="up"/>.</summary>
+        private void Place(CarController car, float d, float lane, float lift, Vector3 up, float speed)
         {
             Vector3 tangent = path.Tangent(d);
             Vector3 position = path.Position(d) + path.Right(d) * lane;
-            position.y = layout.Height(d);
-            car.Teleport(position + up * height + Vector3.up * verticalOffset, Quaternion.LookRotation(tangent, up));
+            position.y = layout.Height(d) + lift;
+            car.Teleport(position, Quaternion.LookRotation(tangent, up));
             car.Body.linearVelocity = tangent * speed;
             Physics.SyncTransforms();
         }
@@ -101,7 +102,7 @@ namespace RacingGame.Tests
             float ceilingAt = layout.TunnelStart + 2f * StarRingLayout.TunnelFlare + 10f;
             input.Set(1f, 0f);
             yield return Ticks(150);   // let the earlier boost run out
-            Place(car, ceilingAt, 0f, -(StarRingTrack.TubeHeight - 0.5f), Vector3.down, 25f);
+            Place(car, ceilingAt, 0f, StarRingTrack.TubeHeight - 0.5f, Vector3.down, 25f);
             yield return Ticks(50);
             Assert.IsTrue(car.WallRiding, $"sticks to the ceiling (y={car.transform.position.y - layout.Height(ceilingAt):F1}, up={car.transform.up}, {car.SpeedKmh:F0} km/h)");
             Assert.Greater(car.transform.position.y, layout.Height(ceilingAt) + StarRingTrack.TubeHeight - 2f, "still up there after a second");
@@ -117,9 +118,9 @@ namespace RacingGame.Tests
             Assert.IsFalse(car.WallRiding, "too slow to stick");
             Assert.Less(car.transform.position.y, layout.Height(ceilingAt) + 3f, "dropped to the floor");
 
-            // 5. Tunnel wall: on its side along the right wall.
+            // 5. Tunnel wall: on its side along the right wall (the wall's normal points left).
             input.Set(1f, 0f);
-            Place(car, ceilingAt, StarRingLayout.HalfWidth - 1.2f, -0.2f, -path.Right(ceilingAt), 25f, 5.5f);
+            Place(car, ceilingAt, StarRingLayout.HalfWidth - 0.8f, 5.5f, -path.Right(ceilingAt), 25f);
             yield return Ticks(50);
             Assert.IsTrue(car.WallRiding, $"sticks to the wall (up={car.transform.up}, {car.SpeedKmh:F0} km/h)");
             Assert.Greater(path.Spline.LateralOffset(car.transform.position, race.Player.Progress.Distance), 6.5f, "still on the wall");
@@ -141,6 +142,7 @@ namespace RacingGame.Tests
             CarController.RamPushScale = ev.ramPush;
 
             // 7. Turrets shoot everyone in sight, player and AI alike.
+            Assert.AreEqual(RaceState.Racing, race.State, $"still racing before the turret check (laps {race.Player.Progress.LapsCompleted})");
             var gunner = map.Turrets[0];
             int hint = -1;
             float turretAt = path.Project(gunner.transform.position, ref hint);
@@ -155,15 +157,13 @@ namespace RacingGame.Tests
                 yield return new WaitForFixedUpdate();
                 if (gunner.Target != null) targeted.Add(gunner.Target.CarId);
                 laser |= gunner.Aiming;
-                if (i % 100 == 0)
-                {
-                    bool playerBlocked = Physics.Linecast(gunner.MuzzlePosition, car.Body.worldCenterOfMass, 1 << LayerMask.NameToLayer("Track"));
-                    bool victimBlocked = Physics.Linecast(gunner.MuzzlePosition, victim.Body.worldCenterOfMass, 1 << LayerMask.NameToLayer("Track"));
-                    Debug.Log($"TURRET_PROBE {i} target={(gunner.Target != null ? gunner.Target.CarId : -1)} seen={string.Join(",", targeted)} shots={gunner.ShotsFired} p={car.CarId}/{car.inputEnabled}/{car.GetComponent<CarHealth>().IsDead}/{Vector3.Distance(gunner.MuzzlePosition,car.transform.position):F1}/{playerBlocked} v={victim.CarId}/{victim.inputEnabled}/{victim.GetComponent<CarHealth>().IsDead}/{Vector3.Distance(gunner.MuzzlePosition,victim.transform.position):F1}/{victimBlocked}");
-                }
             }
             Assert.IsTrue(laser, "the lock is telegraphed");
-            Assert.IsTrue(targeted.Contains(car.CarId) && targeted.Contains(victim.CarId), "both the player and the AI are targets");
+            Assert.IsTrue(targeted.Contains(car.CarId) && targeted.Contains(victim.CarId),
+                $"both the player ({car.CarId}, can={gunner.CanTarget(car)}, {Vector3.Distance(gunner.MuzzlePosition, car.Body.worldCenterOfMass):F0} m) " +
+                $"and the AI ({victim.CarId}, can={gunner.CanTarget(victim)}, {Vector3.Distance(gunner.MuzzlePosition, victim.Body.worldCenterOfMass):F0} m) are targets; " +
+                $"seen [{string.Join(",", targeted)}], shots {gunner.ShotsFired}, now {(gunner.Target != null ? gunner.Target.CarId : 0)}; " +
+                $"race {race.State} laps {race.Player.Progress.LapsCompleted} input {car.inputEnabled}/{victim.inputEnabled} enabled {car.isActiveAndEnabled}/{victim.isActiveAndEnabled}");
             Assert.GreaterOrEqual(gunner.ShotsFired, SpaceTurret.Burst);
 
             flow.RetryRace();

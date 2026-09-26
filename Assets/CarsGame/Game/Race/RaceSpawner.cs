@@ -40,6 +40,8 @@ namespace RacingGame
         public RaceParticipant Player { get; private set; }
         public IReadOnlyList<RaceParticipant> Participants => participants;
         public ArenaLayout Arena { get; private set; }
+        /// <summary>Set by the flow before a mission: the field starts on this map, bots get its driver (not the arena box, not the grid).</summary>
+        public IBattleSite Site;
         private readonly List<RaceParticipant> participants = new List<RaceParticipant>();
 
         private void Start()
@@ -52,7 +54,8 @@ namespace RacingGame
         {
             if (track == null) track = TrackPath.Instance;
             if (grid == null) grid = FindAnyObjectByType<StartGrid>();
-            if (raceCarPrefab == null || (!arena && (track == null || grid == null)))
+            bool site = !arena && Site != null;
+            if (raceCarPrefab == null || (!arena && !site && (track == null || grid == null)))
             {
                 Debug.LogError("[RaceSpawner] prefab, TrackPath and StartGrid are required.", this);
                 Clear();
@@ -66,7 +69,7 @@ namespace RacingGame
                 Arena = ArenaLayout.Create(renderer != null ? renderer.sharedMaterial : null);
             }
             int total = aiCount + 1;
-            bool introTarget = RaceSetup.IsIntroRace && total > 1;
+            bool introTarget = RaceSetup.IsIntroRace && total > 1 && !site;
             int playerSlot = RaceSetup.Event != null && RaceSetup.Event.eventId == "e1" ? Mathf.Min(1, total - 1)
                 : playerGridSlot < 0 ? total - 1 : Mathf.Clamp(playerGridSlot, 0, total - 1);
             int aiIndex = 0;
@@ -75,6 +78,7 @@ namespace RacingGame
                 bool isPlayer = slot == playerSlot;
                 Vector3 pos; Quaternion rot; float lane = 0f;
                 if (arena) Arena.GetSpawnPose(slot, total, out pos, out rot);
+                else if (site) Site.GetSpawnPose(slot, total, out pos, out rot);
                 else grid.GetSlot(slot, track, out pos, out rot, out lane);
                 if (introTarget && slot == 0)
                 {
@@ -92,7 +96,8 @@ namespace RacingGame
                 participant.isPlayer = isPlayer;
                 participant.laneOffset = lane;
                 participant.Arena = Arena;
-                participant.Progress.enabled = !arena;
+                participant.Site = site ? Site : null;
+                participant.Progress.enabled = !arena && !site;
                 if (participant.Health != null)
                 {
                     participant.Health.respawnOnDeath = true;
@@ -129,7 +134,8 @@ namespace RacingGame
                     var gunner = go.GetComponent<AiGunner>() ?? go.AddComponent<AiGunner>();
                     gunner.Initialize(profile, aiFireCooldown);
                     gunner.startGraceSeconds = RaceSetup.Event != null && RaceSetup.Event.eventId == "e1" ? 30f : 3f;
-                    if (arena)
+                    if (site) car.SetInputSource(Site.CreateBotDriver(go, profile));
+                    else if (arena)
                     {
                         var ai = go.AddComponent<ArenaDriver>();
                         ai.Initialize(Arena, profile);

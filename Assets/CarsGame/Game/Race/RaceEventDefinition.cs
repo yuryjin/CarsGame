@@ -4,7 +4,8 @@ namespace RacingGame
 {
     public enum FinishGoal { NoDeaths, WinWithoutRepair, BeatTime }
 
-    public enum EventMode { Race, Arena }
+    /// <summary>Mission = co-op boss fight on its own map (<see cref="MissionDirector"/>).</summary>
+    public enum EventMode { Race, Arena, Mission }
 
     /// <summary>One entry of the race-select screen. Rules vary per event so the single track stays fresh.</summary>
     [CreateAssetMenu(menuName = "Racing/Race Event", fileName = "Event")]
@@ -26,6 +27,8 @@ namespace RacingGame
         public bool spaceTrack;
         [Tooltip("Star Ring: its own space circuit (bridge jump, boost pad, drivable tunnel walls, turrets).")]
         public bool starRingTrack;
+        [Tooltip("Post-apocalyptic wasteland circuit with a broken bridge and drivable tunnel.")]
+        public bool wastelandTrack;
         [Tooltip("Ramming shoves the other car this much harder (1 = plain physics).")]
         [Range(1f, 4f)] public float ramPush = 1f;
         [Tooltip("Legacy: night look when no sky preset is assigned.")] public bool night;

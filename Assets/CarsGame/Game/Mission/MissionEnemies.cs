@@ -94,9 +94,9 @@ namespace RacingGame
             if ((aim - pos).sqrMagnitude > Range * Range) return;
             if (burstLeft <= 0) { burstLeft = 3; readyTick = tick + SimulationDriver.SecondsToTicks(0.5f); return; }   // wind-up
             Vector3 lead = Lead(pos, aim, target.Body != null ? target.Body.linearVelocity : Vector3.zero, BulletSpeed, false);
-            FireShell(pos + Vector3.down * 0.4f, (lead - pos).normalized * BulletSpeed, 4f, tick, ProjectileKind.MachineGun, PrimaryWeaponType.MachineGun, 600f);
+            FireShell(pos + Vector3.down * 0.4f, (lead - pos).normalized * BulletSpeed, 3f, tick, ProjectileKind.MachineGun, PrimaryWeaponType.MachineGun, 600f);
             burstLeft--;
-            readyTick = tick + SimulationDriver.SecondsToTicks(burstLeft > 0 ? 0.12f : 1.7f);
+            readyTick = tick + SimulationDriver.SecondsToTicks(burstLeft > 0 ? 0.12f : 2.3f);
         }
 
         private static bool Usable(CarController car)

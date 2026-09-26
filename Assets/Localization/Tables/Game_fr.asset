@@ -1316,7 +1316,107 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8403702163779584
+    m_Localized: Anneau stellaire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8407536768462848
     m_Localized: "Course des terres d\xE9sol\xE9es"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662261374976
+    m_Localized: "L\xE9viathan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346496
+    m_Localized: "Mission boss / {n} alli\xE9s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346497
+    m_Localized: "L\xC9VIATHAN ROUILL\xC9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346498
+    m_Localized: '{m} m du Dernier Puits'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346499
+    m_Localized: 'Ennemis : {n}   Tes kills : {k}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346500
+    m_Localized: "Arr\xEAte la forteresse avant le Dernier Puits !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346501
+    m_Localized: Des cyborgs descendent des rampes !
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346502
+    m_Localized: "RAID A\xC9RIEN ! Sors des cercles rouges !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346503
+    m_Localized: Un char sort de la forteresse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346504
+    m_Localized: "Un blind\xE9 rejoint l'escorte"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346505
+    m_Localized: "Le L\xE9viathan enrage : d\xE9barquement !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346506
+    m_Localized: "Dernier combat ! Le c\u0153ur surchauffe !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346507
+    m_Localized: "Canon d\xE9truit !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346508
+    m_Localized: "Tous les canons r\xE9duits au silence !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346509
+    m_Localized: "DCA d\xE9truite !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346510
+    m_Localized: "Mortier d\xE9truit !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346511
+    m_Localized: "Hangar \xE0 drones d\xE9truit !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346512
+    m_Localized: Bombardier abattu !
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346513
+    m_Localized: "LE L\xC9VIATHAN EST TOMB\xC9 !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346514
+    m_Localized: "La forteresse a atteint le puits\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346515
+    m_Localized: "D\xE9truis la forteresse"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346516
+    m_Localized: "D\xE9truis {n} ennemis"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346517
+    m_Localized: Char
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346518
+    m_Localized: "Blind\xE9"
     m_Metadata:
       m_Items: []
   references:

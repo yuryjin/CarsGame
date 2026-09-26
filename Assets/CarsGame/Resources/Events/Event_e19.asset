@@ -23,7 +23,7 @@ MonoBehaviour:
   starRingTrack: 1
   ramPush: 2.2
   night: 0
-  sky: {fileID: 11400000, guid: ed31c2cf4ce213d7b9c521d9fd395721, type: 2}
+  sky: {fileID: 11400000, guid: 848e3c246303454e9e20469c5eea9732, type: 2}
   damageMultiplier: 1
   pickupCount: 0
   mineFieldCount: 0

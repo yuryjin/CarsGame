@@ -59,6 +59,7 @@ namespace RacingGame
         private Quaternion turretRestRotation, barrelRestRotation;
         private float turretYaw, barrelPitch;
         private CarController turretTarget;
+        private MissionUnit turretUnit;
         private bool aimCommitted;
         private Vector3 aimCommitPoint;
         private Material shellMaterial;
@@ -78,6 +79,8 @@ namespace RacingGame
         public float BarrelPitch => barrelPitch;
         /// <summary>The rival the turret is tracking, else null.</summary>
         public CarController TurretTarget => turretTarget;
+        /// <summary>The mission unit the turret is tracking when no car is in its sector, else null.</summary>
+        public MissionUnit TurretUnit => turretUnit;
         /// <summary>True while an AI gunner holds the barrel on a frozen aim point.</summary>
         public bool HasAimCommit => aimCommitted;
         /// <summary>World point the barrel tracks while <see cref="HasAimCommit"/> is set.</summary>
@@ -105,6 +108,15 @@ namespace RacingGame
                 }
             }
             return aim + relative * (Vector3.Distance(aim, origin) / speed);
+        }
+
+        /// <summary>Lead for a mission unit (drone, trooper, a point on the boss's hull nearest the barrel).</summary>
+        public Vector3 SolveAimPoint(MissionUnit target)
+        {
+            Vector3 origin = barrel != null ? barrel.position : transform.position;
+            Vector3 aim = target.AimPointFrom(origin);
+            Vector3 relative = target.Velocity - (rb != null ? rb.linearVelocity : Vector3.zero);
+            return aim + relative * (Vector3.Distance(aim, origin) / Mathf.Max(1f, shellSpeed));
         }
 
         /// <summary>Hold the barrel on a world point until <see cref="ClearAimCommit"/>. The player never calls this.</summary>
@@ -239,17 +251,23 @@ namespace RacingGame
             }
             else
             {
-                if (!enabled) turretTarget = null;
+                if (!enabled) { turretTarget = null; turretUnit = null; }
                 else if ((tick + (car != null ? car.CarId : 0)) % 5 == 0)   // re-acquire 10×/s, staggered per car
                 {
                     // From the muzzle, not the roof pivot: the pivot sits inside the hull, so a linecast from it
                     // hits the car or the road and the turret never acquires.
                     Vector3 origin = muzzle != null ? muzzle.position : turret.position;
                     turretTarget = TargetFinder.Find(car, origin, transform.forward, turretYawLimit, turretMinRange, turretMaxRange, shellSpeed, closestToAxis: true);
+                    turretUnit = turretTarget == null ? TargetFinder.FindUnit(car, origin, transform.forward, turretYawLimit, turretMinRange, turretMaxRange, closestToAxis: true) : null;
                 }
                 if (turretTarget != null && turretTarget.isActiveAndEnabled)
                 {
                     aim = SolveAimPoint(turretTarget, false);
+                    haveAim = true;
+                }
+                else if (turretUnit != null && turretUnit.Targetable)
+                {
+                    aim = SolveAimPoint(turretUnit);
                     haveAim = true;
                 }
             }

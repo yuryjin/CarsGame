@@ -20,7 +20,7 @@ namespace RacingGame.Tests
         {
             var layout = new StarRingLayout();
             var p = layout.Points;
-            Assert.That(layout.Length, Is.InRange(1200f, 1600f));
+            Assert.That(layout.Length, Is.InRange(1000f, 1600f));
             Assert.Less(Vector3.Distance(p[p.Length - 1], p[0]), StarRingLayout.Step * 1.5f, "the last chord ends at the start");
             var spline = new TrackSpline(p);
             Assert.AreEqual(layout.Length, spline.Length, 0.5f, "feature distances index the spline");
@@ -75,7 +75,7 @@ namespace RacingGame.Tests
             Assert.Greater(Landing(75f, layout), StarRingLayout.GapLength, "75 km/h clears it");
             float boosted = Landing(160f, layout);   // faster than a boosted standard car
             Assert.Greater(boosted, 0f);
-            Assert.Less(layout.GapStart + boosted, layout.Range("sweep2").x + 20f, "even a boosted car lands on the high road");
+            Assert.Less(layout.GapStart + boosted, layout.Range("drop").x + 20f, "even a boosted car lands on the high road");
             Assert.AreEqual(StarRingLayout.DeckHeight, layout.Height(layout.GapStart - StarRingLayout.KickLength - 1f), 1e-3f);
             Assert.AreEqual(StarRingLayout.LipHeight, layout.Height(layout.GapStart - 1e-3f), 0.01f);
             for (float d = 0f; d < layout.Length; d += 0.5f)
@@ -91,7 +91,7 @@ namespace RacingGame.Tests
                 Assert.LessOrEqual(layout.SafeRespawn(d), layout.GapStart - StarRingLayout.JumpRunUp, $"from {d}");
             Assert.AreEqual(layout.Hairpin.x, layout.SafeRespawn(layout.Hairpin.x));
             Assert.AreEqual(10f, layout.SafeRespawn(10f));
-            Assert.Greater(layout.GapStart - StarRingLayout.JumpRunUp, layout.Range("sweep1").x, "the run-up starts on the climb, not on the grid");
+            Assert.Greater(layout.GapStart - StarRingLayout.JumpRunUp, layout.Range("rise").x, "the run-up starts on the climb, not after the corner");
         }
 
         [Test]
@@ -116,6 +116,7 @@ namespace RacingGame.Tests
                 Assert.AreEqual(layout.Length, path.Length, 0.5f);
                 Assert.AreEqual(StarRingLayout.HalfWidth, path.halfWidth);
                 int mask = 1 << LayerMask.NameToLayer("Track");
+                // The path points carry the road height already.
                 Vector3 Surface(float d, float lane) => path.Position(d) + path.Right(d) * lane;
                 bool Down(float d, float lane) => Physics.Raycast(Surface(d, lane) + Vector3.up * 3f, Vector3.down, 6f, mask);
 
@@ -139,12 +140,12 @@ namespace RacingGame.Tests
                 Assert.IsNotNull(wall.collider.GetComponent<GravitySurface>());
                 Assert.IsFalse(Physics.Raycast(Surface(layout.StartLine, 0f) + Vector3.up * 3f, Vector3.up, 30f, mask), "open sky outside the tunnel");
 
-                // Rails on the straights, none on the outside (left) of the semi-sharp corner.
+                // Rails on the straights, none on the outside of the semi-sharp corner.
                 bool Side(float d, float sign) => Physics.Raycast(Surface(d, 0f) + Vector3.up * 0.5f, path.Right(d) * sign, StarRingLayout.HalfWidth + 1f, mask);
                 Assert.IsTrue(Side(layout.StartLine + 20f, -1f) && Side(layout.StartLine + 20f, 1f));
                 float apex = (layout.Hairpin.x + layout.Hairpin.y) * 0.5f;
-                Assert.IsFalse(Side(apex, -1f), "open edge outside the corner");
-                Assert.IsTrue(Side(apex, 1f), "inside rail stays");
+                Assert.IsFalse(Side(apex, StarRingLayout.HairpinOutside), "open edge outside the corner");
+                Assert.IsTrue(Side(apex, -StarRingLayout.HairpinOutside), "inside rail stays");
 
                 Assert.AreEqual(5, map.Turrets.Count);
                 foreach (var turret in map.Turrets)

@@ -9,6 +9,7 @@ namespace RacingGame
         private readonly GameObject owner;
         private readonly CarController car;
         private CarController pendingTarget;
+        private MissionUnit pendingUnit;
         private PrimaryWeaponCatalog.Profile pendingShot;
         private float pendingDamage;
         private int impactTick = -1;
@@ -30,7 +31,7 @@ namespace RacingGame
                 && PrimaryWeaponCatalog.Get(type).Mode != WeaponMode.Trap ? new WeaponRig(owner.transform, type) : null;
         }
 
-        public void Cancel() { impactTick = -1; pendingTarget = null; rig?.Stop(); }
+        public void Cancel() { impactTick = -1; pendingTarget = null; pendingUnit = null; rig?.Stop(); }
         public void UpdateVisual() => rig?.Update();
 
         public void Step(int tick)
@@ -41,7 +42,9 @@ namespace RacingGame
             var health = owner.GetComponent<CarHealth>();
             if ((status != null && status.IsJammed) || (health != null && health.IsDead)) return;
             if (CanHit(pendingTarget, pendingShot)) Hit(pendingTarget, pendingShot, pendingDamage);
+            else if (CanHit(pendingUnit, pendingShot)) HitUnit(pendingUnit, pendingDamage);
             pendingTarget = null;
+            pendingUnit = null;
         }
 
         public void Fire(PrimaryWeaponCatalog.Profile shot, float damage, int tick)
@@ -65,13 +68,16 @@ namespace RacingGame
             }
 
             var target = TargetFinder.Find(car, origin, owner.transform.forward, shot.Mode == WeaponMode.Pulse ? 180f : shot.Arc, 0.1f, shot.Range);
-            Vector3 end = target != null ? target.transform.position + Vector3.up * 0.5f : origin + owner.transform.forward * shot.Range;
+            var unit = target == null ? TargetFinder.FindUnit(car, origin, owner.transform.forward, shot.Mode == WeaponMode.Pulse ? 180f : shot.Arc, 0.1f, shot.Range) : null;
+            Vector3 end = target != null ? target.transform.position + Vector3.up * 0.5f
+                : unit != null ? unit.AimPointFrom(origin) : origin + owner.transform.forward * shot.Range;
             if (target == null && Physics.Linecast(origin, end, out var obstacle, TargetFinder.ObstacleMask, QueryTriggerInteraction.Ignore)) end = obstacle.point;
             rig?.Play(end, shot);
 
             if (shot.Mode == WeaponMode.Melee)
             {
                 pendingTarget = target;
+                pendingUnit = unit;
                 pendingShot = shot;
                 pendingDamage = damage;
                 impactTick = tick + SimulationDriver.SecondsToTicks(Mathf.Min(0.18f, shot.Interval * 0.45f));
@@ -79,18 +85,23 @@ namespace RacingGame
             else if (shot.Mode == WeaponMode.Beam)
             {
                 if (CanHit(target, shot)) Hit(target, shot, damage);
+                else if (CanHit(unit, shot)) HitUnit(unit, damage);
             }
             else
             {
                 var cars = director.Cars;
                 for (int i = 0; i < cars.Count; i++)
                     if (CanHit(cars[i], shot)) Hit(cars[i], shot, damage);
+                var units = MissionUnit.All;
+                for (int i = units.Count - 1; i >= 0; i--)
+                    if (i < units.Count && CanHit(units[i], shot)) HitUnit(units[i], damage);
             }
         }
 
         private bool CanHit(CarController target, PrimaryWeaponCatalog.Profile shot)
         {
             if (target == null || target.gameObject == owner || !target.isActiveAndEnabled) return false;
+            if (!Teams.Hostile(owner, target.gameObject)) return false;
             var health = target.GetComponent<CarHealth>();
             if (health == null || health.IsDead || health.IsInvulnerable) return false;
             Vector3 origin = owner.transform.position + Vector3.up;
@@ -99,6 +110,26 @@ namespace RacingGame
             if (offset.sqrMagnitude > shot.Range * shot.Range || offset.sqrMagnitude < 0.001f) return false;
             if (shot.Mode != WeaponMode.Pulse && Vector3.Angle(owner.transform.forward, offset) > shot.Arc) return false;
             return !Physics.Linecast(origin, end, TargetFinder.ObstacleMask, QueryTriggerInteraction.Ignore);
+        }
+
+        private bool CanHit(MissionUnit unit, PrimaryWeaponCatalog.Profile shot)
+        {
+            if (unit == null || !unit.Targetable || !Teams.Hostile(owner, unit.gameObject)) return false;
+            Vector3 origin = owner.transform.position + Vector3.up;
+            Vector3 end = unit.AimPointFrom(origin);
+            Vector3 offset = end - origin;
+            float reach = shot.Range + unit.Radius;
+            if (offset.sqrMagnitude > reach * reach || offset.sqrMagnitude < 0.001f) return false;
+            if (shot.Mode != WeaponMode.Pulse && Vector3.Angle(owner.transform.forward, offset) > shot.Arc + 10f) return false;
+            return !Physics.Linecast(origin, end, TargetFinder.ObstacleMask, QueryTriggerInteraction.Ignore);
+        }
+
+        private void HitUnit(MissionUnit unit, float damage)
+        {
+            Vector3 point = unit.AimPointFrom(owner.transform.position + Vector3.up);
+            if (!unit.TakeHit(owner, damage, point)) return;
+            RaceDirector.Current?.CountHit(owner, unit.gameObject);
+            EffectPool.Current?.PlayShellImpact(point);
         }
 
         private void Hit(CarController target, PrimaryWeaponCatalog.Profile shot, float damage)

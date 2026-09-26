@@ -31,6 +31,8 @@ namespace RacingGame
         public float MatchDuration => (RaceSetup.Event != null && RaceSetup.Event.mode == EventMode.Arena && RaceSetup.Event.matchDuration > 0f)
             ? RaceSetup.Event.matchDuration
             : arenaDurationSeconds;
+        /// <summary>Co-op boss mission: the <see cref="MissionDirector"/> decides when it ends (<see cref="EndMission"/>).</summary>
+        public bool IsMissionMode => RaceSetup.Event != null && RaceSetup.Event.mode == EventMode.Mission;
         public double RemainingTime => IsArenaMode ? Math.Max(0d, MatchDuration - RaceTime) : 0d;
 
         public RaceState State { get; private set; } = RaceState.Idle;
@@ -81,6 +83,22 @@ namespace RacingGame
             EndRace();
         }
         public bool HasFinished(RaceParticipant p) => finishTimes.ContainsKey(p);
+
+        /// <summary>
+        /// Boss mission over. A win: the whole team finishes together, placed by kills. A loss: everyone is DNF.
+        /// </summary>
+        public void EndMission(bool victory)
+        {
+            if (State != RaceState.Racing && State != RaceState.Finishing) return;
+            if (victory)
+            {
+                double t = RaceClock.Now - RaceStartTime;
+                var order = new List<RaceParticipant>(participants);
+                order.Sort((a, b) => b.Kills != a.Kills ? b.Kills.CompareTo(a.Kills) : a.Deaths.CompareTo(b.Deaths));
+                for (int i = 0; i < order.Count; i++) if (order[i] != null) finishTimes[order[i]] = t + i * 0.001;
+            }
+            EndRace();
+        }
 
         private void Start()
         {
@@ -250,6 +268,7 @@ namespace RacingGame
                 if (RaceTime >= MatchDuration) EndRace();
                 return;
             }
+            if (IsMissionMode) return;   // no laps, no rubber band: the mission ends itself
 
             bandTimer += Time.unscaledDeltaTime;
             if (bandTimer >= 0.5f) { bandTimer = 0f; ApplyRubberBand(); }

@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7207e96185f9726db8f236de4b3dfb7a, type: 3}
+  m_Name: Sky_Desert
+  m_EditorClassIdentifier: RacingGame.Game::RacingGame.World.SkyPreset
+  zenith: {r: 0.26, g: 0.47, b: 0.82, a: 1}
+  horizon: {r: 0.96, g: 0.83, b: 0.64, a: 1}
+  ground: {r: 0.56, g: 0.43, b: 0.3, a: 1}
+  horizonExp: 0.45
+  sunEuler: {x: 52, y: 300, z: 0}
+  sunLightColor: {r: 1, g: 0.9, b: 0.76, a: 1}
+  sunIntensity: 1.6
+  sunDiscColor: {r: 2.8, g: 2.3, b: 1.5, a: 1}
+  sunAngularRadius: 1.6
+  sunGlow: 0.45
+  sunGlowPower: 18
+  moonEuler: {x: 40, y: 120, z: 0}
+  moonColor: {r: 0, g: 0, b: 0, a: 1}
+  moonAngularRadius: 1.6
+  stars: 0
+  fogStart: 220
+  fogEnd: 900
+  ambientSky: {r: 0.62, g: 0.64, b: 0.72, a: 1}
+  ambientEquator: {r: 0.72, g: 0.6, b: 0.46, a: 1}
+  ambientGround: {r: 0.36, g: 0.27, b: 0.18, a: 1}
+  reflectionIntensity: 0.9
+  mountainColor: {r: 0.72, g: 0.52, b: 0.38, a: 1}
+  postExposure: 0.1
+  saturation: 14
+  contrast: 16
+  colorFilter: {r: 1, g: 0.96, b: 0.9, a: 1}
+  bloomIntensity: 0.75
+  vignette: 0.3
+  headlights: 0
+  lampsOn: 0

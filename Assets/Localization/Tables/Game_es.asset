@@ -1320,7 +1320,107 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8403702163779584
+    m_Localized: Anillo estelar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8407536768462848
     m_Localized: Carrera del Yermo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662261374976
+    m_Localized: "Leviat\xE1n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346496
+    m_Localized: "Misi\xF3n jefe / {n} aliados"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346497
+    m_Localized: "LEVIAT\xC1N OXIDADO"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346498
+    m_Localized: "{m} m al \xDAltimo Pozo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346499
+    m_Localized: 'Enemigos: {n}   Tus bajas: {k}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346500
+    m_Localized: "\xA1Det\xE9n la fortaleza antes de que llegue al pozo!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346501
+    m_Localized: "\xA1C\xEDborgs bajando por las rampas!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346502
+    m_Localized: "\xA1ATAQUE A\xC9REO! \xA1Sal de los c\xEDrculos rojos!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346503
+    m_Localized: Un tanque sale de la fortaleza
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346504
+    m_Localized: Un blindado se une a la escolta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346505
+    m_Localized: "\xA1El Leviat\xE1n se enfurece: despliega tropas!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346506
+    m_Localized: "\xA1\xDAltima batalla! \xA1El n\xFAcleo se sobrecalienta!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346507
+    m_Localized: "\xA1Ca\xF1\xF3n destruido!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346508
+    m_Localized: "\xA1Todos los ca\xF1ones silenciados!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346509
+    m_Localized: "\xA1Antia\xE9rea destruida!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346510
+    m_Localized: "\xA1Mortero destruido!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346511
+    m_Localized: "\xA1Hangar de drones destruido!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346512
+    m_Localized: "\xA1Bombardero derribado!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346513
+    m_Localized: "\xA1EL LEVIAT\xC1N HA CA\xCDDO!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346514
+    m_Localized: "La fortaleza lleg\xF3 al pozo\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346515
+    m_Localized: Destruye la fortaleza
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346516
+    m_Localized: Destruye {n} enemigos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346517
+    m_Localized: Tanque
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346518
+    m_Localized: Blindado
     m_Metadata:
       m_Items: []
   references:

@@ -51,6 +51,8 @@ namespace RacingGame
         private AbyssTrack abyssTrack;
         private SpaceTrack spaceTrack;
         private StarRingTrack starRing;
+        private WastelandTrack wasteland;
+        private MissionDirector mission;
         private TrackFork trackFork;
         private HotBombRace hotBomb;
         private PickupSpawner pickups;
@@ -128,10 +130,12 @@ namespace RacingGame
             ClearGhosts();
             if (hotBomb != null) { hotBomb.Stop(); Destroy(hotBomb); hotBomb = null; }
             if (race != null && race.State != RaceState.Idle) race.AbortRace();
+            if (mission != null) { mission.Dispose(); Destroy(mission.gameObject); mission = null; }
             if (pickups != null) pickups.Clear();
             if (trackFork != null) { trackFork.Restore(); Destroy(trackFork.gameObject); trackFork = null; }
             if (spaceTrack != null) { spaceTrack.Restore(); Destroy(spaceTrack.gameObject); spaceTrack = null; }
             if (starRing != null) { starRing.Restore(); Destroy(starRing.gameObject); starRing = null; }
+            if (wasteland != null) { wasteland.Restore(); Destroy(wasteland.gameObject); wasteland = null; }
             CarController.RamPushScale = 1f;
             if (abyssTrack != null) { abyssTrack.Restore(); Destroy(abyssTrack.gameObject); abyssTrack = null; }
             var director = RaceDirector.Current; if (director != null) director.ResetRace();   // no shell survives into the next race
@@ -178,13 +182,15 @@ namespace RacingGame
             race.laps = ev != null ? ev.laps : 3;
             race.aiCountOverride = ev != null ? ev.aiCountOverride : -1;
             if (track != null) { track.reversed = ev != null && ev.reversed; track.Build(); }
-            if (ev != null && ev.starRingTrack && track != null) starRing = StarRingTrack.Create(track, race);
+            if (ev != null && ev.wastelandTrack && track != null) wasteland = WastelandTrack.Create(track);
+            else if (ev != null && ev.starRingTrack && track != null) starRing = StarRingTrack.Create(track, race);
             else if (ev != null && (ev.abyssTrack || ev.spaceTrack) && track != null)
             {
                 abyssTrack = AbyssTrack.Create(track);
                 if (ev.spaceTrack) spaceTrack = SpaceTrack.Create(track, abyssTrack);
             }
-            if (track != null && abyssTrack == null && starRing == null && (ev == null || ev.mode != EventMode.Arena))
+            if (ev != null && ev.mode == EventMode.Mission) mission = MissionDirector.Create(race);   // its own desert; the circuit hides
+            if (track != null && abyssTrack == null && starRing == null && wasteland == null && mission == null && (ev == null || ev.mode != EventMode.Arena))
                 trackFork = TrackFork.Create(track);
             CarHealth.GlobalDamageMultiplier = ev != null ? ev.damageMultiplier : 1f;
             CarController.RamPushScale = ev != null ? ev.ramPush : 1f;
@@ -199,13 +205,13 @@ namespace RacingGame
             race.StartRace();
             if (race.State == RaceState.Idle) { EnterMenu(); return; }
             if (abyssTrack != null && spaceTrack == null && race.Player != null) abyssTrack.Follow(race.Player.Progress);
-            if (pickups != null && (ev == null || ev.mode != EventMode.Arena)) pickups.Spawn(ev != null ? ev.pickupCount : 9);
+            if (pickups != null && mission == null && (ev == null || ev.mode != EventMode.Arena)) pickups.Spawn(ev != null ? ev.pickupCount : 9);
             LayMineField(ev);
             if (hud != null) hud.SetVisible(true);
             if (speedFx != null) speedFx.SetVisible(true);
             if (overlays != null) overlays.SetVisible(true);
             SetState(FlowState.Racing);
-            if (ev == null || ev.mode != EventMode.Arena) SpawnGhosts(ev, generation);
+            if (mission == null && (ev == null || ev.mode != EventMode.Arena)) SpawnGhosts(ev, generation);
         }
 
         // Arena: the fight zone; a race: slalom gates on the straights. Seeded from the race, so the daily race matches for everyone.
@@ -469,6 +475,7 @@ namespace RacingGame
             float mult = RaceSetup.Tier != null ? RaceSetup.Tier.rewardMultiplier : 1f;
             int[] killsPerVictim = me != null && me.Kills > 0 ? KillsPerVictim(race.Player) : null;
             LastReward = me != null ? Economy.RaceReward(me.Position, me.Finished, me.Laps, race.laps, killsPerVictim, mult) : 0;
+            if (mission != null) LastReward = mission.Reward(me, mult);
             // The floor is for the first FINISHED race (a DNF before it must not use it up); a finish always leaves a timed best.
             bool firstFinish = save != null && !save.Data.progress.bests.Exists(b => b != null && b.bestTimeMs > 0);
             if (me != null && save != null) LastReward = Economy.WithFirstRaceFloor(LastReward, me.Finished, firstFinish);

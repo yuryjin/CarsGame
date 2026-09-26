@@ -13,8 +13,8 @@ namespace RacingGame
     /// </summary>
     public sealed class BossCrawler : MonoBehaviour
     {
-        public const float Length = 46f, Width = 26f, HullShare = 0.3f;
-        public const float BaseSpeed = 5f;   // m/s: ~4.5 minutes from the start to the settlement
+        public const float Length = 46f, Width = 26f, HullShare = 0.5f;
+        public const float BaseSpeed = 4.4f;   // m/s: ~5 minutes from the start to the settlement
 
         public DesertMap Map { get; private set; }
         public float Distance { get; private set; }
@@ -233,9 +233,9 @@ namespace RacingGame
             {
                 if (car == null || !car.isActiveAndEnabled || !Teams.Hostile(gameObject, car.gameObject)) continue;
                 Vector3 local = transform.InverseTransformPoint(car.transform.position);
-                if (local.y > 9f || Mathf.Abs(local.x) > Width * 0.5f + 1.5f) continue;
+                if (local.y > 9f || Mathf.Abs(local.x) > Width * 0.5f + 0.6f) continue;
                 bool wheelZone = local.z > Length * 0.5f - 2f && local.z < Length * 0.5f + 20f && Mathf.Abs(local.x) < 5f;
-                bool trackZone = Mathf.Abs(local.z) < Length * 0.5f && Mathf.Abs(local.x) > 6f && local.y < 5f;
+                bool trackZone = Mathf.Abs(local.z) < Length * 0.5f - 1f && Mathf.Abs(local.x) > 7f && Mathf.Abs(local.x) < Width * 0.5f && local.y < 4f;   // under a track pod
                 if (!wheelZone && !trackZone) continue;
                 if (crushTick.TryGetValue(car.CarId, out int last) && tick - last < cooldown) continue;
                 crushTick[car.CarId] = tick;
@@ -451,7 +451,7 @@ namespace RacingGame
 
         private void StepCannon(int tick)
         {
-            const float range = 125f, shellSpeed = 85f;
+            const float range = 105f, shellSpeed = 85f;
             if (tick < readyTick) return;
             if (target == null || !StillValid(target, range))
             {
@@ -462,10 +462,10 @@ namespace RacingGame
             aimPoint = Lead(muzzle.position, target.transform.position + Vector3.up * 0.6f, target.Body != null ? target.Body.linearVelocity : Vector3.zero, shellSpeed);
             TurnHead(aimPoint, 70f);
             if (tick < fireAtTick) return;
-            FireShell(muzzle.position, (aimPoint - muzzle.position).normalized * shellSpeed, 20f, tick, impact: 6500f);
+            FireShell(muzzle.position, (aimPoint - muzzle.position).normalized * shellSpeed, 12f, tick, impact: 6000f);
             lastTargetId = target.CarId;
             target = null;
-            readyTick = tick + SimulationDriver.SecondsToTicks(3.4f * PhaseScale);
+            readyTick = tick + SimulationDriver.SecondsToTicks(4.2f * PhaseScale);
         }
 
         private void StepFlak(int tick)
@@ -483,7 +483,7 @@ namespace RacingGame
             aimPoint = Lead(muzzle.position, target.transform.position + Vector3.up * 0.5f, target.Body != null ? target.Body.linearVelocity : Vector3.zero, speed, false);
             TurnHead(aimPoint, 160f);
             if (tick < fireAtTick) return;
-            FireShell(muzzle.position, (aimPoint - muzzle.position).normalized * speed, 3.5f, tick, ProjectileKind.MachineGun, PrimaryWeaponType.MachineGun, 700f);
+            FireShell(muzzle.position, (aimPoint - muzzle.position).normalized * speed, 2.5f, tick, ProjectileKind.MachineGun, PrimaryWeaponType.MachineGun, 700f);
             burstLeft--;
             readyTick = burstLeft > 0 ? tick + SimulationDriver.SecondsToTicks(0.09f) : tick + SimulationDriver.SecondsToTicks(2.2f * PhaseScale);
         }

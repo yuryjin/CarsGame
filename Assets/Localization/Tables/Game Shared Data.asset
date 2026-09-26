@@ -1307,6 +1307,106 @@ MonoBehaviour:
     m_Key: events.e19.name
     m_Metadata:
       m_Items: []
+  - m_Id: 8407536768462848
+    m_Key: events.e20.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662261374976
+    m_Key: events.m1.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346496
+    m_Key: mission.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346497
+    m_Key: mission.boss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346498
+    m_Key: mission.route
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346499
+    m_Key: mission.count
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346500
+    m_Key: mission.brief
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346501
+    m_Key: mission.troops
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346502
+    m_Key: mission.air_raid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346503
+    m_Key: mission.tank_out
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346504
+    m_Key: mission.escort_out
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346505
+    m_Key: mission.phase2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346506
+    m_Key: mission.phase3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346507
+    m_Key: mission.cannon_down
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346508
+    m_Key: mission.cannons_down
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346509
+    m_Key: mission.flak_down
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346510
+    m_Key: mission.mortar_down
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346511
+    m_Key: mission.hangar_down
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346512
+    m_Key: mission.plane_down
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346513
+    m_Key: mission.victory
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346514
+    m_Key: mission.defeat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346515
+    m_Key: mission.star1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346516
+    m_Key: mission.star2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346517
+    m_Key: mission.unit.tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8409662282346518
+    m_Key: mission.unit.armored
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228
