@@ -15,7 +15,7 @@ namespace RacingGame
         private const int MaxBars = 10;
         private MissionDirector mission;
         private HudScreen hud;
-        private RectTransform root, bossMarker;
+        private RectTransform root, bossMarker, distancePanel, bossPanel, coreTrack, routeTrack;
         private GameObject raceStatus;
         private Image coreFill, routeFill;
         private TextMeshProUGUI bossName, corePct, routeText, countText, markerText, hitText;
@@ -23,6 +23,18 @@ namespace RacingGame
         private readonly Image[] barFills = new Image[MaxBars];
         private float hitUntil, nextSlowRefresh;
         private Sprite white;
+        private int layoutWidth, layoutHeight;
+        private float layoutScale;
+        private bool layoutTouch;
+        private readonly List<RectTransform> markerBlockers = new List<RectTransform>();
+        private readonly List<Rect> occupied = new List<Rect>();
+        private readonly Vector3[] corners = new Vector3[4];
+        private static readonly HashSet<string> MarkerBlockerNames = new HashSet<string>
+        {
+            "BossPanel", "LiveGoals", "Speedometer", "Health", "AmmoPanel", "SecondaryPanel",
+            "StatusPanel", "TimerPanel", "PauseButton", "HintsPanel", "EventPanel",
+            "Left", "Right", "Fire", "Brake", "SwapWeapon", "Secondary", "Reset"
+        };
 
         public static MissionHud Create(MissionDirector mission, HudScreen hud)
         {
@@ -51,21 +63,25 @@ namespace RacingGame
             white = Sprite.Create(Texture2D.whiteTexture, new Rect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f));
             var top = new Vector2(0.5f, 1f);
             var panel = UiFactory.Card(root, "BossPanel", top, top, new Vector2(-380f, -212f), new Vector2(380f, -104f), 0.92f);
+            bossPanel = panel;
             bossName = UiFactory.Text(panel, "BossName", Loc.Get("mission.boss"), 26f, TextAlignmentOptions.MidlineLeft, new Vector2(0f, 1f), Vector2.one, new Vector2(18f, -44f), new Vector2(-120f, -6f), new Color(1f, 0.45f, 0.3f));
             bossName.fontStyle = FontStyles.Bold;
             corePct = UiFactory.Text(panel, "CorePct", "100%", 26f, TextAlignmentOptions.MidlineRight, new Vector2(0f, 1f), Vector2.one, new Vector2(-140f, -44f), new Vector2(-18f, -6f));
             var track = UiFactory.Panel(panel, "CoreBar", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(18f, -70f), new Vector2(-18f, -48f), new Color(0.12f, 0.08f, 0.07f), false);
+            coreTrack = track;
             coreFill = Fill(track, new Color(1f, 0.32f, 0.18f));
             foreach (float notch in new[] { 0.33f, 0.66f })
                 UiFactory.Panel(track, "Phase", new Vector2(notch, 0f), new Vector2(notch, 1f), new Vector2(-2f, -4f), new Vector2(2f, 4f), new Color(1f, 0.85f, 0.4f), false);
             var route = UiFactory.Panel(panel, "RouteBar", Vector2.zero, new Vector2(1f, 0f), new Vector2(18f, 12f), new Vector2(-300f, 22f), new Color(0.12f, 0.1f, 0.08f), false);
+            routeTrack = route;
             routeFill = Fill(route, new Color(1f, 0.6f, 0.15f));
             routeText = UiFactory.Text(panel, "RouteText", "", 20f, TextAlignmentOptions.MidlineRight, Vector2.zero, new Vector2(1f, 0f), new Vector2(-290f, 4f), new Vector2(-18f, 32f), UiFactory.Muted);
-            countText = UiFactory.Text(root, "EnemyCount", "", 22f, TextAlignmentOptions.Center, top, top, new Vector2(-300f, -250f), new Vector2(300f, -216f), UiFactory.Muted);
+            countText = UiFactory.Text(panel, "EnemyCount", "", 22f, TextAlignmentOptions.Center, top, top, new Vector2(-300f, -250f), new Vector2(300f, -216f), UiFactory.Muted);
 
             bossMarker = UiFactory.Panel(root, "BossMarker", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-22f, -22f), new Vector2(22f, 22f), new Color(1f, 0.3f, 0.2f, 0.9f));
             bossMarker.localRotation = Quaternion.Euler(0f, 0f, 45f);
-            markerText = UiFactory.Text(root, "BossDistance", "", 20f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-80f, -60f), new Vector2(80f, -30f), new Color(1f, 0.55f, 0.4f));
+            distancePanel = UiFactory.Panel(root, "BossDistancePanel", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-55f, -12f), new Vector2(55f, 12f), new Color(0.035f, 0.05f, 0.08f, 0.9f), false);
+            markerText = UiFactory.Text(distancePanel, "BossDistance", "", 20f, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, UiFactory.Accent);
             hitText = UiFactory.Text(root, "UnitHit", "×", 56f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-50f, 30f), new Vector2(50f, 130f), new Color(1f, 0.6f, 0.2f));
             hitText.gameObject.SetActive(false);
             for (int i = 0; i < MaxBars; i++)
@@ -75,6 +91,97 @@ namespace RacingGame
                 bars[i] = bar;
                 bar.gameObject.SetActive(false);
             }
+            // These are informational overlays, never targets that intercept driving input.
+            foreach (var graphic in root.GetComponentsInChildren<Graphic>(true)) graphic.raycastTarget = false;
+        }
+
+        internal static float StatusWidthPixels(float screenWidth, float scale) => Mathf.Min(screenWidth - 24f, Mathf.Max(250f, 760f * scale));
+
+        private void Layout()
+        {
+            float scale = Mathf.Max(0.01f, root.lossyScale.x);
+            bool touch = TouchControlsPresenter.IsShown;
+            if (layoutWidth == Screen.width && layoutHeight == Screen.height && Mathf.Abs(layoutScale - scale) < 0.001f && layoutTouch == touch) return;
+            layoutWidth = Screen.width; layoutHeight = Screen.height; layoutScale = scale;
+            layoutTouch = touch;
+            // Keep the HUD coordinate system for world projections, but size information in
+            // actual screen pixels. Uniformly enlarging the old card would cover the health HUD.
+            float width = StatusWidthPixels(Screen.width, scale);
+            float title = Mathf.Max(14f, 26f * scale), detail = Mathf.Max(12f, 20f * scale);
+            float percentageWidth = title * 3.6f;
+            bossName.fontSize = corePct.fontSize = title / scale;
+            float nameHeight = bossName.GetPreferredValues(bossName.text, (width - percentageWidth - 28f) / scale, float.PositiveInfinity).y * scale;
+            float count = Mathf.Max(12f, 22f * scale), header = Mathf.Max(title + 12f, nameHeight + 8f);
+            float routeTop = header + 12f, routeBottom = routeTop + detail + 8f;
+            float countTop = routeBottom + 12f, height = countTop + count + 12f;
+            float top = 100f * scale + 8f; // below the ordinary race timer
+            bossPanel.offsetMin = new Vector2(-width * 0.5f, -top - height) / scale;
+            bossPanel.offsetMax = new Vector2(width * 0.5f, -top) / scale;
+            Place(bossName.rectTransform, 10f, 3f, width - percentageWidth - 18f, header - 2f, scale);
+            Place(corePct.rectTransform, width - percentageWidth - 10f, 3f, width - 10f, header - 2f, scale);
+            Place(coreTrack, 10f, header, width - 10f, header + 7f, scale);
+            Place(routeText.rectTransform, 10f, routeTop, width - 10f, routeBottom, scale);
+            Place(routeTrack, 10f, routeBottom + 3f, width - 10f, routeBottom + 8f, scale);
+            Place(countText.rectTransform, 10f, countTop, width - 10f, height - 4f, scale);
+            routeText.fontSize = detail / scale; countText.fontSize = count / scale;
+            routeText.alignment = TextAlignmentOptions.MidlineLeft;
+            markerText.fontSize = Mathf.Max(12f, 20f * scale) / scale;
+            distancePanel.sizeDelta = new Vector2(110f, 24f) / scale;
+            bossMarker.sizeDelta = Vector2.one * Mathf.Max(14f, 44f * scale) / scale;
+            markerBlockers.Clear();
+            CollectMarkerBlockers(hud != null ? hud.transform : root);
+            var controls = FindAnyObjectByType<TouchControlsPresenter>();
+            if (controls != null) CollectMarkerBlockers(controls.transform);
+        }
+
+        private void CollectMarkerBlockers(Transform parent)
+        {
+            foreach (var rt in parent.GetComponentsInChildren<RectTransform>(true))
+                if (MarkerBlockerNames.Contains(rt.name) && !markerBlockers.Contains(rt)) markerBlockers.Add(rt);
+        }
+
+        // Keep the marker's horizontal direction, but use the closest free vertical space
+        // when a projected/off-screen target would put its distance behind another HUD card.
+        private Vector2 AvoidHud(Vector2 point, float unitsPerPixel)
+        {
+            occupied.Clear();
+            foreach (var rt in markerBlockers)
+            {
+                if (rt == null || !rt.gameObject.activeInHierarchy) continue;
+                rt.GetWorldCorners(corners);
+                Vector2 a = RectTransformUtility.WorldToScreenPoint(null, corners[0]);
+                Vector2 b = RectTransformUtility.WorldToScreenPoint(null, corners[2]);
+                occupied.Add(Rect.MinMaxRect(a.x, a.y, b.x, b.y));
+            }
+            Vector2 screen = point / unitsPerPixel + new Vector2(Screen.width, Screen.height) * 0.5f;
+            float above = bossMarker.sizeDelta.y / unitsPerPixel * 0.71f;
+            if (MarkerFits(screen.x, screen.y, above)) return point;
+            float best = screen.y, distance = float.PositiveInfinity;
+            foreach (var r in occupied)
+                for (int side = 0; side < 2; side++)
+                {
+                    float candidate = side == 0 ? r.yMin - above - 4f : r.yMax + 42f;
+                    float delta = Mathf.Abs(candidate - screen.y);
+                    if (delta >= distance || !MarkerFits(screen.x, candidate, above)) continue;
+                    best = candidate; distance = delta;
+                }
+            screen.y = best;
+            return (screen - new Vector2(Screen.width, Screen.height) * 0.5f) * unitsPerPixel;
+        }
+
+        private bool MarkerFits(float x, float y, float above)
+        {
+            var box = new Rect(x - 55f, y - 38f, 110f, 38f + above);
+            if (box.yMin < 8f || box.yMax > Screen.height - 8f) return false;
+            foreach (var r in occupied) if (box.Overlaps(r)) return false;
+            return true;
+        }
+
+        private static void Place(RectTransform rt, float left, float top, float right, float bottom, float scale)
+        {
+            rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
+            rt.offsetMin = new Vector2(left, -bottom) / scale;
+            rt.offsetMax = new Vector2(right, -top) / scale;
         }
 
         private Image Fill(RectTransform track, Color color)
@@ -114,6 +221,7 @@ namespace RacingGame
         private void LateUpdate()
         {
             if (mission == null || mission.Boss == null) return;
+            Layout();
             var boss = mission.Boss;
             if (hitText.gameObject.activeSelf && Time.unscaledTime > hitUntil) hitText.gameObject.SetActive(false);
             float core = boss.CoreFraction;
@@ -137,7 +245,7 @@ namespace RacingGame
         {
             bool show = !boss.Defeated;
             bossMarker.gameObject.SetActive(show);
-            markerText.gameObject.SetActive(show);
+            distancePanel.gameObject.SetActive(show);
             if (!show) return;
             Vector3 target = boss.transform.position + Vector3.up * 30f;
             Vector3 sp = cam.WorldToScreenPoint(target);
@@ -145,16 +253,19 @@ namespace RacingGame
             float scale = root.rect.width / Mathf.Max(1f, Screen.width);
             Vector2 p = new Vector2(sp.x - Screen.width * 0.5f, sp.y - Screen.height * 0.5f) * scale;
             if (sp.z < 0f) p = -p;
-            bool onScreen = sp.z > 0f && Mathf.Abs(p.x) < half.x - 40f && Mathf.Abs(p.y) < half.y - 40f;
+            // Reserve room for the distance label as well as the diamond at either edge.
+            Vector2 bounds = new Vector2(Mathf.Max(1f, half.x - 64f * scale), Mathf.Max(1f, half.y - 54f * scale));
+            bool onScreen = sp.z > 0f && Mathf.Abs(p.x) < bounds.x && Mathf.Abs(p.y) < bounds.y;
             if (!onScreen)
             {
                 // Clamp to the screen edge along the direction to the fortress.
                 if (p.sqrMagnitude < 1f) p = Vector2.down;
-                float k = Mathf.Min((half.x - 50f) / Mathf.Max(1f, Mathf.Abs(p.x)), (half.y - 90f) / Mathf.Max(1f, Mathf.Abs(p.y)));
+                float k = Mathf.Min(bounds.x / Mathf.Max(1f, Mathf.Abs(p.x)), bounds.y / Mathf.Max(1f, Mathf.Abs(p.y)));
                 p *= k;
             }
+            p = AvoidHud(p, scale);
             bossMarker.anchoredPosition = p;
-            markerText.rectTransform.anchoredPosition = p + new Vector2(0f, -40f);
+            distancePanel.anchoredPosition = p + new Vector2(0f, -26f * scale);
             var car = PlayerCar();
             float metres = car != null ? Vector3.Distance(car.transform.position, boss.transform.position) : 0f;
             markerText.SetText("{0:0} m", metres);

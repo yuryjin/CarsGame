@@ -1312,7 +1312,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697473
-    m_Localized: "\xBFAtascado? Pulsa \u21BA"
+    m_Localized: "\xBFAtascado? Pulsa R"
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697474
@@ -1433,6 +1433,339 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8422648379514880
     m_Localized: "\xA1LA PISTA SE DERRUMBA!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871854370816
+    m_Localized: Ver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565120
+    m_Localized: Arrastra para girar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565121
+    m_Localized: Comparado con {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759424
+    m_Localized: "Prueba \xB7 45 s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759425
+    m_Localized: Volver al garaje
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759426
+    m_Localized: Prueba gratis. Tu progreso se mantiene.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466443100160
+    m_Localized: Equipo de carrera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488768
+    m_Localized: "Arsenal libre \xB7 todas las armas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488769
+    m_Localized: "Equipo de carrera \xB7 dos armas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488770
+    m_Localized: CAMBIAR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488771
+    m_Localized: Elige dos armas. Cambia con Q / rueda, cruceta arriba/abajo o CAMBIAR.
+      Armas secundarias abajo.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488772
+    m_Localized: "Da\xF1o base: {damage} \xB7 intervalo: {interval} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488773
+    m_Localized: "Disparo a distancia. Anticipa al objetivo y vigila munici\xF3n
+      y calor."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488774
+    m_Localized: Cuerpo a cuerpo. Ponte junto al rival antes de golpear.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488775
+    m_Localized: "Mant\xE9n un rival a la vista. Suelta el disparo para enfriar."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488776
+    m_Localized: Alcanza rivales delante. Ideal contra grupos juntos.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488777
+    m_Localized: "Afecta a rivales cercanos alrededor del coche. Ac\xE9rcate."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488778
+    m_Localized: "Deja una trampa detr\xE1s para atrapar perseguidores."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488779
+    m_Localized: 'Gas: W/arriba. Gira: A/D o flechas. Dispara: Ctrl / clic izquierdo.
+      Alcanza y acierta al rival.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488780
+    m_Localized: El coche acelera solo. Gira con las flechas, alcanza un rival y
+      pulsa FUEGO.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488781
+    m_Localized: "A m\xE1s de 40 km/h: gira y pulsa Espacio. Acumula carga y suelta
+      para acelerar."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488782
+    m_Localized: "A m\xE1s de 40 km/h: gira y mant\xE9n FRENO para cargar. Suelta
+      para acelerar."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488783
+    m_Localized: "Sigue las flechas amarillas al puente estrecho. \xA1M\xE1s corto,
+      pero sin barreras!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488784
+    m_Localized: "Entra al t\xFAnel a m\xE1s de 55 km/h. Sube por la pared al turbo
+      del techo; mant\xE9n la velocidad."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488785
+    m_Localized: "\xA1Turbo de derrape! Prueba una carga m\xE1s larga en la pr\xF3xima
+      curva."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488786
+    m_Localized: "\xA1Atajo completado! Compara la pr\xF3xima vuelta por la ruta
+      principal."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488787
+    m_Localized: "\xA1Turbo del techo! Sigue girando suavemente en el t\xFAnel."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488788
+    m_Localized: "\xBFTienes la bomba? Toca un rival para pasarla. Si no, al\xE9jate
+      del portador. La mecha no se reinicia."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488789
+    m_Localized: "Solo minas en esta carrera. Adel\xE1ntate y deja una trampa al
+      perseguidor."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488790
+    m_Localized: "Mant\xE9n freno y direcci\xF3n para cargar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488791
+    m_Localized: "Nivel {n} \xB7 suelta el freno para acelerar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488792
+    m_Localized: "Turbo de derrape \xB7 nivel {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488793
+    m_Localized: "\u2605 {n}/3 \xB7 Ver objetivos"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488794
+    m_Localized: Termina sin destrozos ni reinicios
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488795
+    m_Localized: Consigue {n} turbos de derrape
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488796
+    m_Localized: Completa el atajo del puente {n} veces
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488797
+    m_Localized: Usa el turbo del techo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488798
+    m_Localized: "Completa la \xFAltima vuelta sin destrozos ni reinicios"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488799
+    m_Localized: Pasa la bomba {n} veces
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488800
+    m_Localized: Copas de carreras
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488801
+    m_Localized: Escuela de pilotos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488802
+    m_Localized: Copa de combate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488803
+    m_Localized: Rutas extremas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488804
+    m_Localized: "\u2605 {stars}/6 \xB7 {n}/3 carreras terminadas \xB7 Premio: {reward}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488805
+    m_Localized: Premio desbloqueado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488806
+    m_Localized: "Tu pr\xF3ximo objetivo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488807
+    m_Localized: "Supera tu r\xE9cord personal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18166440566009856
+    m_Localized: Controles y objetivos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514288177152
+    m_Localized: Todo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954368
+    m_Localized: A distancia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954369
+    m_Localized: Cuerpo a cuerpo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954370
+    m_Localized: Control
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954371
+    m_Localized: Trampas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954372
+    m_Localized: "Dispersi\xF3n amplia. Ac\xE9rcate para acertar m\xE1s perdigones."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954373
+    m_Localized: "Varios proyectiles por disparo. Mant\xE9n al rival centrado."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954374
+    m_Localized: "Fuego r\xE1pido continuo. Suelta el gatillo para enfriar."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954375
+    m_Localized: Disparos potentes y lentos. Apunta bien entre disparos.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954376
+    m_Localized: "El cohete sigue a un objetivo delante. Dispara con visi\xF3n despejada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954377
+    m_Localized: Rebota en las paredes. Usa las barreras para tiros indirectos.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954378
+    m_Localized: Atrae al rival. Mantente a alcance y cuida tu trayectoria.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954379
+    m_Localized: "Cargador: {n} \xB7 recarga: {seconds} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954380
+    m_Localized: "Sin recarga de cargador \xB7 vigila el calor"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954381
+    m_Localized: 'Alcance: {n} m'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954382
+    m_Localized: 'Radio de efecto: {n} m'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954383
+    m_Localized: '{effect}: {seconds} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820457320448
+    m_Localized: "Gas: W / arriba. Marcha atr\xE1s: S / abajo. Gira: A/D o flechas.
+      Freno: Espacio. Volver a la pista: R."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097664
+    m_Localized: "El coche acelera solo. Gira con las flechas. Mant\xE9n FRENO para
+      reducir la velocidad. Pulsa R para volver a la pista."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097665
+    m_Localized: 'Dispara: Ctrl / clic izquierdo. Cambia entre tus dos armas: Q /
+      rueda o teclas 1 y 2.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097666
+    m_Localized: "Dispara: Ctrl / clic izquierdo. Mant\xE9n Q y mueve el rat\xF3n
+      para elegir; suelta Q para equipar. Con Q pulsada: Tab / rueda cambia de p\xE1gina;
+      1\u20130 elige casilla."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097667
+    m_Localized: "Mant\xE9n FUEGO para disparar. Pulsa CAMBIAR para recorrer las
+      armas disponibles en tu equipamiento."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097668
+    m_Localized: "{action}: E / May\xFAs / clic derecho / LB. La munici\xF3n y disponibilidad
+      aparecen en pantalla."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097669
+    m_Localized: "Pulsa {action} para usar tu arma secundaria. La munici\xF3n y disponibilidad
+      aparecen en pantalla."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097670
+    m_Localized: "Si ya colocaste una carga, pulsa el mismo bot\xF3n otra vez para
+      detonarla."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097671
+    m_Localized: "Mando: palanca izquierda para girar; RT / LT para gas / marcha
+      atr\xE1s; A para frenar; Y para volver a la pista."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291968
+    m_Localized: 'Mando: RB para disparar; cruceta abajo / arriba elige las casillas
+      de armas 1 / 2.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291969
+    m_Localized: "Solo minas. Adel\xE1ntate y pulsa E / May\xFAs / clic derecho para
+      dejar una mina detr\xE1s."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291970
+    m_Localized: "Solo minas. Adel\xE1ntate y pulsa MINA para dejar una trampa a
+      tus perseguidores."
     m_Metadata:
       m_Items: []
   references:

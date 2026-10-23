@@ -62,14 +62,15 @@ namespace RacingGame.EditorTools
             }, log);
             var night = Preset("Sky_Night", p =>
             {
+                // Keep the driving line and car silhouette visible in the unlit sections of the circuit.
                 p.zenith = C(0.02f, 0.03f, 0.08f); p.horizon = C(0.10f, 0.14f, 0.26f); p.ground = C(0.03f, 0.03f, 0.05f); p.horizonExp = 0.6f;
-                p.sunEuler = new Vector3(50f, 120f, 0f); p.sunLightColor = C(0.60f, 0.70f, 1f); p.sunIntensity = 0.6f;
+                p.sunEuler = new Vector3(50f, 120f, 0f); p.sunLightColor = C(0.60f, 0.70f, 1f); p.sunIntensity = 0.8f;
                 p.sunDiscColor = Color.black; p.sunGlow = 0f;
                 p.moonEuler = new Vector3(50f, 120f, 0f); p.moonColor = C(0.9f, 0.95f, 1f); p.moonAngularRadius = 1.6f; p.stars = 1f;
                 p.fogStart = 80f; p.fogEnd = 300f;
-                p.ambientSky = C(0.16f, 0.20f, 0.34f); p.ambientEquator = C(0.10f, 0.12f, 0.18f); p.ambientGround = C(0.04f, 0.04f, 0.06f);
+                p.ambientSky = C(0.32f, 0.38f, 0.55f); p.ambientEquator = C(0.24f, 0.29f, 0.42f); p.ambientGround = C(0.13f, 0.16f, 0.24f);
                 p.mountainColor = C(0.06f, 0.08f, 0.14f);
-                p.postExposure = 0.35f; p.saturation = 10f; p.contrast = 15f; p.colorFilter = C(0.92f, 0.95f, 1f); p.bloomIntensity = 1.2f; p.vignette = 0.4f;
+                p.postExposure = 0.5f; p.saturation = 10f; p.contrast = 5f; p.colorFilter = C(0.92f, 0.95f, 1f); p.bloomIntensity = 1.2f; p.vignette = 0.25f;
                 p.headlights = true; p.lampsOn = true;
             }, log);
             var overcast = Preset("Sky_Overcast", p =>

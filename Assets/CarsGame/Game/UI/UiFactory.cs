@@ -14,6 +14,12 @@ namespace RacingGame
         public static readonly Color Accent = new Color(1f, 0.8f, 0.25f);
         public static readonly Color Positive = new Color(0.25f, 0.9f, 0.7f);
 
+        // Menus can scroll; keep their text and controls readable instead of fitting a desktop page
+        // into a phone. World/HUD canvases retain their original coordinate system.
+        public static float ReadableScale(int width, int height) => Mathf.Max(
+            Mathf.Sqrt(Mathf.Max(1f, width) * Mathf.Max(1f, height) / (1920f * 1080f)),
+            Mathf.Min(0.65f, Mathf.Max(1f, width) / 900f));
+
         public static Canvas CreateOverlayCanvas(string name, int sortingOrder = 0)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -156,9 +162,11 @@ namespace RacingGame
 
         public static string FormatTime(double seconds)
         {
-            if (double.IsInfinity(seconds) || double.IsNaN(seconds) || seconds < 0) return "--:--.---";
-            int m = (int)(seconds / 60d); double s = seconds - m * 60d;
-            return $"{m}:{s:00.000}";
+            if (double.IsNaN(seconds) || seconds < 0d || seconds >= long.MaxValue / 1000d) return "--:--.---";
+            // Match the HUD and stored best times: complete milliseconds, with one shared carry.
+            long ms = (long)(seconds * 1000d);
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}:{1:00}.{2:000}",
+                ms / 60000, ms / 1000 % 60, ms % 1000);
         }
     }
 }

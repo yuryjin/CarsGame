@@ -47,6 +47,7 @@ namespace RacingGame
 
         private void OnRaceStarted()
         {
+            if (GetComponent<GameFlow>()?.IsTestDrive == true) { tracker = null; return; }
             var save = PlatformGlue.Save;
             tracker = new HintTracker(save != null ? save.Data.settings.hintsSeen : 0);
             grassTime = lockedTime = stuckTime = 0f;
@@ -65,9 +66,31 @@ namespace RacingGame
             var player = race.Player;
             if (player == null || player.Car == null || (player.Health != null && player.Health.IsDead)) return;
             float dt = Time.unscaledDeltaTime;
+            var ev = RaceSetup.Event;
+            if (ev != null)
+            {
+                if (player.DriftBoosts > 0) Try(Hint.DriftSuccess, "lesson.drift.done");
+                if (player.Shortcuts > 0) Try(Hint.ShortcutSuccess, "lesson.shortcut.done");
+                if (player.CeilingBoosts > 0) Try(Hint.CeilingSuccess, "lesson.wall.done");
+                if (ev.starRingTrack || ev.wastelandTrack) Try(Hint.WallRide, "lesson.wall");
+                else if (ev.eventId == "e3" && player.Progress != null && player.Progress.Path != null && player.Progress.Path.Fork != null)
+                    Try(Hint.Shortcut, "lesson.shortcut");
+                else if (ev.eventId != "e1" && player.Car.SpeedKmh >= 40f)
+                    Try(Hint.Drift, hud.TouchLayout ? "lesson.drift.touch" : "lesson.drift.keys");
+            }
 
-            if (Mathf.Abs(player.Car.SpeedKmh) < 3f) stuckTime += dt;
-            else { OnTeleported(); stuckReset = false; }
+            float speed = Mathf.Abs(player.Car.SpeedKmh);
+            var command = player.Car.LastCommand;
+            bool tryingToMove = Mathf.Abs(command.Throttle) > 0.1f && !command.Brake;
+            // Reading a tip, waiting with manual throttle, or holding the brake is intentional.
+            // Teleporting those drivers also unfairly invalidates their clean-race goal.
+            if (speed < 3f && tryingToMove) stuckTime += dt;
+            else
+            {
+                stuckTime = 0f;
+                stuckShown = false;
+                if (speed >= 3f) stuckReset = false;
+            }
             if (stuckTime >= 2f && !stuckShown)
             {
                 stuckShown = true;
@@ -84,7 +107,7 @@ namespace RacingGame
             if (grassTime > grassSeconds) Try(Hint.Grass, "hint.grass");
 
             // A target sits in the reticle and the player keeps not shooting: say where the trigger is.
-            bool idleLock = hud.ReticleLocked && !player.Car.LastCommand.Fire;
+            bool idleLock = player.Car.Cannon != null && !player.Car.Cannon.locked && hud.ReticleLocked && !player.Car.LastCommand.Fire;
             lockedTime = idleLock ? lockedTime + dt : 0f;
             bool earlyAim = RaceSetup.IsIntroRace && race.RaceTime <= 15d;
             if (lockedTime > (earlyAim ? 0f : lockedNoFireSeconds)) Try(Hint.AimFire, hud.TouchLayout ? "hint.aim.touch" : "hint.aim.keys", earlyAim);

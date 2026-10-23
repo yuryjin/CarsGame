@@ -72,9 +72,19 @@ namespace RacingGame
 
         public static string Get(string key)
         {
-            if (!Ready) return Fallback(key);
+            return TryGet(key, out var value) ? value : Fallback(key);
+        }
+
+        /// <summary>Optional lookup, for example a literal name that may have a translation.
+        /// Unlike Get, an absent entry does not emit a missing-key warning or a placeholder.</summary>
+        public static bool TryGet(string key, out string value)
+        {
+            value = null;
+            if (!Ready || string.IsNullOrEmpty(key)) return false;
             var entry = loadedTable?.GetEntry(key);
-            return entry != null ? entry.GetLocalizedString() : Fallback(key);
+            if (entry == null) return false;
+            value = entry.GetLocalizedString();
+            return true;
         }
 
         /// <summary>Named placeholders: Format("menu.coins", "n", 120).</summary>

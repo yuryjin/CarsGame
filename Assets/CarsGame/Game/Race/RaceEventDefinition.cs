@@ -2,7 +2,8 @@ using UnityEngine;
 
 namespace RacingGame
 {
-    public enum FinishGoal { NoDeaths, WinWithoutRepair, BeatTime }
+    public enum FinishGoal { NoDeaths, WinWithoutRepair, BeatTime, CleanRun }
+    public enum SkillGoal { Kills, DriftBoosts, Shortcuts, CeilingBoost, CleanFinalLap, BombPasses }
 
     /// <summary>Mission = co-op boss fight on its own map (<see cref="MissionDirector"/>).</summary>
     public enum EventMode { Race, Arena, Mission }
@@ -48,6 +49,8 @@ namespace RacingGame
         public int star1TargetPosition = 3;
         [Tooltip("Target kills for Star 2 (default 2).")]
         public int star2TargetKills = 2;
+        public SkillGoal skillGoal;
+        [Min(1)] public int skillTarget = 1;
         [Tooltip("Require 0 deaths for Star 3.")]
         public bool star3ZeroDeaths = true;
         public FinishGoal finishGoal;
@@ -58,16 +61,37 @@ namespace RacingGame
         public int StarMask(RaceResultEntry me)
         {
             if (me == null) return 0;
-            return StarMask(me.Finished, me.Position, me.Kills, me.Deaths, me.RepairsUsed, me.TotalTime);
+            int mask = StarMask(me.Finished, me.Position, me.Kills, me.Deaths, me.RepairsUsed, me.TotalTime, me.Resets);
+            if (skillGoal != SkillGoal.Kills)
+            {
+                mask &= ~2;
+                if (SkillCount(me) >= Mathf.Max(1, skillTarget)) mask |= 2;
+            }
+            return mask;
         }
 
-        public int StarMask(bool finished, int position, int kills, int deaths, int repairsUsed = 0, double totalTime = double.PositiveInfinity)
+        public int SkillCount(RaceResultEntry me)
+        {
+            if (me == null) return 0;
+            switch (skillGoal)
+            {
+                case SkillGoal.DriftBoosts: return me.DriftBoosts;
+                case SkillGoal.Shortcuts: return me.Shortcuts;
+                case SkillGoal.CeilingBoost: return me.CeilingBoosts;
+                case SkillGoal.CleanFinalLap: return me.Finished && me.CleanFinalLap ? 1 : 0;
+                case SkillGoal.BombPasses: return me.BombPasses;
+                default: return me.Kills;
+            }
+        }
+
+        public int StarMask(bool finished, int position, int kills, int deaths, int repairsUsed = 0, double totalTime = double.PositiveInfinity, int resets = 0)
         {
             int mask = 0;
             if (finished && position <= (star1TargetPosition > 0 ? star1TargetPosition : 3)) mask |= 1;
-            if (kills >= (star2TargetKills > 0 ? star2TargetKills : 2)) mask |= 2;
+            if (skillGoal == SkillGoal.Kills && kills >= (star2TargetKills > 0 ? star2TargetKills : 2)) mask |= 2;
             bool goalMet = finishGoal == FinishGoal.WinWithoutRepair ? position == 1 && repairsUsed == 0
                 : finishGoal == FinishGoal.BeatTime ? totalTime > 0 && totalTime <= targetSeconds
+                : finishGoal == FinishGoal.CleanRun ? deaths == 0 && resets == 0
                 : !star3ZeroDeaths || deaths == 0;
             if (finished && goalMet) mask |= 4;
             return mask;

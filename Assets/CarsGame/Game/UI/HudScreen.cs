@@ -37,12 +37,14 @@ namespace RacingGame
         private TextMeshProUGUI goalsText, combatText, incomingArrow, incomingText;
         private readonly RaceResultEntry goalEntry = new RaceResultEntry();
         private float nextGoalRefresh, incomingUntil;
+        private bool goalsExpanded;
         private Vector3 incomingSource;
 
         private Image hpFill, hpTrail, hpIcon;
         private Sprite healthFillSprite;
         private RectTransform speedPanel, healthPanel, hintPanel, ammoPanel, secondaryPanel, statusPanel, eventPanel, centerPanel, pauseButton;
         private TextMeshProUGUI secondaryText, statusText;
+        private TextMeshProUGUI primaryNameText;
         private string lastStatusStr;
         private bool lastStatusShield, lastStatusFrozen, lastStatusJammed, lastStatusPunctured, lastStatusSlowed;
         private int lastSecondaryAmmo = -1;
@@ -53,6 +55,10 @@ namespace RacingGame
         private bool lastOverheated;
         private int lastHeatPct = -1;
         private Button resumeButton, restartButton, menuButton;
+        private RectTransform helpPanel;
+        private ScrollRect helpScroll;
+        private int layoutScreenWidth, layoutScreenHeight;
+        private TextMeshProUGUI helpText;
         private CanvasGroup pauseControls;
         private string shownCenter;
         private SpeedometerGraphic speedDial;
@@ -120,6 +126,9 @@ namespace RacingGame
         private bool touchLayout;
         private float layoutWidth = -1f;
         private RectTransform pausePanel;
+        private RectTransform finishPanel;
+        private TextMeshProUGUI finishTitle, finishSummary;
+        private Button finishResultsButton;
         private CarController playerCar;
         private CarHealth playerHealth;
         private float hintUntil;
@@ -192,8 +201,11 @@ namespace RacingGame
             hintText = UiFactory.Text(hintPanel, "Hints", "", 24f, TextAlignmentOptions.MidlineLeft, Vector2.zero, Vector2.one, new Vector2(18f, 14f), new Vector2(-18f, -14f));
 
             BuildHealthBar(root);
-            ammoPanel = UiFactory.Card(root, "AmmoPanel", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 186f), HudPanelAlpha);
-            ammoText = UiFactory.Text(ammoPanel, "Ammo", "", 30f, TextAlignmentOptions.MidlineRight, Vector2.zero, Vector2.one, new Vector2(18f, 4f), new Vector2(-18f, -4f), new Color(1f, 0.85f, 0.3f));
+            ammoPanel = UiFactory.Card(root, "AmmoPanel", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 218f), HudPanelAlpha);
+            primaryNameText = UiFactory.Text(ammoPanel, "ActiveWeapon", "", 36f, TextAlignmentOptions.MidlineRight,
+                new Vector2(0f, 1f), Vector2.one, new Vector2(14f, -47f), new Vector2(-14f, -3f), Color.white);
+            primaryNameText.enableWordWrapping = false; primaryNameText.overflowMode = TextOverflowModes.Ellipsis;
+            ammoText = UiFactory.Text(ammoPanel, "Ammo", "", 30f, TextAlignmentOptions.MidlineRight, Vector2.zero, new Vector2(1f, 0f), new Vector2(18f, 4f), new Vector2(-18f, 44f), new Color(1f, 0.85f, 0.3f));
             ammoText.enableAutoSizing = true; ammoText.fontSizeMin = 18f; ammoText.fontSizeMax = 30f;
 
             secondaryPanel = UiFactory.Card(root, "SecondaryPanel", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 194f), new Vector2(-30f, 242f), HudPanelAlpha);
@@ -230,7 +242,10 @@ namespace RacingGame
                 Vector2.zero, Vector2.one, new Vector2(16f, 8f), new Vector2(-16f, -8f));
             goalsText.enableAutoSizing = true; goalsText.fontSizeMin = 18f; goalsText.fontSizeMax = 23f;
             goalsText.raycastTarget = combatText.raycastTarget = incomingArrow.raycastTarget = incomingText.raycastTarget = false;
-            goalsPanel.GetComponent<Image>().raycastTarget = false;
+            goalsPanel.GetComponent<Image>().raycastTarget = true;
+            var goalsButton = goalsPanel.gameObject.AddComponent<Button>();
+            goalsButton.targetGraphic = goalsPanel.GetComponent<Image>();
+            goalsButton.onClick.AddListener(() => { goalsExpanded = !goalsExpanded; nextGoalRefresh = 0f; });
 
             // Top-left: lap + position
             var racePanel = UiFactory.Card(root, "RaceStatus", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -174f), new Vector2(310f, -24f), HudPanelAlpha);
@@ -255,6 +270,7 @@ namespace RacingGame
             centerPanel.gameObject.SetActive(false);
 
             BuildWeaponWheel(root);
+            BuildFinishCard(root);
             BuildPause(root);
 
             hintUntil = Time.unscaledTime + hintSeconds;
@@ -315,6 +331,34 @@ namespace RacingGame
                 + (playerWeapons.IsPrimaryAvailable(shown) ? "" : "\n" + Loc.Get("garage.locked"));
         }
 
+        private void BuildFinishCard(Transform root)
+        {
+            var center = new Vector2(0.5f, 0.5f);
+            finishPanel = UiFactory.Card(root, "FinishCard", center, center, new Vector2(-300f, -140f), new Vector2(300f, 140f), 1f);
+            finishTitle = UiFactory.Text(finishPanel, "FinishTitle", "", 48f, TextAlignmentOptions.Center,
+                new Vector2(0f, 1f), Vector2.one, new Vector2(24f, -90f), new Vector2(-24f, -20f), UiFactory.Positive);
+            finishTitle.fontStyle = FontStyles.Bold;
+            finishSummary = UiFactory.Text(finishPanel, "FinishSummary", "", 30f, TextAlignmentOptions.Center,
+                new Vector2(0f, 1f), Vector2.one, new Vector2(24f, -158f), new Vector2(-24f, -96f));
+            finishResultsButton = UiFactory.Button(finishPanel, "FinishResults", "", () => race.ShowResultsAfterFinish(),
+                Vector2.zero, new Vector2(1f, 0f), new Vector2(36f, 26f), new Vector2(-36f, 102f), 30f);
+            finishPanel.gameObject.SetActive(false);
+        }
+
+        private void UpdateFinishCard()
+        {
+            bool visible = race.CanShowResults && !PauseController.IsPaused;
+            bool wasVisible = finishPanel.gameObject.activeSelf;
+            finishPanel.gameObject.SetActive(visible);
+            if (!visible || wasVisible) return;
+            centerText.text = "";
+            finishTitle.text = Loc.Get("hud.finish");
+            finishSummary.text = Loc.Format("hud.position", "pos", race.PositionOf(race.Player), "n", race.Participants.Count)
+                + " · " + UiFactory.FormatTime(race.PlayerElapsedTime);
+            finishResultsButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("results.title");
+            EventSystem.current?.SetSelectedGameObject(finishResultsButton.gameObject);
+        }
+
         private void BuildPause(Transform root)
         {
             pauseButton = (RectTransform)UiFactory.Button(root, "PauseButton", "", () => PauseController.Set(PauseReason.User, true), Vector2.one, Vector2.one, new Vector2(-106f, -100f), new Vector2(-30f, -24f), 28f, UiFactory.Surface).transform;
@@ -334,8 +378,68 @@ namespace RacingGame
             resumeButton = UiFactory.Button(card, "Resume", "", () => PauseController.Set(PauseReason.User, false), new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -266f), new Vector2(-40f, -180f), 32f);
             restartButton = UiFactory.Button(card, "Restart", "", () => flow.RetryRace(), new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -366f), new Vector2(-40f, -286f), 30f, UiFactory.Raised);
             menuButton = UiFactory.Button(card, "MainMenu", "", () => flow.EnterMenu(), new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -466f), new Vector2(-40f, -386f), 30f, UiFactory.Raised);
-            pauseHint = UiFactory.Text(card, "Hint", "", 23f, TextAlignmentOptions.Center, Vector2.zero, new Vector2(1f, 0f), new Vector2(40f, 40f), new Vector2(-40f, 90f), UiFactory.Muted);
+            pauseHint = UiFactory.Text(card, "Hint", "", 26f, TextAlignmentOptions.Center, Vector2.zero, new Vector2(1f, 0f), new Vector2(40f, 26f), new Vector2(-40f, 110f), UiFactory.Muted);
+            pauseHint.raycastTarget = true;
+            var helpButton = pauseHint.gameObject.AddComponent<Button>();
+            helpButton.targetGraphic = pauseHint;
+            helpButton.onClick.AddListener(ShowHelp);
+            helpPanel = UiFactory.Card(pausePanel, "DrivingHelp", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                new Vector2(-500f, -360f), new Vector2(500f, 360f), 1f);
+            var lessons = UiFactory.Scroll(helpPanel, "HelpScroll", new Vector2(28f, 130f), new Vector2(-28f, -28f));
+            helpScroll = lessons.GetComponentInParent<ScrollRect>();
+            helpText = UiFactory.Text(lessons, "Lessons", "", 26f, TextAlignmentOptions.TopLeft,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            helpText.outlineWidth = 0f;
+            UiFactory.Button(helpPanel, "CloseHelp", Loc.Get("common.back"), () => CloseHelpIfOpen(),
+                Vector2.zero, new Vector2(1f, 0f), new Vector2(32f, 30f), new Vector2(-32f, 106f), 28f);
+            helpPanel.gameObject.SetActive(false);
             pausePanel.gameObject.SetActive(false);
+        }
+
+        /// <summary>Back dismisses the help layer while preserving every pause reason.</summary>
+        public bool CloseHelpIfOpen()
+        {
+            if (helpPanel == null || !helpPanel.gameObject.activeInHierarchy) return false;
+            helpPanel.gameObject.SetActive(false);
+            if (resumeButton != null) EventSystem.current?.SetSelectedGameObject(resumeButton.gameObject);
+            return true;
+        }
+
+        private void ShowHelp()
+        {
+            helpText.text = Loc.Get(touchLayout ? "help.drive.touch" : "help.drive.keys");
+            if (!touchLayout) helpText.text += "\n\n" + Loc.Get("help.drive.gamepad");
+            string context = ControlsHint(touchLayout);
+            string drift = Loc.Get(touchLayout ? "lesson.drift.touch" : "lesson.drift.keys");
+            // Special-event advice supplements the controls rather than replacing them.
+            if (context != Loc.Get(touchLayout ? "lesson.drive.touch" : "lesson.drive.keys"))
+                helpText.text += "\n\n" + context;
+            if (context != drift) helpText.text += "\n\n" + drift;
+            var car = race != null && race.Player != null ? race.Player.Car : null;
+            var weapons = car != null ? car.Weapons : null;
+            if (EventRules.PrimaryEnabled(car) && weapons != null)
+            {
+                helpText.text += "\n\n" + Loc.Get(touchLayout ? "help.primary.touch"
+                    : weapons.CompactLoadout ? "help.primary.compact" : "help.primary.full");
+                if (!touchLayout) helpText.text += "\n" + Loc.Get("help.primary.gamepad");
+            }
+            if (weapons != null && weapons.secondaryType != SecondaryWeaponType.None)
+            {
+                string action = Loc.Get(weapons.secondaryType == SecondaryWeaponType.FreezeLauncher ? "touch.freeze"
+                    : weapons.secondaryType == SecondaryWeaponType.RemoteCharge ? "touch.charge" : "touch.secondary");
+                helpText.text += "\n\n" + Loc.Format(touchLayout ? "help.secondary.touch" : "help.secondary.keys", "action", action);
+                if (weapons.secondaryType == SecondaryWeaponType.RemoteCharge)
+                    helpText.text += " " + Loc.Get("help.charge");
+            }
+            var ev = RaceSetup.Event;
+            if (ev != null) helpText.text += "\n\n" + StarGoalText.Description(ev, 0) + "\n" + StarGoalText.Description(ev, 1) + "\n" + StarGoalText.Description(ev, 2);
+            helpPanel.gameObject.SetActive(true);
+            ApplyReadableOverlays();
+            Canvas.ForceUpdateCanvases();
+            helpScroll.verticalNormalizedPosition = 1f;
+            var back = helpPanel.GetComponentInChildren<Button>();
+            back.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("common.back");
+            EventSystem.current?.SetSelectedGameObject(back.gameObject);
         }
 
         private void BuildSpeedometer(Transform root)
@@ -398,7 +502,7 @@ namespace RacingGame
             statusText.raycastTarget = false;
 
             BuildStatusIndicator(0, StatusKind.Shield, new Color(0.25f, 0.88f, 0.82f), "◆", "hud.status.shield");
-            BuildStatusIndicator(1, StatusKind.Frozen, new Color(0.4f, 0.8f, 1f), "✦", "hud.status.frozen");
+            BuildStatusIndicator(1, StatusKind.Frozen, new Color(0.4f, 0.8f, 1f), "☆", "hud.status.frozen");
             BuildStatusIndicator(2, StatusKind.Jammed, new Color(1f, 0.65f, 0f), "▲", "hud.status.jammed");
             BuildStatusIndicator(3, StatusKind.Punctured, new Color(1f, 0.27f, 0.27f), "●", "hud.status.punctured");
             BuildStatusIndicator(4, StatusKind.Slowed, new Color(0.6f, 0.35f, 1f), "▼", "hud.status.slowed");
@@ -438,7 +542,7 @@ namespace RacingGame
         private void ApplyStaticTexts()
         {
             ApplyLayout(touchLayout);
-            pauseText.text = Loc.Get("pause.title"); pauseHint.text = Loc.Get("pause.hint");
+            pauseText.text = Loc.Get("pause.title"); pauseHint.text = Loc.Get("experience.help");
             resumeButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.resume");
             restartButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.restart");
             menuButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.menu");
@@ -594,21 +698,25 @@ namespace RacingGame
         private void ApplyLayout(bool touch)
         {
             if (speedText == null) return;
-            hintText.text = Loc.Get(touch ? "hud.hint.touch" : "hud.hint.keys");
+            hintText.text = ControlsHint(touch);
             layoutWidth = hudRoot != null ? hudRoot.rect.width : 1920f;
+            layoutScreenWidth = Screen.width; layoutScreenHeight = Screen.height;
+            ApplyReadableOverlays();
             // Portrait phones give the canvas ~1000 reference units of width: the timer (±200 around the
             // centre) would collide with a top-right HP bar, so HP/ammo drop to a row below it.
             bool narrow = layoutWidth < 1400f;
             if (touch)
             {
-                Place(pauseButton, Vector2.one, new Vector2(-140f, -254f), new Vector2(-40f, -154f));
+                float edge = Mathf.Max(100f, 44f / Mathf.Max(0.1f, hudRoot.lossyScale.x));
+                float statusRight = Mathf.Min(-170f, -64f - edge);
+                Place(pauseButton, Vector2.one, new Vector2(-40f - edge, -54f - edge * 2f), new Vector2(-40f, -54f - edge));
                 Place(speedPanel, Vector2.zero, new Vector2(40f, 224f), new Vector2(284f, 448f));
                 float row = narrow ? -90f : 0f;
-                Place(healthPanel, Vector2.one, new Vector2(-494f, -134f + row), new Vector2(-170f, -34f + row));
-                Place(ammoPanel, Vector2.one, new Vector2(-494f, -186f + row), new Vector2(-170f, -138f + row));
-                Place(secondaryPanel, Vector2.one, new Vector2(-494f, -238f + row), new Vector2(-170f, -190f + row));
-                Place(statusPanel, Vector2.one, new Vector2(-494f, -290f + row), new Vector2(-170f, -242f + row));
-                Place(hintPanel, new Vector2(0.5f, 1f), new Vector2(-460f, -322f + row), new Vector2(420f, -202f + row));
+                Place(healthPanel, Vector2.one, new Vector2(statusRight - 324f, -134f + row), new Vector2(statusRight, -34f + row));
+                Place(ammoPanel, Vector2.one, new Vector2(statusRight - 324f, -234f + row), new Vector2(statusRight, -138f + row));
+                Place(secondaryPanel, Vector2.one, new Vector2(statusRight - 324f, -286f + row), new Vector2(statusRight, -238f + row));
+                Place(statusPanel, Vector2.one, new Vector2(statusRight - 324f, -338f + row), new Vector2(statusRight, -290f + row));
+                Place(hintPanel, new Vector2(0.5f, 1f), new Vector2(-420f, -322f + row), new Vector2(420f, -202f + row));
                 if (killFeedPanel != null) Place(killFeedPanel, new Vector2(0f, 1f), new Vector2(30f, -310f), new Vector2(360f, -190f));
                 for (int i = 0; i < killFeedTexts.Length; i++) if (killFeedTexts[i] != null) killFeedTexts[i].alignment = TextAlignmentOptions.MidlineLeft;
                 hintText.alignment = TextAlignmentOptions.Center;
@@ -618,17 +726,77 @@ namespace RacingGame
                 Place(pauseButton, Vector2.one, new Vector2(-106f, -100f), new Vector2(-30f, -24f));
                 Place(speedPanel, Vector2.zero, new Vector2(30f, 30f), new Vector2(274f, 254f));
                 Place(healthPanel, new Vector2(1f, 0f), new Vector2(-354f, 30f), new Vector2(-30f, 130f));
-                Place(ammoPanel, new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 186f));
-                Place(secondaryPanel, new Vector2(1f, 0f), new Vector2(-354f, 194f), new Vector2(-30f, 242f));
-                Place(statusPanel, new Vector2(1f, 0f), new Vector2(-354f, 250f), new Vector2(-30f, 298f));
+                Place(ammoPanel, new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 234f));
+                Place(secondaryPanel, new Vector2(1f, 0f), new Vector2(-354f, 242f), new Vector2(-30f, 290f));
+                Place(statusPanel, new Vector2(1f, 0f), new Vector2(-354f, 298f), new Vector2(-30f, 346f));
                 Place(hintPanel, Vector2.zero, new Vector2(30f, 272f), new Vector2(680f, 422f));
                 if (killFeedPanel != null) Place(killFeedPanel, Vector2.one, new Vector2(-360f, -230f), new Vector2(-30f, -110f));
                 for (int i = 0; i < killFeedTexts.Length; i++) if (killFeedTexts[i] != null) killFeedTexts[i].alignment = TextAlignmentOptions.MidlineRight;
                 hintText.alignment = TextAlignmentOptions.MidlineLeft;
             }
-            if (goalsPanel != null) Place(goalsPanel, new Vector2(0f, 1f),
-                new Vector2(30f, touch ? -484f : -342f), new Vector2(530f, touch ? -332f : -190f));
-            pauseHint.gameObject.SetActive(!touch);
+            LayoutGoals(goalsExpanded || (race != null && race.State == RaceState.Countdown));
+            LayoutHint();
+            pauseHint.gameObject.SetActive(true);
+        }
+
+        private void LayoutHint()
+        {
+            hintText.fontSize = touchLayout ? Mathf.Max(24f, 12f / Mathf.Max(0.1f, hudRoot.lossyScale.x)) : 24f;
+            if (!touchLayout) return;
+            float height = Mathf.Max(120f, hintText.GetPreferredValues(hintText.text, hintPanel.rect.width - 36f, float.PositiveInfinity).y + 28f);
+            var bottom = hintPanel.offsetMin;
+            bottom.y = hintPanel.offsetMax.y - height;
+            hintPanel.offsetMin = bottom;
+        }
+
+        // The live bomb card can grow for small screens or long translations. Keep the
+        // temporary teaching tip below it, restoring the normal row outside bomb races.
+        internal void PlaceHintBelowBomb(float bottomPixels)
+        {
+            if (!touchLayout || hintPanel == null || hudRoot == null) return;
+            float scale = Mathf.Max(0.01f, hudRoot.lossyScale.x);
+            float top = Mathf.Max(layoutWidth < 1400f ? 292f : 202f, bottomPixels > 0f ? (bottomPixels + 6f) / scale : 0f);
+            if (Mathf.Abs(hintPanel.offsetMax.y + top) < 0.01f) return;
+            float height = hintPanel.rect.height;
+            var min = hintPanel.offsetMin; var max = hintPanel.offsetMax;
+            max.y = -top; min.y = -top - height;
+            hintPanel.offsetMin = min; hintPanel.offsetMax = max;
+        }
+
+        private void LayoutGoals(bool expanded)
+        {
+            if (goalsPanel == null) return;
+            float scale = Mathf.Max(0.1f, hudRoot.lossyScale.x);
+            float font = touchLayout ? Mathf.Max(23f, 12f / scale) : 23f;
+            goalsText.enableAutoSizing = !touchLayout;
+            goalsText.fontSize = font;
+            float width = touchLayout && expanded ? Mathf.Min(820f, 500f * font / 23f) : 500f;
+            bool mission = RaceSetup.Event != null && RaceSetup.Event.mode == EventMode.Mission;
+            // The mission hides lap/position. Use that free corner, keeping expanded goals
+            // beside the boss panel instead of covering its route and enemy count.
+            if (mission)
+                width = Mathf.Min(width, Mathf.Max(260f, (hudRoot.rect.width - MissionHud.StatusWidthPixels(Screen.width, scale) / scale) * 0.5f - 60f));
+            float height = expanded ? 152f : 62f;
+            if (touchLayout)
+                height = expanded ? Mathf.Max(152f, goalsText.GetPreferredValues(goalsText.text, width - 32f, float.PositiveInfinity).y + 24f)
+                    : Mathf.Max(62f, 44f / scale);
+            float top = mission ? -24f : touchLayout ? -332f : -190f;
+            if (touchLayout && expanded)
+                top = Mathf.Max(top, -(hudRoot.rect.height - speedPanel.offsetMax.y - height - 16f));
+            Place(goalsPanel, new Vector2(0f, 1f), new Vector2(30f, top - height), new Vector2(30f + width, top));
+        }
+
+        private void ApplyReadableOverlays()
+        {
+            if (hudRoot == null || helpPanel == null || pauseControls == null) return;
+            float pixelScale = Mathf.Max(0.01f, hudRoot.lossyScale.x);
+            float readable = UiFactory.ReadableScale(Screen.width, Screen.height);
+            finishPanel.localScale = Vector3.one * (Mathf.Min(readable, (Screen.width - 32f) / 600f) / pixelScale);
+            // Pause stays fully visible; help may scroll without shrinking the lesson text.
+            float pauseScale = Mathf.Min(readable, Mathf.Min(Screen.width - 32f, Screen.height - 32f) / 600f);
+            pauseControls.transform.localScale = Vector3.one * Mathf.Max(0.1f, pauseScale / pixelScale);
+            helpPanel.localScale = Vector3.one * (readable / pixelScale);
+            helpPanel.sizeDelta = new Vector2(Mathf.Min(1000f, (Screen.width - 32f) / readable), Mathf.Min(720f, (Screen.height - 32f) / readable));
         }
 
         /// <summary>Test hook: current layout mode.</summary>
@@ -638,7 +806,8 @@ namespace RacingGame
         {
             if (race == null) return;
             UpdateCombatAndGoals();
-            if (hudRoot != null && Mathf.Abs(hudRoot.rect.width - layoutWidth) > 1f) ApplyLayout(touchLayout);   // rotation / resize
+            UpdateFinishCard();
+            if (hudRoot != null && (Mathf.Abs(hudRoot.rect.width - layoutWidth) > 1f || Screen.width != layoutScreenWidth || Screen.height != layoutScreenHeight)) ApplyLayout(touchLayout);
             if (playerCar == null && race.Player != null)
             {
                 playerCar = race.Player.Car;
@@ -650,6 +819,8 @@ namespace RacingGame
                 playerStatus = playerCar.GetComponent<CarStatus>();
                 playerWeapons = playerCar.GetComponent<CarWeapons>();
                 playerInput = playerCar.GetComponent<PlayerDriverInput>();
+                lastSecondaryAmmo = -1;
+                lastStatusStr = null;
                 if (playerWeapons != null) { playerWeapons.PrimarySwitched += OnPrimarySwitched; playerWeapons.PrimarySwitchDenied += OnPrimarySwitchDenied; }
                 if (playerCannon != null) { playerCannon.AmmoChanged += OnAmmo; BuildAmmoPips(playerCannon.AmmoMax); OnAmmo(playerCannon.Ammo, playerCannon.AmmoMax); }
 
@@ -726,7 +897,7 @@ namespace RacingGame
                     }
                     else
                     {
-                        ammoText.text = Loc.Get(PrimaryWeaponCatalog.Get(playerWeapons.PrimaryType).NameKey);
+                        ammoText.text = Loc.Format("hud.heat", "pct", heatPct);
                         ammoText.color = new Color(1f, 0.85f, 0.3f);
                     }
                 }
@@ -767,9 +938,11 @@ namespace RacingGame
             }
 
             if (hitMarker.gameObject.activeSelf && Time.unscaledTime > hitMarkerUntil) hitMarker.gameObject.SetActive(false);
-            if (race.State >= RaceState.Racing) SetTimer(race.RaceTime);
+            if (race.State >= RaceState.Racing) SetTimer(race.PlayerElapsedTime);
 
-            if (hintPanel.gameObject.activeSelf && Time.unscaledTime > hintUntil) hintPanel.gameObject.SetActive(false);
+            bool hintVisible = Time.unscaledTime <= hintUntil && !(touchLayout && (goalsExpanded || race.State == RaceState.Countdown))
+                && race.State >= RaceState.Countdown && race.State <= RaceState.Finishing;
+            if (hintPanel.gameObject.activeSelf != hintVisible) hintPanel.gameObject.SetActive(hintVisible);
 
             if (race.State == RaceState.Racing && race.Player != null && race.Player.Progress != null)
             {
@@ -803,6 +976,7 @@ namespace RacingGame
             if (hintText == null || string.IsNullOrEmpty(text)) return;
             LastHint = text;
             hintText.text = text;
+            LayoutHint();
             hintPanel.gameObject.SetActive(true);
             hintUntil = Time.unscaledTime + seconds;
         }
@@ -811,7 +985,18 @@ namespace RacingGame
         public string LastHint { get; private set; }
 
         /// <summary>How long the controls card stays up at the start of a race: long for newcomers, a reminder later.</summary>
-        private float ControlsHintSeconds => PlatformGlue.Save != null && PlatformGlue.Save.Data.Races >= 3 ? 8f : hintSeconds;
+        private float ControlsHintSeconds => PlatformGlue.Save != null && PlatformGlue.Save.Data.Races >= 3 ? 5f : 8f;
+
+        public static string ControlsHint(bool touch)
+        {
+            var ev = RaceSetup.Event;
+            if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.HotBomb) return Loc.Get("lesson.bomb");
+            if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.MinesOnly) return Loc.Get(touch ? "lesson.mines.touch" : "lesson.mines.keys");
+            if (ev != null && (ev.starRingTrack || ev.wastelandTrack)) return Loc.Get("lesson.wall");
+            if (ev != null && ev.eventId == "e2") return Loc.Get(touch ? "lesson.drift.touch" : "lesson.drift.keys");
+            if (ev != null && ev.eventId == "e3") return Loc.Get("lesson.shortcut");
+            return Loc.Get(touch ? "lesson.drive.touch" : "lesson.drive.keys");
+        }
 
         /// <summary>Short centred message (kill, death, pickup). The newest replaces the current one.</summary>
         public void ShowEvent(string text, Color color)
@@ -870,7 +1055,11 @@ namespace RacingGame
                 centerPanel.sizeDelta = new Vector2(Mathf.Clamp(centerText.preferredWidth + 64f, 200f, Mathf.Min(900f, hudRoot.rect.width - 80f)), 190f);
             }
             if (pausePanel.gameObject.activeSelf)
-                pauseControls.interactable = (PauseController.Reasons & ~PauseReason.User) == PauseReason.None;
+            {
+                pauseControls.interactable = !helpPanel.gameObject.activeSelf && (PauseController.Reasons & ~PauseReason.User) == PauseReason.None;
+                pauseControls.alpha = helpPanel.gameObject.activeSelf ? 0f : 1f;
+                pauseControls.blocksRaycasts = !helpPanel.gameObject.activeSelf;
+            }
         }
 
         private void UpdateThreatMarkers()
@@ -973,7 +1162,9 @@ namespace RacingGame
 
         private void OnAmmo(int ammo, int max)
         {
+            if (playerWeapons != null) primaryNameText.text = Loc.Get(PrimaryWeaponCatalog.Get(playerWeapons.PrimaryType).NameKey);
             lastReloadPct = -1;
+            lastHeatPct = -1; // new race / language / weapon: rebuild heat-only text even at zero heat
             if (ammoPips.Length != Mathf.Clamp(max, 0, 12)) BuildAmmoPips(max);   // swapped between cannon and machine gun
             bool primary = max > 0 && (playerCannon == null || !playerCannon.locked);   // mines-only events lock the cannon
             ammoPanel.gameObject.SetActive(primary);
@@ -983,6 +1174,7 @@ namespace RacingGame
 
         private void OnPrimarySwitched(PrimaryWeaponType type)
         {
+            primaryNameText.text = Loc.Get(PrimaryWeaponCatalog.Get(type).NameKey);
             ShowHint(Loc.Get(PrimaryWeaponCatalog.Get(type).NameKey), 1.2f);
         }
 
@@ -1043,7 +1235,10 @@ namespace RacingGame
             if (showGoals)
             {
                 race.ReadResult(race.Player, goalEntry);
-                goalsText.text = StarGoalText.Progress(RaceSetup.Event, goalEntry);
+                bool expanded = goalsExpanded || race.State == RaceState.Countdown;
+                goalsText.text = expanded ? StarGoalText.Progress(RaceSetup.Event, goalEntry)
+                    : Loc.Format("goals.compact", "n", RaceEventDefinition.CountStars(RaceSetup.Event.StarMask(goalEntry)));
+                LayoutGoals(expanded);
             }
         }
 
@@ -1100,7 +1295,7 @@ namespace RacingGame
                 var p = participants[i];
                 if (p == null) continue;
                 int carId = p.Car != null ? p.Car.CarId : 0;
-                string locName = GetLocalizedRacerName(p.displayName, p.isPlayer);
+                string locName = UiFactory.Escape(GetLocalizedRacerName(p.displayName, p.isPlayer));
                 killFeedBuffer.RegisterRacerName(carId, locName);
             }
             killFeedBuffer.PrecacheAll();
@@ -1111,8 +1306,7 @@ namespace RacingGame
         {
             if (isPlayer || string.Equals(rawName, "You", System.StringComparison.OrdinalIgnoreCase))
             {
-                string loc = Loc.Get("player.name");
-                if (!string.IsNullOrEmpty(loc) && !loc.StartsWith("[")) return loc;
+                if (Loc.TryGet("player.name", out string loc) && !string.IsNullOrEmpty(loc)) return loc;
                 return "You";
             }
             if (string.IsNullOrEmpty(rawName)) return "Car";
@@ -1121,8 +1315,7 @@ namespace RacingGame
             if (split > 0 && int.TryParse(rawName.Substring(split + 1), out _))
             { baseName = rawName.Substring(0, split); suffix = rawName.Substring(split); }
             string key = "ai.name." + baseName.ToLowerInvariant();
-            string aiLoc = Loc.Get(key);
-            if (!string.IsNullOrEmpty(aiLoc) && !aiLoc.StartsWith("[")) return aiLoc + suffix;
+            if (Loc.TryGet(key, out string aiLoc) && !string.IsNullOrEmpty(aiLoc)) return aiLoc + suffix;
             return rawName;
         }
 
@@ -1193,7 +1386,7 @@ namespace RacingGame
 
         private void ClearCenter() { if (centerText.text == Loc.Get("hud.go")) centerText.text = ""; }
 
-        private void OnStarted() { RefreshPosition(); }
+        private void OnStarted() { RefreshPosition(); nextGoalRefresh = 0f; UpdateCombatAndGoals(); }
 
         private void OnFinished(RaceResults results) { centerText.text = ""; }
 
@@ -1202,9 +1395,14 @@ namespace RacingGame
         {
             foreach (var c in GetComponentsInChildren<Canvas>(true)) if (c.name == "HUD") c.gameObject.SetActive(visible);
             pausePanel.gameObject.SetActive(visible && PauseController.IsPaused);
+            helpPanel.gameObject.SetActive(false);
+            finishPanel.gameObject.SetActive(false);
             if (visible)
             {
-                hintText.text = Loc.Get(touchLayout ? "hud.hint.touch" : "hud.hint.keys");
+                SetTimer(0d);
+                goalsExpanded = false;
+                hintText.text = ControlsHint(touchLayout);
+                LayoutHint();
                 hintUntil = Time.unscaledTime + ControlsHintSeconds; hintPanel.gameObject.SetActive(true); playerCar = null;
             }
             if (eventPanel != null) eventPanel.gameObject.SetActive(false);
@@ -1224,6 +1422,7 @@ namespace RacingGame
         {
             if (pausePanel == null) return;
             pausePanel.gameObject.SetActive(paused);
+            if (!paused && helpPanel != null) helpPanel.gameObject.SetActive(false);
             if (paused && resumeButton != null) EventSystem.current?.SetSelectedGameObject(resumeButton.gameObject);
             else EventSystem.current?.SetSelectedGameObject(null);
         }

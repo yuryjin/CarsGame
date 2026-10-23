@@ -91,6 +91,7 @@ namespace RacingGame
             Carrier = to;
             passAfter = tick + SimulationDriver.SecondsToTicks(PassCooldownSeconds);
             Passes++;
+            from.BombPasses++;
             return true;
         }
 

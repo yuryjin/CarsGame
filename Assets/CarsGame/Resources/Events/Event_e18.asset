@@ -29,5 +29,7 @@ MonoBehaviour:
   star2TargetKills: 1
   star3ZeroDeaths: 1
   finishGoal: 0
+  skillGoal: 5
+  skillTarget: 2
   targetSeconds: 340
   twist: 7

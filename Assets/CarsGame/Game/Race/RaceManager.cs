@@ -83,6 +83,18 @@ namespace RacingGame
             EndRace();
         }
         public bool HasFinished(RaceParticipant p) => finishTimes.ContainsKey(p);
+        public bool CanShowResults => State == RaceState.Finishing && !IsArenaMode && !IsMissionMode
+            && Player != null && HasFinished(Player);
+        /// <summary>The player's clock stops at the line while the remaining field can keep racing.</summary>
+        public double PlayerElapsedTime => Player != null && finishTimes.TryGetValue(Player, out double time) ? time : RaceTime;
+
+        /// <summary>Skip the remaining spectator wait only after a legitimate player finish.</summary>
+        public bool ShowResultsAfterFinish()
+        {
+            if (!CanShowResults) return false;
+            EndRace();
+            return true;
+        }
 
         /// <summary>
         /// Boss mission over. A win: the whole team finishes together, placed by kills. A loss: everyone is DNF.
@@ -228,6 +240,7 @@ namespace RacingGame
             Rank();                                  // placement is final before anyone reads PositionOf
             var entry = new RaceResultEntry();
             ReadResult(p, entry);
+            entry.KillsPerVictim = p.KillTally.ToPerVictimCounts();
             finishEntries[p] = entry;
             OnParticipantFinished?.Invoke(p);
             if (p.isPlayer)
@@ -350,13 +363,20 @@ namespace RacingGame
             entry.Position = PositionOf(p);
             entry.Finished = finishTimes.TryGetValue(p, out double time);
             entry.TotalTime = entry.Finished ? time : RaceTime;
-            entry.BestLap = p.Progress != null ? p.Progress.BestLapTime : double.PositiveInfinity;
-            entry.Laps = p.Progress != null ? p.Progress.LapsCompleted : 0;
+            entry.BestLap = finishedEntry != null ? finishedEntry.BestLap : p.Progress != null ? p.Progress.BestLapTime : double.PositiveInfinity;
+            entry.Laps = finishedEntry != null ? finishedEntry.Laps : p.Progress != null ? p.Progress.LapsCompleted : 0;
             entry.Kills = finishedEntry != null ? finishedEntry.Kills : p.Kills;
+            entry.KillsPerVictim = finishedEntry != null ? finishedEntry.KillsPerVictim : null;
             entry.TurretPoints = finishedEntry != null ? finishedEntry.TurretPoints : p.TurretPoints;
             entry.Deaths = finishedEntry != null ? finishedEntry.Deaths : p.Deaths;
             entry.RepairsUsed = finishedEntry != null ? finishedEntry.RepairsUsed : p.Health != null ? p.Health.RepairsUsed : 0;
-            entry.Survived = p.Deaths == 0;
+            entry.DriftBoosts = finishedEntry != null ? finishedEntry.DriftBoosts : p.DriftBoosts;
+            entry.Shortcuts = finishedEntry != null ? finishedEntry.Shortcuts : p.Shortcuts;
+            entry.CeilingBoosts = finishedEntry != null ? finishedEntry.CeilingBoosts : p.CeilingBoosts;
+            entry.BombPasses = finishedEntry != null ? finishedEntry.BombPasses : p.BombPasses;
+            entry.Resets = finishedEntry != null ? finishedEntry.Resets : p.Resets;
+            entry.CleanFinalLap = finishedEntry != null ? finishedEntry.CleanFinalLap : p.CleanFinalLap;
+            entry.Survived = entry.Deaths == 0;
         }
 
         private void EndRace()
@@ -376,6 +396,7 @@ namespace RacingGame
             {
                 var entry = new RaceResultEntry();
                 ReadResult(p, entry);
+                if (!finishEntries.ContainsKey(p)) entry.KillsPerVictim = p.KillTally.ToPerVictimCounts();
                 if (isArena)
                 {
                     entry.Finished = true;

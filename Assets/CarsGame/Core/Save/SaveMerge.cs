@@ -43,6 +43,8 @@ namespace RacingGame.Core.Save
 
             m.progress.equippedSecondary = newer.progress.equippedSecondary;
             m.progress.equippedPrimary = newer.progress.equippedPrimary;
+            m.progress.reservePrimary = newer.progress.reservePrimary;
+            m.progress.fullArsenal = newer.progress.fullArsenal;
             m.progress.buildPreset = Math.Clamp(newer.progress.buildPreset, 0, 3);
 
             // Cosmetics: owned items are a union (a purchase is never lost); the selection follows the newer blob.

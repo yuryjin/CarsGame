@@ -1419,6 +1419,314 @@ MonoBehaviour:
     m_Key: hud.wasteland.narrowing
     m_Metadata:
       m_Items: []
+  - m_Id: 18164871854370816
+    m_Key: garage.inspect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565120
+    m_Key: garage.rotate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565121
+    m_Key: garage.compare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759424
+    m_Key: garage.test_drive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759425
+    m_Key: garage.test_return
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759426
+    m_Key: garage.test_note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466443100160
+    m_Key: loadout.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488768
+    m_Key: loadout.full
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488769
+    m_Key: loadout.compact
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488770
+    m_Key: loadout.swap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488771
+    m_Key: loadout.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488772
+    m_Key: loadout.stats
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488773
+    m_Key: weapon.role.projectile
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488774
+    m_Key: weapon.role.melee
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488775
+    m_Key: weapon.role.beam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488776
+    m_Key: weapon.role.cone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488777
+    m_Key: weapon.role.pulse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488778
+    m_Key: weapon.role.trap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488779
+    m_Key: lesson.drive.keys
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488780
+    m_Key: lesson.drive.touch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488781
+    m_Key: lesson.drift.keys
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488782
+    m_Key: lesson.drift.touch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488783
+    m_Key: lesson.shortcut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488784
+    m_Key: lesson.wall
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488785
+    m_Key: lesson.drift.done
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488786
+    m_Key: lesson.shortcut.done
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488787
+    m_Key: lesson.wall.done
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488788
+    m_Key: lesson.bomb
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488789
+    m_Key: lesson.mines
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488790
+    m_Key: drift.hold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488791
+    m_Key: drift.release
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488792
+    m_Key: drift.released
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488793
+    m_Key: goals.compact
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488794
+    m_Key: goals.clean_run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488795
+    m_Key: goals.skill.driftboosts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488796
+    m_Key: goals.skill.shortcuts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488797
+    m_Key: goals.skill.ceilingboost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488798
+    m_Key: goals.skill.cleanfinallap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488799
+    m_Key: goals.skill.bombpasses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488800
+    m_Key: cup.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488801
+    m_Key: cup.rookie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488802
+    m_Key: cup.combat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488803
+    m_Key: cup.explorer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488804
+    m_Key: cup.progress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488805
+    m_Key: cup.complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488806
+    m_Key: experience.next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488807
+    m_Key: experience.record
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18166440566009856
+    m_Key: experience.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514288177152
+    m_Key: arsenal.all
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954368
+    m_Key: arsenal.ranged
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954369
+    m_Key: arsenal.close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954370
+    m_Key: arsenal.control
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954371
+    m_Key: arsenal.traps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954372
+    m_Key: weapon.role.spread
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954373
+    m_Key: weapon.role.volley
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954374
+    m_Key: weapon.role.rapid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954375
+    m_Key: weapon.role.heavy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954376
+    m_Key: weapon.role.homing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954377
+    m_Key: weapon.role.ricochet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954378
+    m_Key: weapon.role.pull
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954379
+    m_Key: loadout.magazine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954380
+    m_Key: loadout.heat_only
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954381
+    m_Key: loadout.range
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954382
+    m_Key: loadout.radius
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954383
+    m_Key: loadout.effect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820457320448
+    m_Key: help.drive.keys
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097664
+    m_Key: help.drive.touch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097665
+    m_Key: help.primary.compact
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097666
+    m_Key: help.primary.full
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097667
+    m_Key: help.primary.touch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097668
+    m_Key: help.secondary.keys
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097669
+    m_Key: help.secondary.touch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097670
+    m_Key: help.charge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097671
+    m_Key: help.drive.gamepad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291968
+    m_Key: help.primary.gamepad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291969
+    m_Key: lesson.mines.keys
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291970
+    m_Key: lesson.mines.touch
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

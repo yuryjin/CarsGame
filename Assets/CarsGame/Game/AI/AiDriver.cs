@@ -73,6 +73,7 @@ namespace RacingGame
         private float trafficSpeedKmh;
         private bool boxedIn;           // blocked ahead with no free side: hold the lane and brake
         private float stuckTime, reverseTime, overturnedTime;
+        private float recoveryDistance;
         private bool reversing;
         private float noise, noiseTarget;
         private int ticksSinceEnable;
@@ -101,6 +102,7 @@ namespace RacingGame
         private void OnTeleported()
         {
             reversing = false; stuckTime = reverseTime = overturnedTime = 0f;
+            recoveryDistance = progress != null ? progress.Distance : 0f;
             passDirection = 0; boxedIn = false; clearTime = 0f;
             if (path != null && progress != null)
                 currentLane = targetLane = path.Spline.LateralOffset(transform.position, progress.Distance);
@@ -127,6 +129,7 @@ namespace RacingGame
             passDirection = 0; boxedIn = false; clearTime = 0f;
             ticksSinceEnable = 0;
             reversing = false; stuckTime = reverseTime = overturnedTime = 0f;
+            recoveryDistance = progress != null ? progress.Distance : 0f;
             noise = noiseTarget = 0f;
             int delayTicks = SimulationDriver.SecondsToTicks(P.reactionDelay);
             delayBuffer = P.reactionDelay > 0.001f ? new DriveCommand[delayTicks] : null;
@@ -269,18 +272,31 @@ namespace RacingGame
 
             // --- Stuck recovery: reverse a moment, then give up and respawn.
             bool reset = false;
-            // "Stuck" means no progress along the track, not zero speed: a car pinned against a barrier
-            // keeps bouncing at a few m/s and would otherwise grind there until it is wrecked.
-            float along = progress.SpeedAlongTrack;
-            if (along < 1f && ticksSinceEnable > 100 && !car.Status.IsFrozen) stuckTime += dt; else if (along > 2f) stuckTime = 0f;
-            if (!reversing && stuckTime > 2.5f) { reversing = true; reverseTime = 0f; }
-            if (reversing)
+            // A barrier bounce can produce high instantaneous forward speed without going anywhere.
+            // Move the checkpoint only after two net metres forward; reversing cannot lower it.
+            // SignedDelta keeps this continuous across the spline seam, independent of lap gates.
+            if (ticksSinceEnable <= 100 || car.Status.IsFrozen) recoveryDistance = d;
+            else
             {
-                reverseTime += dt;
-                throttle = -1f; brake = false; steer = -steer;
-                if (reverseTime > 1.2f) reversing = false; // only forward progress clears the recovery deadline
+                if (path.SignedDelta(recoveryDistance, d) >= 2f)
+                {
+                    recoveryDistance = d;
+                    stuckTime = 0f;
+                }
+                else stuckTime += dt;
+                if (!reversing && stuckTime > 2.5f) { reversing = true; reverseTime = 0f; }
+                if (reversing)
+                {
+                    reverseTime += dt;
+                    throttle = -1f; brake = false; steer = -steer;
+                    if (reverseTime > 1.2f) reversing = false; // only forward progress clears the recovery deadline
+                }
+                if (stuckTime > 6f)
+                {
+                    reset = true; stuckTime = 0f; reversing = false; resetCount++;
+                    recoveryDistance = d;
+                }
             }
-            if (stuckTime > 6f) { reset = true; stuckTime = 0f; reversing = false; resetCount++; }
 
             // --- Overturned or fallen off the world.
             bool overturned = transform.position.y < -5f || (!car.WallRiding && Vector3.Dot(transform.up, Vector3.up) < 0.2f);

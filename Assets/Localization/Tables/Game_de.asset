@@ -1307,7 +1307,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697473
-    m_Localized: "Festgefahren? Dr\xFCck \u21BA"
+    m_Localized: "Festgefahren? Dr\xFCck R"
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697474
@@ -1428,6 +1428,336 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8422648379514880
     m_Localized: DIE STRASSE BRICHT WEG!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871854370816
+    m_Localized: Ansehen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565120
+    m_Localized: Zum Drehen ziehen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565121
+    m_Localized: Vergleich mit {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759424
+    m_Localized: "Probefahrt \xB7 45 s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759425
+    m_Localized: "Zur\xFCck zur Garage"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759426
+    m_Localized: Alle Karosserien gratis testen. Fortschritt bleibt.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466443100160
+    m_Localized: "Rennausr\xFCstung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488768
+    m_Localized: "Freies Arsenal \xB7 alle Waffen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488769
+    m_Localized: "Rennausr\xFCstung \xB7 zwei Waffen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488770
+    m_Localized: WECHSEL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488771
+    m_Localized: "W\xE4hle zwei Waffen. Wechsel: Q / Mausrad, Steuerkreuz hoch/runter
+      oder WECHSEL. Zweitwaffen unten."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488772
+    m_Localized: "Basisschaden: {damage} \xB7 Intervall: {interval} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488773
+    m_Localized: Fernkampf. Ziele voraus; achte auf Munition und Hitze.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488774
+    m_Localized: Nahkampf. Fahre vor dem Schlag neben den Gegner.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488775
+    m_Localized: "Halte einen Gegner im Visier. Lass zum Abk\xFChlen los."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488776
+    m_Localized: Trifft Gegner voraus. Gut gegen enge Gruppen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488777
+    m_Localized: Wirkt rund ums Auto. Fahre zuerst nahe heran.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488778
+    m_Localized: Legt Fallen hinter dem Auto. Fange Verfolger ab.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488779
+    m_Localized: 'Gas: W/hoch. Lenken: A/D oder Pfeile. Feuer: Strg / linke Maus.
+      Hole den Rivalen ein und triff ihn.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488780
+    m_Localized: "Das Auto beschleunigt selbst. Lenke mit den Pfeilen und dr\xFCcke
+      FEUER beim Rivalen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488781
+    m_Localized: "Ab 40 km/h: lenken und Leertaste dr\xFCcken. Lade auf und lass
+      f\xFCr den Boost los."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488782
+    m_Localized: "Ab 40 km/h: lenken und BREMSE halten. Lass f\xFCr einen Boost los."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488783
+    m_Localized: "Folge den gelben Pfeilen auf die schmale Br\xFCcke. K\xFCrzer,
+      aber ohne Leitplanken!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488784
+    m_Localized: "Fahre mit \xFCber 55 km/h in den Tunnel. Lenke an der Wand zum
+      Deckenboost; halte das Tempo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488785
+    m_Localized: "Driftboost geschafft! Lade in der n\xE4chsten Kurve l\xE4nger auf."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488786
+    m_Localized: "Abk\xFCrzung geschafft! Vergleiche die n\xE4chste Runde auf der
+      Hauptstrecke."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488787
+    m_Localized: "Deckenboost erreicht! Lenke im Tunnel weiter gleichm\xE4\xDFig."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488788
+    m_Localized: "Hast du die Bombe? Ber\xFChre einen Rivalen. Sonst halte Abstand
+      zum Tr\xE4ger. Die Z\xFCndschnur l\xE4uft weiter."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488789
+    m_Localized: "Nur Minen in diesem Rennen. \xDCberhole und lege eine Falle f\xFCr
+      Verfolger."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488790
+    m_Localized: Bremse und Lenkung zum Laden halten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488791
+    m_Localized: "Stufe {n} \xB7 Bremse f\xFCr Boost loslassen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488792
+    m_Localized: "Driftboost \xB7 Stufe {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488793
+    m_Localized: "\u2605 {n}/3 \xB7 Ziele anzeigen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488794
+    m_Localized: "Ohne Zerst\xF6rung oder Zur\xFCcksetzen ins Ziel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488795
+    m_Localized: '{n} Driftboosts verdienen'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488796
+    m_Localized: "Br\xFCckenabk\xFCrzung {n}-mal schaffen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488797
+    m_Localized: Deckenboost nutzen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488798
+    m_Localized: "Letzte Runde ohne Zerst\xF6rung oder Zur\xFCcksetzen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488799
+    m_Localized: Bombe {n}-mal weitergeben
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488800
+    m_Localized: Rennpokale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488801
+    m_Localized: Rennschule
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488802
+    m_Localized: Kampfpokal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488803
+    m_Localized: Extreme Strecken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488804
+    m_Localized: "\u2605 {stars}/6 \xB7 {n}/3 Rennen beendet \xB7 Belohnung: {reward}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488805
+    m_Localized: Belohnung freigeschaltet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488806
+    m_Localized: "Dein n\xE4chstes Ziel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488807
+    m_Localized: "Pers\xF6nliche Bestzeit schlagen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18166440566009856
+    m_Localized: Steuerung und Ziele
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514288177152
+    m_Localized: Alle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954368
+    m_Localized: Fernkampf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954369
+    m_Localized: Nahkampf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954370
+    m_Localized: Kontrolle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954371
+    m_Localized: Fallen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954372
+    m_Localized: "Breite Streuung. Geh n\xE4her heran, damit mehr Schrot trifft."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954373
+    m_Localized: Mehrere Geschosse pro Schuss. Halte den Rivalen in der Mitte.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954374
+    m_Localized: "Schnelles Dauerfeuer. Lass zum Abk\xFChlen den Abzug los."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954375
+    m_Localized: "Starke, langsame Sch\xFCsse. Ziele in der Feuerpause genau."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954376
+    m_Localized: Die Rakete verfolgt ein Ziel voraus. Feuere bei freier Sicht.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954377
+    m_Localized: "Prallt von W\xE4nden ab. Nutze Banden f\xFCr indirekte Treffer."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954378
+    m_Localized: Zieht den Rivalen heran. Bleib in Reichweite und achte auf deine
+      Linie.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954379
+    m_Localized: "Magazin: {n} \xB7 Nachladen: {seconds} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954380
+    m_Localized: "Kein Magazinwechsel \xB7 achte auf Hitze"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954381
+    m_Localized: 'Reichweite: {n} m'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954382
+    m_Localized: 'Wirkungsradius: {n} m'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954383
+    m_Localized: '{effect}: {seconds} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820457320448
+    m_Localized: "Gas: W / hoch. R\xFCckw\xE4rts: S / runter. Lenken: A/D oder Pfeile.
+      Bremse: Leertaste. Zur\xFCck auf die Strecke: R."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097664
+    m_Localized: "Das Auto beschleunigt selbst. Lenke mit den Pfeilen. Halte BREMSE
+      zum Verlangsamen. R bringt dich zur\xFCck auf die Strecke."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097665
+    m_Localized: 'Feuer: Strg / linke Maus. Wechsle deine zwei Waffen: Q / Mausrad
+      oder 1 und 2.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097666
+    m_Localized: "Feuer: Strg / linke Maus. Halte Q und bewege die Maus zur Waffenwahl;
+      lass Q zum Ausr\xFCsten los. Mit gehaltenem Q: Tab / Mausrad f\xFCr Seiten,
+      1\u20130 f\xFCr Pl\xE4tze."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097667
+    m_Localized: "Halte FEUER zum Schie\xDFen. Tippe WECHSEL, um durch die verf\xFCgbaren
+      Waffen deiner Ausr\xFCstung zu wechseln."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097668
+    m_Localized: '{action}: E / Umschalt / rechte Maus / LB. Munition und Bereitschaft
+      werden im HUD angezeigt.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097669
+    m_Localized: Tippe {action}, um deine Zweitwaffe einzusetzen. Munition und Bereitschaft
+      werden im HUD angezeigt.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097670
+    m_Localized: "Ist eine Ladung gelegt, dr\xFCcke dieselbe Taste erneut zum Z\xFCnden."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097671
+    m_Localized: "Gamepad: linker Stick zum Lenken; RT / LT f\xFCr Gas / R\xFCckw\xE4rts;
+      A zum Bremsen; Y zur\xFCck auf die Strecke."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291968
+    m_Localized: "Gamepad: RB zum Feuern; Steuerkreuz runter / hoch w\xE4hlt Waffenplatz
+      1 / 2."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291969
+    m_Localized: "Nur Minen. \xDCberhole und dr\xFCcke E / Umschalt / rechte Maus,
+      um eine Mine hinter dir abzulegen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291970
+    m_Localized: "Nur Minen. \xDCberhole und tippe MINE, um eine Falle f\xFCr deine
+      Verfolger abzulegen."
     m_Metadata:
       m_Items: []
   references:

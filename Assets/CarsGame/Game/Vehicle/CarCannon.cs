@@ -146,7 +146,8 @@ namespace RacingGame
             if (status == null) status = gameObject.AddComponent<CarStatus>();
             weapons = GetComponent<CarWeapons>();
             if (weapons == null) weapons = gameObject.AddComponent<CarWeapons>();
-            if (barrel == null || muzzle == null) BuildTurret();
+            if (barrel == null || muzzle == null) shellMaterial = MakeMaterial(new Color(1f, 0.8f, 0.25f));
+            EnsureTurretVisuals();
             barrelRestPosition = barrel.localPosition;
             barrelRestRotation = barrel.localRotation;
             if (turret == null && barrel.parent != transform) turret = barrel.parent;
@@ -380,10 +381,16 @@ namespace RacingGame
             return true;
         }
 
+        /// <summary>Also used by the inactive garage template; creates visuals without registering a live car.</summary>
+        public void EnsureTurretVisuals()
+        {
+            if (barrel == null || muzzle == null) BuildTurret();
+            if (turret == null && barrel != null && barrel.parent != transform) turret = barrel.parent;
+        }
+
         private void BuildTurret()
         {
             Material dark = FindMaterialOnCar("carbon", "dark") ?? MakeMaterial(new Color(0.12f, 0.12f, 0.13f));
-            shellMaterial = MakeMaterial(new Color(1f, 0.8f, 0.25f));
 
             var turret = new GameObject("Cannon_Turret").transform;
             turret.gameObject.layer = gameObject.layer;

@@ -24,7 +24,32 @@ namespace RacingGame
             public int coins, lastReward, position, lap, laps, races, liveShells;
             public int[] upgrades;
             public bool touch, autopilot;
+            public int equippedPrimary, reservePrimary, activePrimary, driftBoosts, shortcuts, ceilingBoosts, bombPasses, resets;
+            public bool fullArsenal;
+            public double raceSeconds;
+            public float speedKmh, health, trackDistance, lateral, throttle, steer;
+            public int deaths, aiResets, raceSeed;
+            public float aiStuckTime;
+            public bool braking, aiReversing, frozen;
+            public UiButton[] buttons;
+            public string[] texts;
+            public UiLabel[] labels;
             public Perf perf;
+        }
+
+        [Serializable] public class UiButton
+        {
+            public string name, text;
+            public float x, y, width, height;
+            public bool interactable;
+        }
+
+        [Serializable] public class UiLabel
+        {
+            public string name, parent, text, renderedText;
+            public int lines;
+            public float fontPixels, x, y, width, height;
+            public bool truncated;
         }
 
         [Serializable]
@@ -102,6 +127,7 @@ namespace RacingGame
                 switch (cmd)
                 {
                     case "state": break;
+                    case "ui": break;
                     case "startRace": StartRace(Arg(args, 0), Arg(args, 1)); break;
                     case "daily": autopilot = false; flow.StartRace(flow.DailyEvent, null); break;
                     case "wear": if (CheatsAllowed) Wear(Arg(args, 0), Arg(args, 1)); else lastError = "not in store builds"; break;
@@ -210,6 +236,9 @@ namespace RacingGame
             var save = PlatformGlue.Save;
             var p = race != null ? race.Player : null;
             var director = RaceDirector.Current;
+            var car = p != null ? p.Car : null;
+            var progress = p != null ? p.Progress : null;
+            var ai = p != null ? p.GetComponent<AiDriver>() : null;
             return new Snapshot
             {
                 flow = flow.State.ToString(), race = race != null ? race.State.ToString() : "", screen = menus != null ? menus.Current : "",
@@ -220,8 +249,68 @@ namespace RacingGame
                 lap = p != null && p.Progress != null ? p.Progress.LapsCompleted : 0, laps = race != null ? race.laps : 0,
                 liveShells = director != null ? director.LiveProjectiles : 0,
                 touch = TouchControlsPresenter.IsShown, autopilot = autopilot,
+                equippedPrimary = save?.Data.progress.equippedPrimary ?? 0,
+                reservePrimary = save?.Data.progress.reservePrimary ?? 2,
+                fullArsenal = save?.Data.progress.fullArsenal ?? false,
+                activePrimary = p != null ? (int)p.Weapons.PrimaryType : -1,
+                driftBoosts = p?.DriftBoosts ?? 0, shortcuts = p?.Shortcuts ?? 0,
+                ceilingBoosts = p?.CeilingBoosts ?? 0, bombPasses = p?.BombPasses ?? 0, resets = p?.Resets ?? 0,
+                raceSeconds = race != null ? race.RaceTime : 0d,
+                speedKmh = car != null ? car.SpeedKmh : 0f, health = p != null && p.Health != null ? p.Health.Health : 0f,
+                trackDistance = progress != null ? progress.Distance : 0f,
+                lateral = progress != null && progress.Path != null ? progress.Path.Spline.LateralOffset(p.transform.position, progress.Distance) : 0f,
+                throttle = car != null ? car.LastCommand.Throttle : 0f, steer = car != null ? car.LastCommand.Steer : 0f,
+                braking = car != null && car.LastCommand.Brake, deaths = p?.Deaths ?? 0,
+                aiResets = ai != null ? ai.ResetCount : 0,
+                raceSeed = director != null ? director.raceSeed : 0,
+                aiStuckTime = ai != null ? ai.StuckTime : 0f,
+                aiReversing = ai != null && ai.Reversing,
+                frozen = p != null && p.Status != null && p.Status.IsFrozen,
+                buttons = lastCommand == "ui" ? ReadButtons() : null,
+                texts = lastCommand == "ui" ? ReadTexts() : null,
+                labels = lastCommand == "ui" ? ReadLabels() : null,
                 lastCommand = lastCommand, error = lastError, perf = perfOn ? lastPerf : null
             };
+        }
+
+        private static UiButton[] ReadButtons()
+        {
+            var list = new System.Collections.Generic.List<UiButton>();
+            foreach (var button in FindObjectsByType<UnityEngine.UI.Button>())
+            {
+                if (!button.isActiveAndEnabled) continue;
+                var rect = (RectTransform)button.transform;
+                Vector2 center = RectTransformUtility.WorldToScreenPoint(null, rect.TransformPoint(rect.rect.center));
+                list.Add(new UiButton { name = button.name, text = button.GetComponentInChildren<TMPro.TMP_Text>()?.text ?? "",
+                    x = center.x / Screen.width, y = 1f - center.y / Screen.height,
+                    width = rect.rect.width * rect.lossyScale.x, height = rect.rect.height * rect.lossyScale.y, interactable = button.IsInteractable() });
+            }
+            return list.ToArray();
+        }
+
+        private static string[] ReadTexts()
+        {
+            var list = new System.Collections.Generic.List<string>();
+            foreach (var label in FindObjectsByType<TMPro.TMP_Text>())
+                if (label.isActiveAndEnabled) list.Add(label.name + ": " + label.text);
+            return list.ToArray();
+        }
+
+        private static UiLabel[] ReadLabels()
+        {
+            var list = new System.Collections.Generic.List<UiLabel>();
+            foreach (var label in FindObjectsByType<TMPro.TextMeshProUGUI>())
+            {
+                if (!label.isActiveAndEnabled) continue;
+                var rect = label.rectTransform;
+                Vector2 center = RectTransformUtility.WorldToScreenPoint(null, rect.TransformPoint(rect.rect.center));
+                list.Add(new UiLabel { name = label.name, parent = rect.parent.name, text = label.text, lines = label.textInfo.lineCount,
+                    renderedText = label.GetParsedText(),
+                    fontPixels = label.fontSize * rect.lossyScale.y, truncated = label.isTextTruncated,
+                    x = center.x / Screen.width, y = 1f - center.y / Screen.height,
+                    width = rect.rect.width * rect.lossyScale.x, height = rect.rect.height * rect.lossyScale.y });
+            }
+            return list.ToArray();
         }
 
         private string Post()

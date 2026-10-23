@@ -3,7 +3,8 @@ using System;
 namespace RacingGame.Core.Onboarding
 {
     /// <summary>Situations that deserve a one-time tip the first time they happen.</summary>
-    public enum Hint { Grass = 0, UnderFire = 1, AimFire = 2, PickupHealth = 3, PickupAmmo = 4, PickupNitro = 5 }
+    public enum Hint { Grass = 0, UnderFire = 1, AimFire = 2, PickupHealth = 3, PickupAmmo = 4, PickupNitro = 5,
+        Drift = 6, Shortcut = 7, WallRide = 8, DriftSuccess = 9, ShortcutSuccess = 10, CeilingSuccess = 11 }
 
     /// <summary>
     /// Which contextual tips a player has already seen (a bit mask kept in the save) and pacing

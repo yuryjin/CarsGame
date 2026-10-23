@@ -16,7 +16,7 @@ namespace RacingGame.EditorTools
     {
         private const string FontsDir = "Assets/CarsGame/Fonts";
         /// <summary>Glyphs the UI code draws that the default font does not have (the subset TTF must contain them).</summary>
-        public const string UiSymbols = "★☆×▲";
+        public const string UiSymbols = "★☆×▲▼◆●中文"; // HUD status icons and the language selector's untranslated autonym.
 
         [MenuItem("Racing/Localization/Bake CJK font atlas")]
         public static void BakeMenu() => Debug.Log(BakeChinese());

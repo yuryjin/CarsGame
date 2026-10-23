@@ -119,6 +119,7 @@ namespace RacingGame.Tests
             bool ceilingBoost = false;
             for (int i = 0; i < 75 && !ceilingBoost; i++) { yield return new WaitForFixedUpdate(); ceilingBoost = car.IsBoosting; }
             Assert.IsTrue(ceilingBoost, "the ceiling pad rewards the ride");
+            Assert.Greater(race.Player.CeilingBoosts, 0, "the skill goal receives the ceiling pad trigger");
             // Slow down and it lets go.
             input.Set(0f, 0f);
             car.Body.linearVelocity = path.Tangent(race.Player.Progress.Distance) * 5f;

@@ -13,9 +13,14 @@ namespace RacingGame
         public double BestLap;      // seconds, +inf if none
         public int Laps;
         public int Kills;
+        // Captured for payout at the finish (or race end for unfinished/arena participants).
+        // HUD snapshots before that point do not allocate a per-victim array.
+        public int[] KillsPerVictim;
         public int TurretPoints;
         public int Deaths;
         public int RepairsUsed;
+        public int DriftBoosts, Shortcuts, CeilingBoosts, BombPasses, Resets;
+        public bool CleanFinalLap;
     }
 
     public sealed class RaceResults

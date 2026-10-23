@@ -69,6 +69,8 @@ namespace RacingGame.Core.Save
         public int[] weapons = new int[4];   // WeaponKind levels
         public int equippedSecondary = 0;
         public int equippedPrimary = 0;
+        public int reservePrimary = 2; // shotgun; independent magazine, swapped with the primary
+        public bool fullArsenal; // optional free selection of the entire owned arsenal
         public int buildPreset; // CarBuild; zero preserves the handling of old saves
         public List<string> unlockedEvents = new List<string>();
         public List<EventBest> bests = new List<EventBest>();
@@ -86,7 +88,7 @@ namespace RacingGame.Core.Save
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 4;
+        public const int CurrentVersion = 5;
         public int version = CurrentVersion;
         public long updatedAtUnixMs;
         public string deviceId = "";

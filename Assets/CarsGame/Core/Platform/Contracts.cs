@@ -10,7 +10,7 @@ namespace RacingGame.Core.Platform
     public enum ResultCategory { Ok, NotAvailable, Timeout, Error, Suppressed, Unauthorized }
 
     [Flags]
-    public enum PauseReason { None = 0, User = 1, Ad = 2, HostPause = 4, Hidden = 8, Menu = 16 }
+    public enum PauseReason { None = 0, User = 1, Ad = 2, HostPause = 4, Hidden = 8, Menu = 16, Orientation = 32 }
 
     [Flags]
     public enum PlatformFeature { None = 0, Ads = 1, RewardedAds = 2, CloudSave = 4, Leaderboards = 8, Auth = 16, AsyncSessions = 32, Payments = 64, Share = 128 }

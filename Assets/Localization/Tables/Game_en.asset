@@ -1311,7 +1311,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697473
-    m_Localized: "Stuck? Tap \u21BA"
+    m_Localized: Stuck? Tap R
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697474
@@ -1432,6 +1432,335 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8422648379514880
     m_Localized: THE ROAD IS COLLAPSING!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871854370816
+    m_Localized: Inspect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565120
+    m_Localized: Drag to rotate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565121
+    m_Localized: Compared with {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759424
+    m_Localized: "Test drive \xB7 45 s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759425
+    m_Localized: Return to garage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759426
+    m_Localized: Try any body for free. Progress stays unchanged.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466443100160
+    m_Localized: Race loadout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488768
+    m_Localized: "Free arsenal \xB7 all weapons"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488769
+    m_Localized: "Race loadout \xB7 two weapons"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488770
+    m_Localized: SWAP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488771
+    m_Localized: 'Select two weapons. Swap: Q / wheel, gamepad D-pad up/down, or
+      SWAP on touch. Secondary equipment below.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488772
+    m_Localized: "Base damage: {damage} \xB7 interval: {interval} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488773
+    m_Localized: Ranged fire. Lead moving targets; watch ammo and heat.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488774
+    m_Localized: Close combat. Pull alongside a rival before striking.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488775
+    m_Localized: Keep one rival in sight. Release fire to cool down.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488776
+    m_Localized: Hits rivals in front. Best when the pack bunches up.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488777
+    m_Localized: Affects nearby rivals around the car. Get close first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488778
+    m_Localized: Drop behind the car to catch pursuers. Plan your line.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488779
+    m_Localized: 'Gas: W/up. Steer: A/D or arrows. Fire: Ctrl / left mouse. Catch
+      and hit the rival ahead.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488780
+    m_Localized: The car accelerates itself. Steer with the arrows; catch a rival
+      and press FIRE.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488781
+    m_Localized: 'Above 40 km/h: turn and press Space to drift. Build charge, then
+      release Space for a boost.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488782
+    m_Localized: 'Above 40 km/h: steer and tap BRAKE, then hold it to charge. Release
+      BRAKE for a boost.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488783
+    m_Localized: Follow the yellow arrows onto the narrow bridge. A shorter route,
+      but no barriers!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488784
+    m_Localized: Enter the tunnel above 55 km/h. Steer up the wall to reach the ceiling
+      boost; keep your speed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488785
+    m_Localized: Drift boost earned! Try a longer charge on the next bend.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488786
+    m_Localized: Shortcut completed! Compare your next lap using the main road.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488787
+    m_Localized: Ceiling boost reached! Keep steering smoothly through the tunnel.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488788
+    m_Localized: Have the bomb? Touch a rival to pass it. Otherwise keep away from
+      the carrier. The fuse keeps ticking.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488789
+    m_Localized: Only mines in this race. Get ahead and drop a trap in a pursuer's
+      path.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488790
+    m_Localized: Hold brake + steer to charge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488791
+    m_Localized: "Stage {n} \xB7 release brake for boost"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488792
+    m_Localized: "Drift boost \xB7 stage {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488793
+    m_Localized: "\u2605 {n}/3 \xB7 Show goals"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488794
+    m_Localized: Finish without wrecks or resets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488795
+    m_Localized: Earn {n} drift boosts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488796
+    m_Localized: Complete the bridge shortcut {n} time(s)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488797
+    m_Localized: Use the ceiling boost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488798
+    m_Localized: Finish the last lap without wrecks or resets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488799
+    m_Localized: Pass the bomb {n} times
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488800
+    m_Localized: Race cups
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488801
+    m_Localized: Driving school
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488802
+    m_Localized: Combat cup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488803
+    m_Localized: Extreme routes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488804
+    m_Localized: "\u2605 {stars}/6 \xB7 finished {n}/3 races \xB7 Reward: {reward}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488805
+    m_Localized: Reward unlocked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488806
+    m_Localized: Your next goal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488807
+    m_Localized: Beat your personal best
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18166440566009856
+    m_Localized: Controls and goals
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514288177152
+    m_Localized: All
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954368
+    m_Localized: Ranged
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954369
+    m_Localized: Close combat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954370
+    m_Localized: Control
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954371
+    m_Localized: Traps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954372
+    m_Localized: Wide spread. Get close to land more pellets.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954373
+    m_Localized: Several projectiles per shot. Keep the rival centered.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954374
+    m_Localized: Fast sustained fire. Release the trigger to manage heat.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954375
+    m_Localized: Powerful, slow shots. Aim carefully during the firing pause.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954376
+    m_Localized: The rocket follows a target ahead. Fire with a clear line of sight.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954377
+    m_Localized: Bounces off walls. Use barriers to reach awkward angles.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954378
+    m_Localized: Pulls the rival toward you. Stay in range and watch your driving
+      line.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954379
+    m_Localized: "Magazine: {n} \xB7 reload: {seconds} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954380
+    m_Localized: "No magazine reload \xB7 watch the heat"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954381
+    m_Localized: 'Range: {n} m'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954382
+    m_Localized: 'Effect radius: {n} m'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954383
+    m_Localized: '{effect}: {seconds} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820457320448
+    m_Localized: 'Gas: W / up. Reverse: S / down. Steer: A/D or arrows. Brake: Space.
+      Return to the track: R.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097664
+    m_Localized: The car accelerates itself. Steer with the arrows. Hold BRAKE to
+      slow down. Tap R to return to the track.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097665
+    m_Localized: 'Fire: Ctrl / left mouse. Swap your two weapons: Q / mouse wheel,
+      or keys 1 and 2.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097666
+    m_Localized: "Fire: Ctrl / left mouse. Hold Q and move the mouse to select a
+      weapon; release Q to equip it. While holding Q, use Tab / mouse wheel for pages
+      and 1\u20130 for slots."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097667
+    m_Localized: Hold FIRE to shoot. Tap SWAP to cycle through the weapons available
+      in your loadout.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097668
+    m_Localized: '{action}: E / Shift / right mouse / LB. Ammo and readiness are
+      shown on the HUD.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097669
+    m_Localized: Tap {action} to use your secondary weapon. Ammo and readiness are
+      shown on the HUD.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097670
+    m_Localized: With a charge planted, press the same control again to detonate
+      it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097671
+    m_Localized: 'Gamepad: left stick to steer; RT / LT for gas / reverse; A to brake;
+      Y to return to the track.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291968
+    m_Localized: 'Gamepad: RB to fire; D-pad down / up selects weapon slots 1 / 2.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291969
+    m_Localized: Only mines. Get ahead, then press E / Shift / right mouse to drop
+      a mine behind you.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291970
+    m_Localized: Only mines. Get ahead and tap MINE to leave a trap for your pursuers.
     m_Metadata:
       m_Items: []
   references:

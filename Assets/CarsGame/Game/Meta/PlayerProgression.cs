@@ -32,6 +32,19 @@ namespace RacingGame
             progress.equippedPrimary = build == CarBuild.Firepower && WeaponCatalog.Level(progress.weapons, 2) > 0 ? 1 : 0;
             int secondary = build == CarBuild.Speed ? 2 : build == CarBuild.Balanced ? 0 : 1;
             progress.equippedSecondary = secondary > 0 && WeaponCatalog.Level(progress.weapons, (int)KindOf((SecondaryWeaponType)secondary)) > 0 ? secondary : 0;
+            NormalizeLoadout(progress);
+        }
+
+        public static bool NormalizeLoadout(Core.Save.ProgressData progress)
+        {
+            if (progress == null) return false;
+            int first = progress.equippedPrimary, second = progress.reservePrimary;
+            bool Valid(int type) => PrimaryWeaponCatalog.IsValid((PrimaryWeaponType)type)
+                && (type != (int)PrimaryWeaponType.MachineGun || WeaponCatalog.Level(progress.weapons, (int)WeaponKind.MachineGun) > 0);
+            if (!Valid(first)) progress.equippedPrimary = 0;
+            if (!Valid(second) || second == progress.equippedPrimary)
+                progress.reservePrimary = progress.equippedPrimary == 2 ? 0 : 2;
+            return first != progress.equippedPrimary || second != progress.reservePrimary;
         }
 
         /// <summary>The garage line that unlocks a secondary weapon (the two enums are numbered differently).</summary>
@@ -45,7 +58,7 @@ namespace RacingGame
             int mgLevel = WeaponCatalog.Level(weaponLevels, (int)WeaponKind.MachineGun);
             weapons.machineGunUnlocked = mgLevel > 0;   // lets the driver swap to it mid-race (key 2)
             weapons.machineGunHeatFactor = WeaponCatalog.For(mgLevel).HeatFactor;
-            var primaryType = (PrimaryWeaponType)Mathf.Clamp(equippedPrimary, 0, 1);
+            var primaryType = (PrimaryWeaponType)Mathf.Clamp(equippedPrimary, 0, PrimaryWeaponCatalog.Count - 1);
             if (primaryType == PrimaryWeaponType.MachineGun && mgLevel == 0) primaryType = PrimaryWeaponType.Cannon;
             weapons.SetPrimaryType(primaryType);
 

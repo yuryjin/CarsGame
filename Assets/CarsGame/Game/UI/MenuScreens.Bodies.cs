@@ -30,7 +30,7 @@ namespace RacingGame
             for (int i = 0; i < CarBodies.Classes.Length; i++)
             {
                 var cls = CarBodies.Classes[i];
-                UiFactory.Button(tabs, "Tab_" + cls, Loc.Get(CarBodies.ClassKey(cls)), cls == tab ? null : (Action)(() => { bodyTab = cls; Show("garage"); }),
+                UiFactory.Button(tabs, "Tab_" + cls, Loc.Get(CarBodies.ClassKey(cls)), cls == tab ? null : (Action)(() => { bodyTab = cls; PreviewBody(CarBodies.OfClass(cls)[0].Id); }),
                     new Vector2(i / 4f, 0f), new Vector2((i + 1f) / 4f, 1f), new Vector2(i == 0 ? 0f : 4f, 6f), new Vector2(i == 3 ? 0f : -4f, -6f), 25f, cls == tab ? UiFactory.Accent : UiFactory.Raised);
             }
             var style = Item(content, "BodyStyle", Narrow ? 110f : 84f, false);
@@ -43,8 +43,15 @@ namespace RacingGame
         {
             var row = Item(content, "Body_" + def.Id, Narrow ? 330f : 250f);
             float right = Narrow ? -30f : -290f;
-            var icon = UiFactory.Panel(row, "Icon", Top, Top, new Vector2(24f, -150f), new Vector2(144f, -24f), UiFactory.Raised);
+            var icon = UiFactory.Panel(row, "InspectBody_" + def.Id, Top, Top, new Vector2(24f, -150f), new Vector2(144f, -24f), UiFactory.Raised);
             BodyIcon(icon, def.Class);
+            var inspect = icon.gameObject.AddComponent<UnityEngine.UI.Button>();
+            inspect.targetGraphic = icon.GetComponent<UnityEngine.UI.Image>();
+            inspect.targetGraphic.raycastTarget = true;
+            string inspectId = def.Id;
+            inspect.onClick.AddListener(() => PreviewBody(inspectId));
+            icon.gameObject.AddComponent<UiButtonFx>();
+            Label(icon, "Inspect", Loc.Get("garage.inspect"), 18f, Vector2.zero, Vector2.one, new Vector2(2f, 0f), new Vector2(-2f, -96f), UiFactory.Accent, TextAlignmentOptions.Bottom);
             Label(row, "Name", Loc.Get(def.NameKey), 32f, Top, Vector2.one, new Vector2(164f, -64f), new Vector2(right, -16f)).fontStyle = FontStyles.Bold;
             float kg = 1250f * def.Stats.Mass, hp = 100f * def.Stats.Health;
             Label(row, "Mass", Loc.Format("body.mass", "kg", Mathf.RoundToInt(kg / 10f) * 10) + "   /   " + Loc.Format("body.hp", "hp", Mathf.RoundToInt(hp)),
@@ -113,6 +120,7 @@ namespace RacingGame
             var save = PlatformGlue.Save;
             if (save == null || !CarBodies.Owns(save.Data.progress.cosmetics, id)) return false;
             save.Data.progress.body = id;
+            previewBodyId = id;
             save.MarkDirty(); SfxPlayer.Instance.PlayUi(SfxSynth.Beep); Show("garage");
             return true;
         }
@@ -125,6 +133,7 @@ namespace RacingGame
             if (!CarBodies.TryBuy(save.Data.progress.cosmetics, id, save.Data.Coins, out int cost)) { Toast(Loc.Get("garage.not_enough")); return false; }
             save.Local.coinsSpent += cost;
             save.Data.progress.body = id;   // drive what you just bought
+            previewBodyId = id;
             save.MarkDirty(); SfxPlayer.Instance.PlayUi(SfxSynth.LapDing); Show("garage");
             return true;
         }
@@ -136,7 +145,7 @@ namespace RacingGame
             bool ok = await RewardedOffers.ShowAsync(() =>
             {
                 save.Data.progress.cosmetics ??= new List<string>();
-                if (CarBodies.GrantRewarded(save.Data.progress.cosmetics, id)) { save.Data.progress.body = id; save.MarkDirty(); }
+                if (CarBodies.GrantRewarded(save.Data.progress.cosmetics, id)) { save.Data.progress.body = id; previewBodyId = id; save.MarkDirty(); }
             });
             if (this == null) return;
             if (ok) SfxPlayer.Instance.PlayUi(SfxSynth.LapDing);

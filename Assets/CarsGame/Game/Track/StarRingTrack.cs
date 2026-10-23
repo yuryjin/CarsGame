@@ -359,6 +359,7 @@ namespace RacingGame
             trigger.size = new Vector3(PadHalfWidth * 2.2f, 3f, PadLength);
             var gate = go.GetComponent<BoostGate>();
             gate.radius = PadRadius;
+            gate.ceiling = ceiling;
             pads.Add(gate);
         }
 

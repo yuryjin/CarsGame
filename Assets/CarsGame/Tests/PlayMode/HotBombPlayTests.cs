@@ -87,6 +87,7 @@ namespace RacingGame.Tests
             while (bomb.Carrier == player && contactTicks++ < 60) yield return null;
             Assert.AreEqual(rival, bomb.Carrier, "touch passes the bomb");
             Assert.AreEqual(1, bomb.Passes, "one collision cannot bounce it back");
+            Assert.AreEqual(1, player.BombPasses, "the passer receives skill credit once");
             Assert.Less(bomb.SecondsLeft, fuseBefore, "passing never resets the fuse");
             Assert.IsFalse(bomb.Touch(rival, player), "new carrier gets a short no-pass window");
             player.Car.Body.constraints = rival.Car.Body.constraints = RigidbodyConstraints.FreezeAll;

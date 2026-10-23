@@ -30,6 +30,13 @@ namespace RacingGame.Core.Save
                 data.version = 3;
             }
             if (data.version == 3) { data.progress ??= new ProgressData(); data.progress.buildPreset = 0; data.version = 4; }
+            if (data.version == 4)
+            {
+                data.progress ??= new ProgressData();
+                data.progress.reservePrimary = 2;
+                data.progress.fullArsenal = false;
+                data.version = 5;
+            }
             if (data.version > SaveData.CurrentVersion) { status = SaveParseStatus.NewerVersion; return null; }    // from a newer build: refuse rather than corrupt
             status = SaveParseStatus.Ok;
             data.settings ??= new SettingsData();

@@ -58,6 +58,24 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void RotationPausePreservesUserAndHostPauseReasons()
+        {
+            PauseController.Set(PauseReason.User, true);
+            PauseController.Set(PauseReason.Orientation, true);
+            PauseController.Set(PauseReason.Orientation, false);
+            Assert.AreEqual(PauseReason.User, PauseController.Reasons);
+            PauseController.Set(PauseReason.Orientation, true);
+            PauseController.Set(PauseReason.Ad, true);
+            PauseController.Set(PauseReason.User, false);
+            PauseController.Set(PauseReason.Orientation, false);
+            Assert.AreEqual(PauseReason.Ad, PauseController.Reasons);
+            Assert.IsTrue(RaceClock.Paused);
+            PauseController.Set(PauseReason.Ad, false);
+            Assert.IsFalse(PauseController.IsPaused);
+            Assert.IsFalse(RaceClock.Paused);
+        }
+
+        [Test]
         public void PauseSourcesComposeAndNotifyOnlyOnStateChanges()
         {
             var changes = new List<bool>();

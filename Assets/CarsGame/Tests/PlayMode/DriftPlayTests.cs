@@ -62,6 +62,7 @@ namespace RacingGame.Tests
             Assert.Greater(minSpeed, entrySpeed * 0.45f, "a drift keeps most of the speed (a hard brake would not)");
             Assert.GreaterOrEqual(stage, 2, "2 s of full-lock drift reaches stage 2");
             Assert.IsTrue(car.IsBoosting, "releasing the brake fires the boost");
+            Assert.Greater(race.Player.DriftBoosts, 0, "the skill goal receives the real drift release");
             Time.captureDeltaTime = 0f;
             flow.EnterMenu();
         }

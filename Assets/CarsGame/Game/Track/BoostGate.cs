@@ -10,6 +10,7 @@ namespace RacingGame
         public const float BoostSeconds = 2.5f;
         [Tooltip("Aperture around the local Z axis the car's centre must pass through (a flat pad uses a small one).")]
         public float radius = Radius;
+        public bool ceiling;
         private readonly Dictionary<int, int> nextBoostTick = new Dictionary<int, int>();
 
         private void OnTriggerEnter(Collider other)
@@ -26,6 +27,11 @@ namespace RacingGame
             if (nextBoostTick.TryGetValue(car.CarId, out int next) && tick < next) return;
             nextBoostTick[car.CarId] = tick + SimulationDriver.SecondsToTicks(BoostSeconds);
             car.ApplyBoost(BoostSeconds);
+            if (ceiling)
+            {
+                var participant = car.GetComponent<RaceParticipant>();
+                if (participant != null) participant.CeilingBoosts++;
+            }
             float kick = Mathf.Clamp(car.maxSpeed / 3.6f - speed, 0f, 8f);
             car.Body.linearVelocity += transform.forward * kick;
         }

@@ -1308,7 +1308,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697473
-    m_Localized: "Bloqu\xE9 ? Appuie sur \u21BA"
+    m_Localized: "Bloqu\xE9 ? Appuie sur R"
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697474
@@ -1429,6 +1429,339 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8422648379514880
     m_Localized: LA ROUTE S'EFFONDRE !
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871854370816
+    m_Localized: Voir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565120
+    m_Localized: Glisser pour tourner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565121
+    m_Localized: Comparaison avec {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759424
+    m_Localized: "Essai \xB7 45 s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759425
+    m_Localized: Retour au garage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759426
+    m_Localized: "Essai gratuit. Progression conserv\xE9e."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466443100160
+    m_Localized: "\xC9quipement de course"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488768
+    m_Localized: "Arsenal libre \xB7 toutes les armes"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488769
+    m_Localized: "\xC9quipement \xB7 deux armes"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488770
+    m_Localized: CHANGER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488771
+    m_Localized: Choisis deux armes. Change avec Q / molette, croix haut/bas ou CHANGER.
+      Armes secondaires ci-dessous.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488772
+    m_Localized: "D\xE9g\xE2ts de base : {damage} \xB7 intervalle : {interval} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488773
+    m_Localized: "Tir \xE0 distance. Anticipe les mouvements et surveille munitions
+      et chaleur."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488774
+    m_Localized: "Corps \xE0 corps. Place-toi \xE0 c\xF4t\xE9 du rival avant de frapper."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488775
+    m_Localized: "Garde un rival en vue. Rel\xE2che le tir pour refroidir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488776
+    m_Localized: "Touche les rivaux devant. Id\xE9al contre un groupe serr\xE9."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488777
+    m_Localized: Agit autour de la voiture. Rapproche-toi des rivaux.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488778
+    m_Localized: "Pose un pi\xE8ge derri\xE8re pour arr\xEAter les poursuivants."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488779
+    m_Localized: "Gaz : W/haut. Direction : A/D ou fl\xE8ches. Tir : Ctrl / clic
+      gauche. Rattrape et touche le rival."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488780
+    m_Localized: "La voiture acc\xE9l\xE8re seule. Dirige-toi avec les fl\xE8ches
+      et appuie sur TIR pr\xE8s d'un rival."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488781
+    m_Localized: "Au-dessus de 40 km/h : tourne et appuie sur Espace. Charge puis
+      rel\xE2che pour acc\xE9l\xE9rer."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488782
+    m_Localized: "Au-dessus de 40 km/h : tourne et maintiens FREIN. Rel\xE2che pour
+      acc\xE9l\xE9rer."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488783
+    m_Localized: "Suis les fl\xE8ches jaunes vers le pont \xE9troit. Plus court,
+      mais sans barri\xE8res !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488784
+    m_Localized: "Entre dans le tunnel \xE0 plus de 55 km/h. Monte au mur vers le
+      boost au plafond et garde ta vitesse."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488785
+    m_Localized: "Boost de d\xE9rapage r\xE9ussi ! Charge plus longtemps au prochain
+      virage."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488786
+    m_Localized: "Raccourci r\xE9ussi ! Compare le prochain tour par la route principale."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488787
+    m_Localized: Boost au plafond atteint ! Continue de tourner doucement dans le
+      tunnel.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488788
+    m_Localized: "Tu as la bombe ? Touche un rival pour la passer. Sinon, \xE9vite
+      le porteur. Le compte \xE0 rebours continue."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488789
+    m_Localized: "Seulement des mines. Prends de l'avance et pi\xE8ge les poursuivants."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488790
+    m_Localized: Maintiens frein et direction pour charger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488791
+    m_Localized: "Niveau {n} \xB7 rel\xE2che le frein pour acc\xE9l\xE9rer"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488792
+    m_Localized: "Boost de d\xE9rapage \xB7 niveau {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488793
+    m_Localized: "\u2605 {n}/3 \xB7 Voir les objectifs"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488794
+    m_Localized: Terminer sans destruction ni remise en piste
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488795
+    m_Localized: "Obtenir {n} boosts de d\xE9rapage"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488796
+    m_Localized: Prendre le raccourci du pont {n} fois
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488797
+    m_Localized: Utiliser le boost au plafond
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488798
+    m_Localized: Dernier tour sans destruction ni remise en piste
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488799
+    m_Localized: Passer la bombe {n} fois
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488800
+    m_Localized: Coupes de course
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488801
+    m_Localized: "\xC9cole de pilotage"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488802
+    m_Localized: Coupe de combat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488803
+    m_Localized: "Parcours extr\xEAmes"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488804
+    m_Localized: "\u2605 {stars}/6 \xB7 {n}/3 courses termin\xE9es \xB7 R\xE9compense
+      : {reward}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488805
+    m_Localized: "R\xE9compense d\xE9bloqu\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488806
+    m_Localized: Ton prochain objectif
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488807
+    m_Localized: Bats ton record personnel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18166440566009856
+    m_Localized: Commandes et objectifs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514288177152
+    m_Localized: Tout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954368
+    m_Localized: "\xC0 distance"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954369
+    m_Localized: "Corps \xE0 corps"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954370
+    m_Localized: "Contr\xF4le"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954371
+    m_Localized: "Pi\xE8ges"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954372
+    m_Localized: Dispersion large. Approche-toi pour toucher avec plus de plombs.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954373
+    m_Localized: Plusieurs projectiles par tir. Garde le rival au centre.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954374
+    m_Localized: "Tir rapide continu. Rel\xE2che la g\xE2chette pour refroidir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954375
+    m_Localized: Tirs puissants et lents. Vise soigneusement entre les tirs.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954376
+    m_Localized: "La roquette suit une cible devant. Tire avec une ligne de vue d\xE9gag\xE9e."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954377
+    m_Localized: "Rebondit sur les murs. Utilise les barri\xE8res pour des tirs indirects."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954378
+    m_Localized: "Attire le rival. Reste \xE0 port\xE9e et surveille ta trajectoire."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954379
+    m_Localized: "Chargeur : {n} \xB7 recharge : {seconds} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954380
+    m_Localized: "Pas de chargeur \xE0 recharger \xB7 surveille la chaleur"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954381
+    m_Localized: "Port\xE9e : {n} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954382
+    m_Localized: "Rayon d\u2019effet : {n} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954383
+    m_Localized: '{effect} : {seconds} s'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820457320448
+    m_Localized: "Gaz : W / haut. Reculer : S / bas. Direction : A/D ou fl\xE8ches.
+      Frein : Espace. Retour en piste : R."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097664
+    m_Localized: "La voiture acc\xE9l\xE8re seule. Dirige-toi avec les fl\xE8ches.
+      Maintiens FREIN pour ralentir. R te ram\xE8ne sur la piste."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097665
+    m_Localized: 'Tir : Ctrl / clic gauche. Change entre tes deux armes : Q / molette
+      ou touches 1 et 2.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097666
+    m_Localized: "Tir : Ctrl / clic gauche. Maintiens Q et d\xE9place la souris pour
+      choisir; rel\xE2che Q pour \xE9quiper. Avec Q maintenu : Tab / molette change
+      de page, 1\u20130 choisit une case."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097667
+    m_Localized: "Maintiens TIR pour tirer. Appuie sur CHANGER pour parcourir les
+      armes disponibles dans ton \xE9quipement."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097668
+    m_Localized: "{action} : E / Maj / clic droit / LB. Les munitions et la disponibilit\xE9
+      sont affich\xE9es \xE0 l\u2019\xE9cran."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097669
+    m_Localized: "Appuie sur {action} pour utiliser l\u2019arme secondaire. Les munitions
+      et la disponibilit\xE9 sont affich\xE9es \xE0 l\u2019\xE9cran."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097670
+    m_Localized: "Si une charge est pos\xE9e, appuie encore sur la m\xEAme commande
+      pour la faire exploser."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097671
+    m_Localized: "Manette : stick gauche pour diriger; RT / LT pour acc\xE9l\xE9rer
+      / reculer; A pour freiner; Y pour revenir en piste."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291968
+    m_Localized: "Manette : RB pour tirer; croix bas / haut choisit les emplacements
+      d\u2019arme 1 / 2."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291969
+    m_Localized: "Seulement des mines. Prends de l\u2019avance puis appuie sur E
+      / Maj / clic droit pour poser une mine derri\xE8re toi."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291970
+    m_Localized: "Seulement des mines. Prends de l\u2019avance et appuie sur MINE
+      pour pi\xE9ger tes poursuivants."
     m_Metadata:
       m_Items: []
   references:

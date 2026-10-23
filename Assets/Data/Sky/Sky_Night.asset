@@ -18,7 +18,7 @@ MonoBehaviour:
   horizonExp: 0.6
   sunEuler: {x: 50, y: 120, z: 0}
   sunLightColor: {r: 0.6, g: 0.7, b: 1, a: 1}
-  sunIntensity: 0.6
+  sunIntensity: 0.8
   sunDiscColor: {r: 0, g: 0, b: 0, a: 1}
   sunAngularRadius: 1.4
   sunGlow: 0
@@ -29,16 +29,16 @@ MonoBehaviour:
   stars: 1
   fogStart: 80
   fogEnd: 300
-  ambientSky: {r: 0.16, g: 0.2, b: 0.34, a: 1}
-  ambientEquator: {r: 0.1, g: 0.12, b: 0.18, a: 1}
-  ambientGround: {r: 0.04, g: 0.04, b: 0.06, a: 1}
+  ambientSky: {r: 0.32, g: 0.38, b: 0.55, a: 1}
+  ambientEquator: {r: 0.24, g: 0.29, b: 0.42, a: 1}
+  ambientGround: {r: 0.13, g: 0.16, b: 0.24, a: 1}
   reflectionIntensity: 1
   mountainColor: {r: 0.06, g: 0.08, b: 0.14, a: 1}
-  postExposure: 0.35
+  postExposure: 0.5
   saturation: 10
-  contrast: 15
+  contrast: 5
   colorFilter: {r: 0.92, g: 0.95, b: 1, a: 1}
   bloomIntensity: 1.2
-  vignette: 0.4
+  vignette: 0.25
   headlights: 1
   lampsOn: 1

@@ -15,7 +15,7 @@ namespace RacingGame
     /// upgrades to the player car, pause key, audio cues and payouts.
     /// </summary>
     [RequireComponent(typeof(RaceManager))]
-    public sealed class GameFlow : MonoBehaviour
+    public sealed partial class GameFlow : MonoBehaviour
     {
         public RaceEventDefinition[] events;
         public DifficultyTier[] tiers;
@@ -119,6 +119,7 @@ namespace RacingGame
             race.OnRaceFinished -= OnFinished;
             race.OnParticipantFinished -= OnParticipantFinished;
             Teardown();
+            RestoreTestDrive();
         }
 
         /// <summary>Idempotent: undo every race-time rule and drop async work in flight.</summary>
@@ -152,30 +153,43 @@ namespace RacingGame
         {
             bool pausePressed = pauseAction != null ? pauseAction.WasPressedThisFrame()
                 : (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame);
-            if (pausePressed && State == FlowState.Racing && race.State >= RaceState.Countdown && race.State < RaceState.Finished) PauseController.Toggle(PauseReason.User);
+            if (State == FlowState.Racing && race.State >= RaceState.Countdown && race.State < RaceState.Finished)
+            {
+                if (pausePressed)
+                {
+                    if (hud == null || !hud.CloseHelpIfOpen()) PauseController.Toggle(PauseReason.User);
+                }
+                else if (Gamepad.current?.buttonEast.wasPressedThisFrame == true) hud?.CloseHelpIfOpen();
+            }
+            TickTestDrive();
         }
 
         // ---------- transitions ----------
         public void EnterMenu()
         {
+            ReturningFromTestDrive = IsTestDrive;
             Teardown();
+            RestoreTestDrive();
             if (hud != null) hud.SetVisible(false);
             SetState(FlowState.Menu);
         }
 
         public void StartRace(RaceEventDefinition ev, DifficultyTier tier)
         {
-            if (ev != null) RaceSetup.Event = ev;
-            if (tier != null) RaceSetup.Tier = tier;
-            ev = RaceSetup.Event; tier = RaceSetup.Tier;
+            ev = ev != null ? ev : RaceSetup.Event;
+            tier = tier != null ? tier : RaceSetup.Tier;
             // A daily button, Retry or Next built before midnight must start today's race, not yesterday's.
-            if (DailyRace.IsDaily(ev) && DailyRace.DayOf(ev) != DailyRace.Today) RaceSetup.Event = ev = DailyEvent;
+            if (DailyRace.IsDaily(ev) && DailyRace.DayOf(ev) != DailyRace.Today) ev = DailyEvent;
             if (!PlatformGlue.IsReady) { MenuScreens.Toast(Loc.Get("common.loading")); return; }
             if (ev != null && !IsUnlocked(ev)) { MenuScreens.Toast(Loc.Get("events.locked")); return; }
+            // A rejected request must leave the current race and any test-drive snapshot intact.
+            if (IsTestDrive && ev != testDriveEvent) RestoreTestDrive();
+            RaceSetup.Event = ev;
+            RaceSetup.Tier = tier;
             Teardown();
             int generation = raceGeneration;
             var tierSave = PlatformGlue.Save;   // remember the difficulty actually raced (direct PLAY, Next and Retry too)
-            if (tier != null && tierSave != null && tierSave.Data.settings.tier != tier.tierId) { tierSave.Data.settings.tier = tier.tierId; tierSave.MarkDirty(); }
+            if (!IsTestDrive && tier != null && tierSave != null && tierSave.Data.settings.tier != tier.tierId) { tierSave.Data.settings.tier = tier.tierId; tierSave.MarkDirty(); }
 
             // Event rules
             race.tier = tier;
@@ -212,7 +226,7 @@ namespace RacingGame
             if (speedFx != null) speedFx.SetVisible(true);
             if (overlays != null) overlays.SetVisible(true);
             SetState(FlowState.Racing);
-            if (mission == null && (ev == null || ev.mode != EventMode.Arena)) SpawnGhosts(ev, generation);
+            if (!IsTestDrive && mission == null && (ev == null || ev.mode != EventMode.Arena)) SpawnGhosts(ev, generation);
         }
 
         // Arena: the fight zone; a race: slalom gates on the straights. Seeded from the race, so the daily race matches for everyone.
@@ -286,7 +300,16 @@ namespace RacingGame
             try { return string.IsNullOrEmpty(payload) ? null : JsonUtility.FromJson<GhostSession>(payload); } catch { return null; }
         }
 
-        public void RetryRace() { StartRace(RaceSetup.Event, RaceSetup.Tier); }
+        public void RetryRace()
+        {
+            if (IsTestDrive)
+            {
+                string body = race.spawner.playerBodyId;
+                EnterMenu();
+                StartTestDrive(body);
+            }
+            else StartRace(RaceSetup.Event, RaceSetup.Tier);
+        }
 
         private void SetState(FlowState s) { State = s; StateChanged?.Invoke(s); }
 
@@ -301,12 +324,14 @@ namespace RacingGame
             {
                 // Selecting the primary resets its base stats, so upgrades and tuning follow it.
                 PlayerProgression.ApplyWeapons(player.Weapons, save.Data.progress.weapons, save.Data.progress.equippedSecondary, save.Data.progress.equippedPrimary);
+                player.Weapons.ConfigureLoadout(!save.Data.progress.fullArsenal,
+                    (PrimaryWeaponType)save.Data.progress.equippedPrimary, (PrimaryWeaponType)save.Data.progress.reservePrimary);
                 // A rewarded "try it for one race" level rides on top of the saved levels and is used up here.
-                PlayerProgression.ApplyTo(playerCar, player.Health, playerCar.GetComponent<CarCannon>(), RewardedOffers.ConsumeTrial(save.Data.progress.upgrades),
+                PlayerProgression.ApplyTo(playerCar, player.Health, playerCar.GetComponent<CarCannon>(), IsTestDrive ? save.Data.progress.upgrades : RewardedOffers.ConsumeTrial(save.Data.progress.upgrades),
                     (Core.Economy.CarBuild)save.Data.progress.buildPreset);
                 PlayerCosmetics.Apply(playerCar.gameObject, save.Data.progress);
             }
-            else RewardedOffers.ConsumeTrial(null);
+            else if (!IsTestDrive) RewardedOffers.ConsumeTrial(null);
 
             // Brake + steer drifts and charges a boost (player only; the AI keeps the plain brake).
             playerCar.driftEnabled = true;
@@ -365,7 +390,7 @@ namespace RacingGame
             var player = race.Player;
             if (!victim.isPlayer && attacker != null && attacker == player.gameObject)
             {
-                hud.ShowEvent(Loc.Format("hud.kill", "name", victim.displayName), KillColor);
+                hud.ShowEvent(Loc.Format("hud.kill", "name", UiFactory.Escape(HudScreen.GetLocalizedRacerName(victim.displayName, victim.isPlayer))), KillColor);
                 SfxPlayer.Instance.PlayUi(SfxSynth.KillSting, 0.8f);
                 var impulse = Camera.main != null ? Camera.main.GetComponent<CameraImpulse>() : null;
                 if (impulse != null) impulse.AddImpulse(0.2f);
@@ -373,7 +398,7 @@ namespace RacingGame
             else if (victim.isPlayer)
             {
                 var killer = attacker != null ? attacker.GetComponent<RaceParticipant>() : null;
-                hud.ShowEvent(killer != null ? Loc.Format("hud.killed_by", "name", killer.displayName) : Loc.Get("hud.wrecked"), DeathColor);
+                hud.ShowEvent(killer != null ? Loc.Format("hud.killed_by", "name", UiFactory.Escape(HudScreen.GetLocalizedRacerName(killer.displayName, killer.isPlayer))) : Loc.Get("hud.wrecked"), DeathColor);
                 if (victim.Health != null && !victim.Health.respawnOnDeath && !race.HasFinished(victim)) OfferContinue(victim);
             }
         }
@@ -442,10 +467,11 @@ namespace RacingGame
         {
             if (playerEngine != null) playerEngine.SetRunning(true);
             foreach (var g in ghosts) if (g != null) g.Begin(race.RaceStartTime);
-            if (race.Player != null) recorder.Begin(race.Player, TrackHash(RaceSetup.Event), UiFactory.Escape(PlatformGlue.Platform != null ? PlatformGlue.Platform.Player.Name : "You"));
+            if (!IsTestDrive && race.Player != null) recorder.Begin(race.Player, TrackHash(RaceSetup.Event), UiFactory.Escape(PlatformGlue.Platform != null ? PlatformGlue.Platform.Player.Name : "You"));
         }
         private void OnParticipantFinished(RaceParticipant p)
         {
+            if (IsTestDrive) return;
             if (!p.isPlayer) return;
             SfxPlayer.Instance.PlayUi(SfxSynth.Finish);
             var rec = recorder.Stop();
@@ -466,6 +492,7 @@ namespace RacingGame
 
         private void OnFinished(RaceResults results)
         {
+            if (IsTestDrive) { EnterMenu(); return; }
             if (hotBomb != null) hotBomb.Stop();
             if (playerEngine != null) playerEngine.SetRunning(false);
             recorder.Stop();                                   // DNF path never reached OnParticipantFinished
@@ -474,7 +501,7 @@ namespace RacingGame
             var save = PlatformGlue.Save;
             var ev = RaceSetup.Event;
             float mult = RaceSetup.Tier != null ? RaceSetup.Tier.rewardMultiplier : 1f;
-            int[] killsPerVictim = me != null && me.Kills > 0 ? KillsPerVictim(race.Player) : null;
+            int[] killsPerVictim = me != null ? me.KillsPerVictim : null;
             LastReward = me != null ? Economy.RaceReward(me.Position, me.Finished, me.Laps, race.laps, killsPerVictim, mult) : 0;
             if (mission != null) LastReward = mission.Reward(me, mult);
             if (me != null && starRing != null) LastReward += Mathf.RoundToInt(me.TurretPoints * mult);
@@ -524,6 +551,7 @@ namespace RacingGame
                     if (me.Finished && me.Position <= 3) UnlockNext(ev, save);
                     if (daily) RecordDaily(ev, me, save, row);
                 }
+                Core.Economy.RaceCups.GrantCompleted(save.Data.progress);
                 save.MarkDirty();
             }
             GetComponent<PlatformGlue>()?.AfterRaceRecorded();   // flush → leaderboards → interstitial, in that order
@@ -558,7 +586,6 @@ namespace RacingGame
                 && int.TryParse(b.eventId.Substring(1), out int bd) && bd < day - 7);
         }
 
-        private static int[] KillsPerVictim(RaceParticipant player) => player != null ? player.KillTally.ToPerVictimCounts() : null;
 
         private void UnlockNext(RaceEventDefinition finished, Core.Save.SaveService save)
         {

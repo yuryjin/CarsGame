@@ -66,8 +66,22 @@ namespace RacingGame.Tests
         }
 
         private float savedCaptureDelta;
+        private string savedProfile;
+        private GameFlow runningFlow;
+        private RaceEventDefinition measuringEvent;
         [SetUp] public void SaveTimestep() { savedCaptureDelta = Time.captureDeltaTime; }
-        [TearDown] public void RestoreTimestep() { Time.captureDeltaTime = savedCaptureDelta; LogAssert.ignoreFailingMessages = false; }
+        [TearDown] public void RestoreTimestep()
+        {
+            if (runningFlow != null) runningFlow.EnterMenu();
+            if (savedProfile != null && PlatformGlue.Save != null)
+            {
+                JsonUtility.FromJsonOverwrite(savedProfile, PlatformGlue.Save.Data);
+                PlatformGlue.Save.MarkDirty();
+            }
+            if (measuringEvent != null) UnityEngine.Object.DestroyImmediate(measuringEvent);
+            Time.captureDeltaTime = savedCaptureDelta;
+            LogAssert.ignoreFailingMessages = false;
+        }
 
         private static string Env(string key, string fallback)
         {
@@ -91,8 +105,11 @@ namespace RacingGame.Tests
             if (!PlatformGlue.IsReady)
                 Debug.LogWarning($"[RaceHarness] not ready: save={(PlatformGlue.Save != null)} loaded={(PlatformGlue.Save != null && PlatformGlue.Save.Loaded)} loc={Loc.Ready} platform={(PlatformRuntime.Current != null ? PlatformRuntime.Current.IsInitialized.ToString() : "null")} scene={SceneManager.GetActiveScene().name} roots={SceneManager.GetActiveScene().rootCount} glue={UnityEngine.Object.FindObjectsByType<PlatformGlue>(FindObjectsInactive.Include).Length}/{UnityEngine.Object.FindAnyObjectByType<PlatformGlue>() != null} flow={UnityEngine.Object.FindAnyObjectByType<GameFlow>() != null} t={Time.frameCount}");
             Assert.IsTrue(PlatformGlue.Save != null && PlatformGlue.Save.Loaded, "save never loaded");
+            Assert.IsTrue(PlatformGlue.IsReady, "platform never became ready");
+            savedProfile = JsonUtility.ToJson(PlatformGlue.Save.Data);
 
             var flow = UnityEngine.Object.FindAnyObjectByType<GameFlow>();
+            runningFlow = flow;
             var race = UnityEngine.Object.FindAnyObjectByType<RaceManager>();
             var bus = UnityEngine.Object.FindAnyObjectByType<DebugBus>();
             RaceEventDefinition ev = null; DifficultyTier tier = null;
@@ -100,6 +117,10 @@ namespace RacingGame.Tests
             foreach (var t in flow.tiers) if (t != null && t.tierId == tierId) tier = t;
             Assert.IsNotNull(ev, "event " + evtId);
             ev = UnityEngine.Object.Instantiate(ev);
+            measuringEvent = ev;
+            // This is a physical measuring fixture, not a progression journey. Only the clone
+            // bypasses the campaign gate; the original event asset and saved unlocks stay intact.
+            ev.unlockAfterEventId = "";
             if (rivals >= 0) ev.aiCountOverride = rivals;
             if (laps > 0) ev.laps = laps;
 
@@ -109,6 +130,7 @@ namespace RacingGame.Tests
             race.spawner.playerBodyId = Env("CG_BODY", "");
             race.spawner.aiBodyVariety = Env("CG_AI_BODIES", "1") != "0";
             flow.StartRace(ev, tier);
+            Assert.AreEqual(RaceState.Countdown, race.State, "The measuring race must actually start");
             bus.Execute("autopilot", "on");
 
             var drivers = new List<RaceParticipant>(race.Participants);

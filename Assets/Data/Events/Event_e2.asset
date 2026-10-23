@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: RacingGame.Game::RacingGame.RaceEventDefinition
   eventId: e2
   nameKey: events.e2.name
-  laps: 3
+  laps: 2
   aiCountOverride: -1
   reversed: 1
   night: 0
@@ -23,5 +23,7 @@ MonoBehaviour:
   pickupCount: 9
   unlockAfterEventId: e1
   order: 1
+  skillGoal: 1
+  skillTarget: 2
   finishGoal: 2
   targetSeconds: 210

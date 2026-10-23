@@ -165,6 +165,16 @@ namespace RacingGame.Tests
                 Assert.GreaterOrEqual(farthest, 198, "car physically reaches the other end");
                 Assert.AreEqual(0, race.Player.Deaths);
 
+                // Cross the bridge's exit under normal physics, so the skill goal is credited only on completion.
+                for (int i = 0; i < 120 && race.Player.Shortcuts == 0; i++)
+                {
+                    var target = path.Position(path.Wrap(race.Player.Progress.Distance + 10f)) - car.transform.position;
+                    target.y = 0f;
+                    input.Set(car.SpeedKmh < 45f ? 1f : 0f, Mathf.Clamp(Vector3.SignedAngle(car.transform.forward, target, Vector3.up) / 35f, -1f, 1f));
+                    yield return null;
+                }
+                Assert.AreEqual(1, race.Player.Shortcuts, "a complete physical passage earns one shortcut");
+
                 // Missing the bridge costs time but does not strand the car or jump its progress to another bend.
                 Vector3 middle = fork.Position(0.5f);
                 hint = -1;
@@ -179,6 +189,7 @@ namespace RacingGame.Tests
                 for (int i = 0; i < 425; i++) yield return null;
                 Assert.Greater(race.Player.AutoResets, 0, "fall recovery returns to the main road");
                 Assert.AreEqual(GroundSurface.Track, car.Surface);
+                Assert.AreEqual(1, race.Player.Shortcuts, "falling and resetting never earns another shortcut");
 
                 Pickup repair = null;
                 foreach (var pickup in Object.FindObjectsByType<Pickup>())

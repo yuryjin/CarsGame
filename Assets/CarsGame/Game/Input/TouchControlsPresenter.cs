@@ -30,6 +30,10 @@ namespace RacingGame
         private bool previousAutoThrottle;
         private bool previousAutoSecondary;
         private TMPro.TextMeshProUGUI secondaryLabel;
+        private TMPro.TextMeshProUGUI fireLabel;
+        private Button swapButton;
+        private RectTransform resetButton, brakeButton;
+        private float targetScale = -1f;
         private string secondaryKey = "touch.secondary";
 
         private void Awake()
@@ -42,7 +46,7 @@ namespace RacingGame
         private void OnDisable()
         {
             Loc.LanguageChanged -= OnLanguageChanged;
-            if (hooked != null) { hooked.autoThrottle = previousAutoThrottle; hooked = null; }
+            if (hooked != null) { hooked.autoThrottle = previousAutoThrottle; hooked.autoSecondary = previousAutoSecondary; hooked = null; }
             if (canvas != null) canvas.gameObject.SetActive(false);
             shown = false;
             Publish(false);
@@ -66,21 +70,31 @@ namespace RacingGame
             bool wantShow = inRace && (forceShow || (!keyboardChosen && (Application.isMobilePlatform || touchSeen)));
             if (wantShow && !built) Build();
             shown = wantShow;
-            if (built && canvas.gameObject.activeSelf != (wantShow && !PauseController.IsPaused)) canvas.gameObject.SetActive(wantShow && !PauseController.IsPaused);
+            bool controlsActive = wantShow && !PauseController.IsPaused && (race == null || !race.CanShowResults);
+            if (built && canvas.gameObject.activeSelf != controlsActive) canvas.gameObject.SetActive(controlsActive);
             Publish(built && shown);
 
             var input = race != null && race.Player != null ? race.Player.GetComponent<PlayerDriverInput>() : null;
             if (shown && input != null && hooked != input) { hooked = input; previousAutoThrottle = input.autoThrottle; previousAutoSecondary = input.autoSecondary; input.autoThrottle = true; input.autoSecondary = true; }
             if (!shown && hooked != null) { hooked.autoThrottle = previousAutoThrottle; hooked.autoSecondary = previousAutoSecondary; hooked = null; }
             if (!shown && input != null && PlatformGlue.Save != null && PlatformGlue.Save.Data.settings.autoThrottle && !input.autoThrottle) input.autoThrottle = true;
-            if (shown) UpdateSecondaryLabel(input != null ? input.GetComponent<CarWeapons>() : null);
+            if (shown)
+            {
+                ApplyTouchTargets();
+                var weapons = input != null ? input.GetComponent<CarWeapons>() : null;
+                var cannon = input != null ? input.GetComponent<CarCannon>() : null;
+                bool primary = cannon != null && cannon.enabled && !cannon.locked;
+                fireLabel.transform.parent.gameObject.SetActive(primary);
+                swapButton.gameObject.SetActive(primary && weapons != null);
+                UpdateSecondaryLabel(weapons);
+            }
         }
 
         // The second button says what a press does now: drop a mine, plant a charge, blow the planted one, freeze.
         private void UpdateSecondaryLabel(CarWeapons weapons)
         {
             if (secondaryLabel == null) return;
-            var type = weapons != null ? weapons.secondaryType : SecondaryWeaponType.None;
+            var type = weapons != null && weapons.enabled ? weapons.secondaryType : SecondaryWeaponType.None;
             secondaryLabel.transform.parent.gameObject.SetActive(type != SecondaryWeaponType.None);
             if (type == SecondaryWeaponType.None) return;
             string key = type == SecondaryWeaponType.FreezeLauncher ? "touch.freeze"
@@ -99,12 +113,35 @@ namespace RacingGame
             var root = canvas.transform;
             Button(root, "Left", "◄", "<Gamepad>/dpad/left", new Vector2(0f, 0f), new Vector2(40f, 40f), new Vector2(200f, 200f));
             Button(root, "Right", "►", "<Gamepad>/dpad/right", new Vector2(0f, 0f), new Vector2(260f, 40f), new Vector2(420f, 200f));
-            Button(root, "Fire", Loc.Get("touch.fire"), "<Gamepad>/rightShoulder", new Vector2(1f, 0f), new Vector2(-260f, 40f), new Vector2(-40f, 260f));
+            fireLabel = Button(root, "Fire", Loc.Get("touch.fire"), "<Gamepad>/rightShoulder", new Vector2(1f, 0f), new Vector2(-260f, 40f), new Vector2(-40f, 260f));
+            swapButton = UiFactory.Button(root, "SwapWeapon", Loc.Get("loadout.swap"), () => hooked?.CycleLoadout(),
+                new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-260f, 280f), new Vector2(-40f, 370f), 26f, UiFactory.Surface);
             secondaryLabel = Button(root, "Secondary", Loc.Get("touch.secondary"), "<Gamepad>/leftShoulder", new Vector2(1f, 0f), new Vector2(-480f, 180f), new Vector2(-280f, 300f));
             secondaryKey = "touch.secondary";
             secondaryLabel.transform.parent.gameObject.SetActive(false);
-            Button(root, "Brake", Loc.Get("touch.brake"), "<Gamepad>/buttonSouth", new Vector2(1f, 0f), new Vector2(-480f, 40f), new Vector2(-280f, 160f));
-            Button(root, "Reset", "↺", "<Gamepad>/buttonNorth", new Vector2(1f, 1f), new Vector2(-140f, -140f), new Vector2(-40f, -40f));
+            brakeButton = (RectTransform)Button(root, "Brake", Loc.Get("touch.brake"), "<Gamepad>/buttonSouth", new Vector2(1f, 0f), new Vector2(-480f, 40f), new Vector2(-280f, 160f)).transform.parent;
+            resetButton = (RectTransform)Button(root, "Reset", "R", "<Gamepad>/buttonNorth", new Vector2(1f, 1f), new Vector2(-140f, -140f), new Vector2(-40f, -40f)).transform.parent;
+            targetScale = -1f;
+        }
+
+        private void ApplyTouchTargets()
+        {
+            float scale = Mathf.Max(0.1f, canvas.scaleFactor);
+            if (Mathf.Approximately(scale, targetScale)) return;
+            targetScale = scale;
+            float edge = 44f / scale;
+            float reset = Mathf.Max(100f, edge);
+            resetButton.offsetMin = new Vector2(-40f - reset, -40f - reset);
+            brakeButton.offsetMax = new Vector2(-280f, 40f + Mathf.Max(120f, edge));
+            ((RectTransform)swapButton.transform).offsetMax = new Vector2(-40f, 280f + Mathf.Max(90f, edge));
+            var secondary = (RectTransform)secondaryLabel.transform.parent;
+            secondary.offsetMax = new Vector2(-280f, 180f + Mathf.Max(120f, edge));
+            var swapLabel = swapButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            swapLabel.rectTransform.offsetMin = new Vector2(8f, 8f);
+            swapLabel.rectTransform.offsetMax = new Vector2(-8f, -8f);
+            swapLabel.enableWordWrapping = false;
+            swapLabel.fontSizeMax = Mathf.Max(26f, 12f / scale);
+            swapLabel.fontSizeMin = swapLabel.fontSizeMax;
         }
 
         private static TMPro.TextMeshProUGUI Button(Transform parent, string name, string label, string controlPath, Vector2 anchor, Vector2 offsetMin, Vector2 offsetMax)

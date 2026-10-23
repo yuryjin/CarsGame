@@ -28,6 +28,8 @@ namespace RacingGame
         private RectTransform driftMeter;
         private readonly Image[] driftPips = new Image[3];
         private Image driftFill;
+        private TMPro.TextMeshProUGUI driftLabel;
+        private int releasedStage;
         private CarController car;
         private int shownStage = -1;
         private float boostFlash;
@@ -60,17 +62,21 @@ namespace RacingGame
             driftFill = UiFactory.Panel(driftMeter, "Fill", Vector2.zero, new Vector2(0f, 1f), new Vector2(3f, 3f), new Vector2(3f, -3f), StageColors[0], false).GetComponent<Image>();
             for (int i = 0; i < 3; i++)
             {
-                float x = (i + 1) / 3f;
+                float x = i == 0 ? 0.6f / 2.4f : i == 1 ? 1.4f / 2.4f : 1f;
                 driftPips[i] = UiFactory.Panel(driftMeter, "Stage" + i, new Vector2(x, 0f), new Vector2(x, 1f), new Vector2(-3f, -6f), new Vector2(0f, 6f), new Color(1f, 1f, 1f, 0.35f), false).GetComponent<Image>();
             }
             foreach (var img in driftMeter.GetComponentsInChildren<Image>()) img.raycastTarget = false;
+            driftLabel = UiFactory.Text(driftMeter, "Action", "", 24f, TMPro.TextAlignmentOptions.Center,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-240f, 12f), new Vector2(240f, 65f), Color.white);
+            driftLabel.raycastTarget = false;
+            driftLabel.enableAutoSizing = true; driftLabel.fontSizeMin = 18f; driftLabel.fontSizeMax = 24f;
             driftMeter.gameObject.SetActive(false);
             SetVisible(false);
         }
 
         public void SetVisible(bool visible) { if (canvas != null) canvas.gameObject.SetActive(visible); }
 
-        private void OnDrift(int stage, float seconds) { boostFlash = 1f; }
+        private void OnDrift(int stage, float seconds) { boostFlash = 1f; releasedStage = stage; }
 
         private void LateUpdate()
         {
@@ -82,6 +88,7 @@ namespace RacingGame
                 car = c;
                 if (car != null) car.DriftBoosted += OnDrift;
                 shownStage = -1;
+                boostFlash = 0f;
             }
             bool racing = car != null && race.State >= RaceState.Racing && race.State < RaceState.Finished && !PauseController.IsPaused;
             float dt = Time.unscaledDeltaTime;
@@ -96,7 +103,7 @@ namespace RacingGame
                 target = Mathf.Max(target, boostFlash * 0.7f);
             }
             intensity = Mathf.MoveTowards(intensity, target, dt * (target > intensity ? 4f : 2f));
-            boostFlash = Mathf.MoveTowards(boostFlash, 0f, dt * 1.5f);
+            if (!PauseController.IsPaused) boostFlash = Mathf.MoveTowards(boostFlash, 0f, dt * 0.8f);
             float halfW = root.rect.width * 0.5f, halfH = root.rect.height * 0.5f;
             float outer = Mathf.Sqrt(halfW * halfW + halfH * halfH);
             for (int i = 0; i < lines.Length; i++)
@@ -122,17 +129,24 @@ namespace RacingGame
 
             // ---- drift meter ----
             bool drifting = racing && car.IsDrifting;
-            if (driftMeter.gameObject.activeSelf != drifting) driftMeter.gameObject.SetActive(drifting);
-            if (!drifting) return;
+            bool showMeter = racing && (drifting || boostFlash > 0f);
+            if (driftMeter.gameObject.activeSelf != showMeter) driftMeter.gameObject.SetActive(showMeter);
+            if (!drifting)
+            {
+                shownStage = -1;
+                if (showMeter) driftLabel.text = Loc.Format("drift.released", "n", releasedStage);
+                return;
+            }
             float charge = car.DriftCharge01;
             driftFill.rectTransform.anchorMax = new Vector2(charge, 1f);
             int stage = car.DriftStage;
             if (stage != shownStage)
             {
                 shownStage = stage;
+                driftLabel.text = stage > 0 ? Loc.Format("drift.release", "n", stage) : Loc.Get("drift.hold");
                 driftFill.color = StageColors[Mathf.Clamp(stage, 0, 3)];
                 for (int i = 0; i < 3; i++) driftPips[i].color = i < stage ? StageColors[i + 1] : new Color(1f, 1f, 1f, 0.35f);
-                if (stage > 0) SfxPlayer.Instance.PlayUi(SfxSynth.Beep, 0.25f + 0.1f * stage);
+                if (stage > 0) SfxPlayer.Instance.PlayUi(SfxSynth.Beep, 0.25f + 0.1f * stage, 0.9f + 0.2f * stage);
             }
         }
 

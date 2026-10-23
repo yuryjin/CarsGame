@@ -15,13 +15,15 @@ namespace RacingGame
     public sealed class RaceOverlays : MonoBehaviour
     {
         private RaceManager race;
+        private HudScreen hud;
         private RectTransform bombPanel;
         private TextMeshProUGUI bombTitle, bombHint;
         private Transform bombMarker;
         private Material bombMaterial;
         private RaceParticipant shownCarrier;
         private int shownBombSeconds = -1, shownLockSeconds = -1;
-        private bool bombNarrow;
+        private int bombWidth, bombHeight;
+        private float bombScale;
         public string BombMessage => bombTitle != null ? bombTitle.text : "";
         private Canvas canvas;
         private RectTransform aimedPanel;
@@ -46,6 +48,7 @@ namespace RacingGame
         private void Awake()
         {
             race = GetComponent<RaceManager>() ?? FindAnyObjectByType<RaceManager>();
+            hud = GetComponent<HudScreen>() ?? FindAnyObjectByType<HudScreen>();
             canvas = UiFactory.CreateOverlayCanvas("RaceOverlays", 25);
             canvas.transform.SetParent(transform, false);
             var root = canvas.transform;
@@ -54,9 +57,9 @@ namespace RacingGame
             bombTitle = UiFactory.Text(bombPanel, "CarrierTimer", "", 32f, TextAlignmentOptions.Center, new Vector2(0f, 0.45f), Vector2.one, new Vector2(14f, 0f), new Vector2(-14f, -6f));
             bombTitle.fontStyle = FontStyles.Bold;
             bombTitle.richText = false;
-            bombTitle.enableAutoSizing = true; bombTitle.fontSizeMin = 20f; bombTitle.fontSizeMax = 32f;
+            bombTitle.enableAutoSizing = false;
             bombHint = UiFactory.Text(bombPanel, "PassHint", "", 23f, TextAlignmentOptions.Center, Vector2.zero, new Vector2(1f, 0.45f), new Vector2(14f, 5f), new Vector2(-14f, 0f), UiFactory.Muted);
-            bombHint.enableAutoSizing = true; bombHint.fontSizeMin = 16f; bombHint.fontSizeMax = 23f;
+            bombHint.enableAutoSizing = false;
             foreach (var graphic in bombPanel.GetComponentsInChildren<Graphic>()) graphic.raycastTarget = false;
             bombPanel.gameObject.SetActive(false);
 
@@ -161,23 +164,16 @@ namespace RacingGame
             bool visible = canvas.gameObject.activeSelf && bomb != null && !PauseController.IsPaused
                 && race.State >= RaceState.Countdown && race.State < RaceState.Finished && !race.HasFinished(player);
             bombPanel.gameObject.SetActive(visible);
-            bool narrow = ((RectTransform)canvas.transform).rect.width < 1400f;
-            if (narrow != bombNarrow)
-            {
-                bombNarrow = narrow;
-                float top = narrow ? -430f : -108f;
-                bombPanel.offsetMin = new Vector2(-320f, top - 90f);
-                bombPanel.offsetMax = new Vector2(320f, top);
-            }
             var carrier = visible ? bomb.Carrier : null;
             if (bombMarker != null) bombMarker.gameObject.SetActive(carrier != null);
-            if (!visible) { shownCarrier = null; shownBombSeconds = -1; return; }
+            if (!visible) { shownCarrier = null; shownBombSeconds = -1; hud?.PlaceHintBelowBomb(0f); return; }
             int seconds = carrier != null ? Mathf.CeilToInt(bomb.SecondsLeft) : 0;
             int lockSeconds = carrier != null ? Mathf.CeilToInt(bomb.PassLockSeconds) : 0;
             if (shownCarrier != carrier || shownBombSeconds != seconds || shownLockSeconds != lockSeconds)
             {
                 bool mine = carrier == player;
-                bombTitle.text = carrier == null ? Loc.Get("bomb.wait") : Loc.Format(mine ? "bomb.yours" : "bomb.owner", "name", carrier.displayName, "n", seconds);
+                bombTitle.text = carrier == null ? Loc.Get("bomb.wait") : Loc.Format(mine ? "bomb.yours" : "bomb.owner",
+                    "name", UiFactory.Escape(HudScreen.GetLocalizedRacerName(carrier.displayName, carrier.isPlayer)), "n", seconds);
                 bombTitle.color = mine ? AimRed : UiFactory.Accent;
                 bombHint.text = mine && lockSeconds > 0 ? Loc.Format("bomb.locked", "n", lockSeconds)
                     : Loc.Get(carrier == null ? "bomb.rules" : mine ? "bomb.pass" : "bomb.avoid");
@@ -186,7 +182,10 @@ namespace RacingGame
                 shownCarrier = carrier;
                 shownBombSeconds = seconds;
                 shownLockSeconds = lockSeconds;
+                bombWidth = 0; // Text changes can change the preferred line count.
             }
+            LayoutBomb();
+            hud?.PlaceHintBelowBomb(-bombPanel.offsetMin.y * canvas.scaleFactor);
             if (carrier == null) return;
             if (bombMarker == null) BuildBombMarker();
             bombMarker.gameObject.SetActive(true);
@@ -196,6 +195,33 @@ namespace RacingGame
             Color color = seconds <= 5 ? AimRed : UiFactory.Accent;
             bombMaterial.SetColor("_BaseColor", color);
             bombMaterial.SetColor("_EmissionColor", color * 1.5f);
+        }
+
+        private void LayoutBomb()
+        {
+            float scale = Mathf.Max(0.01f, canvas.scaleFactor);
+            if (bombWidth == Screen.width && bombHeight == Screen.height && Mathf.Abs(bombScale - scale) < 0.001f) return;
+            bombWidth = Screen.width; bombHeight = Screen.height; bombScale = scale;
+            float width = Mathf.Min(Screen.width - 24f, Mathf.Max(280f, 640f * scale));
+            float title = Mathf.Max(14f, 32f * scale), detail = Mathf.Max(12f, 23f * scale);
+            bombTitle.fontSize = title / scale; bombHint.fontSize = detail / scale;
+            float textWidth = (width - 20f) / scale;
+            float titleHeight = Mathf.Max(title + 4f, bombTitle.GetPreferredValues(bombTitle.text, textWidth, float.PositiveInfinity).y * scale + 2f);
+            float hintHeight = Mathf.Max(detail + 4f, bombHint.GetPreferredValues(bombHint.text, textWidth, float.PositiveInfinity).y * scale + 2f);
+            float height = titleHeight + hintHeight + 14f;
+            bool narrow = ((RectTransform)canvas.transform).rect.width < 1400f;
+            float top = (narrow ? 430f : 100f) * scale + 8f;
+            bombPanel.offsetMin = new Vector2(-width * 0.5f, -top - height) / scale;
+            bombPanel.offsetMax = new Vector2(width * 0.5f, -top) / scale;
+            PlaceBombText(bombTitle.rectTransform, width, 6f, titleHeight, scale);
+            PlaceBombText(bombHint.rectTransform, width, 8f + titleHeight, hintHeight, scale);
+        }
+
+        private static void PlaceBombText(RectTransform rect, float width, float top, float height, float scale)
+        {
+            rect.anchorMin = rect.anchorMax = new Vector2(0f, 1f);
+            rect.offsetMin = new Vector2(10f, -top - height) / scale;
+            rect.offsetMax = new Vector2(width - 10f, -top) / scale;
         }
 
         private void BuildBombMarker()

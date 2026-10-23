@@ -1311,7 +1311,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697473
-    m_Localized: "Tak\u0131ld\u0131n m\u0131? \u21BA tu\u015Funa bas"
+    m_Localized: "Tak\u0131ld\u0131n m\u0131? R tu\u015Funa bas"
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697474
@@ -1432,6 +1432,354 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8422648379514880
     m_Localized: "YOL \xC7\xD6K\xDCYOR!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871854370816
+    m_Localized: "\u0130ncele"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565120
+    m_Localized: "D\xF6nd\xFCrmek i\xE7in s\xFCr\xFCkle"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871858565121
+    m_Localized: "{name} ile kar\u015F\u0131la\u015Ft\u0131rma"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759424
+    m_Localized: "Test s\xFCr\xFC\u015F\xFC \xB7 45 sn"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759425
+    m_Localized: "Garaja d\xF6n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18164871862759426
+    m_Localized: "Her g\xF6vdeyi \xFCcretsiz dene. \u0130lerleme de\u011Fi\u015Fmez."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466443100160
+    m_Localized: "Yar\u0131\u015F donan\u0131m\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488768
+    m_Localized: "Serbest cephanelik \xB7 t\xFCm silahlar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488769
+    m_Localized: "Yar\u0131\u015F donan\u0131m\u0131 \xB7 iki silah"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488770
+    m_Localized: "DE\u011E\u0130\u015ET\u0130R"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488771
+    m_Localized: "\u0130ki silah se\xE7. Q / tekerlek, y\xF6n tu\u015Fu yukar\u0131/a\u015Fa\u011F\u0131
+      veya DE\u011E\u0130\u015ET\u0130R ile ge\xE7i\u015F yap. \u0130kincil silahlar
+      a\u015Fa\u011F\u0131da."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488772
+    m_Localized: "Temel hasar: {damage} \xB7 aral\u0131k: {interval} sn"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488773
+    m_Localized: "Uzaktan ate\u015F. Hareketli hedeflerin \xF6n\xFCne ni\u015Fan
+      al; cephane ve \u0131s\u0131y\u0131 izle."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488774
+    m_Localized: "Yak\u0131n d\xF6v\xFC\u015F. Vurmadan \xF6nce rakibin yan\u0131na
+      gel."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488775
+    m_Localized: "Bir rakibi g\xF6r\xFC\u015Fte tut. So\u011Fumak i\xE7in ate\u015Fi
+      b\u0131rak."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488776
+    m_Localized: "\xD6ndeki rakipleri vurur. S\u0131k\u0131\u015F\u0131k gruplara
+      kar\u015F\u0131 etkilidir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488777
+    m_Localized: "Arac\u0131n \xE7evresindeki rakipleri etkiler. \xD6nce yakla\u015F."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488778
+    m_Localized: "Takip\xE7ileri yakalamak i\xE7in arkaya b\u0131rak. Rotan\u0131
+      planla."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488779
+    m_Localized: "Gaz: W/yukar\u0131. D\xF6n: A/D veya oklar. Ate\u015F: Ctrl / sol
+      fare. \xD6ndeki rakibi yakala ve vur."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488780
+    m_Localized: "Ara\xE7 kendisi h\u0131zlan\u0131r. Oklarla d\xF6n; rakibi yakala
+      ve ATE\u015E'e bas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488781
+    m_Localized: "40 km/sa \xFCzerinde d\xF6n ve Bo\u015Fluk'a bas. \u015Earj biriktir,
+      h\u0131zlanmak i\xE7in Bo\u015Fluk'u b\u0131rak."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488782
+    m_Localized: "40 km/sa \xFCzerinde d\xF6n ve FREN'e bas\u0131l\u0131 tut. H\u0131zlanmak
+      i\xE7in FREN'i b\u0131rak."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488783
+    m_Localized: "Sar\u0131 oklarla dar k\xF6pr\xFCye gir. Daha k\u0131sa yol, ama
+      bariyer yok!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488784
+    m_Localized: "T\xFCnele 55 km/sa \xFCzerinde gir. Tavandaki h\u0131zland\u0131r\u0131c\u0131ya
+      ula\u015Fmak i\xE7in duvara d\xF6n; h\u0131z\u0131n\u0131 koru."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488785
+    m_Localized: "Drift h\u0131zlanmas\u0131 kazan\u0131ld\u0131! Sonraki virajda
+      daha \xE7ok \u015Farj biriktir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488786
+    m_Localized: "Kestirme tamamland\u0131! Sonraki turda ana yolla kar\u015F\u0131la\u015Ft\u0131r."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488787
+    m_Localized: "Tavan h\u0131zland\u0131r\u0131c\u0131s\u0131na ula\u015Ft\u0131n!
+      T\xFCnelde yumu\u015Fak d\xF6nmeye devam et."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488788
+    m_Localized: "Bomba sende mi? Aktarmak i\xE7in rakibe dokun. De\u011Filse ta\u015F\u0131y\u0131c\u0131dan
+      uzak dur. Fitil s\u0131f\u0131rlanmaz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488789
+    m_Localized: "Bu yar\u0131\u015Fta sadece may\u0131n var. \xD6ne ge\xE7 ve takip\xE7inin
+      yoluna tuzak b\u0131rak."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488790
+    m_Localized: "\u015Earj i\xE7in fren ve y\xF6n\xFC tut"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488791
+    m_Localized: "Seviye {n} \xB7 h\u0131zlanmak i\xE7in freni b\u0131rak"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488792
+    m_Localized: "Drift h\u0131zlanmas\u0131 \xB7 seviye {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488793
+    m_Localized: "\u2605 {n}/3 \xB7 Hedefleri g\xF6ster"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488794
+    m_Localized: "Kaza veya s\u0131f\u0131rlama olmadan bitir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488795
+    m_Localized: "{n} drift h\u0131zlanmas\u0131 kazan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488796
+    m_Localized: "K\xF6pr\xFC kestirmesini {n} kez tamamla"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488797
+    m_Localized: "Tavan h\u0131zland\u0131r\u0131c\u0131s\u0131n\u0131 kullan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488798
+    m_Localized: "Son turu kaza veya s\u0131f\u0131rlama olmadan bitir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488799
+    m_Localized: "Bombay\u0131 {n} kez aktar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488800
+    m_Localized: "Yar\u0131\u015F kupalar\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488801
+    m_Localized: "S\xFCr\xFC\u015F okulu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488802
+    m_Localized: "Sava\u015F kupas\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488803
+    m_Localized: Ekstrem rotalar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488804
+    m_Localized: "\u2605 {stars}/6 \xB7 {n}/3 yar\u0131\u015F tamamland\u0131 \xB7
+      \xD6d\xFCl: {reward}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488805
+    m_Localized: "\xD6d\xFCl a\xE7\u0131ld\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488806
+    m_Localized: Sonraki hedefin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18165466451488807
+    m_Localized: "Ki\u015Fisel rekorunu k\u0131r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18166440566009856
+    m_Localized: Kontroller ve hedefler
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514288177152
+    m_Localized: "T\xFCm\xFC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954368
+    m_Localized: Menzilli
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954369
+    m_Localized: "Yak\u0131n d\xF6v\xFC\u015F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954370
+    m_Localized: Kontrol
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954371
+    m_Localized: Tuzaklar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954372
+    m_Localized: "Geni\u015F sa\xE7\u0131lma. Daha \xE7ok sa\xE7ma isabeti i\xE7in
+      yakla\u015F."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954373
+    m_Localized: "Her at\u0131\u015Fta birka\xE7 mermi. Rakibi ni\u015Fang\xE2h\u0131n
+      ortas\u0131nda tut."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954374
+    m_Localized: "H\u0131zl\u0131 s\xFCrekli ate\u015F. So\u011Fumak i\xE7in teti\u011Fi
+      b\u0131rak."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954375
+    m_Localized: "G\xFC\xE7l\xFC ama yava\u015F at\u0131\u015Flar. At\u0131\u015F
+      aralar\u0131nda dikkatle ni\u015Fan al."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954376
+    m_Localized: "Roket \xF6ndeki hedefi izler. G\xF6r\xFC\u015F hatt\u0131 a\xE7\u0131kken
+      ate\u015F et."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954377
+    m_Localized: "Duvarlardan seker. Zor a\xE7\u0131lara ula\u015Fmak i\xE7in bariyerleri
+      kullan."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954378
+    m_Localized: "Rakibi kendine \xE7eker. Menzilde kal ve s\xFCr\xFC\u015F \xE7izgine
+      dikkat et."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954379
+    m_Localized: "\u015Earj\xF6r: {n} \xB7 doldurma: {seconds} sn"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954380
+    m_Localized: "\u015Earj\xF6r doldurma yok \xB7 \u0131s\u0131ya dikkat et"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954381
+    m_Localized: 'Menzil: {n} m'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954382
+    m_Localized: "Etki yar\u0131\xE7ap\u0131: {n} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18182514304954383
+    m_Localized: '{effect}: {seconds} sn'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820457320448
+    m_Localized: "Gaz: W / yukar\u0131. Geri: S / a\u015Fa\u011F\u0131. D\xF6n\xFC\u015F:
+      A/D veya oklar. Fren: Bo\u015Fluk. Piste d\xF6n: R."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097664
+    m_Localized: "Ara\xE7 kendisi h\u0131zlan\u0131r. Oklarla d\xF6n. Yava\u015Flamak
+      i\xE7in FREN bas\u0131l\u0131 tut. Piste d\xF6nmek i\xE7in R d\xFC\u011Fmesine
+      dokun."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097665
+    m_Localized: "Ate\u015F: Ctrl / sol fare. \u0130ki silah aras\u0131nda ge\xE7i\u015F:
+      Q / fare tekerle\u011Fi veya 1 ve 2."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097666
+    m_Localized: "Ate\u015F: Ctrl / sol fare. Q bas\u0131l\u0131yken fareyi hareket
+      ettirerek silah se\xE7; Q b\u0131rak\u0131nca ku\u015Fan. Q bas\u0131l\u0131yken
+      Tab / tekerlek sayfay\u0131, 1\u20130 yuvay\u0131 se\xE7er."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097667
+    m_Localized: "Ate\u015F etmek i\xE7in ATE\u015E bas\u0131l\u0131 tut. Ku\u015Fand\u0131\u011F\u0131n
+      silahlar aras\u0131nda ge\xE7mek i\xE7in DE\u011E\u0130\u015ET\u0130R d\xFC\u011Fmesine
+      dokun."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097668
+    m_Localized: "{action}: E / Shift / sa\u011F fare / LB. Cephane ve haz\u0131r
+      olma durumu ekranda g\xF6sterilir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097669
+    m_Localized: "\u0130kincil silah\u0131 kullanmak i\xE7in {action} d\xFC\u011Fmesine
+      dokun. Cephane ve haz\u0131r olma durumu ekranda g\xF6sterilir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097670
+    m_Localized: "Bir patlay\u0131c\u0131 yerle\u015Ftirildiyse patlatmak i\xE7in
+      ayn\u0131 d\xFC\u011Fmeye yeniden bas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820474097671
+    m_Localized: "Gamepad: sol \xE7ubukla d\xF6n; RT / LT gaz / geri; A fren; Y piste
+      d\xF6n\xFC\u015F."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291968
+    m_Localized: "Gamepad: RB ate\u015F; y\xF6n tu\u015Fu a\u015Fa\u011F\u0131 /
+      yukar\u0131 silah yuvas\u0131 1 / 2."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291969
+    m_Localized: "Sadece may\u0131nlar. \xD6ne ge\xE7 ve arkana may\u0131n b\u0131rakmak
+      i\xE7in E / Shift / sa\u011F fareye bas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18240820478291970
+    m_Localized: "Sadece may\u0131nlar. \xD6ne ge\xE7 ve takip\xE7ilere tuzak b\u0131rakmak
+      i\xE7in MAYIN d\xFC\u011Fmesine dokun."
     m_Metadata:
       m_Items: []
   references:

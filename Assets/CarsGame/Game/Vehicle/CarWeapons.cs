@@ -89,6 +89,23 @@ namespace RacingGame
         public float overheatRecoveryThreshold = 40f;
         [Tooltip("The driver may swap to the machine gun mid-race (bought in the garage).")]
         public bool machineGunUnlocked;
+        public bool CompactLoadout { get; private set; }
+        public PrimaryWeaponType LoadoutFirst { get; private set; }
+        public PrimaryWeaponType LoadoutSecond { get; private set; }
+
+        public void ConfigureLoadout(bool compact, PrimaryWeaponType first, PrimaryWeaponType second)
+        {
+            LoadoutFirst = CanOwn(first) ? first : PrimaryWeaponType.Cannon;
+            LoadoutSecond = CanOwn(second) && second != LoadoutFirst ? second
+                : LoadoutFirst == PrimaryWeaponType.Shotgun ? PrimaryWeaponType.Cannon : PrimaryWeaponType.Shotgun;
+            CompactLoadout = compact;
+            SetPrimaryType(LoadoutFirst);
+        }
+
+        private bool CanOwn(PrimaryWeaponType type) => PrimaryWeaponCatalog.IsValid(type)
+            && (type != PrimaryWeaponType.MachineGun || machineGunUnlocked);
+
+        public int LoadoutSlot(int index) => (int)(index == 0 ? LoadoutFirst : LoadoutSecond) + 1;
         [Tooltip("Machine gun heat upgrade: scales heat per shot, divides the cooling rate (<1 = cooler).")]
         public float machineGunHeatFactor = 1f;
         [Tooltip("Seconds after a mid-race swap before the new primary can fire.")]
@@ -169,7 +186,7 @@ namespace RacingGame
         public bool TrySwitchPrimary(PrimaryWeaponType type, int tick)
         {
             if (!PrimaryWeaponCatalog.IsValid(type) || type == primaryType) return false;
-            if (type == PrimaryWeaponType.MachineGun && !machineGunUnlocked)
+            if (!IsPrimaryAvailable(type))
             {
                 PrimarySwitchDenied?.Invoke();
                 return false;
@@ -182,8 +199,8 @@ namespace RacingGame
             return true;
         }
 
-        public bool IsPrimaryAvailable(PrimaryWeaponType type) => PrimaryWeaponCatalog.IsValid(type)
-            && (type != PrimaryWeaponType.MachineGun || machineGunUnlocked);
+        public bool IsPrimaryAvailable(PrimaryWeaponType type) => CanOwn(type)
+            && (!CompactLoadout || type == LoadoutFirst || type == LoadoutSecond);
 
         public int CyclePrimarySlot(int currentSlot, int direction)
         {

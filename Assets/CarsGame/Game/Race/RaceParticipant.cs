@@ -43,6 +43,14 @@ namespace RacingGame
         [Tooltip("Lateral distance (m) from the centre line that counts as lost.")]
         public float lostLateralMetres = 20f;
         public int AutoResets { get; private set; }
+        public int DriftBoosts { get; private set; }
+        public int Shortcuts { get; private set; }
+        public int CeilingBoosts { get; internal set; }
+        public int BombPasses { get; internal set; }
+        public int Resets { get; private set; }
+        public bool CleanFinalLap => finalLapStarted && !finalLapMistake;
+        private bool finalLapStarted, finalLapMistake, wasOnFork;
+        private float forkTravel;
 
         private int carMask;
         private float offTrackTime;
@@ -62,11 +70,30 @@ namespace RacingGame
         private void OnEnable()
         {
             if (Health != null) Health.OnDied += OnDied;
+            Car.DriftBoosted += OnDriftBoost;
+            Car.Teleported += OnReset;
+            if (Progress != null) Progress.LapCompleted += OnLap;
         }
 
         private void OnDisable()
         {
             if (Health != null) Health.OnDied -= OnDied;
+            if (Car != null) { Car.DriftBoosted -= OnDriftBoost; Car.Teleported -= OnReset; }
+            if (Progress != null) Progress.LapCompleted -= OnLap;
+        }
+
+        private void OnDriftBoost(int stage, float seconds) { if (Car.inputEnabled) DriftBoosts++; }
+        private void OnLap(int laps, double seconds)
+        {
+            var ev = RaceSetup.Event;
+            if (ev != null && laps == ev.laps - 1) finalLapStarted = true;
+        }
+        private void OnReset()
+        {
+            wasOnFork = false; forkTravel = 0f;
+            if (!Car.inputEnabled) return;
+            Resets++;
+            if (finalLapStarted) finalLapMistake = true;
         }
 
         // Lost cars come back by themselves: a touch player with auto-throttle who wanders into the
@@ -79,6 +106,16 @@ namespace RacingGame
             bool offAsphalt = Car.Surface == GroundSurface.Ground || (Car.Surface == GroundSurface.None && Car.IsGrounded == false && transform.position.y > -5f);
             float lateral = Mathf.Abs(Progress.Path.Spline.LateralOffset(transform.position, Progress.Distance));
             bool onFork = Progress.Path.OnFork(transform.position);
+            if (onFork && Progress.SpeedAlongTrack > 0f && Car.IsGrounded)
+                forkTravel += Mathf.Min(Car.Body.linearVelocity.magnitude * Time.fixedDeltaTime, 5f);
+            if (wasOnFork && !onFork)
+            {
+                if (Progress.Path.Fork != null && forkTravel >= Progress.Path.Fork.Length * 0.7f && Car.IsGrounded && Progress.SpeedAlongTrack > 0f
+                    && Vector3.Distance(transform.position, Progress.Path.Fork.Position(Progress.Path.reversed ? 0f : 1f)) < 20f)
+                    Shortcuts++;
+                forkTravel = 0f;
+            }
+            wasOnFork = onFork;
             bool lost = !onFork && lateral > lostLateralMetres;
             offTrackTime = offAsphalt || lost ? offTrackTime + Time.fixedDeltaTime : 0f;
             if (offTrackTime >= offTrackResetSeconds || (!onFork && lateral > lostLateralMetres * 2f))
@@ -103,6 +140,8 @@ namespace RacingGame
         private void OnDied(GameObject attacker)
         {
             Deaths++;
+            if (finalLapStarted) finalLapMistake = true;
+            forkTravel = 0f;
             EliminatedAtTick = SimulationDriver.Instance.Tick;
             if (attacker != null)
             {
