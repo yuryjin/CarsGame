@@ -146,7 +146,7 @@ namespace RacingGame
             if (status == null) status = gameObject.AddComponent<CarStatus>();
             weapons = GetComponent<CarWeapons>();
             if (weapons == null) weapons = gameObject.AddComponent<CarWeapons>();
-            if (barrel == null || muzzle == null) shellMaterial = MakeMaterial(new Color(1f, 0.8f, 0.25f));
+            if (barrel == null || muzzle == null) shellMaterial = WeaponArt.Material(new Color(1f, 0.8f, 0.25f));
             EnsureTurretVisuals();
             barrelRestPosition = barrel.localPosition;
             barrelRestRotation = barrel.localRotation;
@@ -390,7 +390,7 @@ namespace RacingGame
 
         private void BuildTurret()
         {
-            Material dark = FindMaterialOnCar("carbon", "dark") ?? MakeMaterial(new Color(0.12f, 0.12f, 0.13f));
+            Material dark = FindMaterialOnCar("carbon", "dark") ?? WeaponArt.Material(new Color(0.12f, 0.12f, 0.13f));
 
             var turret = new GameObject("Cannon_Turret").transform;
             turret.gameObject.layer = gameObject.layer;
@@ -466,14 +466,5 @@ namespace RacingGame
             return null;
         }
 
-        // TODO(M5): serialized material assets instead of Shader.Find (stripped in builds).
-        private static Material MakeMaterial(Color color)
-        {
-            var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-            var m = new Material(shader);
-            if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", color);
-            if (m.HasProperty("_Color")) m.SetColor("_Color", color);
-            return m;
-        }
     }
 }

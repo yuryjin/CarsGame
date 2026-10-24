@@ -126,11 +126,13 @@ namespace RacingGame
         private void Teardown()
         {
             raceGeneration++;
-            PauseController.ResetAll();
             if (recorder != null) recorder.Stop();
             ClearGhosts();
             if (hotBomb != null) { hotBomb.Stop(); Destroy(hotBomb); hotBomb = null; }
             if (race != null && race.State != RaceState.Idle) race.AbortRace();
+            // A transition owns only the local menus. Visibility, ads and host overlays
+            // must keep the next countdown/audio paused until their own resume callback.
+            PauseController.Set(PauseReason.User | PauseReason.Menu, false);
             if (mission != null) { mission.Dispose(); Destroy(mission.gameObject); mission = null; }
             if (pickups != null) pickups.Clear();
             if (trackFork != null) { trackFork.Restore(); Destroy(trackFork.gameObject); trackFork = null; }
@@ -377,7 +379,12 @@ namespace RacingGame
                     lastHp = cur;
                 };
                 health.OnDied += attacker => { SfxPlayer.Instance.Play(SfxSynth.Wreck, participant.transform.position, 1f); OnWreck(participant, attacker); };
-                p.Progress.LapCompleted += (lap, t) => { if (participant.isPlayer) SfxPlayer.Instance.PlayUi(SfxSynth.LapDing); };
+                p.Progress.LapCompleted += (lap, t) => {
+                    if (!participant.isPlayer) return;
+                    SfxPlayer.Instance.PlayUi(SfxSynth.LapDing);
+                    if (RaceSetup.Event != null && RaceSetup.Event.abyssTrack && !RaceSetup.Event.spaceTrack && lap < race.laps && lap <= 2)
+                        hud?.ShowHint(Loc.Get(lap == 1 ? "abyss.open" : "abyss.narrow"), 6f);
+                };
             }
         }
 

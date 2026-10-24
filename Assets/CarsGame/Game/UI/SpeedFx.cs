@@ -33,6 +33,8 @@ namespace RacingGame
         private CarController car;
         private int shownStage = -1;
         private float boostFlash;
+        private float pixelScale = -1f;
+        private int layoutWidth;
 
         private static readonly Color[] StageColors = { new Color(1f, 1f, 1f, 0.9f), new Color(0.35f, 0.75f, 1f), new Color(1f, 0.65f, 0.15f), new Color(1f, 0.3f, 0.85f) };
 
@@ -78,8 +80,29 @@ namespace RacingGame
 
         private void OnDrift(int stage, float seconds) { boostFlash = 1f; releasedStage = stage; }
 
+        private void UpdateDriftLayout()
+        {
+            float scale = Mathf.Max(0.01f, root.lossyScale.x);
+            if (Mathf.Abs(scale - pixelScale) < 0.001f && layoutWidth == Screen.width) return;
+            pixelScale = scale; layoutWidth = Screen.width;
+            driftMeter.sizeDelta = new Vector2(Mathf.Max(160f, 220f * scale), Mathf.Max(10f, 18f * scale)) / scale;
+            driftFill.rectTransform.offsetMin = new Vector2(2f, 2f) / scale;
+            driftFill.rectTransform.offsetMax = new Vector2(2f - 4f * driftFill.rectTransform.anchorMax.x, -2f) / scale;
+            foreach (var pip in driftPips)
+            {
+                pip.rectTransform.offsetMin = new Vector2(-2f, -3f) / scale;
+                pip.rectTransform.offsetMax = new Vector2(0f, 3f) / scale;
+            }
+            float width = Mathf.Clamp(Screen.width * 0.6f, 240f, 520f) / scale;
+            driftLabel.rectTransform.offsetMin = new Vector2(-width * 0.5f, 6f / scale);
+            driftLabel.rectTransform.offsetMax = new Vector2(width * 0.5f, 46f / scale);
+            driftLabel.fontSizeMin = 14f / scale;
+            driftLabel.fontSizeMax = Mathf.Max(24f, 14f / scale);
+        }
+
         private void LateUpdate()
         {
+            UpdateDriftLayout();
             var player = race != null ? race.Player : null;
             var c = player != null ? player.Car : null;
             if (c != car)
@@ -139,6 +162,7 @@ namespace RacingGame
             }
             float charge = car.DriftCharge01;
             driftFill.rectTransform.anchorMax = new Vector2(charge, 1f);
+            driftFill.rectTransform.offsetMax = new Vector2(2f - 4f * charge, -2f) / pixelScale;
             int stage = car.DriftStage;
             if (stage != shownStage)
             {

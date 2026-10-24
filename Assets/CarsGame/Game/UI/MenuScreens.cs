@@ -181,7 +181,7 @@ namespace RacingGame
         private static TextMeshProUGUI Label(Transform parent, string name, string value, float size, Vector2 min, Vector2 max, Vector2 lo, Vector2 hi, Color? color = null, TextAlignmentOptions alignment = TextAlignmentOptions.MidlineLeft)
         {
             var text = UiFactory.Text(parent, name, value, size, alignment, min, max, lo, hi, color);
-            text.outlineWidth = 0f; text.enableAutoSizing = true; text.fontSizeMin = Mathf.Max(18f, size * 0.7f); text.fontSizeMax = size;
+            UiFactory.SetOutline(text, 0f); text.enableAutoSizing = true; text.fontSizeMin = Mathf.Max(18f, size * 0.7f); text.fontSizeMax = size;
             text.overflowMode = TextOverflowModes.Ellipsis;
             return text;
         }

@@ -45,11 +45,33 @@ namespace RacingGame
         public bool UsingActionMap => map != null;
         /// <summary>Current throttle level (0..1 forward) even while the car ignores commands (countdown revving).</summary>
         public float ThrottleLevel => Mathf.Max(0f, throttle);
-        /// <summary>The player's own throttle input before auto-throttle fills it in (0..1 forward).</summary>
-        public float RawThrottle { get; private set; }
+        /// <summary>Physical throttle before auto-throttle, including while paused. Launch timing
+        /// observes held controls without allowing them into the paused simulation.</summary>
+        public float RawThrottle
+        {
+            get
+            {
+                if (map != null) return Mathf.Max(0f, throttleAction != null ? throttleAction.ReadValue<float>() : 0f);
+                float value = 0f;
+                var k = Keyboard.current;
+                if (k != null)
+                {
+                    if (k.wKey.isPressed || k.upArrowKey.isPressed) value += 1f;
+                    if (k.sKey.isPressed || k.downArrowKey.isPressed) value -= 1f;
+                }
+                var g = Gamepad.current;
+                if (g != null)
+                {
+                    float right = g.rightTrigger.ReadValue(), left = g.leftTrigger.ReadValue();
+                    if (right > 0.05f || left > 0.05f) value = right - left;
+                }
+                return Mathf.Max(0f, value);
+            }
+        }
 
         private void OnEnable()
         {
+            PauseController.PausedChanged += OnPaused;
             weapons = GetComponent<CarWeapons>();
             car = GetComponent<CarController>();
             cannon = GetComponent<CarCannon>();
@@ -77,6 +99,19 @@ namespace RacingGame
 
         private void OnDisable()
         {
+            PauseController.PausedChanged -= OnPaused;
+            ClearInput();
+        }
+
+        private void OnPaused(bool paused)
+        {
+            // Simulation stops during a pause, but frame input continues. Discard commands
+            // already waiting for a tick as well as those entered while a menu is open.
+            if (paused) ClearInput();
+        }
+
+        private void ClearInput()
+        {
             if (cannon != null) cannon.ClearAimCommit();
             throttle = steer = 0f; brake = fire = secondary = mouseAimActive = false; resetLatch.Clear(); pendingPrimary = 0;
             WeaponWheelOpen = false; WheelSelection = 0;
@@ -84,6 +119,7 @@ namespace RacingGame
 
         private void Update()
         {
+            if (PauseController.IsPaused) { ClearInput(); return; }
             if (map != null) ReadActions(); else PollDevices();
 
             ReadWeaponSelection();
@@ -92,7 +128,6 @@ namespace RacingGame
             if (mouse != null && (mouse.delta.ReadValue().sqrMagnitude > 0.01f || mouse.leftButton.isPressed)) mouseAimActive = true;
             var gamepad = Gamepad.current;
             if (gamepad != null && (gamepad.rightShoulder.isPressed || gamepad.buttonWest.isPressed)) mouseAimActive = false;
-            RawThrottle = Mathf.Max(0f, throttle);
             if (autoThrottle && Mathf.Abs(throttle) < 0.05f) throttle = brake ? 0f : 1f;
         }
 
@@ -237,6 +272,7 @@ namespace RacingGame
 
         public DriveCommand Sample(int tick)
         {
+            if (PauseController.IsPaused) { ClearInput(); return new DriveCommand { Tick = tick }; }
             UpdateMouseAim();
             bool sec = secondary;
             // Touch auto-fire of a planted charge: blow it the moment a rival rolls over it (every tick, not every 10th).

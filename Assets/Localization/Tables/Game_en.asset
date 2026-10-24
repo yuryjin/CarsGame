@@ -1779,6 +1779,24 @@ MonoBehaviour:
     m_Localized: Not earned this race
     m_Metadata:
       m_Items: []
+  - m_Id: 18826098154745856
+    m_Localized: 'The road changes each lap: barriers disappear on lap 2; the road
+      narrows on lap 3. Stay near the centre.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077504
+    m_Localized: 'Pass through the glowing rings for a boost. The road has no barriers:
+      line up before accelerating.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077505
+    m_Localized: 'Lap 2: barriers gone. Keep clear of the edges!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077506
+    m_Localized: 'Lap 3: the road is narrower. Aim for the centre!'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

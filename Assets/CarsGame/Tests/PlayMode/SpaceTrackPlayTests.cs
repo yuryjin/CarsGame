@@ -24,6 +24,7 @@ namespace RacingGame.Tests
             var ev = Resources.Load<RaceEventDefinition>("Events/Event_e17");
             Assert.IsNotNull(ev);
             flow.StartRace(ev, null);
+            Assert.AreEqual(Loc.Get("lesson.space"), HudScreen.ControlsHint(false));
             Assert.AreEqual(RaceState.Countdown, race.State);
             Assert.IsFalse(mountains.activeSelf);
             Assert.IsFalse(ground.activeSelf);

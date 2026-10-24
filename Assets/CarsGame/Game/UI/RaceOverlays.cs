@@ -24,6 +24,7 @@ namespace RacingGame
         private int shownBombSeconds = -1, shownLockSeconds = -1;
         private int bombWidth, bombHeight;
         private float bombScale;
+        private float bombUsableWidth;
         public string BombMessage => bombTitle != null ? bombTitle.text : "";
         private Canvas canvas;
         private RectTransform aimedPanel;
@@ -200,9 +201,10 @@ namespace RacingGame
         private void LayoutBomb()
         {
             float scale = Mathf.Max(0.01f, canvas.scaleFactor);
-            if (bombWidth == Screen.width && bombHeight == Screen.height && Mathf.Abs(bombScale - scale) < 0.001f) return;
-            bombWidth = Screen.width; bombHeight = Screen.height; bombScale = scale;
             float width = Mathf.Min(Screen.width - 24f, Mathf.Max(280f, 640f * scale));
+            if (hud != null) width = hud.ConstrainTopCenterWidth(width);
+            if (bombWidth == Screen.width && bombHeight == Screen.height && Mathf.Abs(bombScale - scale) < 0.001f && Mathf.Abs(bombUsableWidth - width) < 0.01f) return;
+            bombWidth = Screen.width; bombHeight = Screen.height; bombScale = scale; bombUsableWidth = width;
             float title = Mathf.Max(14f, 32f * scale), detail = Mathf.Max(12f, 23f * scale);
             bombTitle.fontSize = title / scale; bombHint.fontSize = detail / scale;
             float textWidth = (width - 20f) / scale;

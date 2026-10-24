@@ -107,6 +107,7 @@ namespace RacingGame
             // Keep the HUD coordinate system for world projections, but size information in
             // actual screen pixels. Uniformly enlarging the old card would cover the health HUD.
             float width = StatusWidthPixels(Screen.width, scale);
+            if (hud != null) width = hud.ConstrainTopCenterWidth(width);
             float title = Mathf.Max(14f, 26f * scale), detail = Mathf.Max(12f, 20f * scale);
             float percentageWidth = title * 3.6f;
             bossName.fontSize = corePct.fontSize = title / scale;

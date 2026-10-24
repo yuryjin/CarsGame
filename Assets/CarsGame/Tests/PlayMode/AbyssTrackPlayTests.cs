@@ -24,6 +24,8 @@ namespace RacingGame.Tests
             var ev = Resources.Load<RaceEventDefinition>("Events/Event_e16");
             Assert.IsNotNull(ev);
             flow.StartRace(ev, null);
+            var hud = Object.FindAnyObjectByType<HudScreen>();
+            Assert.AreEqual(Loc.Get("lesson.abyss"), HudScreen.ControlsHint(false));
             var map = Object.FindAnyObjectByType<AbyssTrack>();
             Assert.IsNotNull(map);
             Assert.AreEqual(RaceState.Countdown, race.State);
@@ -44,6 +46,8 @@ namespace RacingGame.Tests
                     progress.SimulationStep(i);
                 }
                 Assert.AreEqual(lap, map.Lap, "player lap event changes the map");
+                Assert.AreEqual(Loc.Get(lap == 2 ? "abyss.open" : "abyss.narrow"), hud.LastHint,
+                    "The changing road must explain the newly removed protection.");
             }
             Physics.SyncTransforms();
             int mask = 1 << LayerMask.NameToLayer("Track") | 1 << LayerMask.NameToLayer("Ground");

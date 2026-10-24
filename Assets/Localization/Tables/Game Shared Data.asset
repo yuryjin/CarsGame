@@ -1743,6 +1743,22 @@ MonoBehaviour:
     m_Key: results.star_missed
     m_Metadata:
       m_Items: []
+  - m_Id: 18826098154745856
+    m_Key: lesson.abyss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077504
+    m_Key: lesson.space
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077505
+    m_Key: abyss.open
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077506
+    m_Key: abyss.narrow
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

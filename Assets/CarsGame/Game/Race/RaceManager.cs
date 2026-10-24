@@ -153,6 +153,7 @@ namespace RacingGame
 
             OnFieldSpawned?.Invoke();
             RaceClock.Reset();
+            RaceClock.Paused = PauseController.IsPaused;
             countdownStart = RaceClock.Now;
             lastCountdownValue = -1;
             State = RaceState.Countdown;

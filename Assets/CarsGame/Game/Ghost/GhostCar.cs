@@ -12,12 +12,16 @@ namespace RacingGame
         public GhostRecord Record { get; private set; }
         private double startClock;
         private bool running;
+        private static Material translucentMaterial;
 
         public static GhostCar Spawn(GameObject carPrefab, GhostRecord record, Color tint)
         {
             // Copy only the baked visuals: cloning a live car runs its Awake and registers it with
             // the race, while removing its controller fails RequireComponent dependency checks.
             var go = new GameObject("Ghost_" + record.PlayerName);
+            // A tint's alpha cannot make an opaque car shader transparent. Use the
+            // shipped alpha-blended material, shared across every ghost and submesh.
+            if (translucentMaterial == null) translucentMaterial = Resources.Load<Material>("FX_Flash");
             var block = new MaterialPropertyBlock();
             foreach (var source in carPrefab.GetComponentsInChildren<MeshFilter>(true))
             {
@@ -30,8 +34,15 @@ namespace RacingGame
                 visual.transform.localScale = pose.lossyScale;
                 visual.AddComponent<MeshFilter>().sharedMesh = source.sharedMesh;
                 var r = visual.AddComponent<MeshRenderer>();
-                r.sharedMaterials = renderer.sharedMaterials;
+                if (translucentMaterial != null)
+                {
+                    var materials = new Material[source.sharedMesh.subMeshCount];
+                    for (int i = 0; i < materials.Length; i++) materials[i] = translucentMaterial;
+                    r.sharedMaterials = materials;
+                }
+                else r.sharedMaterials = renderer.sharedMaterials;
                 r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                r.receiveShadows = false;
                 block.Clear(); block.SetColor("_BaseColor", tint); block.SetColor("_Color", tint); r.SetPropertyBlock(block);
             }
             int ghostLayer = LayerMask.NameToLayer("Ignore Raycast");

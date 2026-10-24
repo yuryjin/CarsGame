@@ -35,6 +35,12 @@ namespace RacingGame
             public string[] texts;
             public UiLabel[] labels;
             public Perf perf;
+            public ResourceCounts resources;
+        }
+
+        [Serializable] public class ResourceCounts
+        {
+            public int materials, meshes, renderTextures, gameObjects, audioClips;
         }
 
         [Serializable] public class UiButton
@@ -71,6 +77,7 @@ namespace RacingGame
         private int frameCount, frameHead, gcAtWindowStart;
         private float nextReport;
         private Perf lastPerf;
+        private ResourceCounts lastResources;
         private string lastCommand = "", lastError = "";
 
         /// <summary>
@@ -128,6 +135,15 @@ namespace RacingGame
                 {
                     case "state": break;
                     case "ui": break;
+                    case "resources":
+                        lastResources = new ResourceCounts {
+                            materials = Resources.FindObjectsOfTypeAll<Material>().Length,
+                            meshes = Resources.FindObjectsOfTypeAll<Mesh>().Length,
+                            renderTextures = Resources.FindObjectsOfTypeAll<RenderTexture>().Length,
+                            gameObjects = FindObjectsByType<GameObject>(FindObjectsInactive.Include).Length,
+                            audioClips = Resources.FindObjectsOfTypeAll<AudioClip>().Length
+                        };
+                        break;
                     case "startRace": StartRace(Arg(args, 0), Arg(args, 1)); break;
                     case "daily": autopilot = false; flow.StartRace(flow.DailyEvent, null); break;
                     case "wear": if (CheatsAllowed) Wear(Arg(args, 0), Arg(args, 1)); else lastError = "not in store builds"; break;
@@ -269,7 +285,8 @@ namespace RacingGame
                 buttons = lastCommand == "ui" ? ReadButtons() : null,
                 texts = lastCommand == "ui" ? ReadTexts() : null,
                 labels = lastCommand == "ui" ? ReadLabels() : null,
-                lastCommand = lastCommand, error = lastError, perf = perfOn ? lastPerf : null
+                lastCommand = lastCommand, error = lastError, perf = perfOn ? lastPerf : null,
+                resources = lastCommand == "resources" ? lastResources : null
             };
         }
 

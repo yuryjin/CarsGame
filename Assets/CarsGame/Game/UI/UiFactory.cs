@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,24 @@ namespace RacingGame
         public static readonly Color Muted = new Color(0.68f, 0.75f, 0.83f);
         public static readonly Color Accent = new Color(1f, 0.8f, 0.25f);
         public static readonly Color Positive = new Color(0.25f, 0.9f, 0.7f);
+        private static readonly Dictionary<(Material font, float outline), Material> textMaterials = new Dictionary<(Material, float), Material>();
+
+        /// <summary>Use shared immutable outline styles instead of TMP's per-label material instances.</summary>
+        public static void SetOutline(TMP_Text text, float width)
+        {
+            var source = text.font.material;
+            width = Mathf.Clamp01(width);
+            var key = (source, width);
+            if (!textMaterials.TryGetValue(key, out var material) || material == null)
+            {
+                material = new Material(source) { name = "UiTextOutline_" + width, hideFlags = HideFlags.HideAndDontSave };
+                material.SetFloat(ShaderUtilities.ID_OutlineWidth, width);
+                material.SetColor(ShaderUtilities.ID_OutlineColor, new Color(0f, 0f, 0f, 0.8f));
+                textMaterials[key] = material;
+            }
+            text.fontSharedMaterial = material;
+            text.UpdateMeshPadding();
+        }
 
         // Menus can scroll; keep their text and controls readable instead of fitting a desktop page
         // into a phone. World/HUD canvases retain their original coordinate system.
@@ -95,7 +114,7 @@ namespace RacingGame
             rt.anchorMin = anchorMin; rt.anchorMax = anchorMax; rt.offsetMin = offsetMin; rt.offsetMax = offsetMax;
             tmp.text = text; tmp.fontSize = size; tmp.alignment = align; tmp.color = color ?? Color.white;
             tmp.raycastTarget = false; tmp.enableWordWrapping = true; tmp.overflowMode = TextOverflowModes.Overflow;
-            tmp.outlineWidth = 0.15f; tmp.outlineColor = new Color(0f, 0f, 0f, 0.8f);
+            SetOutline(tmp, 0.15f);
             return tmp;
         }
 
@@ -120,7 +139,7 @@ namespace RacingGame
             colors.disabledColor = new Color(0.6f, 0.6f, 0.6f, 1f);
             colors.fadeDuration = 0.12f; btn.colors = colors;
             var text = Text(rt, "Label", label, fontSize, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, new Vector2(20f, 10f), new Vector2(-20f, -10f), face.grayscale > 0.5f ? Ink : Color.white);
-            text.outlineWidth = 0f;
+            SetOutline(text, 0f);
             text.enableAutoSizing = true; text.fontSizeMax = fontSize; text.fontSizeMin = Mathf.Max(14f, fontSize * 0.5f);   // long translations shrink instead of escaping the button
             text.fontStyle = FontStyles.Bold;
             btn.interactable = onClick != null;

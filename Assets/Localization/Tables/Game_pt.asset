@@ -1780,6 +1780,24 @@ MonoBehaviour:
     m_Localized: "N\xE3o ganha nesta corrida"
     m_Metadata:
       m_Items: []
+  - m_Id: 18826098154745856
+    m_Localized: 'A pista muda: na volta 2 as barreiras somem; na volta 3 a estrada
+      fica estreita. Fique perto do centro.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077504
+    m_Localized: "Passe pelos an\xE9is brilhantes para acelerar. N\xE3o h\xE1 barreiras:
+      alinhe o carro antes de ganhar velocidade."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077505
+    m_Localized: 'Volta 2: sem barreiras. Afaste-se das bordas!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077506
+    m_Localized: "Volta 3: a estrada est\xE1 mais estreita. Fique no centro!"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

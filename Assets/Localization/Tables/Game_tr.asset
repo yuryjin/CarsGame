@@ -1798,6 +1798,24 @@ MonoBehaviour:
     m_Localized: "Bu yar\u0131\u015Fta kazan\u0131lmad\u0131"
     m_Metadata:
       m_Items: []
+  - m_Id: 18826098154745856
+    m_Localized: "Pist her tur de\u011Fi\u015Fir: 2. turda bariyerler kalkar, 3.
+      turda yol daral\u0131r. Merkeze yak\u0131n kal."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077504
+    m_Localized: "H\u0131zlanmak i\xE7in parlayan halkalardan ge\xE7. Yolda bariyer
+      yok: h\u0131zlanmadan \xF6nce arac\u0131 d\xFCzelt."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077505
+    m_Localized: "2. tur: bariyerler kalkt\u0131. Kenarlardan uzak dur!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077506
+    m_Localized: "3. tur: yol darald\u0131. Merkezde kal!"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

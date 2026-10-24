@@ -120,6 +120,13 @@ namespace RacingGame.Tests
             Debug.Log($"[MinesPlayTests] arena 40s: bot charges planted={planted} on the ground={charges} fieldHits={fieldHits} carMineHits={carMineHits} dropped={director.MinesDropped} fieldLive={director.Field.LiveCount}/{director.Field.Count} deaths:{Deaths()}");
 
             // The player's charge: plant, wait for it to arm, put a rival on it, press again.
+            // The autonomous battle above is complete. Stop its input before testing a
+            // particular blast, so unrelated gunfire cannot kill the target while it arms.
+            foreach (var p in race.Participants)
+            {
+                p.Health.ReviveNow();
+                p.Car.inputEnabled = false;
+            }
             var player = race.Player;
             RaceParticipant rival = null;
             foreach (var p in race.Participants) if (!p.isPlayer && !p.Health.IsDead) { rival = p; break; }
@@ -135,11 +142,13 @@ namespace RacingGame.Tests
             Assert.IsNotNull(charge);
             player.Car.Teleport(spot + arena.transform.right * 30f, arena.transform.rotation);
             yield return Ticks(40);
+            rival.Health.ReviveNow();
             rival.Car.Teleport(charge.transform.position + arena.transform.right * 2f + Vector3.up * 0.5f, arena.transform.rotation);
             rival.Car.inputEnabled = false;
             yield return Ticks(5);
             while (rival.Health.IsInvulnerable) yield return null;
             float before = rival.Health.Health;
+            Assert.Greater(before, 0f, "The controlled blast needs a live target.");
             Assert.IsTrue(w.TryFireSecondary(SimulationDriver.Instance.Tick), "second press detonates");
             Assert.Less(rival.Health.Health, before, "the rival on the charge takes the blast");
             Assert.IsNull(w.PlantedCharge);

@@ -1780,6 +1780,24 @@ MonoBehaviour:
     m_Localized: Non obtenue dans cette course
     m_Metadata:
       m_Items: []
+  - m_Id: 18826098154745856
+    m_Localized: "La piste change : les barri\xE8res disparaissent au tour 2, la
+      route r\xE9tr\xE9cit au tour 3. Reste pr\xE8s du centre."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077504
+    m_Localized: "Traverse les anneaux lumineux pour acc\xE9l\xE9rer. Il n\u2019y
+      a pas de barri\xE8res : aligne la voiture avant d\u2019acc\xE9l\xE9rer."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077505
+    m_Localized: "Tour 2 : plus de barri\xE8res. \xC9loigne-toi des bords !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077506
+    m_Localized: "Tour 3 : la route est plus \xE9troite. Vise le centre !"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

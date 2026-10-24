@@ -1776,6 +1776,24 @@ MonoBehaviour:
     m_Localized: In diesem Rennen nicht verdient
     m_Metadata:
       m_Items: []
+  - m_Id: 18826098154745856
+    m_Localized: "Die Strecke ver\xE4ndert sich: Runde 2 ohne Leitplanken, Runde
+      3 mit schmalerer Fahrbahn. Bleib nahe der Mitte."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077504
+    m_Localized: "Fahre f\xFCr einen Boost durch die leuchtenden Ringe. Es gibt keine
+      Leitplanken: Richte das Auto vor dem Beschleunigen aus."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077505
+    m_Localized: 'Runde 2: Keine Leitplanken mehr. Halte Abstand zum Rand!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18826098205077506
+    m_Localized: 'Runde 3: Die Fahrbahn ist schmaler. Bleib in der Mitte!'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

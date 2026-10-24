@@ -43,7 +43,7 @@ namespace RacingGame
 
         private Image hpFill, hpTrail, hpIcon;
         private Sprite healthFillSprite;
-        private RectTransform speedPanel, healthPanel, hintPanel, ammoPanel, secondaryPanel, statusPanel, eventPanel, centerPanel, pauseButton;
+        private RectTransform speedPanel, healthPanel, hintPanel, ammoPanel, secondaryPanel, statusPanel, eventPanel, centerPanel, pauseButton, racePanel, timerPanel;
         private TextMeshProUGUI secondaryText, statusText;
         private TextMeshProUGUI primaryNameText;
         private string lastStatusStr;
@@ -206,7 +206,7 @@ namespace RacingGame
             ammoPanel = UiFactory.Card(root, "AmmoPanel", new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 218f), HudPanelAlpha);
             primaryNameText = UiFactory.Text(ammoPanel, "ActiveWeapon", "", 36f, TextAlignmentOptions.MidlineRight,
                 new Vector2(0f, 1f), Vector2.one, new Vector2(14f, -47f), new Vector2(-14f, -3f), Color.white);
-            primaryNameText.enableWordWrapping = false; primaryNameText.overflowMode = TextOverflowModes.Ellipsis;
+            primaryNameText.enableWordWrapping = true; primaryNameText.overflowMode = TextOverflowModes.Ellipsis;
             ammoText = UiFactory.Text(ammoPanel, "Ammo", "", 30f, TextAlignmentOptions.MidlineRight, Vector2.zero, new Vector2(1f, 0f), new Vector2(18f, 4f), new Vector2(-18f, 44f), new Color(1f, 0.85f, 0.3f));
             ammoText.enableAutoSizing = true; ammoText.fontSizeMin = 18f; ammoText.fontSizeMax = 30f;
 
@@ -235,7 +235,7 @@ namespace RacingGame
             combatText = UiFactory.Text(reticle, "HitOutcome", "", 22f, TextAlignmentOptions.Center,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-180f, 60f), new Vector2(180f, 100f));
             combatText.fontStyle = FontStyles.Bold;
-            combatText.outlineWidth = 0.25f;
+            UiFactory.SetOutline(combatText, 0.25f);
             incomingArrow = UiFactory.Text(root, "IncomingDirection", "▲", 44f, TextAlignmentOptions.Center,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-28f, -28f), new Vector2(28f, 28f), CriticalColor);
             incomingText = UiFactory.Text(root, "IncomingSource", "", 23f, TextAlignmentOptions.Center,
@@ -252,7 +252,7 @@ namespace RacingGame
             goalsButton.onClick.AddListener(() => { goalsExpanded = !goalsExpanded; nextGoalRefresh = 0f; });
 
             // Top-left: lap + position
-            var racePanel = UiFactory.Card(root, "RaceStatus", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -174f), new Vector2(310f, -24f), HudPanelAlpha);
+            racePanel = UiFactory.Card(root, "RaceStatus", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -174f), new Vector2(310f, -24f), HudPanelAlpha);
             UiFactory.Panel(racePanel, "Accent", Vector2.zero, new Vector2(0f, 1f), new Vector2(0f, 18f), new Vector2(3f, -18f), UiFactory.Accent, false);
             lapText = UiFactory.Text(racePanel, "Lap", "LAP 1/3", 36f, TextAlignmentOptions.MidlineLeft, new Vector2(0f, 1f), Vector2.one, new Vector2(18f, -70f), new Vector2(-18f, -12f));
             positionText = UiFactory.Text(racePanel, "Position", "P1/4", 36f, TextAlignmentOptions.MidlineLeft, new Vector2(0f, 1f), Vector2.one, new Vector2(18f, -138f), new Vector2(-18f, -80f));
@@ -263,7 +263,7 @@ namespace RacingGame
             lapText.fontSizeMax = 28f; positionText.fontSizeMax = 36f;
 
             // Top-centre: timer
-            var timerPanel = UiFactory.Card(root, "TimerPanel", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-140f, -94f), new Vector2(140f, -24f), HudPanelAlpha);
+            timerPanel = UiFactory.Card(root, "TimerPanel", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-140f, -94f), new Vector2(140f, -24f), HudPanelAlpha);
             timerText = UiFactory.Text(timerPanel, "Timer", "0:00.000", 40f, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, new Vector2(16f, 10f), new Vector2(-16f, -10f));
 
             // Centre: countdown / wrong way / messages
@@ -393,7 +393,7 @@ namespace RacingGame
             helpScroll = lessons.GetComponentInParent<ScrollRect>();
             helpText = UiFactory.Text(lessons, "Lessons", "", 26f, TextAlignmentOptions.TopLeft,
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            helpText.outlineWidth = 0f;
+            UiFactory.SetOutline(helpText, 0f);
             UiFactory.Button(helpPanel, "CloseHelp", Loc.Get("common.back"), () => CloseHelpIfOpen(),
                 Vector2.zero, new Vector2(1f, 0f), new Vector2(32f, 30f), new Vector2(-32f, 106f), 28f);
             helpPanel.gameObject.SetActive(false);
@@ -459,12 +459,12 @@ namespace RacingGame
                 Vector2 p = new Vector2(122f, 92f) + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 71f;
                 var label = UiFactory.Text(speedPanel, "Scale" + i, (i * SpeedometerGraphic.MaxSpeed / 4f).ToString("0"), 16f,
                     TextAlignmentOptions.Center, Vector2.zero, Vector2.zero, p - new Vector2(20f, 11f), p + new Vector2(20f, 11f), new Color(0.82f, 0.88f, 0.94f));
-                label.outlineWidth = 0f;
+                UiFactory.SetOutline(label, 0f);
             }
             speedText = UiFactory.Text(speedPanel, "Speed", "0", 46f, TextAlignmentOptions.Center,
                 Vector2.zero, Vector2.zero, new Vector2(74f, 32f), new Vector2(170f, 80f));
             speedText.fontStyle = FontStyles.Bold;
-            speedText.outlineWidth = 0f;
+            UiFactory.SetOutline(speedText, 0f);
             speedUnit = UiFactory.Text(speedPanel, "Unit", "", 16f, TextAlignmentOptions.Center,
                 Vector2.zero, Vector2.zero, new Vector2(62f, 12f), new Vector2(182f, 35f), new Color(0.82f, 0.88f, 0.94f));
             nitroText = UiFactory.Text(speedPanel, "Nitro", "", 16f, TextAlignmentOptions.Center,
@@ -483,7 +483,7 @@ namespace RacingGame
             hpText = UiFactory.Text(healthPanel, "HpText", "", 26f, TextAlignmentOptions.MidlineRight,
                 Vector2.zero, Vector2.one, new Vector2(60f, 48f), new Vector2(-18f, -12f));
             hpText.fontStyle = FontStyles.Bold;
-            hpText.outlineWidth = 0f;
+            UiFactory.SetOutline(hpText, 0f);
             hpText.enableAutoSizing = true; hpText.fontSizeMin = 16f; hpText.fontSizeMax = 26f;
             var track = UiFactory.Panel(healthPanel, "HpBar", Vector2.zero, new Vector2(1f, 0f), new Vector2(18f, 20f), new Vector2(-18f, 40f), new Color(0.14f, 0.2f, 0.27f), false);
             // Filled Images need a sprite; a white texel keeps this thin bar rectangular.
@@ -614,7 +614,7 @@ namespace RacingGame
                 var markerRt = UiFactory.Panel(container, "Threat" + i, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-28f, -28f), new Vector2(28f, 28f), new Color(0.04f, 0.06f, 0.1f, 0.88f), true);
                 var arrow = UiFactory.Text(markerRt, "Arrow", "▲", 24f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-16f, 2f), new Vector2(16f, 28f), Color.red);
                 var dist = UiFactory.Text(markerRt, "Dist", "", 15f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-26f, -24f), new Vector2(26f, 4f), Color.white);
-                dist.outlineWidth = 0.2f; arrow.outlineWidth = 0.2f;
+                UiFactory.SetOutline(dist, 0.2f); UiFactory.SetOutline(arrow, 0.2f);
                 arrow.raycastTarget = false; dist.raycastTarget = false;
                 markerRt.GetComponent<Image>().raycastTarget = false;
                 threatMarkers[i] = new ThreatMarkerWidget { root = markerRt, arrow = arrow, distanceText = dist };
@@ -738,15 +738,89 @@ namespace RacingGame
                 for (int i = 0; i < killFeedTexts.Length; i++) if (killFeedTexts[i] != null) killFeedTexts[i].alignment = TextAlignmentOptions.MidlineRight;
                 hintText.alignment = TextAlignmentOptions.MidlineLeft;
             }
+            ApplyReadableVitals();
             LayoutGoals(goalsExpanded || (race != null && race.State == RaceState.Countdown));
             LayoutHint();
             pauseHint.gameObject.SetActive(true);
         }
 
+        private void ApplyReadableVitals()
+        {
+            float scale = Mathf.Max(0.01f, hudRoot.lossyScale.x);
+            void Font(TextMeshProUGUI text, float min, float max, float pixels)
+            {
+                text.enableAutoSizing = true;
+                text.fontSizeMin = Mathf.Max(min, pixels / scale);
+                text.fontSizeMax = Mathf.Max(max, text.fontSizeMin);
+            }
+            Font(lapText, 20f, 28f, 12f);
+            Font(positionText, 20f, 36f, 16f);
+            Font(hpText, 16f, 26f, 12f);
+            Font(ammoText, 18f, 30f, 12f);
+            Font(primaryNameText, 36f, 36f, 14f);
+            Font(secondaryText, 16f, 24f, 12f);
+            Font(statusText, 14f, 22f, 12f);
+            timerText.fontSize = Mathf.Max(40f, 16f / scale);
+            speedText.fontSize = Mathf.Max(46f, 18f / scale);
+            speedUnit.fontSize = Mathf.Max(16f, 9f / scale);
+            // Tiny dial numerals add noise; the needle and large digital speed remain visible.
+            foreach (var text in speedPanel.GetComponentsInChildren<TextMeshProUGUI>(true))
+                if (text.name.StartsWith("Scale", System.StringComparison.Ordinal)) text.gameObject.SetActive(16f * scale >= 9f);
+            float unitTop = Mathf.Max(35f, 12f + 12f / scale);
+            float speedBottom = unitTop + 4f;
+            speedText.rectTransform.offsetMin = new Vector2(50f, speedBottom);
+            speedText.rectTransform.offsetMax = new Vector2(194f, speedBottom + Mathf.Max(60f, 24f / scale));
+            speedUnit.rectTransform.offsetMax = new Vector2(182f, unitTop);
+
+            float lapHeight = Mathf.Max(58f, 22f / scale), positionHeight = Mathf.Max(58f, 26f / scale);
+            float raceWidth = Mathf.Max(280f, 116f / scale), raceHeight = lapHeight + positionHeight + 34f;
+            Place(racePanel, new Vector2(0f, 1f), new Vector2(30f, -24f - raceHeight), new Vector2(30f + raceWidth, -24f));
+            lapText.rectTransform.offsetMin = new Vector2(18f, -12f - lapHeight);
+            positionText.rectTransform.offsetMax = new Vector2(-18f, -22f - lapHeight);
+            positionText.rectTransform.offsetMin = new Vector2(18f, -22f - lapHeight - positionHeight);
+            float timerWidth = Mathf.Max(280f, 110f / scale), timerHeight = Mathf.Max(70f, 30f / scale);
+            Place(timerPanel, new Vector2(0.5f, 1f), new Vector2(-timerWidth * 0.5f, -24f - timerHeight), new Vector2(timerWidth * 0.5f, -24f));
+
+            float width = Mathf.Max(324f, 132f / scale), healthHeight = Mathf.Max(100f, 42f / scale);
+            // Noto CJK's ascent/descent needs ~1.45 em. Reserve both complete lines:
+            // a short box with Ellipsis can discard even a two-character weapon name.
+            primaryNameText.fontSize = primaryNameText.fontSizeMax;
+            float weaponLineHeight = Mathf.Max(primaryNameText.fontSizeMax * 1.55f,
+                primaryNameText.GetPreferredValues(primaryNameText.text, width - 28f, float.PositiveInfinity).y + 4f);
+            weaponLineHeight = Mathf.Max(44f, weaponLineHeight);
+            float ammoLineHeight = Mathf.Max(40f, ammoText.fontSizeMax * 1.55f);
+            float ammoHeight = Mathf.Max(96f, weaponLineHeight + ammoLineHeight + 12f);
+            float extraHeight = Mathf.Max(48f, 28f / scale);
+            float right = healthPanel.offsetMax.x;
+            Vector2 anchor = touchLayout ? Vector2.one : new Vector2(1f, 0f);
+            float healthBottom = touchLayout ? healthPanel.offsetMax.y - healthHeight : 30f;
+            Place(healthPanel, anchor, new Vector2(right - width, healthBottom), new Vector2(right, healthBottom + healthHeight));
+            float ammoBottom = touchLayout ? healthBottom - 4f - ammoHeight : healthBottom + healthHeight + 8f;
+            Place(ammoPanel, anchor, new Vector2(right - width, ammoBottom), new Vector2(right, ammoBottom + ammoHeight));
+            float secondaryBottom = touchLayout ? ammoBottom - 4f - extraHeight : ammoBottom + ammoHeight + 8f;
+            Place(secondaryPanel, anchor, new Vector2(right - width, secondaryBottom), new Vector2(right, secondaryBottom + extraHeight));
+            float statusBottom = touchLayout ? secondaryBottom - 4f - extraHeight : secondaryBottom + extraHeight + 8f;
+            Place(statusPanel, anchor, new Vector2(right - width, statusBottom), new Vector2(right, statusBottom + extraHeight));
+            hpText.rectTransform.offsetMin = new Vector2(60f, healthHeight * 0.48f);
+            primaryNameText.rectTransform.offsetMin = new Vector2(14f, -3f - weaponLineHeight);
+            ammoText.rectTransform.offsetMax = new Vector2(-18f, 4f + ammoLineHeight);
+        }
+
         private void LayoutHint()
         {
-            hintText.fontSize = touchLayout ? Mathf.Max(24f, 12f / Mathf.Max(0.1f, hudRoot.lossyScale.x)) : 24f;
-            if (!touchLayout) return;
+            float scale = Mathf.Max(0.01f, hudRoot.lossyScale.x);
+            hintText.fontSize = Mathf.Max(24f, 12f / scale);
+            if (!touchLayout)
+            {
+                float width = Mathf.Max(650f, Mathf.Min(340f, Screen.width * 0.48f) / scale);
+                float desktopHeight = Mathf.Max(150f, hintText.GetPreferredValues(hintText.text, width - 36f, float.PositiveInfinity).y + 28f);
+                Place(hintPanel, Vector2.zero, new Vector2(30f, speedPanel.offsetMax.y + 18f), new Vector2(30f + width, speedPanel.offsetMax.y + 18f + desktopHeight));
+                return;
+            }
+            float halfWidth = Mathf.Min(420f, Mathf.Max(180f, hudRoot.rect.width * 0.5f + healthPanel.offsetMin.x - 24f));
+            var min = hintPanel.offsetMin; var max = hintPanel.offsetMax;
+            min.x = -halfWidth; max.x = halfWidth;
+            hintPanel.offsetMin = min; hintPanel.offsetMax = max;
             float height = Mathf.Max(120f, hintText.GetPreferredValues(hintText.text, hintPanel.rect.width - 36f, float.PositiveInfinity).y + 28f);
             var bottom = hintPanel.offsetMin;
             bottom.y = hintPanel.offsetMax.y - height;
@@ -771,20 +845,18 @@ namespace RacingGame
         {
             if (goalsPanel == null) return;
             float scale = Mathf.Max(0.1f, hudRoot.lossyScale.x);
-            float font = touchLayout ? Mathf.Max(23f, 12f / scale) : 23f;
-            goalsText.enableAutoSizing = !touchLayout;
+            float font = Mathf.Max(23f, 12f / scale);
+            goalsText.enableAutoSizing = false;
             goalsText.fontSize = font;
-            float width = touchLayout && expanded ? Mathf.Min(820f, 500f * font / 23f) : 500f;
+            float width = expanded ? Mathf.Min(820f, 500f * font / 23f) : 500f;
             bool mission = RaceSetup.Event != null && RaceSetup.Event.mode == EventMode.Mission;
             // The mission hides lap/position. Use that free corner, keeping expanded goals
             // beside the boss panel instead of covering its route and enemy count.
             if (mission)
                 width = Mathf.Min(width, Mathf.Max(260f, (hudRoot.rect.width - MissionHud.StatusWidthPixels(Screen.width, scale) / scale) * 0.5f - 60f));
-            float height = expanded ? 152f : 62f;
-            if (touchLayout)
-                height = expanded ? Mathf.Max(152f, goalsText.GetPreferredValues(goalsText.text, width - 32f, float.PositiveInfinity).y + 24f)
-                    : Mathf.Max(62f, 44f / scale);
-            float top = mission ? -24f : touchLayout ? -332f : -190f;
+            float height = expanded ? Mathf.Max(152f, goalsText.GetPreferredValues(goalsText.text, width - 32f, float.PositiveInfinity).y + 24f)
+                : Mathf.Max(62f, (touchLayout ? 44f : 28f) / scale);
+            float top = mission ? -24f : touchLayout ? -332f : Mathf.Min(-190f, racePanel.offsetMin.y - 16f);
             if (touchLayout && expanded)
                 top = Mathf.Max(top, -(hudRoot.rect.height - speedPanel.offsetMax.y - height - 16f));
             Place(goalsPanel, new Vector2(0f, 1f), new Vector2(30f, top - height), new Vector2(30f + width, top));
@@ -816,6 +888,15 @@ namespace RacingGame
 
         /// <summary>Test hook: current layout mode.</summary>
         public bool TouchLayout => touchLayout;
+
+        // Touch puts the vital cards at the top right. Event/mission cards share that
+        // row and must leave space for the actual readable width of those cards.
+        internal float ConstrainTopCenterWidth(float preferredPixels)
+        {
+            if (!touchLayout || healthPanel == null || hudRoot == null) return preferredPixels;
+            float rightEdge = Screen.width + healthPanel.offsetMin.x * hudRoot.lossyScale.x - 8f;
+            return Mathf.Min(preferredPixels, Mathf.Max(120f, (rightEdge - Screen.width * 0.5f) * 2f));
+        }
 
         private void Update()
         {
@@ -1007,6 +1088,8 @@ namespace RacingGame
             var ev = RaceSetup.Event;
             if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.HotBomb) return Loc.Get("lesson.bomb");
             if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.MinesOnly) return Loc.Get(touch ? "lesson.mines.touch" : "lesson.mines.keys");
+            if (ev != null && ev.spaceTrack) return Loc.Get("lesson.space");
+            if (ev != null && ev.abyssTrack) return Loc.Get("lesson.abyss");
             if (ev != null && (ev.starRingTrack || ev.wastelandTrack)) return Loc.Get("lesson.wall");
             if (ev != null && ev.eventId == "e2") return Loc.Get(touch ? "lesson.drift.touch" : "lesson.drift.keys");
             if (ev != null && ev.eventId == "e3") return Loc.Get("lesson.shortcut");
@@ -1177,7 +1260,7 @@ namespace RacingGame
 
         private void OnAmmo(int ammo, int max)
         {
-            if (playerWeapons != null) primaryNameText.text = Loc.Get(PrimaryWeaponCatalog.Get(playerWeapons.PrimaryType).NameKey);
+            if (playerWeapons != null) SetPrimaryName(playerWeapons.PrimaryType);
             lastReloadPct = -1;
             lastHeatPct = -1; // new race / language / weapon: rebuild heat-only text even at zero heat
             if (ammoPips.Length != Mathf.Clamp(max, 0, 12)) BuildAmmoPips(max);   // swapped between cannon and machine gun
@@ -1189,8 +1272,18 @@ namespace RacingGame
 
         private void OnPrimarySwitched(PrimaryWeaponType type)
         {
-            primaryNameText.text = Loc.Get(PrimaryWeaponCatalog.Get(type).NameKey);
+            SetPrimaryName(type);
             ShowHint(Loc.Get(PrimaryWeaponCatalog.Get(type).NameKey), 1.2f);
+        }
+
+        private void SetPrimaryName(PrimaryWeaponType type)
+        {
+            string title = Loc.Get(PrimaryWeaponCatalog.Get(type).NameKey);
+            if (primaryNameText.text == title) return;
+            primaryNameText.text = title;
+            // Long translated names wrap at a readable size; grow the card only
+            // when its content changes, not on every ammo or simulation update.
+            if (hudRoot != null) ApplyReadableVitals();
         }
 
         private void OnPrimarySwitchDenied()
