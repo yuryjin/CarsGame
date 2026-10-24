@@ -4,101 +4,62 @@
 
 ## Project Summary
 
-- Project root: `/home/user/projects/games/Unity/newgames/CarsGame`
-- Small single-scene driving/combat prototype with a procedural circuit, one player car, and three AI opponents.
-- Last analyzed: 2026-09-01
-- Last analyzed commit: `e2c51a3` (working tree also contains uncommitted gameplay and scene changes)
+- Root: `/home/user/projects/games/Unity/newgames/CarsGame`.
+- Single-scene arcade driving/combat game with a campaign, special tracks, boss mission, daily race, garage, test drives, progression, ghosts and nine UI languages.
+- Refreshed 2026-10-24 against base commit `35035e5` and the current polish changes.
+- Current validation and before/after evidence: [Polish-2026-10-24.md](Polish-2026-10-24.md).
+- AI recovery work predates this iteration: [AiRecoveryInvestigation.md](AiRecoveryInvestigation.md). Older pending items in [ContinuousPlaytest.md](ContinuousPlaytest.md) are chronological history, not necessarily outstanding defects.
 
-## Confirmed Environment
+## Environment And Build
 
-- Unity version: 6000.5.9f1
-- Render pipeline: Universal Render Pipeline 17.5.0
-- Input system: Unity Input System 1.20.0; new input backend active
-- Target platforms: unresolved; current editor target is Linux Standalone and mobile settings also exist
+| Area | Confirmed configuration |
+| --- | --- |
+| Unity | 6000.5.9f1 |
+| Rendering | URP 17.5.0 |
+| Input | Input System 1.20.0 |
+| UI/localization | UGUI 2.5.0, TMP, Localization 1.5.12, Addressables |
+| Tests | Unity Test Framework 1.7.0; dedicated EditMode and PlayMode assemblies |
+| Product version | 0.2.0 |
+| Shipping build path | WebGL with the Yandex template and SDK adapter; local mock SDK for QA |
+| Scene | `Assets/Scenes/SampleScene.unity` is the enabled build scene |
 
-## Important Packages And Frameworks
+`Tools/qa/build-web.sh` runs a solo driving gate, then `RacingGame.EditorTools.BuildCommands.BuildYandex`, producing a WebGL folder, ZIP and size report. See `Assets/CarsGame/Editor/Build/` for the build/postprocess implementation. Browser runs do not establish production Yandex moderation or real-phone compatibility.
 
-| Area | Finding | Confidence | Evidence |
-| --- | --- | --- | --- |
-| Rendering | URP | Confirmed | `Packages/manifest.json`, `ProjectSettings/GraphicsSettings.asset` |
-| Input | Unity Input System | Confirmed | `Packages/manifest.json`, `Assets/Scripts/CarController.cs` |
-| Tests | Unity Test Framework installed; no first-party tests found | Confirmed | `Packages/manifest.json`, repository scan |
-| Navigation | AI Navigation package installed but not used by gameplay code | Confirmed | `Packages/manifest.json`, repository scan |
-| Networking | No first-party multiplayer implementation | Confirmed | repository scan |
+## Code Layout And Assemblies
 
-## Directory Structure
+| Path / assembly | Responsibility |
+| --- | --- |
+| `Assets/CarsGame/Core` / `RacingGame.Core` | Save merging/migration, economy, event rules, track math and platform contracts |
+| `Assets/CarsGame/Game` / `RacingGame.Game` | Vehicles, simulation, races/missions, camera, runtime menus/HUD, audio and flow |
+| `Assets/CarsGame/Platform` / `RacingGame.Platform` | Mock/standalone/Yandex adapters and local save storage; depends on Core |
+| `Assets/CarsGame/Editor` / `RacingGame.Editor` | Build tools, localization/font import and generated content tooling |
+| `Assets/CarsGame/Net` / `RacingGame.Net` | Optional transport code, gated by `CARS_NET`; not evidence of shipped multiplayer |
+| `Assets/CarsGame/Tests/{EditMode,PlayMode}` | Separate test assemblies |
+| `Assets/WebGLTemplates/Yandex/TemplateData` | Browser SDK, mock SDK and music integration |
+| `Assets/CarsGame/Localization/Source/strings.csv` | Localization source; generated tables live in `Assets/Localization/Tables` |
+| `Tools/qa` | Native tests, browser interaction probes, builds and local server |
 
-| Path | Purpose | Confidence | Evidence |
-| --- | --- | --- | --- |
-| `Assets/Scripts` | Runtime vehicle, combat, health, camera, and opponent logic | Confirmed | first-party scripts |
-| `Assets/Scenes` | Main gameplay scene | Confirmed | `SampleScene.unity` |
-| `Assets/Settings` | URP renderer and volume assets | Confirmed | asset inventory |
+## Runtime Architecture
 
-## Assembly Boundaries
+- `PlatformBootstrap`/`PlatformRuntime` select and initialize platform services. `PlatformGlue` loads/merges saves and initializes localization; `GameFlow` waits for readiness before the initial menu.
+- `GameFlow` owns menu/race/results/test-drive transitions. `RaceManager` owns countdown, racing, finishing and results. Events combine scene references with `Resources/Events`; daily events are generated separately.
+- `SimulationDriver` enforces a 0.02 s fixed step and orders simulation participants. `CarController` consumes player, AI or scripted input. `AiDriver` follows `TrackPath` and handles recovery.
+- Menus and HUD are runtime UGUI/TMP hierarchies. Physical-pixel readability matters because menus and driving HUD use different scaling rules.
+- `SaveService` writes a local mirror and coalesces cloud writes. Cloud data must be successfully read before writes are authorized; account generations reject stale loads. The JavaScript adapter serializes writes and prevents stale account acknowledgements from discarding a new account's queued payload.
+- `PauseController` combines user, host, ad and visibility pause reasons. UI closing must preserve unrelated pause reasons.
 
-| Assembly | Responsibility | Key references | Notes |
-| --- | --- | --- | --- |
-| `Assembly-CSharp` | All first-party runtime gameplay | UnityEngine, Input System | No first-party asmdefs |
+## Testing And Tooling
 
-## Scenes And Startup Flow
+- Current EditMode suite: 371 tests. Current PlayMode suite: 40 tests. Consult the iteration report for the final results rather than assuming a build implies runtime validation.
+- Full PlayMode runs require graphics: garage previews use RenderTextures. `Tools/qa/play-tests.sh` runs under Xvfb/Vulkan; `CG_NOGRAPHICS=1` is only appropriate for compatible filtered tests.
+- `Tools/qa/platform-save.mjs` exercises the browser save adapter in a Node VM without a browser or network.
+- Use isolated copies via `Tools/qa/common.sh`; never launch batch Unity on the main project while its editor may be open. Each concurrent Unity process needs its own `SIM`; use separate `CG_QA_CONFIG_HOME` values for independent save state.
+- QA defaults to an isolated `XDG_CONFIG_HOME` so tests cannot change the user's real PlayerPrefs.
+- Every browser check must run through `webtest`, retain its NVIDIA Vulkan arguments and close the browser in `finally`. Keep all audio on `AgentSink`.
+- The official Unity AI package is installed (`com.unity.ai.assistant` 2.19.0-pre.2), but Unity MCP tools are not exposed in this session. CLI automation is verified; do not install a second bridge just to work around this.
 
-- Build scenes: `Assets/Scenes/SampleScene.unity`
-- Likely startup scene: `SampleScene`
-- Scene loading flow: direct single-scene startup; no scene-loading code found
+## Sources
 
-## Architecture
-
-| Pattern | Finding | Confidence | Evidence |
-| --- | --- | --- | --- |
-| Scene composition | MonoBehaviours and explicit serialized references own gameplay | Confirmed | `SampleScene.unity`, `Assets/Scripts` |
-| Vehicle control | Shared Rigidbody-based `CarController`; player or AI supplies input | Confirmed | `CarController.cs`, `OpponentDriver.cs` |
-| Track path | Ordered children of `Track_Markings` form the opponent route | Confirmed | `SampleScene.unity`, `OpponentDriver.cs` |
-| Visual generation | Car meshes can be built procedurally | Confirmed | `ProceduralCarBuilder.cs` |
-
-## Coding Conventions
-
-- Namespace style: `RacingGame`
-- Serialized fields: mostly public Inspector fields; private runtime state
-- Async: none in first-party runtime code
-- Comments/docs: short gameplay and physics rationale near non-obvious behavior
-
-## Testing And Validation
-
-- EditMode tests: none found
-- PlayMode tests: none found
-- CI/build validation: none found
-- Active Unity Editor successfully compiled `Assembly-CSharp` on 2026-09-01
-
-## Available Unity Tooling
-
-| Capability | Status | Evidence |
-| --- | --- | --- |
-| Official Unity AI/MCP package | available | `com.unity.ai.assistant` 2.19.0-pre.1, active relay logs |
-| Unity MCP tools in this Codex thread | unavailable | no Unity MCP capabilities exposed to the session |
-| Unity Editor compilation | available | `Logs/Editor.log`, `Library/ScriptAssemblies/Assembly-CSharp.dll` |
-| Runtime/play-mode automation | unverified | no Unity MCP capability exposed to the session |
-
-## Important Constraints
-
-- `SampleScene.unity` contains large embedded procedural meshes; keep scene edits narrowly targeted.
-- Preserve existing uncommitted gameplay and scene work.
-- Do not add another Unity MCP provider while the official package is present.
-
-## Unknowns And Confidence
-
-- Final supported build platforms and performance targets are unknown.
-- Runtime opponent handling has not yet been observed through an exposed Play Mode tool.
-
-## Source Files Inspected
-
-- `ProjectSettings/ProjectVersion.txt`
-- `ProjectSettings/EditorBuildSettings.asset`
-- `ProjectSettings/GraphicsSettings.asset`
-- `ProjectSettings/ProjectSettings.asset`
-- `Packages/manifest.json`
-- `Packages/packages-lock.json`
-- `Assets/Scenes/SampleScene.unity`
-- `Assets/Scripts/*.cs`
-- `Logs/Editor.log`
+`Packages/manifest.json`, `ProjectSettings/{ProjectVersion.txt,EditorBuildSettings.asset,ProjectSettings.asset}`, the first-party assembly definitions, `Game/Flow/{GameFlow,PlatformGlue}.cs`, `Game/Race/SimulationDriver.cs`, `Core/Save/SaveService.cs`, `TemplateData/cars-platform.js`, the build tools, test XML and QA reports.
 
 <!-- unity-onboarding:generated:end -->

@@ -153,7 +153,7 @@ namespace RacingGame
             int goal = (mask & 2) == 0 ? 1 : (mask & 1) == 0 ? 0 : 2;
             bool unlocksNext = best != null && flow.events != null && Array.Exists(flow.events, e => e != null
                 && e.unlockAfterEventId == next.eventId && !flow.IsUnlocked(e));
-            string target = unlocksNext ? Loc.Format("goals.place", "n", 3)
+            string target = DailyRace.IsDaily(next) ? Loc.Get("experience.record") : unlocksNext ? Loc.Format("goals.place", "n", 3)
                 : mask == 7 ? Loc.Get("experience.record") : StarGoalText.Description(next, goal);
             var row = Item(content, "NextGoal", 180f);
             Label(row, "Title", Loc.Get("experience.next"), 22f, Top, Vector2.one, new Vector2(24f, -42f), new Vector2(-24f, -8f), UiFactory.Accent);

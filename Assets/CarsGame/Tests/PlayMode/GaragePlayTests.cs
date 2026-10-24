@@ -130,11 +130,20 @@ namespace RacingGame.Tests
                 Assert.AreEqual(id, race.Player.GetComponent<CarBody>().BodyId);
                 Assert.AreEqual(2, race.Participants.Count);
                 while (race.State == RaceState.Countdown) yield return null;
+                for (int i = 0; i < 20; i++) yield return null;
+                Assert.IsFalse(System.Array.Exists(Object.FindObjectsByType<Button>(), b => b.name == "LiveGoals"), "Test drives cannot award campaign stars");
+                var returnButton = System.Array.Find(Object.FindObjectsByType<Button>(), b => b.name == "ReturnToGarage");
+                Assert.NotNull(returnButton);
+                var returnRect = (RectTransform)returnButton.transform;
+                Assert.GreaterOrEqual(returnRect.rect.height * returnRect.lossyScale.y, 43.5f);
                 float left = flow.TestDriveRemaining;
                 PauseController.Set(PauseReason.User, true);
                 yield return null; yield return null;
                 Assert.AreEqual(left, flow.TestDriveRemaining, 0.001f);
+                Assert.IsFalse(returnButton.gameObject.activeInHierarchy, "The return overlay yields to pause");
                 PauseController.Set(PauseReason.User, false);
+                yield return null; yield return null;
+                Assert.IsTrue(returnButton.gameObject.activeInHierarchy);
                 if (id == "dune")
                 {
                     flow.RetryRace();

@@ -1727,6 +1727,22 @@ MonoBehaviour:
     m_Key: lesson.mines.touch
     m_Metadata:
       m_Items: []
+  - m_Id: 18675088652316672
+    m_Key: results.stars_this_race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705280
+    m_Key: results.star_earned
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705281
+    m_Key: results.star_previous
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705282
+    m_Key: results.star_missed
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

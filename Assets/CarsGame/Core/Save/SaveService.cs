@@ -28,6 +28,7 @@ namespace RacingGame.Core.Save
         public event Action<SaveData> Changed;
         private double nextCloudRetryAt = double.NegativeInfinity;
         private bool retrying;
+        private int identityGeneration;
         private Task loadTask;
         public SaveParseStatus LastCloudStatus { get; private set; } = SaveParseStatus.Empty;
 
@@ -66,7 +67,11 @@ namespace RacingGame.Core.Save
         // newer-version blobs block writes so we never overwrite data we refused to read.
         private async Task<bool> FetchAndMergeCloudAsync(ICloudSave c)
         {
+            int generation = identityGeneration;
             var r = await c.LoadAsync();
+            // A delayed guest/account response cannot mark a newer identity as synced or
+            // merge its data. The next retry must fetch the account that is current now.
+            if (generation != identityGeneration) return false;
             if (!r.Ok) { CloudFailures++; nextCloudRetryAt = clock() + 10d; return false; }
             var cloudData = SaveMigrator.Parse(r.Value, out var status);
             LastCloudStatus = status;
@@ -105,6 +110,7 @@ namespace RacingGame.Core.Save
         /// blocked until the new account's save has been fetched and merged.</summary>
         public void OnIdentityChanged()
         {
+            identityGeneration++;
             CloudSynced = false;
             nextCloudRetryAt = clock();
             dirty = true;

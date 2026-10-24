@@ -22,6 +22,7 @@ namespace RacingGame
     {
         public RaceManager race;
         public float hintSeconds = 30f;
+        private GameFlow gameFlow;
 
         private TextMeshProUGUI speedText, lapText, positionText, timerText, centerText, hintText, hpText, pauseText, pauseHint, ammoText, hitMarker;
         private CarCannon playerCannon;
@@ -143,6 +144,7 @@ namespace RacingGame
         private void Awake()
         {
             if (race == null) race = GetComponent<RaceManager>() ?? FindAnyObjectByType<RaceManager>();
+            gameFlow = race != null ? race.GetComponent<GameFlow>() : null;
             Build();
         }
 
@@ -232,6 +234,8 @@ namespace RacingGame
             hitMarker.gameObject.SetActive(false);
             combatText = UiFactory.Text(reticle, "HitOutcome", "", 22f, TextAlignmentOptions.Center,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-180f, 60f), new Vector2(180f, 100f));
+            combatText.fontStyle = FontStyles.Bold;
+            combatText.outlineWidth = 0.25f;
             incomingArrow = UiFactory.Text(root, "IncomingDirection", "▲", 44f, TextAlignmentOptions.Center,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-28f, -28f), new Vector2(28f, 28f), CriticalColor);
             incomingText = UiFactory.Text(root, "IncomingSource", "", 23f, TextAlignmentOptions.Center,
@@ -791,6 +795,17 @@ namespace RacingGame
             if (hudRoot == null || helpPanel == null || pauseControls == null) return;
             float pixelScale = Mathf.Max(0.01f, hudRoot.lossyScale.x);
             float readable = UiFactory.ReadableScale(Screen.width, Screen.height);
+            // Combat confirmation must remain readable at phone resolution, independently
+            // of the small targeting reticle's reference-canvas scale.
+            combatText.fontSize = Mathf.Max(22f, 14f / pixelScale);
+            float combatHalfWidth = Mathf.Min(400f, Screen.width * 0.55f) / (2f * pixelScale);
+            Place(combatText.rectTransform, new Vector2(0.5f, 0.5f),
+                new Vector2(-combatHalfWidth, 30f / pixelScale), new Vector2(combatHalfWidth, 62f / pixelScale));
+            incomingText.fontSize = Mathf.Max(23f, 13f / pixelScale);
+            float incomingHalfWidth = Mathf.Min(600f, Screen.width * 0.7f) / (2f * pixelScale);
+            Place(incomingText.rectTransform, new Vector2(0.5f, 0.5f),
+                new Vector2(-incomingHalfWidth, -70f / pixelScale), new Vector2(incomingHalfWidth, -43f / pixelScale));
+            hitMarker.fontSize = Mathf.Max(64f, 28f / pixelScale);
             finishPanel.localScale = Vector3.one * (Mathf.Min(readable, (Screen.width - 32f) / 600f) / pixelScale);
             // Pause stays fully visible; help may scroll without shrinking the lesson text.
             float pauseScale = Mathf.Min(readable, Mathf.Min(Screen.width - 32f, Screen.height - 32f) / 600f);
@@ -1190,14 +1205,17 @@ namespace RacingGame
             bool outgoing = hit.Attacker == player.gameObject && victim != player;
             if (!outgoing && victim != player) return;
             string outcome = Loc.Get(result.Fatal ? "combat.destroyed" : result.ShieldAbsorbed ? "combat.shield" : "combat.hit");
+            if (!result.Fatal && !result.ShieldAbsorbed && result.DamageDealt > 0f)
+                outcome += "  -" + Mathf.CeilToInt(result.DamageDealt);
             Color color = result.Fatal ? HitmarkerKillColor : result.ShieldAbsorbed ? new Color(0.3f, 0.95f, 1f) : HitmarkerNormalColor;
             if (outgoing)
             {
                 // Preserve a kill confirmation if another bullet lands during the same burst.
                 if (!result.Fatal && hitMarker.color == HitmarkerKillColor && Time.unscaledTime < hitMarkerUntil) return;
                 hitMarker.color = color; hitMarker.gameObject.SetActive(true);
-                combatText.text = outcome; combatText.color = color;
-                hitMarkerUntil = Time.unscaledTime + (result.Fatal ? 0.6f : 0.35f);
+                combatText.text = outcome;
+                combatText.color = result.Fatal || result.ShieldAbsorbed ? color : Color.white;
+                hitMarkerUntil = Time.unscaledTime + (result.Fatal ? 0.8f : 0.55f);
                 if (!result.Fatal) SfxPlayer.Instance.PlayUi(result.ShieldAbsorbed ? SfxSynth.ShieldBreak : SfxSynth.Hit, 0.45f, 1.3f);
             }
             else
@@ -1230,7 +1248,8 @@ namespace RacingGame
             if (Time.unscaledTime > hitMarkerUntil) combatText.text = "";
             if (PauseController.IsPaused || Time.unscaledTime < nextGoalRefresh) return;
             nextGoalRefresh = Time.unscaledTime + 0.25f;
-            bool showGoals = race.Player != null && RaceSetup.Event != null && race.State >= RaceState.Countdown && race.State <= RaceState.Finishing;
+            bool showGoals = race.Player != null && RaceSetup.Event != null && !DailyRace.IsDaily(RaceSetup.Event)
+                && (gameFlow == null || !gameFlow.IsTestDrive) && race.State >= RaceState.Countdown && race.State <= RaceState.Finishing;
             goalsPanel.gameObject.SetActive(showGoals);
             if (showGoals)
             {

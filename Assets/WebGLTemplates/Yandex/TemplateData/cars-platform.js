@@ -24,6 +24,7 @@
   var devHost = /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$/.test(location.hostname) || location.protocol === 'file:';
   var mock = devHost && (!!window.__ysdkMissing || /[?&]sdk=mock/.test(location.search));
   var saveQueue = null, saveInFlight = null, saveTimes = [];    // rolling setData quota: 100 per 5 minutes; saveInFlight = drain promise
+  var saveGeneration = 0;    // a completed write only acknowledges the identity it was sent to
   var SAVE_QUOTA = 90, SAVE_WINDOW = 5 * 60 * 1000;
 
   function log(m) { try { console.log('[CarsPlatform] ' + m); debug.log.push(m); if (debug.log.length > 200) debug.log.shift(); } catch (e) {} }
@@ -253,7 +254,7 @@
     return saveInFlight;
   }
   function drainOnce() {
-    var payload = saveQueue;
+    var payload = saveQueue, generation = saveGeneration;
     var size = byteLength(JSON.stringify({ save: payload }));
     if (size > 190000) { log('save too large: ' + size + ' bytes'); return Promise.resolve(false); }
     if (!quotaAvailable()) { log('setData quota reached, deferring'); scheduleFlush(15000); return Promise.resolve(false); }
@@ -261,7 +262,9 @@
     var p;
     try { p = player.setData({ save: payload }, true); } catch (e) { p = Promise.reject(e); }
     return Promise.resolve(p).then(function () {
-      if (saveQueue === payload) saveQueue = null;          // newer data may have arrived meanwhile: keep it queued
+      // The signed-in account can have exactly the guest payload. An old account's
+      // acknowledgement must not clear that account's still-unwritten copy.
+      if (generation === saveGeneration && saveQueue === payload) saveQueue = null;
       return true;
     }).catch(function (e) { log('setData failed ' + e); scheduleFlush(5000); return false; });
   }
@@ -279,6 +282,7 @@
     ysdk.auth.openAuthDialog().then(function () {
       return ysdk.getPlayer({ scopes: false }).then(function (p) {
         // New identity: the guest's queued blob must never land in the signed-in account.
+        saveGeneration++;
         saveQueue = null; if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
         player = p; authorized = true;
         try { playerId = p.getUniqueID(); playerName = p.getName() || playerName; } catch (e) {}

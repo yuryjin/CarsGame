@@ -382,7 +382,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860354
-    m_Localized: Sans accident
+    m_Localized: "Finir sans \xEAtre d\xE9truit"
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860355
@@ -1762,6 +1762,22 @@ MonoBehaviour:
   - m_Id: 18240820478291970
     m_Localized: "Seulement des mines. Prends de l\u2019avance et appuie sur MINE
       pour pi\xE9ger tes poursuivants."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088652316672
+    m_Localized: "CETTE COURSE : {n}/3 \xC9TOILES"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705280
+    m_Localized: Obtenue dans cette course
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705281
+    m_Localized: "D\xE9j\xE0 gagn\xE9e \xB7 conserv\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705282
+    m_Localized: Non obtenue dans cette course
     m_Metadata:
       m_Items: []
   references:

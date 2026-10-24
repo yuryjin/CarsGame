@@ -382,7 +382,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860354
-    m_Localized: Sem acidentes
+    m_Localized: "Termine sem ser destru\xEDdo"
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860355
@@ -1762,6 +1762,22 @@ MonoBehaviour:
   - m_Id: 18240820478291970
     m_Localized: "S\xF3 minas. Assuma a frente e toque em MINA para deixar uma armadilha
       aos perseguidores."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088652316672
+    m_Localized: 'ESTA CORRIDA: {n}/3 ESTRELAS'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705280
+    m_Localized: Ganha nesta corrida
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705281
+    m_Localized: "J\xE1 ganha \xB7 mantida"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705282
+    m_Localized: "N\xE3o ganha nesta corrida"
     m_Metadata:
       m_Items: []
   references:

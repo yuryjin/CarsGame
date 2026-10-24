@@ -382,7 +382,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860354
-    m_Localized: Kaza yapmadan bitir
+    m_Localized: "Par\xE7alanmadan bitir"
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860355
@@ -1584,7 +1584,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488794
-    m_Localized: "Kaza veya s\u0131f\u0131rlama olmadan bitir"
+    m_Localized: "Par\xE7alanmadan veya s\u0131f\u0131rlamadan bitir"
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488795
@@ -1780,6 +1780,22 @@ MonoBehaviour:
   - m_Id: 18240820478291970
     m_Localized: "Sadece may\u0131nlar. \xD6ne ge\xE7 ve takip\xE7ilere tuzak b\u0131rakmak
       i\xE7in MAYIN d\xFC\u011Fmesine dokun."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088652316672
+    m_Localized: "BU YARI\u015E: {n}/3 YILDIZ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705280
+    m_Localized: "Bu yar\u0131\u015Fta kazan\u0131ld\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705281
+    m_Localized: "\xD6nceden kazan\u0131ld\u0131 \xB7 korundu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705282
+    m_Localized: "Bu yar\u0131\u015Fta kazan\u0131lmad\u0131"
     m_Metadata:
       m_Items: []
   references:

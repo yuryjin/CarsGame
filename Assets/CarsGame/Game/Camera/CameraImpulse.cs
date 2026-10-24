@@ -23,6 +23,7 @@ namespace RacingGame
 
         public void AddImpulse(float strength)
         {
+            if (!isActiveAndEnabled || PauseController.IsPaused) return;
             var save = PlatformGlue.Save;
             if (save != null && !save.Data.settings.cameraShake) return;   // accessibility setting
             if (TouchControlsPresenter.IsShown) strength *= touchScale;
@@ -33,23 +34,38 @@ namespace RacingGame
         public void ResetEnergy()
         {
             energy = 0f;
+            RemoveOffset();
+        }
+
+        private void RemoveOffset()
+        {
+            transform.position -= lastOffset;
+            transform.rotation *= Quaternion.Inverse(lastRoll);
             lastOffset = Vector3.zero;
             lastRoll = Quaternion.identity;
         }
 
+        private void OnDisable() => ResetEnergy();
+
+        private void Update()
+        {
+            // All Updates run before the follow camera's LateUpdate. Removing the previous
+            // offset here keeps shake out of its smoothing, aim direction and horizon roll.
+            RemoveOffset();
+            if (PauseController.IsPaused || (PlatformGlue.Save != null && !PlatformGlue.Save.Data.settings.cameraShake))
+                energy = 0f;
+        }
+
         private void LateUpdate()
         {
-            // Undo the previous frame's offset so the follow camera's smoothing never sees the shake.
-            transform.position -= lastOffset;
-            transform.rotation = transform.rotation * Quaternion.Inverse(lastRoll);
-            if (energy <= 0.001f) { lastOffset = Vector3.zero; lastRoll = Quaternion.identity; return; }
-            float t = Time.unscaledTime * 28f + seed;
+            if (energy <= 0.001f || PauseController.IsPaused) return;
+            float t = Time.time * 28f + seed;
             float e = energy * energy;
             lastOffset = transform.right * (Mathf.PerlinNoise(t, 0.3f) - 0.5f) * 2f * amplitude * e + transform.up * (Mathf.PerlinNoise(0.7f, t) - 0.5f) * 2f * amplitude * e;
             lastRoll = Quaternion.AngleAxis((Mathf.PerlinNoise(t * 0.7f, 5f) - 0.5f) * 2f * rollDegrees * e, Vector3.forward);
             transform.position += lastOffset;
             transform.rotation = transform.rotation * lastRoll;
-            energy = Mathf.Max(0f, energy - decay * Time.unscaledDeltaTime * (0.35f + energy));
+            energy = Mathf.Max(0f, energy - decay * Time.deltaTime * (0.35f + energy));
         }
     }
 }

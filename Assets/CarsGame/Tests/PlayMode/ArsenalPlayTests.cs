@@ -45,6 +45,7 @@ namespace RacingGame.Tests
             var mouse = InputSystem.AddDevice<Mouse>();
             var go = new GameObject("ArsenalInput");
             go.transform.SetParent(stage.transform);
+            go.AddComponent<CarCannon>();
             go.AddComponent<CarWeapons>();
             var input = go.AddComponent<PlayerDriverInput>();
             try

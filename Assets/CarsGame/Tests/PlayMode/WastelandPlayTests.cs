@@ -16,6 +16,7 @@ namespace RacingGame.Tests
             float deadline = Time.realtimeSinceStartup + 60f;
             while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < deadline) yield return null;
             Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null; yield return null; // allow GameFlow.Start to finish scene initialization
             var flow = Object.FindAnyObjectByType<GameFlow>();
             var race = Object.FindAnyObjectByType<RaceManager>();
             var path = TrackPath.Instance;

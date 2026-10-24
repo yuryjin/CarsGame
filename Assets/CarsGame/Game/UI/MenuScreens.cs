@@ -714,6 +714,32 @@ namespace RacingGame
             return best;
         }
 
+        private void BuildResultStars(Transform content)
+        {
+            if (DailyRace.IsDaily(flow.CurrentEvent)) return;
+            int currentStars = flow.LastStarsEarned;
+            var starsCard = Item(content, "StarsCard", 304f);
+            Label(starsCard, "StarsTitle", Loc.Format("results.stars_this_race", "n", RaceEventDefinition.CountStars(currentStars)), 22f,
+                Top, Vector2.one, new Vector2(24f, -42f), new Vector2(-24f, -2f), UiFactory.Accent).fontStyle = FontStyles.Bold;
+            var bestEntry = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == (flow.CurrentEvent != null ? flow.CurrentEvent.eventId : ""));
+            int totalEventStars = bestEntry != null ? bestEntry.stars : currentStars;
+
+            for (int s = 0; s < 3; s++)
+            {
+                int bit = 1 << s;
+                bool wonThisRace = (currentStars & bit) != 0;
+                bool wonOverall = (totalEventStars & bit) != 0;
+                // Gold always means earned in this race. A saved achievement is an outlined
+                // star with an explicit caption, so a failed objective cannot look completed.
+                float bottom = 12f + (2 - s) * 84f;
+                var starRow = UiFactory.Panel(starsCard, "Star" + s, Vector2.zero, new Vector2(1f, 0f), new Vector2(24f, bottom), new Vector2(-24f, bottom + 80f));
+                Label(starRow, "StarIcon", wonThisRace ? "★" : "☆", 34f, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(34f, 0f), wonThisRace ? UiFactory.Accent : UiFactory.Muted);
+                Label(starRow, "StarDesc", StarGoalText.Description(flow.CurrentEvent, s), 25f, new Vector2(0f, 0.4f), Vector2.one, new Vector2(46f, 0f), Vector2.zero, wonThisRace ? Color.white : UiFactory.Muted);
+                string status = wonThisRace ? "results.star_earned" : wonOverall ? "results.star_previous" : "results.star_missed";
+                Label(starRow, "StarStatus", Loc.Get(status), 22f, Vector2.zero, new Vector2(1f, 0.4f), new Vector2(46f, 0f), Vector2.zero, wonThisRace ? UiFactory.Positive : UiFactory.Muted);
+            }
+        }
+
         private void BuildResults(RectTransform root)
         {
             var results = race.Results;
@@ -730,7 +756,7 @@ namespace RacingGame
             UiFactory.Panel(summary, "GoldRule", Top, Vector2.one, new Vector2(28f, -4f), new Vector2(-28f, -1f), UiFactory.Accent, false);
             var medal = UiFactory.Panel(summary, "Medal", Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(194f, -24f), new Color(1f, 0.8f, 0.25f, 0.08f));
             var me = results.Player;
-            Label(medal, "Place", me != null ? "#" + me.Position : "—", 86f, Vector2.zero, Vector2.one, new Vector2(8f, 8f), new Vector2(-8f, -8f), PlaceColor(me), TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
+            Label(medal, "Place", me == null ? "—" : me.Finished ? "#" + me.Position : Loc.Get("results.dnf"), me != null && me.Finished ? 86f : 38f, Vector2.zero, Vector2.one, new Vector2(8f, 8f), new Vector2(-8f, -8f), PlaceColor(me), TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
             var rewardText = Label(summary, "Reward", Loc.Format("results.reward", "n", reward), 40f, Top, Vector2.one, new Vector2(234f, -80f), new Vector2(-28f, -20f), UiFactory.Accent);
             rewardText.fontStyle = FontStyles.Bold;
             if (Time.unscaledTime - rewardShownAt < RewardCountSeconds) rewardLabel = rewardText;   // count up once, not on every rebuild
@@ -740,23 +766,7 @@ namespace RacingGame
             string record = RecordLine(me);
             if (record.Length > 0) Label(summary, "Record", record, 24f, Top, Vector2.one, new Vector2(234f, -170f), new Vector2(-28f, -128f), flow.LastWasPersonalBest ? UiFactory.Positive : UiFactory.Muted);
 
-            var starsCard = Item(content, "StarsCard", 184f);
-            Label(starsCard, "StarsTitle", Loc.Get("results.stars"), 22f, Top, Vector2.one, new Vector2(24f, -38f), new Vector2(-24f, -8f), UiFactory.Accent).fontStyle = FontStyles.Bold;
-            int currentStars = flow.LastStarsEarned;
-            var bestEntry = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == (flow.CurrentEvent != null ? flow.CurrentEvent.eventId : ""));
-            int totalEventStars = bestEntry != null ? bestEntry.stars : currentStars;
-
-            for (int s = 0; s < 3; s++)
-            {
-                int bit = 1 << s;
-                bool wonThisRace = (currentStars & bit) != 0;
-                bool wonOverall = (totalEventStars & bit) != 0;
-                string starIcon = wonThisRace ? "<color=#FFCC40>★</color>" : wonOverall ? "<color=#FFD870>★</color>" : "<color=#455568>★</color>";
-                float bottom = 12f + (2 - s) * 42f;
-                var starRow = UiFactory.Panel(starsCard, "Star" + s, Vector2.zero, new Vector2(1f, 0f), new Vector2(24f, bottom), new Vector2(-24f, bottom + 40f));
-                Label(starRow, "StarIcon", starIcon, 30f, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(34f, 0f));
-                Label(starRow, "StarDesc", StarGoalText.Description(flow.CurrentEvent, s), 25f, Vector2.zero, Vector2.one, new Vector2(46f, 0f), Vector2.zero, wonOverall ? Color.white : UiFactory.Muted);
-            }
+            BuildResultStars(content);
             var next = RecommendedNext();
             BuildNextGoal(content, next);
             var actions = UiFactory.Panel(overview, "Actions", Vector2.zero, new Vector2(1f, 0f),

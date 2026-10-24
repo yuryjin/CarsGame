@@ -30,10 +30,12 @@ namespace RacingGame.Tests
             public int FlushCalls;
             public bool ShouldFailLoad;
             public bool ShouldFailFlush;
+            public Task<Result<string>> PendingLoad;
 
             public Task<Result<string>> LoadAsync()
             {
                 LoadCalls++;
+                if (PendingLoad != null) return PendingLoad;
                 if (ShouldFailLoad)
                     return Task.FromResult(Result<string>.Fail(ResultCategory.Error, "load failed", true));
                 return Task.FromResult(Result<string>.Success(StoredJson));
@@ -200,6 +202,62 @@ namespace RacingGame.Tests
 
             service.OnIdentityChanged();
             Assert.IsFalse(service.CloudSynced);
+        }
+
+        private static string CoinsOnDevice(string device, int coins)
+        {
+            var data = new SaveData { deviceId = device };
+            data.Local(device).coinsEarned = coins;
+            return SaveMigrator.ToJson(data);
+        }
+
+        [Test]
+        public async Task AccountChangeDuringInitialLoadCannotAcceptThePreviousAccountsResponse()
+        {
+            var pending = new TaskCompletionSource<Result<string>>();
+            var previous = new MockCloudSave { PendingLoad = pending.Task };
+            var current = new MockCloudSave { StoredJson = CoinsOnDevice("new_account", 200) };
+            ICloudSave provider = previous;
+            var local = new MockLocalStore { StoredJson = CoinsOnDevice("device_1", 100) };
+            var service = new SaveService(local, () => provider, () => 10d, "device_1");
+
+            Task loading = service.LoadAsync();
+            provider = current;
+            service.OnIdentityChanged();
+            pending.SetResult(Result<string>.Success(CoinsOnDevice("old_account", 900)));
+            await loading;
+
+            Assert.IsFalse(service.CloudSynced, "An old response must not authorize writes to the new account");
+            Assert.AreEqual(100, service.Data.CoinsEarned, "Ignore data received for a superseded identity");
+            Assert.IsTrue((await service.FlushAsync()).Ok);
+            Assert.AreEqual(1, current.LoadCalls, "Read the new account before writing to it");
+            Assert.AreEqual(300, SaveMigrator.FromJson(current.StoredJson).CoinsEarned);
+            Assert.AreEqual(0, previous.QueueCalls);
+        }
+
+        [Test]
+        public async Task AccountChangeDuringRetryKeepsWritesBlockedUntilTheNewAccountIsRead()
+        {
+            var previous = new MockCloudSave { ShouldFailLoad = true };
+            var current = new MockCloudSave { StoredJson = CoinsOnDevice("new_account", 200) };
+            ICloudSave provider = previous;
+            var local = new MockLocalStore { StoredJson = CoinsOnDevice("device_1", 100) };
+            var service = new SaveService(local, () => provider, () => 10d, "device_1");
+            await service.LoadAsync();
+            var pending = new TaskCompletionSource<Result<string>>();
+            previous.PendingLoad = pending.Task;
+            Task<Result> flushing = service.FlushAsync();
+            provider = current;
+            service.OnIdentityChanged();
+            pending.SetResult(Result<string>.Success(CoinsOnDevice("old_account", 900)));
+
+            Assert.IsFalse((await flushing).Ok, "A superseded retry cannot flush to either account");
+            Assert.IsFalse(service.CloudSynced);
+            Assert.AreEqual(0, previous.FlushCalls);
+            Assert.AreEqual(0, current.QueueCalls);
+            Assert.IsTrue((await service.FlushAsync()).Ok);
+            Assert.AreEqual(1, current.LoadCalls);
+            Assert.AreEqual(300, SaveMigrator.FromJson(current.StoredJson).CoinsEarned);
         }
     }
 }

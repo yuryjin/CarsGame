@@ -106,6 +106,9 @@ namespace RacingGame.Tests
                 Debug.LogWarning($"[RaceHarness] not ready: save={(PlatformGlue.Save != null)} loaded={(PlatformGlue.Save != null && PlatformGlue.Save.Loaded)} loc={Loc.Ready} platform={(PlatformRuntime.Current != null ? PlatformRuntime.Current.IsInitialized.ToString() : "null")} scene={SceneManager.GetActiveScene().name} roots={SceneManager.GetActiveScene().rootCount} glue={UnityEngine.Object.FindObjectsByType<PlatformGlue>(FindObjectsInactive.Include).Length}/{UnityEngine.Object.FindAnyObjectByType<PlatformGlue>() != null} flow={UnityEngine.Object.FindAnyObjectByType<GameFlow>() != null} t={Time.frameCount}");
             Assert.IsTrue(PlatformGlue.Save != null && PlatformGlue.Save.Loaded, "save never loaded");
             Assert.IsTrue(PlatformGlue.IsReady, "platform never became ready");
+            // A previous test can leave the persistent platform ready before this scene's
+            // GameFlow.Start has run. Let startup enter the menu before spawning the field.
+            yield return null; yield return null;
             savedProfile = JsonUtility.ToJson(PlatformGlue.Save.Data);
 
             var flow = UnityEngine.Object.FindAnyObjectByType<GameFlow>();

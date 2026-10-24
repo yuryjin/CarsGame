@@ -386,7 +386,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860354
-    m_Localized: No wrecks
+    m_Localized: Finish without being wrecked
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860355
@@ -1761,6 +1761,22 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 18240820478291970
     m_Localized: Only mines. Get ahead and tap MINE to leave a trap for your pursuers.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088652316672
+    m_Localized: 'THIS RACE: {n}/3 STARS'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705280
+    m_Localized: Earned this race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705281
+    m_Localized: "Previously earned \xB7 kept"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705282
+    m_Localized: Not earned this race
     m_Metadata:
       m_Items: []
   references:

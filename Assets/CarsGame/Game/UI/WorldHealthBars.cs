@@ -16,7 +16,7 @@ namespace RacingGame
         {
             public RaceParticipant P;
             public RectTransform Rt, Plate, Leader;
-            public Image Fill, Back, Line;
+            public Image Fill, Trail, Back, Line;
             public TextMeshProUGUI Name;
             public Color Tint;
             public Vector3 Screen;
@@ -24,6 +24,7 @@ namespace RacingGame
             public bool Carrier;
             public int Slot, Id;
             public float CompactAt;
+            public float HealthRatio, DamageUntil, FlashUntil;
         }
         private readonly List<Entry> entries = new List<Entry>();
         private readonly List<Entry> visible = new List<Entry>();
@@ -34,7 +35,7 @@ namespace RacingGame
         {
             "RaceStatus", "LiveGoals", "TimerPanel", "Health", "AmmoPanel", "SecondaryPanel", "StatusPanel",
             "PauseButton", "HotBomb", "BossPanel", "Speedometer", "HintsPanel", "EventPanel",
-            "Left", "Right", "Fire", "Brake", "SwapWeapon", "Secondary", "Reset"
+            "Left", "Right", "Fire", "Brake", "SwapWeapon", "Secondary", "Reset", "FinishCard", "ReturnToGarage"
         };
         private static readonly System.Comparison<Entry> PriorityComparer = ComparePriority;
         private Canvas canvas;
@@ -77,8 +78,12 @@ namespace RacingGame
                 Vector2 preferred = e.Name.GetPreferredValues(e.Name.text, float.PositiveInfinity, float.PositiveInfinity) * scale;
                 e.LabelPixels = new Vector2(Mathf.Clamp(preferred.x + 8f, 24f, Screen.width - 8f), Mathf.Max(18f, preferred.y + 4f));
                 e.Plate.sizeDelta = e.LabelPixels / scale;
-                e.BarPixels = new Vector2(Mathf.Max(size.x * scale, 32f), Mathf.Max(size.y * scale, 5f));
+                e.BarPixels = new Vector2(Mathf.Max(size.x * scale, 48f), Mathf.Max(size.y * scale, 7f));
                 e.Rt.sizeDelta = e.BarPixels / scale;
+                // One screen pixel of border: the old three-canvas-unit inset consumed
+                // most of the health fill on a small screen.
+                e.Fill.rectTransform.offsetMin = e.Trail.rectTransform.offsetMin = Vector2.one / scale;
+                e.Fill.rectTransform.offsetMax = e.Trail.rectTransform.offsetMax = -Vector2.one / scale;
                 e.Slot = 0; e.CompactAt = 0f;
             }
             blockers.Clear();
@@ -126,8 +131,22 @@ namespace RacingGame
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRt, e.Screen, null, out Vector2 local);
                 e.Rt.anchoredPosition = local;
                 float t = e.P.Health != null && e.P.Health.maxHealth > 0f ? e.P.Health.Health / e.P.Health.maxHealth : 0f;
+                if (t < e.HealthRatio - 0.001f)
+                {
+                    e.Trail.fillAmount = Mathf.Max(e.Trail.fillAmount, e.HealthRatio);
+                    e.DamageUntil = Time.time + 0.35f;
+                    e.FlashUntil = Time.time + 0.12f;
+                }
+                else if (t > e.HealthRatio + 0.001f)
+                {
+                    e.Trail.fillAmount = t;
+                    e.FlashUntil = 0f;
+                }
+                if (Time.time > e.DamageUntil)
+                    e.Trail.fillAmount = Mathf.MoveTowards(e.Trail.fillAmount, t, Time.deltaTime * 1.5f);
+                e.HealthRatio = t;
                 e.Fill.fillAmount = t;
-                e.Fill.color = Color.Lerp(new Color(1f, 0.3f, 0.28f), UiFactory.Positive, t);
+                e.Fill.color = Time.time < e.FlashUntil ? Color.white : Color.Lerp(new Color(1f, 0.3f, 0.28f), UiFactory.Positive, t);
                 occupied.Add(new Rect((Vector2)e.Screen - e.BarPixels * 0.5f, e.BarPixels));
                 if (e.Screen.z >= 60f || (e.P.Health != null && e.P.Health.IsDead))
                 { e.Plate.gameObject.SetActive(false); e.Leader.gameObject.SetActive(false); continue; }
@@ -229,6 +248,12 @@ namespace RacingGame
             {
                 if (p.isPlayer) continue;
                 var bg = UiFactory.Bar(canvas.transform, "Bar_" + p.displayName, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), -size * 0.5f, size * 0.5f, new Color(0.2f, 0.85f, 0.25f), out var fill);
+                var trail = UiFactory.Panel(bg.transform, "DamageTrail", Vector2.zero, Vector2.one,
+                    Vector2.one, -Vector2.one, new Color(1f, 0.72f, 0.3f)).GetComponent<Image>();
+                trail.type = Image.Type.Filled; trail.fillMethod = Image.FillMethod.Horizontal; trail.fillOrigin = 0;
+                trail.transform.SetSiblingIndex(fill.transform.GetSiblingIndex());
+                float healthRatio = p.Health != null && p.Health.maxHealth > 0f ? p.Health.Health / p.Health.maxHealth : 0f;
+                fill.fillAmount = trail.fillAmount = healthRatio;
                 var line = UiFactory.Panel(leaders, "NameLeader", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, Color.white, false);
                 line.gameObject.SetActive(false);
                 var plate = UiFactory.Panel(bg.transform, "NamePlate", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.one, UiFactory.Surface);
@@ -237,7 +262,7 @@ namespace RacingGame
                 name.fontStyle = FontStyles.Bold; name.enableWordWrapping = false; name.overflowMode = TextOverflowModes.Ellipsis;
                 var ai = p.GetComponent<AiDriver>();
                 if (ai != null && ai.profile != null) name.color = Color.Lerp(ai.profile.paint, Color.white, 0.45f);
-                entries.Add(new Entry { P = p, Rt = bg.rectTransform, Fill = fill, Name = name, Plate = plate,
+                entries.Add(new Entry { P = p, Rt = bg.rectTransform, Fill = fill, Trail = trail, HealthRatio = healthRatio, Name = name, Plate = plate,
                     Leader = line, Line = line.GetComponent<Image>(), Back = plate.GetComponent<Image>(), Tint = name.color, Id = p.Car.CarId });
             }
         }

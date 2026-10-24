@@ -49,6 +49,8 @@ namespace RacingGame
         /// <summary>Explicit hand-over: the race flow calls Activate(false) before it spawns cars.</summary>
         public void Activate(bool on)
         {
+            var impulse = GetComponent<CameraImpulse>();
+            if (impulse != null) impulse.ResetEnergy();
             active = on;
             if (follow != null) follow.enabled = !on;
             if (on && cam != null) cam.fieldOfView = menuFov;

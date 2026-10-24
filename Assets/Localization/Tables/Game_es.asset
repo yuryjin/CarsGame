@@ -386,7 +386,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860354
-    m_Localized: Sin accidentes
+    m_Localized: Termina sin ser destruido
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860355
@@ -1766,6 +1766,22 @@ MonoBehaviour:
   - m_Id: 18240820478291970
     m_Localized: "Solo minas. Adel\xE1ntate y pulsa MINA para dejar una trampa a
       tus perseguidores."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088652316672
+    m_Localized: 'ESTA CARRERA: {n}/3 ESTRELLAS'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705280
+    m_Localized: Ganada en esta carrera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705281
+    m_Localized: "Ya ganada \xB7 conservada"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705282
+    m_Localized: No ganada en esta carrera
     m_Metadata:
       m_Items: []
   references:

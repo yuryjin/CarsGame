@@ -382,7 +382,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860354
-    m_Localized: "Keine Zerst\xF6rung"
+    m_Localized: Ohne Totalschaden ins Ziel
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860355
@@ -1572,7 +1572,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488794
-    m_Localized: "Ohne Zerst\xF6rung oder Zur\xFCcksetzen ins Ziel"
+    m_Localized: "Ohne Totalschaden und R\xFCcksetzen ins Ziel"
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488795
@@ -1758,6 +1758,22 @@ MonoBehaviour:
   - m_Id: 18240820478291970
     m_Localized: "Nur Minen. \xDCberhole und tippe MINE, um eine Falle f\xFCr deine
       Verfolger abzulegen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088652316672
+    m_Localized: 'DIESES RENNEN: {n}/3 STERNE'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705280
+    m_Localized: In diesem Rennen verdient
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705281
+    m_Localized: "Fr\xFCher verdient \xB7 behalten"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18675088660705282
+    m_Localized: In diesem Rennen nicht verdient
     m_Metadata:
       m_Items: []
   references:

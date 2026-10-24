@@ -26,7 +26,11 @@ namespace RacingGame
             car = GetComponent<CarController>();
             health = GetComponent<CarHealth>();
             impulse = Camera.main != null ? Camera.main.GetComponent<CameraImpulse>() : null;
-            if (health != null) health.OnHealthChanged += OnHealth;
+            if (health != null)
+            {
+                lastHealth = health.Health;
+                health.OnHealthChanged += OnHealth;
+            }
             BuildDust();
             var sky = SkyDirector.Instance;
             if (sky != null) { ApplySky(sky.Current); sky.Applied += ApplySky; }
