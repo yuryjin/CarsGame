@@ -1,6 +1,16 @@
 # Continuing improvement session — 2026-10-23
 
-## Latest verified build — 05:38 UTC
+## Latest verified build — 06:09 UTC
+
+`Builds/BombHud-2026-10-23/` makes the live bomb carrier/timer and instruction readable: minimum 14 and 12 physical pixels. The panel height follows translated text; the temporary teaching tip stays below it and returns to its normal row in ordinary races. Baseline readability failures and the first implementation's teaching-tip overlap are preserved as evidence.
+
+**369 EditMode tests, five PlayMode scenarios and the 49.2-second physical gate passed.** Final browser checks passed three landscape sizes, all nine languages plus platform default, expanded goals, actual touch pause, ordinary-race restoration and moving rival-nameplate regression. No captured exception/localization/glyph errors or layout findings. See `BombHudReadability.md` for exact coverage and limits.
+
+The full e18 Easy race finished second in **2:37.289**, with one death, four bomb passes, five resets (one AI recovery) and 206 coins. Fresh-context reload retained **4,424 coins / 25 races**, upgrades/loadout and campaign state. Full-race driving was automated. All 284 C# files match the source used for the final build. ZIP SHA256: `20b1f9349a319868c837997074d926600649e8b800c01662bcd4af4873f49961`.
+
+Next: fix the confirmed duplicate rival-name path. Difficulty_easy includes the Bolt profile twice; RaceSpawner numbers by array traversal rather than actual repeated names. Preserve profile frequency and difficulty while disambiguating names. This iteration is verified progress; no active blocking condition exists.
+
+## Previous verified build — 05:38 UTC
 
 `Builds/Nameplates-2026-10-23/` fixes overlapping rival names in dense packs and tiny small-screen text. Compact plates use at least 12 physical pixels, avoid other plates/health bars/HUD, and prioritize the gold bomb-carrier name. Leader lines identify displaced plates; a short return delay reduces rearrangement.
 

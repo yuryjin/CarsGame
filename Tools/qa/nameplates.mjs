@@ -48,6 +48,8 @@ try {
     for(let i=0;i<14;i++) {
       const state=await cmd('ui'),names=state.labels.filter(l=>l.name==='RivalName');
       samples.push({width,height,state});
+      if(new Set(names.map(n=>n.text.toLocaleLowerCase())).size!==names.length)
+        findings.push(`${width}: rival names must be distinct: ${names.map(n=>n.text).join(', ')}`);
       maxNames=Math.max(maxNames,names.length);
       const banner=state.labels.find(l=>l.name==='CarrierTimer')?.text;
       const owner=banner?.match(/^Бомба у (.+): \d+ с$/)?.[1] || banner?.match(/^(.+)持有炸弹：\d+秒$/)?.[1];

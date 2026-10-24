@@ -127,10 +127,11 @@ namespace RacingGame
                     if (profile != null)
                     {
                         if (!string.IsNullOrEmpty(profile.rivalName))
-                            participant.displayName = profile.rivalName + (aiIndex >= profiles.Length ? " " + (aiIndex / profiles.Length + 1) : "");
+                            participant.displayName = profile.rivalName;
                         paint.SetColor(profile.paint);
                         profile.Equip(participant.Weapons);
                     }
+                    participant.displayName = UniqueRivalName(participant.displayName);
                     var gunner = go.GetComponent<AiGunner>() ?? go.AddComponent<AiGunner>();
                     gunner.Initialize(profile, aiFireCooldown);
                     gunner.startGraceSeconds = RaceSetup.Event != null && RaceSetup.Event.eventId == "e1" ? 30f : 3f;
@@ -160,6 +161,23 @@ namespace RacingGame
             foreach (var p in participants) if (p.Progress != null) p.Progress.BeginRace();
             if (Player == null || participants.Count == 0) { Clear(); return false; }
             return true;
+        }
+
+        private string UniqueRivalName(string baseName)
+        {
+            // A tier can deliberately repeat a profile. Number actual name collisions,
+            // including fallback names, without changing the field's driver composition.
+            string candidate = baseName;
+            int suffix = 2;
+            while (HasRivalName(candidate)) candidate = baseName + " " + suffix++;
+            return candidate;
+        }
+
+        private bool HasRivalName(string candidate)
+        {
+            foreach (var p in participants)
+                if (!p.isPlayer && string.Equals(p.displayName, candidate, System.StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
         }
 
         private Core.Economy.BodyDef PlayerBody()

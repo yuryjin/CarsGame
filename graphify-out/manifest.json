@@ -390,8 +390,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/RaceSpawner.cs": {
-    "mtime": 1790381012.293689,
-    "ast_hash": "1563d3198b9f05d8347c58b2c4005a06",
+    "mtime": 1792735982.6208537,
+    "ast_hash": "f01fc575880f169f92d1f4c320dead54",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/SimulationDriver.cs": {
@@ -1750,8 +1750,8 @@
     "semantic_hash": ""
   },
   "Tools/qa/nameplates.mjs": {
-    "mtime": 1792733112.282928,
-    "ast_hash": "aa5dbeeb057ad466dd04a06659e4b56f",
+    "mtime": 1792735982.6211464,
+    "ast_hash": "ab61dafbfc8e24dab0134690f5a73897",
     "semantic_hash": ""
   },
   "Tools/qa/player-experience.mjs": {
@@ -1765,8 +1765,8 @@
     "semantic_hash": ""
   },
   "Tools/qa/race-soak.mjs": {
-    "mtime": 1792726029.552164,
-    "ast_hash": "f5051b3892985298d143465f97c79b79",
+    "mtime": 1792736124.6655228,
+    "ast_hash": "5d5cd222c9fdaaf33500f836c642a236",
     "semantic_hash": ""
   },
   "Tools/qa/racer-names.mjs": {
@@ -1795,8 +1795,8 @@
     "semantic_hash": ""
   },
   "Docs/AI/BombHudReadability.md": {
-    "mtime": 1792734726.4910529,
-    "ast_hash": "2fb91b4f13fce52d1657ea3d83582c4b",
+    "mtime": 1792735796.4656372,
+    "ast_hash": "e6df78b58b9c1cae8a970a7cce6724ad",
     "semantic_hash": ""
   },
   "Docs/AI/ContextualDrivingHelp.md": {
@@ -1805,8 +1805,8 @@
     "semantic_hash": ""
   },
   "Docs/AI/ContinuousPlaytest.md": {
-    "mtime": 1792733887.133563,
-    "ast_hash": "e08f656378818daacb9af94b0bceb24c",
+    "mtime": 1792735796.526124,
+    "ast_hash": "3d384b20a618167be7f6b2ead66dc271",
     "semantic_hash": ""
   },
   "Docs/AI/GarageShowcase.md": {
@@ -1892,6 +1892,16 @@
   "Docs/AI/reviews/lenses-2026-10-23/prompts/scout.md": {
     "mtime": 1792715271.1553662,
     "ast_hash": "304e3aedcbe01ad859d962003ec72088",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Tests/PlayMode/UniqueRivalNamesPlayTests.cs": {
+    "mtime": 1792735931.683687,
+    "ast_hash": "9644ff58dff9cfa188644802155b3821",
+    "semantic_hash": ""
+  },
+  "Docs/AI/UniqueRivalNames.md": {
+    "mtime": 1792736505.0220675,
+    "ast_hash": "e413a590c8163695ba4c8237dfaf11bf",
     "semantic_hash": ""
   }
 }

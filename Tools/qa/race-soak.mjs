@@ -135,6 +135,9 @@ try {
     run.result = await cmd('ui'); run.finishedAt = new Date().toISOString();
     run.completed = run.result.lap >= run.result.laps;
     run.continueRequested = continueRequested;
+    const standingsNames = run.result.labels.filter(l=>l.name==='Name' && /^Result\d+$/.test(l.parent)).map(l=>l.text);
+    assert(standingsNames.length>0, 'Results must show named participants');
+    assert.equal(new Set(standingsNames.map(n=>n.toLocaleLowerCase())).size, standingsNames.length, 'Standings must distinguish every participant');
     if (run.completed) assert(run.result.lastReward > 0, 'A completed race must grant its normal reward');
     else {
       assert.equal(process.env.CG_ALLOW_DNF, '1', 'The player must finish the full distance unless this probe explicitly records DNF outcomes');

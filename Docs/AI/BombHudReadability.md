@@ -8,9 +8,17 @@ At 640×360, the existing mobile UI dump records 7.67 physical pixels for PassHi
 
 No changes to simulation, weapons, rewards or saves. Test runs use an isolated Unity project/preferences, webtest/NVIDIA Vulkan and AgentSink. Browser probes import the separate QA profile and do not export it. The full race/reload workflow alone advances that QA profile.
 
-## Validation status
+## Final validation
 
-Baseline screen measurements are saved in `/tmp/cars-bomb-hud/before.json`. The browser geometry probe failed on the preceding executable with 24 repeated unreadable-text findings at 812×375 and 640×360; 1280×720 passed that check. All other baseline assertions, including actual touch pause, completed. Native regression coverage includes HotBombPlayTests, nameplates, localized racer names and contextual player HUD. The first native pass completed 369 EditMode tests, five PlayMode scenarios and the 49.2-second physical gate. The first WebGL layout passed text readability but failed with four repeated overlaps between PassHint and the teaching tip at 812×375 and 640×360. After the placement correction, the same five PlayMode scenarios, 369 EditMode tests and 49.2-second physical gate passed again. The final WebGL build completed and all 284 C# files match its isolated source. Desktop probes passed 1280×720, 812×375 and 640×360. Mobile probes passed all nine languages plus platform default, expanded goals, real touch pause and switching back to an ordinary race. Captured error/finding arrays are empty. Russian and French screenshots were visually reviewed. Final browser scope is three landscape sizes, all nine languages plus the platform-default selector entry, expanded goals, real touch pause, nameplate regression and a full bomb race followed by reload. These checks are pending; no finished-build claim yet.
+The initial measurements are retained in `before.json`. The browser geometry probe failed on the preceding executable with 24 repeated unreadable-text observations at 812×375 and 640×360; 1280×720 passed. The first implementation corrected size but produced four repeated intersections with the teaching tip. That failed browser evidence and first executable are retained separately.
+
+After correcting the teaching-tip placement, **369 EditMode tests, five PlayMode scenarios and the 49.2-second physical gate passed**. PlayMode covers bomb contact/pause/explosion/respawn/retry/exit, natural bot completion, dense nameplates, localized racer names and contextual player HUD. All 284 C# files match the final isolated build source.
+
+Final browser probes passed desktop at 1280×720, 812×375 and 640×360; mobile checks visited all nine languages plus the platform-default option. They verify physical font sizes, full text bounds, non-overlap with HUD/teaching tips, expanded goals, real touch pause and restoration of the ordinary teaching-tip row after leaving a bomb race. Russian and French screenshots were visually reviewed. The separate mobile moving-nameplate regression also passed. Captured exception/localization/glyph errors and geometry findings were empty.
+
+A full e18 Easy race on the final executable finished second in **2:37.289**, with one death, four bomb passes and five resets (one AI recovery), awarding 206 coins. The debug world clock at Results was 179.355 seconds, including post-finish waiting; it is not the player's finish time. Fresh-context reload retained **4,424 coins / 25 races**, upgrades, loadout and campaign state. Full-race driving was automated; separate UI probes used actual mouse/touch input. No manual-victory or live advertising-SDK claim.
+
+The final executable and evidence are archived in `Builds/BombHud-2026-10-23/`, with source hashes and `validation.json`. This iteration is verified progress, with no active blocking condition.
 
 ## Separate next investigation
 
