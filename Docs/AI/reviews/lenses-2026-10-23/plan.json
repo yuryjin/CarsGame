@@ -1,0 +1,109 @@
+{
+ "mode": "build",
+ "reviewers": 7,
+ "batches": [
+  {
+   "batch": "b01-experience",
+   "group": "experience",
+   "lenses": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    15,
+    17
+   ],
+   "lens_spec": "1,2,3,4,5,6,15,17"
+  },
+  {
+   "batch": "b02-player",
+   "group": "player",
+   "lenses": [
+    16,
+    18,
+    19,
+    20,
+    45,
+    62,
+    63,
+    65
+   ],
+   "lens_spec": "16,18,19,20,45,62,63,65"
+  },
+  {
+   "batch": "b03-mechanics",
+   "group": "mechanics",
+   "lenses": [
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    39
+   ],
+   "lens_spec": "21,22,23,24,25,26,27,39"
+  },
+  {
+   "batch": "b04-chance-choice",
+   "group": "chance-choice",
+   "lenses": [
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35
+   ],
+   "lens_spec": "28,29,30,31,32,33,34,35"
+  },
+  {
+   "batch": "b05-balance",
+   "group": "balance",
+   "lenses": [
+    36,
+    37,
+    38,
+    40,
+    41,
+    42,
+    43,
+    46,
+    47
+   ],
+   "lens_spec": "36,37,38,40,41,42,43,46,47"
+  },
+  {
+   "batch": "b06-progression",
+   "group": "progression",
+   "lenses": [
+    48,
+    49,
+    50,
+    51,
+    52
+   ],
+   "lens_spec": "48,49,50,51,52"
+  },
+  {
+   "batch": "b07-interface",
+   "group": "interface",
+   "lenses": [
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60
+   ],
+   "lens_spec": "53,54,55,56,57,58,59,60"
+  }
+ ]
+}

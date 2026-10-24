@@ -4,6 +4,10 @@ UNITY=${UNITY:-$HOME/Unity/Hub/Editor/6000.5.9f1/Editor/Unity}
 WORK=${CG_WORK:-/tmp/cars-qa}          # tmpfs is ideal: each project copy is ~3 GB
 SIM=${SIM:-$WORK/sim}                  # a full project copy; one batch Unity per copy at a time
 mkdir -p "$WORK"
+# Unity's Linux PlayerPrefs are shared by company/product, even across project copies.
+# Keep QA progression and Editor preferences outside the user's actual game profile.
+export XDG_CONFIG_HOME="${CG_QA_CONFIG_HOME:-$WORK/config}"
+mkdir -p "$XDG_CONFIG_HOME"
 # fontTools for loc-bake.sh lives in an older user site-packages on this machine.
 export PYTHONPATH=${PYTHONPATH:-$HOME/.local/lib/python3.10/site-packages}
 
