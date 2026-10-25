@@ -23,6 +23,15 @@ namespace RacingGame.Tests
                 float original = path.halfWidth;
                 map = AbyssTrack.Create(path);
                 int mask = 1 << LayerMask.NameToLayer("Track");
+                Physics.SyncTransforms();
+                Vector3 finish = path.Position(path.startLineDistance);
+                Assert.IsTrue(Physics.Raycast(finish + Vector3.up * 2f, Vector3.down, out var finishHit, 4f, mask));
+                Assert.LessOrEqual(finishHit.point.y, finish.y + 0.005f,
+                    "The visible finish paint must not create a raised physical edge");
+                var markings = map.transform.Find("Markings");
+                Assert.IsNotNull(markings);
+                Assert.IsNotEmpty(markings.GetComponentsInChildren<MeshRenderer>());
+                Assert.IsEmpty(markings.GetComponentsInChildren<Collider>());
                 bool Floor(float lane)
                 {
                     Physics.SyncTransforms();

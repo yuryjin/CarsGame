@@ -35,6 +35,8 @@ namespace RacingGame.Tests
             Impacts++;
             WorstSpeed = Mathf.Max(WorstSpeed, v);
             if (progress != null && ImpactDistances.Count < 64) ImpactDistances.Add(progress.Distance);
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CG_TRACE")))
+                Debug.Log($"[WallImpact] {name} d={progress?.Distance:F1} hit={c.collider.name} parent={c.collider.transform.parent?.name} speed={v:F1} point={c.GetContact(0).point} normal={c.GetContact(0).normal}");
         }
     }
 
@@ -54,7 +56,7 @@ namespace RacingGame.Tests
         [Serializable] public class CarReport
         {
             public string name, body; public bool player, finished;
-            public int laps, deaths, kills, autoResets, aiResets, wallImpacts;
+            public int laps, deaths, kills, autoResets, aiResets, wallImpacts, shortcuts, resets;
             public float offTrackSeconds, worstImpact, maxLateral, finishSeconds;
             public float distance, speed, desiredSpeed, stuckSeconds; public int nextGate;
             public float[] lapSeconds; public float[] impactAt;
@@ -62,6 +64,7 @@ namespace RacingGame.Tests
         [Serializable] public class Report
         {
             public string evt, tier, parameters; public int seed, ticks, shots, hits, mines, mineHits;
+            public bool turretsEnabled, reversed;
             public float raceSeconds; public CarReport[] cars;
         }
 
@@ -126,6 +129,8 @@ namespace RacingGame.Tests
             ev.unlockAfterEventId = "";
             if (rivals >= 0) ev.aiCountOverride = rivals;
             if (laps > 0) ev.laps = laps;
+            string reverse = Env("CG_REVERSE", "");
+            if (reverse.Length > 0) ev.reversed = reverse == "1";
 
             var director = RaceDirector.Instance;
             director.raceSeed = seed;
@@ -134,6 +139,9 @@ namespace RacingGame.Tests
             race.spawner.aiBodyVariety = Env("CG_AI_BODIES", "1") != "0";
             flow.StartRace(ev, tier);
             Assert.AreEqual(RaceState.Countdown, race.State, "The measuring race must actually start");
+            bool turretsEnabled = Env("CG_TURRETS", "1") != "0";
+            if (!turretsEnabled)
+                foreach (var turret in UnityEngine.Object.FindObjectsByType<SpaceTurret>()) turret.enabled = false;
             bus.Execute("autopilot", "on");
 
             var drivers = new List<RaceParticipant>(race.Participants);
@@ -151,15 +159,19 @@ namespace RacingGame.Tests
             var finishTick = new Dictionary<RaceParticipant, int>();
             foreach (var p in drivers) { lapTicks[p] = new List<int>(); lastLaps[p] = 0; off[p] = 0f; maxLat[p] = 0f; }
 
-            // CG_TRACE="from to" (metres along the loop, may wrap): track geometry there plus every car inside
+            // CG_TRACE="from to" (metres along the loop, may wrap), or "all": track geometry plus every car inside
             // the zone twice a second, written next to CG_OUT as *.trace.txt.
             string traceZone = Env("CG_TRACE", "");
             StringBuilder trace = null; float traceFrom = 0f, traceTo = 0f;
             var tracePath = TrackPath.Instance;
             if (traceZone.Length > 0 && tracePath != null)
             {
-                var z = traceZone.Split(' ');
-                traceFrom = float.Parse(z[0], CultureInfo.InvariantCulture); traceTo = float.Parse(z[1], CultureInfo.InvariantCulture);
+                if (traceZone == "all") { traceFrom = 0f; traceTo = tracePath.Length - 0.001f; }
+                else
+                {
+                    var z = traceZone.Split(' ');
+                    traceFrom = float.Parse(z[0], CultureInfo.InvariantCulture); traceTo = float.Parse(z[1], CultureInfo.InvariantCulture);
+                }
                 trace = new StringBuilder();
                 trace.AppendLine($"# length={tracePath.Length:F1} halfWidth={tracePath.halfWidth:F2}");
                 trace.AppendLine("# d  kappa(rad/m,+right)  profileKmh  lane  pos");
@@ -174,7 +186,7 @@ namespace RacingGame.Tests
                     trace.AppendLine(string.Format(CultureInfo.InvariantCulture, "G {0,6:F1} {1,7:F4} {2,6:F1} {3,5:F2} ({4:F1},{5:F1})",
                         d, k, tracePath.Profile.SpeedAt(d) * 3.6f, tracePath.Profile.LaneAt(d), pos.x, pos.z));
                 }
-                trace.AppendLine("# tick car d lat(+right) kmh along thr steer brk stuck rev resets deaths yawDegS pathCurv(rad/m) x z surface");
+                trace.AppendLine("# tick car d lat(+right) kmh along thr steer brk stuck rev aiResets deaths yawDegS pathCurv(rad/m) x z surface desiredKmh y totalResets lane targetLane health wallRide gravityY staggered");
             }
 
             while (race.State == RaceState.Countdown) yield return null;
@@ -208,11 +220,13 @@ namespace RacingGame.Tests
                             float yawDeg = p.Car.Body.angularVelocity.y * Mathf.Rad2Deg;
                             float speedMs = p.Car.Body.linearVelocity.magnitude;
                             trace.AppendLine(string.Format(CultureInfo.InvariantCulture,
-                                "C {0} {1} {2:F1} {3:F2} {4:F1} {5:F1} {6:F2} {7:F2} {8} {9:F2} {10} {11} {12} {13:F1} {14:F3} {15:F1} {16:F1} {17}",
+                                "C {0} {1} {2:F1} {3:F2} {4:F1} {5:F1} {6:F2} {7:F2} {8} {9:F2} {10} {11} {12} {13:F1} {14:F3} {15:F1} {16:F1} {17} {18:F1} {19:F2} {20} {21:F2} {22:F2} {23:F1} {24} {25:F3} {26}",
                                 tick - startTick, p.name, p.Progress.Distance, signedLat, Mathf.Abs(p.Car.SpeedKmh), p.Progress.SpeedAlongTrack,
                                 cmd.Throttle, cmd.Steer, cmd.Brake ? 1 : 0, ai != null ? ai.StuckTime : 0f, ai != null && ai.Reversing ? 1 : 0,
                                 ai != null ? ai.ResetCount : 0, p.Deaths, yawDeg, speedMs > 1f ? yawDeg * Mathf.Deg2Rad / speedMs : 0f,
-                                p.transform.position.x, p.transform.position.z, p.Car.Surface));
+                                p.transform.position.x, p.transform.position.z, p.Car.Surface, ai != null ? ai.LastDesiredSpeed : 0f, p.transform.position.y, p.Resets,
+                                ai != null ? ai.CurrentLane : 0f, ai != null ? ai.TargetLane : 0f,
+                                p.Health.Health, p.Car.WallRiding ? 1 : 0, p.Car.GravityUp.y, p.Car.IsStaggered ? 1 : 0));
                         }
                     }
                 }
@@ -224,7 +238,7 @@ namespace RacingGame.Tests
                 evt = evtId, tier = tierId, parameters = parameters, seed = seed,
                 ticks = SimulationDriver.Instance.Tick - startTick,
                 shots = director.ShotsFired, hits = director.ShellHits,
-                mines = director.MinesDropped, mineHits = director.MineHits
+                mines = director.MinesDropped, mineHits = director.MineHits, turretsEnabled = turretsEnabled, reversed = ev.reversed
             };
             report.raceSeconds = report.ticks * SimulationDriver.FixedStep;
             var cars = new List<CarReport>();
@@ -239,7 +253,7 @@ namespace RacingGame.Tests
                 {
                     name = p.name, body = p.GetComponent<CarBody>() != null ? p.GetComponent<CarBody>().BodyId : "", player = p.isPlayer, finished = finishTick.ContainsKey(p),
                     finishSeconds = finishTick.TryGetValue(p, out int ft) ? (ft - startTick) * SimulationDriver.FixedStep : -1f,
-                    laps = p.Progress.LapsCompleted, deaths = p.Deaths, kills = p.Kills, autoResets = p.AutoResets,
+                    laps = p.Progress.LapsCompleted, deaths = p.Deaths, kills = p.Kills, autoResets = p.AutoResets, shortcuts = p.Shortcuts, resets = p.Resets,
                     aiResets = ai != null ? ai.ResetCount : 0, wallImpacts = wc != null ? wc.Impacts : 0,
                     worstImpact = wc != null ? wc.WorstSpeed : 0f, impactAt = wc != null ? wc.ImpactDistances.ToArray() : new float[0],
                     offTrackSeconds = off[p], maxLateral = maxLat[p], lapSeconds = lapsSec,

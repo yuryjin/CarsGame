@@ -33,6 +33,7 @@ MonoBehaviour:
   ambientEquator: {r: 0.25, g: 0.28, b: 0.42, a: 1}
   ambientGround: {r: 0.04, g: 0.04, b: 0.06, a: 1}
   reflectionIntensity: 1
+  reflectionFill: {r: 0.55, g: 0.6, b: 0.7, a: 1}
   mountainColor: {r: 0.06, g: 0.08, b: 0.14, a: 1}
   postExposure: 0.35
   saturation: 10

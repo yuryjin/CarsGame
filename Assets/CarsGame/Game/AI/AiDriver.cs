@@ -105,7 +105,13 @@ namespace RacingGame
             recoveryDistance = progress != null ? progress.Distance : 0f;
             passDirection = 0; boxedIn = false; clearTime = 0f;
             if (path != null && progress != null)
-                currentLane = targetLane = path.Spline.LateralOffset(transform.position, progress.Distance);
+            {
+                currentLane = path.Spline.LateralOffset(transform.position, progress.Distance);
+                // A narrowed road can make the respawn lane unsafe to hold. Keep
+                // the actual starting lane, then move inward from the next command.
+                float limit = Mathf.Max(0.5f, path.halfWidth - laneEdgeMargin);
+                targetLane = Mathf.Clamp(currentLane, -limit, limit);
+            }
             if (delayBuffer != null) System.Array.Clear(delayBuffer, 0, delayBuffer.Length);
             delayHead = 0;
         }
@@ -251,12 +257,11 @@ namespace RacingGame
             desired = Mathf.Min(desired, bombSpeedLimit);
             LastDesiredSpeed = desired; LastCurvature = curvature;
 
-            float throttle;
             bool brake = false;
+            // Follow the planned braking envelope continuously. A 5 km/h coast
+            // band lets heavy bodies enter a tight bend above their turning limit.
             // Negative throttle brakes without the handbrake's 60% grip loss.
-            if (speedKmh > desired + 5f) throttle = -1f;
-            else if (speedKmh > desired) throttle = 0f;
-            else throttle = 1f;
+            float throttle = Mathf.Clamp((desired - speedKmh) / 3f, -1f, 1f);
             if (sideSlip > 3f) throttle = Mathf.Min(throttle, 0f);
 
             // Start ramp so the grid does not pile into itself.

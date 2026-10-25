@@ -1798,6 +1798,18 @@ MonoBehaviour:
     m_Localized: "Volta 3: a estrada est\xE1 mais estreita. Fique no centro!"
     m_Metadata:
       m_Items: []
+  - m_Id: 18889347927715840
+    m_Localized: JOGUE AGORA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881664
+    m_Localized: "CARREIRA \xB7 BLOQUEADO"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881665
+    m_Localized: Top 3 em {name} para desbloquear
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -34,13 +34,20 @@ namespace RacingGame
             public UiButton[] buttons;
             public string[] texts;
             public UiLabel[] labels;
+            public UiReticle reticle;
             public Perf perf;
             public ResourceCounts resources;
         }
 
         [Serializable] public class ResourceCounts
         {
-            public int materials, meshes, renderTextures, gameObjects, audioClips;
+            public int materials, physicsMaterials, textures, meshes, renderTextures, gameObjects, audioClips;
+        }
+
+        [Serializable] public class UiReticle
+        {
+            public bool visible, locked;
+            public float x, y;
         }
 
         [Serializable] public class UiButton
@@ -138,6 +145,8 @@ namespace RacingGame
                     case "resources":
                         lastResources = new ResourceCounts {
                             materials = Resources.FindObjectsOfTypeAll<Material>().Length,
+                            physicsMaterials = Resources.FindObjectsOfTypeAll<PhysicsMaterial>().Length,
+                            textures = Resources.FindObjectsOfTypeAll<Texture2D>().Length,
                             meshes = Resources.FindObjectsOfTypeAll<Mesh>().Length,
                             renderTextures = Resources.FindObjectsOfTypeAll<RenderTexture>().Length,
                             gameObjects = FindObjectsByType<GameObject>(FindObjectsInactive.Include).Length,
@@ -285,6 +294,7 @@ namespace RacingGame
                 buttons = lastCommand == "ui" ? ReadButtons() : null,
                 texts = lastCommand == "ui" ? ReadTexts() : null,
                 labels = lastCommand == "ui" ? ReadLabels() : null,
+                reticle = lastCommand == "ui" ? ReadReticle() : null,
                 lastCommand = lastCommand, error = lastError, perf = perfOn ? lastPerf : null,
                 resources = lastCommand == "resources" ? lastResources : null
             };
@@ -303,6 +313,15 @@ namespace RacingGame
                     width = rect.rect.width * rect.lossyScale.x, height = rect.rect.height * rect.lossyScale.y, interactable = button.IsInteractable() });
             }
             return list.ToArray();
+        }
+
+        private UiReticle ReadReticle()
+        {
+            var hud = GetComponent<HudScreen>();
+            if (hud == null) return null;
+            Vector2 point = hud.ReticleScreenPosition;
+            return new UiReticle { visible = hud.ReticleVisible, locked = hud.ReticleLocked,
+                x = point.x / Screen.width, y = 1f - point.y / Screen.height };
         }
 
         private static string[] ReadTexts()

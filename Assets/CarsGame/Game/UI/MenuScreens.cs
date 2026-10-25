@@ -83,6 +83,7 @@ namespace RacingGame
             }
             if (transition != null) transition.alpha = Mathf.MoveTowards(transition.alpha, 1f, Time.unscaledDeltaTime * 7f);
             if (string.IsNullOrEmpty(current)) return;
+            if (RefreshDailyCard()) return;
             var rect = ((RectTransform)canvas.transform).rect;
             if (Mathf.Abs(rect.width - layoutWidth) > 1f || Mathf.Abs(rect.height - layoutHeight) > 1f) { Rebuild(); return; }
             if (current != "main" && (Keyboard.current?.escapeKey.wasPressedThisFrame == true || Gamepad.current?.buttonEast.wasPressedThisFrame == true))
@@ -169,12 +170,20 @@ namespace RacingGame
             Canvas.ForceUpdateCanvases();
             if (panel == null) return;
             foreach (var scroll in panel.GetComponentsInChildren<ScrollRect>())
-                scroll.verticalNormalizedPosition = scrollPositions.TryGetValue(scroll.name, out float position) ? position : 1f;
+            {
+                scroll.StopMovement();
+                scroll.verticalNormalizedPosition = 1f;
+            }
             var buttons = panel.GetComponentsInChildren<Button>();
             Button focus = Array.Find(buttons, b => b.interactable && b.name == selected)
                 ?? (name == "results" ? Array.Find(buttons, b => b.interactable && b.name == "ResultAction0") : null)
                 ?? Array.Find(buttons, b => b.interactable && b.name != "Back");
             if (focus != null) EventSystem.current?.SetSelectedGameObject(focus.gameObject);
+            // OnSelect reveals keyboard focus. During a refresh the player may
+            // have scrolled away from that control, so restore their view last.
+            foreach (var scroll in panel.GetComponentsInChildren<ScrollRect>())
+                if (scrollPositions.TryGetValue(scroll.name, out float position))
+                    scroll.verticalNormalizedPosition = position;
         }
 
         private string Coins() => Loc.Format("menu.coins", "n", PlatformGlue.Save != null ? PlatformGlue.Save.Data.Coins : 0);
@@ -356,28 +365,39 @@ namespace RacingGame
                 }
             }
             var content = UiFactory.Scroll(body, "EventsScroll", Vector2.zero, new Vector2(0f, tiers.Length > 0 ? -90f : 0f));
-            BuildCups(content);
             var list = Events();
-            for (int i = 0; i < list.Count; i++)
+            // Surface the modes a new player can actually enter before the locked career chain.
+            // Keep the original indices for card numbers and campaign progression.
+            foreach (bool available in new[] { true, false })
             {
-                var ev = list[i]; bool unlocked = flow.IsUnlocked(ev);
-                var row = Item(content, ev.eventId, Narrow ? 310f : 270f);
-                Label(row, "Number", (i + 1).ToString("00"), 52f, Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(116f, -24f), unlocked ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
-                Label(row, "Name", Loc.Get(ev.nameKey), 34f, Top, Vector2.one, new Vector2(144f, -60f), new Vector2(-236f, -12f)).fontStyle = FontStyles.Bold;
-                int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[tierIndex].aiCount : 3;
-                string detail = ev.mode == EventMode.Mission ? Loc.Format("mission.detail", "n", rivals)
-                    : Loc.Format("events.laps", "n", ev.laps) + "   /   " + Loc.Format("events.rivals", "n", rivals) + TwistSuffix(ev);
-                Label(row, "Stats", detail, 23f, Top, Vector2.one, new Vector2(144f, -96f), new Vector2(-236f, -58f), UiFactory.Muted);
-                var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
-                int starMask = best != null ? best.stars : 0;
-                string s1 = (starMask & 1) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
-                string s2 = (starMask & 2) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
-                string s3 = (starMask & 4) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
-                string starDisplay = s1 + " " + StarGoalText.Description(ev, 0) + "\n" + s2 + " " + StarGoalText.Description(ev, 1) + "\n" + s3 + " " + StarGoalText.Description(ev, 2);
-                Label(row, "Stars", starDisplay, 22f, Top, Vector2.one, new Vector2(144f, -222f), new Vector2(-236f, -98f));
-                string status = unlocked ? best != null && best.bestTimeMs > 0 ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) : "" : Loc.Get("events.locked");
-                Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 64f : 44f), unlocked ? UiFactory.Positive : UiFactory.Muted);
-                UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—", unlocked ? () => flow.StartRace(ev, tiers.Length > 0 ? tiers[tierIndex] : null) : null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-216f, -36f), new Vector2(-24f, 36f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
+                if (!available) BuildCups(content);
+                if (!list.Exists(e => flow.IsUnlocked(e) == available)) continue;
+                Section(content, available ? "AvailableEventsTitle" : "LockedEventsTitle",
+                    Loc.Get(available ? "events.available" : "events.career_locked"));
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var ev = list[i]; bool unlocked = flow.IsUnlocked(ev);
+                    if (unlocked != available) continue;
+                    var row = Item(content, ev.eventId, Narrow ? 310f : 270f);
+                    Label(row, "Number", (i + 1).ToString("00"), 52f, Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(116f, -24f), unlocked ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
+                    Label(row, "Name", Loc.Get(ev.nameKey), 34f, Top, Vector2.one, new Vector2(144f, -60f), new Vector2(-236f, -12f)).fontStyle = FontStyles.Bold;
+                    int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[tierIndex].aiCount : 3;
+                    string detail = ev.mode == EventMode.Mission ? Loc.Format("mission.detail", "n", rivals)
+                        : Loc.Format("events.laps", "n", ev.laps) + "   /   " + Loc.Format("events.rivals", "n", rivals) + TwistSuffix(ev);
+                    Label(row, "Stats", detail, 23f, Top, Vector2.one, new Vector2(144f, -96f), new Vector2(-236f, -58f), UiFactory.Muted);
+                    var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
+                    int starMask = best != null ? best.stars : 0;
+                    string s1 = (starMask & 1) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
+                    string s2 = (starMask & 2) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
+                    string s3 = (starMask & 4) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
+                    string starDisplay = s1 + " " + StarGoalText.Description(ev, 0) + "\n" + s2 + " " + StarGoalText.Description(ev, 1) + "\n" + s3 + " " + StarGoalText.Description(ev, 2);
+                    Label(row, "Stars", starDisplay, 22f, Top, Vector2.one, new Vector2(144f, -222f), new Vector2(-236f, -98f));
+                    var prerequisite = unlocked ? null : list.Find(e => e.eventId == ev.unlockAfterEventId);
+                    string status = unlocked ? best != null && best.bestTimeMs > 0 ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) : ""
+                        : prerequisite != null ? Loc.Format("events.locked_after", "name", Loc.Get(prerequisite.nameKey)) : Loc.Get("events.locked");
+                    Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 64f : 44f), unlocked ? UiFactory.Positive : UiFactory.Muted);
+                    UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—", unlocked ? () => flow.StartRace(ev, tiers.Length > 0 ? tiers[tierIndex] : null) : null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-216f, -36f), new Vector2(-24f, 36f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
+                }
             }
         }
 

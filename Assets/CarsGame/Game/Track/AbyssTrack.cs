@@ -9,6 +9,7 @@ namespace RacingGame
     {
         public const float WideHalfWidth = 5f;
         public const float NarrowHalfWidth = 3f;
+        public const int LayoutVersion = 3; // Finish paint no longer changes the driving surface.
         private TrackPath path;
         private RaceProgress progress;
         private float originalWidth;
@@ -71,6 +72,7 @@ namespace RacingGame
         private void Build(Material material)
         {
             var road = new MeshChunkWriter("AbyssRoad");
+            var markings = new MeshChunkWriter("AbyssMarkings");
             var edges = new MeshChunkWriter("AbyssShoulders");
             var walls = new MeshChunkWriter("AbyssBarriers");
             int count = Mathf.CeilToInt(path.Length / 2f);
@@ -92,9 +94,11 @@ namespace RacingGame
                 }
             // A visible finish line remains after the shoulders disappear.
             path.Pose(path.startLineDistance, 0f, out var start, out var rotation);
-            LowPoly.GroundQuad(road, start, rotation * Vector3.forward, NarrowHalfWidth, 0.35f,
+            // Paint must not become a raised collision edge that launches cars at speed.
+            LowPoly.GroundQuad(markings, start, rotation * Vector3.forward, NarrowHalfWidth, 0.35f,
                 new Color32(235, 235, 225, 0), start.y + 0.025f);
             AddMeshes("Road", road, material);
+            AddMeshes("Markings", markings, material, false);
             shoulders = AddMeshes("Shoulders", edges, material);
             barriers = AddMeshes("Barriers", walls, material);
         }
@@ -114,7 +118,7 @@ namespace RacingGame
             writer.AddQuad(d + down, c + down, b + down, a + down, cliff);
         }
 
-        private GameObject AddMeshes(string groupName, MeshChunkWriter writer, Material material)
+        private GameObject AddMeshes(string groupName, MeshChunkWriter writer, Material material, bool solid = true)
         {
             var group = new GameObject(groupName);
             group.transform.SetParent(transform, false);
@@ -122,12 +126,12 @@ namespace RacingGame
             foreach (var mesh in writer.Finish())
             {
                 meshes.Add(mesh);
-                var go = new GameObject(mesh.name, typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider));
+                var go = new GameObject(mesh.name, typeof(MeshFilter), typeof(MeshRenderer));
                 go.transform.SetParent(group.transform, false);
                 if (layer >= 0) go.layer = layer;
                 go.GetComponent<MeshFilter>().sharedMesh = mesh;
                 go.GetComponent<MeshRenderer>().sharedMaterial = material;
-                go.GetComponent<MeshCollider>().sharedMesh = mesh;
+                if (solid) go.AddComponent<MeshCollider>().sharedMesh = mesh;
             }
             return group;
         }

@@ -138,6 +138,12 @@ namespace RacingGame
 
         public void ClearAimCommit() { aimCommitted = false; }
 
+        public bool TryGetSpecialAim(out Vector3 point)
+        {
+            point = transform.position;
+            return specialAttack != null && specialAttack.TryGetAimPoint(PrimaryWeaponCatalog.Get(profile), out point);
+        }
+
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();

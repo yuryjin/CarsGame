@@ -76,7 +76,7 @@ namespace RacingGame
         public float lockConeDegrees = 9f;
         public float lockMinRange = 6f, lockMaxRange = 45f;
         private static readonly Color ReticleIdle = new Color(1f, 1f, 1f, 0.85f), ReticleLockedColor = new Color(1f, 0.25f, 0.2f, 1f);
-        private RectTransform hudRoot, reticle;
+        private RectTransform hudRoot, reticle, combatFeedback, incomingPanel;
         private readonly Image[] reticleArms = new Image[8];
         private Image[] ammoPips = new Image[0];
         private float reticlePunch;
@@ -124,6 +124,8 @@ namespace RacingGame
 
         /// <summary>True while a rival is inside the lock cone with a clear line of fire.</summary>
         public bool ReticleLocked { get; private set; }
+        public bool ReticleVisible => reticle != null && reticle.gameObject.activeInHierarchy;
+        public Vector2 ReticleScreenPosition => reticle != null ? RectTransformUtility.WorldToScreenPoint(null, reticle.position) : Vector2.zero;
         private bool touchLayout;
         private float layoutWidth = -1f;
         private RectTransform pausePanel;
@@ -230,16 +232,21 @@ namespace RacingGame
             lowHpEdges[2] = UiFactory.Panel(root, "LowHpT", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -16f), Vector2.zero, red, roundedCorners: false).GetComponent<Image>();
             lowHpEdges[3] = UiFactory.Panel(root, "LowHpB", new Vector2(0f, 0f), new Vector2(1f, 0f), Vector2.zero, new Vector2(0f, 16f), red, roundedCorners: false).GetComponent<Image>();
             foreach (var e in lowHpEdges) { e.raycastTarget = false; e.gameObject.SetActive(false); }
-            hitMarker = UiFactory.Text(reticle, "HitMarker", "×", 64f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-60f, -60f), new Vector2(60f, 60f), HitmarkerNormalColor);
+            // Hit confirmation also applies to radial pulses and rear traps,
+            // independently of whether a forward aiming marker exists.
+            combatFeedback = UiFactory.Panel(root, "CombatFeedback", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-36f, -36f), new Vector2(36f, 36f));
+            hitMarker = UiFactory.Text(combatFeedback, "HitMarker", "×", 64f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-60f, -60f), new Vector2(60f, 60f), HitmarkerNormalColor);
             hitMarker.gameObject.SetActive(false);
-            combatText = UiFactory.Text(reticle, "HitOutcome", "", 22f, TextAlignmentOptions.Center,
+            combatText = UiFactory.Text(combatFeedback, "HitOutcome", "", 22f, TextAlignmentOptions.Center,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-180f, 60f), new Vector2(180f, 100f));
             combatText.fontStyle = FontStyles.Bold;
             UiFactory.SetOutline(combatText, 0.25f);
             incomingArrow = UiFactory.Text(root, "IncomingDirection", "▲", 44f, TextAlignmentOptions.Center,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-28f, -28f), new Vector2(28f, 28f), CriticalColor);
-            incomingText = UiFactory.Text(root, "IncomingSource", "", 23f, TextAlignmentOptions.Center,
-                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-260f, -150f), new Vector2(260f, -112f));
+            incomingPanel = UiFactory.Card(root, "IncomingPanel", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-260f, -150f), new Vector2(260f, -112f), HudPanelAlpha);
+            incomingText = UiFactory.Text(incomingPanel, "IncomingSource", "", 23f, TextAlignmentOptions.Center,
+                Vector2.zero, Vector2.one, new Vector2(10f, 6f), new Vector2(-10f, -6f));
+            incomingPanel.gameObject.SetActive(false);
             incomingArrow.gameObject.SetActive(false); incomingText.gameObject.SetActive(false);
             goalsPanel = UiFactory.Card(root, "LiveGoals", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(30f, -342f), new Vector2(530f, -190f), HudPanelAlpha);
             goalsText = UiFactory.Text(goalsPanel, "Goals", "", 23f, TextAlignmentOptions.MidlineLeft,
@@ -633,30 +640,42 @@ namespace RacingGame
             for (int i = 0; i < reticleArms.Length; i++) if (reticleArms[i] != null) reticleArms[i].color = c;
         }
 
-        // Where the shell will be after aimDistance: muzzle, launch velocity (barrel + car), gravity drop.
+        // Projectile ballistics and contact weapons have different aiming geometry.
         private void UpdateReticle()
         {
             bool show = playerCar != null && playerCannon != null && !playerCannon.locked && playerCannon.muzzle != null && race.State >= RaceState.Countdown && race.State < RaceState.Finished
                         && (playerHealth == null || !playerHealth.IsDead);
             var cam = Camera.main;
+            var shot = PrimaryWeaponCatalog.Get(playerCar != null && playerCar.Weapons != null ? playerCar.Weapons.PrimaryType : PrimaryWeaponType.Cannon);
+            // A radial pulse or a trap behind the car has no forward aiming point.
+            show &= shot.Mode != WeaponMode.Trap && shot.Mode != WeaponMode.Pulse;
             if (!show || cam == null) { if (reticle.gameObject.activeSelf) reticle.gameObject.SetActive(false); ClearLock(); return; }
 
             var muzzle = playerCannon.muzzle;
-            Vector3 velocity = muzzle.forward * playerCannon.shellSpeed + playerCar.Body.linearVelocity;
-            float distance = playerCannon.HasAimCommit ? Vector3.Distance(muzzle.position, playerCannon.AimCommitPoint) : aimDistance;
-            float t = distance / Mathf.Max(1f, playerCannon.shellSpeed);
-            Vector3 aim = muzzle.position + velocity * t + 0.5f * t * t * Physics.gravity;
+            bool projectile = shot.Mode == WeaponMode.Projectile;
+            bool specialLocked = false;
+            Vector3 aim;
+            if (projectile)
+            {
+                Vector3 velocity = muzzle.forward * playerCannon.shellSpeed + playerCar.Body.linearVelocity;
+                float distance = playerCannon.HasAimCommit ? Vector3.Distance(muzzle.position, playerCannon.AimCommitPoint) : aimDistance;
+                float t = distance / Mathf.Max(1f, playerCannon.shellSpeed);
+                aim = muzzle.position + velocity * t + 0.5f * t * t * Physics.gravity;
+            }
+            else specialLocked = playerCannon.TryGetSpecialAim(out aim);
             Vector3 sp = cam.WorldToScreenPoint(aim);
             if (sp.z <= 0f) { reticle.gameObject.SetActive(false); ClearLock(); return; }
             if (!reticle.gameObject.activeSelf) reticle.gameObject.SetActive(true);
             RectTransformUtility.ScreenPointToLocalPointInRectangle(hudRoot, sp, null, out Vector2 local);
             reticle.anchoredPosition = local;
 
-            if (++lockCheckFrame >= 5)
+            if (!projectile || ++lockCheckFrame >= 5)
             {
                 lockCheckFrame = 0;
-                bool locked = TargetFinder.Find(playerCar, muzzle.position, muzzle.forward, lockConeDegrees, lockMinRange, lockMaxRange) != null
-                    || TargetFinder.FindUnit(playerCar, muzzle.position, muzzle.forward, lockConeDegrees, lockMinRange, lockMaxRange * 1.5f) != null;
+                bool locked = specialLocked || (projectile && (
+                    TargetFinder.Find(playerCar, muzzle.position, muzzle.forward, lockConeDegrees, lockMinRange, lockMaxRange) != null
+                    || TargetFinder.FindUnit(playerCar, muzzle.position, muzzle.forward, lockConeDegrees, lockMinRange, lockMaxRange * 1.5f) != null
+                    || TargetFinder.FindTurret(muzzle.position, muzzle.forward, lockConeDegrees, lockMinRange, lockMaxRange) != null));
                 if (locked != ReticleLocked)
                 {
                     ReticleLocked = locked;
@@ -827,11 +846,12 @@ namespace RacingGame
             hintPanel.offsetMin = bottom;
         }
 
-        // The live bomb card can grow for small screens or long translations. Keep the
-        // temporary teaching tip below it, restoring the normal row outside bomb races.
+        // Top-center cards can grow for small screens or long translations. Keep the
+        // teaching tip below both the bomb card and the test-drive return button.
         internal void PlaceHintBelowBomb(float bottomPixels)
         {
             if (!touchLayout || hintPanel == null || hudRoot == null) return;
+            if (gameFlow != null) bottomPixels = Mathf.Max(bottomPixels, gameFlow.TestDriveOverlayBottomPixels);
             float scale = Mathf.Max(0.01f, hudRoot.lossyScale.x);
             float top = Mathf.Max(layoutWidth < 1400f ? 292f : 202f, bottomPixels > 0f ? (bottomPixels + 6f) / scale : 0f);
             if (Mathf.Abs(hintPanel.offsetMax.y + top) < 0.01f) return;
@@ -874,9 +894,7 @@ namespace RacingGame
             Place(combatText.rectTransform, new Vector2(0.5f, 0.5f),
                 new Vector2(-combatHalfWidth, 30f / pixelScale), new Vector2(combatHalfWidth, 62f / pixelScale));
             incomingText.fontSize = Mathf.Max(23f, 13f / pixelScale);
-            float incomingHalfWidth = Mathf.Min(600f, Screen.width * 0.7f) / (2f * pixelScale);
-            Place(incomingText.rectTransform, new Vector2(0.5f, 0.5f),
-                new Vector2(-incomingHalfWidth, -70f / pixelScale), new Vector2(incomingHalfWidth, -43f / pixelScale));
+            LayoutIncomingFeedback();
             hitMarker.fontSize = Mathf.Max(64f, 28f / pixelScale);
             finishPanel.localScale = Vector3.one * (Mathf.Min(readable, (Screen.width - 32f) / 600f) / pixelScale);
             // Pause stays fully visible; help may scroll without shrinking the lesson text.
@@ -884,6 +902,17 @@ namespace RacingGame
             pauseControls.transform.localScale = Vector3.one * Mathf.Max(0.1f, pauseScale / pixelScale);
             helpPanel.localScale = Vector3.one * (readable / pixelScale);
             helpPanel.sizeDelta = new Vector2(Mathf.Min(1000f, (Screen.width - 32f) / readable), Mathf.Min(720f, (Screen.height - 32f) / readable));
+        }
+
+        private void LayoutIncomingFeedback()
+        {
+            float scale = Mathf.Max(0.01f, hudRoot.lossyScale.x);
+            float padding = 10f / scale;
+            float width = Mathf.Min(Mathf.Min(600f, Screen.width * 0.7f) / scale, incomingText.preferredWidth + padding * 2f);
+            float height = Mathf.Max(30f / scale, incomingText.GetPreferredValues(incomingText.text, width - padding * 2f, float.PositiveInfinity).y + 12f / scale);
+            Place(incomingPanel, new Vector2(0.5f, 0.5f), new Vector2(-width * 0.5f, -56f / scale - height * 0.5f), new Vector2(width * 0.5f, -56f / scale + height * 0.5f));
+            incomingText.rectTransform.offsetMin = new Vector2(padding, 6f / scale);
+            incomingText.rectTransform.offsetMax = new Vector2(-padding, -6f / scale);
         }
 
         /// <summary>Test hook: current layout mode.</summary>
@@ -1145,7 +1174,13 @@ namespace RacingGame
                 float k = 1f + 0.6f * countdownPunch * countdownPunch;
                 centerPanel.localScale = new Vector3(k, k, 1f);
             }
-            if (race != null) { UpdateReticle(); UpdateThreatMarkers(); UpdateToastAndWarnings(); }
+            if (race != null)
+            {
+                UpdateReticle(); UpdateThreatMarkers(); UpdateToastAndWarnings();
+                combatFeedback.anchoredPosition = reticle.gameObject.activeSelf ? reticle.anchoredPosition : Vector2.zero;
+                combatFeedback.gameObject.SetActive(playerCar != null && race.State >= RaceState.Countdown && race.State < RaceState.Finished
+                    && (playerHealth == null || !playerHealth.IsDead) && Time.unscaledTime <= hitMarkerUntil);
+            }
             if (shownCenter != centerText.text)
             {
                 shownCenter = centerText.text;
@@ -1318,7 +1353,9 @@ namespace RacingGame
                 var attacker = hit.Attacker != null ? hit.Attacker.GetComponent<RaceParticipant>() : null;
                 string name = attacker != null ? UiFactory.Escape(GetLocalizedRacerName(attacker.displayName)) : Loc.Get("combat.obstacle");
                 incomingText.text = name + " · " + outcome;
-                incomingText.color = incomingArrow.color = color;
+                incomingArrow.color = color;
+                incomingText.color = result.ShieldAbsorbed ? color : Color.white;
+                LayoutIncomingFeedback();
                 if (result.ShieldAbsorbed) SfxPlayer.Instance.PlayUi(SfxSynth.ShieldBreak, 0.65f);
             }
         }
@@ -1327,6 +1364,7 @@ namespace RacingGame
         {
             bool incoming = playerCar != null && Time.time < incomingUntil;
             incomingArrow.gameObject.SetActive(incoming);
+            incomingPanel.gameObject.SetActive(incoming);
             incomingText.gameObject.SetActive(incoming);
             if (incoming)
             {

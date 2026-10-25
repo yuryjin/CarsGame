@@ -10,6 +10,7 @@ namespace RacingGame
         private readonly CarController car;
         private CarController pendingTarget;
         private MissionUnit pendingUnit;
+        private SpaceTurret pendingTurret;
         private PrimaryWeaponCatalog.Profile pendingShot;
         private float pendingDamage;
         private int impactTick = -1;
@@ -31,7 +32,7 @@ namespace RacingGame
                 && PrimaryWeaponCatalog.Get(type).Mode != WeaponMode.Trap ? new WeaponRig(owner.transform, type) : null;
         }
 
-        public void Cancel() { impactTick = -1; pendingTarget = null; pendingUnit = null; rig?.Stop(); }
+        public void Cancel() { impactTick = -1; pendingTarget = null; pendingUnit = null; pendingTurret = null; rig?.Stop(); }
         public void UpdateVisual() => rig?.Update();
 
         public void Step(int tick)
@@ -43,14 +44,34 @@ namespace RacingGame
             if ((status != null && status.IsJammed) || (health != null && health.IsDead)) return;
             if (CanHit(pendingTarget, pendingShot)) Hit(pendingTarget, pendingShot, pendingDamage);
             else if (CanHit(pendingUnit, pendingShot)) HitUnit(pendingUnit, pendingDamage);
+            else if (CanHit(pendingTurret, pendingShot)) HitTurret(pendingTurret, pendingDamage);
             pendingTarget = null;
             pendingUnit = null;
+            pendingTurret = null;
+        }
+
+        // The aiming marker and the attack use the same reach, arc and occlusion rules.
+        public bool TryGetAimPoint(PrimaryWeaponCatalog.Profile shot, out Vector3 end)
+        {
+            FindTargets(shot, out var target, out var unit, out var turret, out end);
+            return CanHit(target, shot) || CanHit(unit, shot) || CanHit(turret, shot);
+        }
+
+        private void FindTargets(PrimaryWeaponCatalog.Profile shot, out CarController target, out MissionUnit unit, out SpaceTurret turret, out Vector3 end)
+        {
+            Vector3 origin = owner.transform.position + Vector3.up;
+            float arc = shot.Mode == WeaponMode.Pulse ? 180f : shot.Arc;
+            target = TargetFinder.Find(car, origin, owner.transform.forward, arc, 0.1f, shot.Range);
+            unit = target == null ? TargetFinder.FindUnit(car, origin, owner.transform.forward, arc, 0.1f, shot.Range) : null;
+            turret = target == null && unit == null ? TargetFinder.FindTurret(origin, owner.transform.forward, arc, 0.1f, shot.Range) : null;
+            end = target != null ? target.transform.position + Vector3.up * 0.5f
+                : unit != null ? unit.AimPointFrom(origin) : turret != null ? turret.AimPoint : origin + owner.transform.forward * shot.Range;
+            if (target == null && Physics.Linecast(origin, end, out var obstacle, TargetFinder.ObstacleMask, QueryTriggerInteraction.Ignore)) end = obstacle.point;
         }
 
         public void Fire(PrimaryWeaponCatalog.Profile shot, float damage, int tick)
         {
             var director = RaceDirector.Current ?? RaceDirector.Instance;
-            Vector3 origin = owner.transform.position + Vector3.up;
             if (shot.Mode == WeaponMode.Trap)
             {
                 Vector3 position = owner.transform.position - owner.transform.forward * 3f;
@@ -67,17 +88,14 @@ namespace RacingGame
                 return;
             }
 
-            var target = TargetFinder.Find(car, origin, owner.transform.forward, shot.Mode == WeaponMode.Pulse ? 180f : shot.Arc, 0.1f, shot.Range);
-            var unit = target == null ? TargetFinder.FindUnit(car, origin, owner.transform.forward, shot.Mode == WeaponMode.Pulse ? 180f : shot.Arc, 0.1f, shot.Range) : null;
-            Vector3 end = target != null ? target.transform.position + Vector3.up * 0.5f
-                : unit != null ? unit.AimPointFrom(origin) : origin + owner.transform.forward * shot.Range;
-            if (target == null && Physics.Linecast(origin, end, out var obstacle, TargetFinder.ObstacleMask, QueryTriggerInteraction.Ignore)) end = obstacle.point;
+            FindTargets(shot, out var target, out var unit, out var turret, out var end);
             rig?.Play(end, shot);
 
             if (shot.Mode == WeaponMode.Melee)
             {
                 pendingTarget = target;
                 pendingUnit = unit;
+                pendingTurret = turret;
                 pendingShot = shot;
                 pendingDamage = damage;
                 impactTick = tick + SimulationDriver.SecondsToTicks(Mathf.Min(0.18f, shot.Interval * 0.45f));
@@ -86,6 +104,7 @@ namespace RacingGame
             {
                 if (CanHit(target, shot)) Hit(target, shot, damage);
                 else if (CanHit(unit, shot)) HitUnit(unit, damage);
+                else if (CanHit(turret, shot)) HitTurret(turret, damage);
             }
             else
             {
@@ -95,6 +114,10 @@ namespace RacingGame
                 var units = MissionUnit.All;
                 for (int i = units.Count - 1; i >= 0; i--)
                     if (i < units.Count && CanHit(units[i], shot)) HitUnit(units[i], damage);
+                // Destroying a turret removes it from All, so iterate backwards.
+                var turrets = SpaceTurret.All;
+                for (int i = turrets.Count - 1; i >= 0; i--)
+                    if (i < turrets.Count && CanHit(turrets[i], shot)) HitTurret(turrets[i], damage);
             }
         }
 
@@ -130,6 +153,25 @@ namespace RacingGame
             if (!unit.TakeHit(owner, damage, point)) return;
             RaceDirector.Current?.CountHit(owner, unit.gameObject);
             EffectPool.Current?.PlayShellImpact(point);
+        }
+
+        private bool CanHit(SpaceTurret turret, PrimaryWeaponCatalog.Profile shot)
+        {
+            if (turret == null || !turret.IsAlive || !turret.isActiveAndEnabled) return false;
+            Vector3 origin = owner.transform.position + Vector3.up;
+            Vector3 offset = turret.AimPoint - origin;
+            if (offset.sqrMagnitude > shot.Range * shot.Range || offset.sqrMagnitude < 0.001f) return false;
+            if (shot.Mode != WeaponMode.Pulse && Vector3.Angle(owner.transform.forward, offset) > shot.Arc) return false;
+            return !Physics.Linecast(origin, turret.AimPoint, TargetFinder.ObstacleMask, QueryTriggerInteraction.Ignore);
+        }
+
+        private void HitTurret(SpaceTurret turret, float damage)
+        {
+            Vector3 point = turret.AimPoint;
+            if (!turret.TakeHit(owner, damage)) return;
+            RaceDirector.Current?.CountHit(owner, turret.gameObject);
+            EffectPool.Current?.PlayShellImpact(point);
+            if (PrimaryWeaponCatalog.Get(type).Mode == WeaponMode.Melee) WeaponSounds.MeleeHit(type, point);
         }
 
         private void Hit(CarController target, PrimaryWeaponCatalog.Profile shot, float damage)

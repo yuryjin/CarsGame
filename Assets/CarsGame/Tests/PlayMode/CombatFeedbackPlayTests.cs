@@ -119,6 +119,21 @@ namespace RacingGame.Tests
             Assert.AreEqual(0f, impulse.Energy, "Turning shake off clears an active effect");
             race.Player.Health.ApplyHit(new HitInfo(rival.gameObject, 10f));
             Assert.AreEqual(0f, impulse.Energy, "The accessibility setting suppresses subsequent hits");
+
+            // Radial weapons and rear traps have no forward crosshair, but their
+            // actual damage still needs a visible confirmation.
+            for (int i = 0; i < 110; i++) yield return null;
+            foreach (var type in new[] { PrimaryWeaponType.TeslaCoil, PrimaryWeaponType.MineDispenser })
+            {
+                race.Player.Car.Weapons.SetPrimaryType(type);
+                yield return null; yield return null;
+                Assert.IsFalse(race.GetComponent<HudScreen>().ReticleVisible);
+                var result = rival.Health.ApplyHit(new HitInfo(race.Player.gameObject, 7f));
+                Assert.AreEqual(7f, result.DamageDealt);
+                yield return null; yield return null;
+                Assert.IsTrue(text.gameObject.activeInHierarchy, type + " damage confirmation must survive hiding its aiming marker");
+                StringAssert.Contains("-7", text.text);
+            }
         }
     }
 }

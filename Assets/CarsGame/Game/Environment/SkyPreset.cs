@@ -40,6 +40,8 @@ namespace RacingGame.World
         public Color ambientEquator = new Color(0.55f, 0.55f, 0.55f);
         public Color ambientGround = new Color(0.20f, 0.18f, 0.15f);
         [Range(0f, 2f)] public float reflectionIntensity = 1f;
+        [Tooltip("Soft reflection-only fill for metallic cars against a dark sky. Black preserves the sky reflection exactly.")]
+        public Color reflectionFill = Color.black;
 
         [Header("Mountains / distant tint")]
         public Color mountainColor = new Color(0.55f, 0.62f, 0.75f);
@@ -67,5 +69,17 @@ namespace RacingGame.World
             SunGlow = sunGlow, SunGlowPower = sunGlowPower,
             MoonDir = MoonDirection, MoonColor = moonColor.linear, MoonSize1mCos = SkyMath.DiscSize(moonAngularRadius)
         };
+
+        /// <summary>Keep the visible sky dark while giving metal a readable sky-to-ground reflection.</summary>
+        public SkyParams ToReflectionParams()
+        {
+            var p = ToParams();
+            Color fill = reflectionFill.linear;
+            fill.a = 0f;
+            p.Zenith += fill;
+            p.Horizon += fill * 0.55f;
+            p.Ground += fill * 0.18f;
+            return p;
+        }
     }
 }

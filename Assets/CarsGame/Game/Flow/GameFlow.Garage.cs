@@ -10,6 +10,8 @@ namespace RacingGame
         public bool IsTestDrive => testDriveEvent != null;
         public bool ReturningFromTestDrive { get; private set; }
         public float TestDriveRemaining => Mathf.Max(0f, TestDriveSeconds - (float)race.RaceTime);
+        internal float TestDriveOverlayBottomPixels => testDriveTimer != null && testDriveCanvas.gameObject.activeInHierarchy
+            ? -((RectTransform)testDriveTimer.transform.parent).offsetMin.y * testDriveCanvas.scaleFactor : 0f;
         private RaceEventDefinition testDriveEvent, beforeTestEvent;
         private DifficultyTier beforeTestTier;
         private string beforeTestBody;
@@ -18,6 +20,7 @@ namespace RacingGame
         private int shownTestSecond = -1;
         private float testDrivePixelScale = -1f;
         private int testDriveScreenWidth, testDriveScreenHeight;
+        private bool testDriveTouch;
 
         public bool StartTestDrive(string bodyId)
         {
@@ -64,13 +67,17 @@ namespace RacingGame
                 bool visible = !PauseController.IsPaused;
                 if (testDriveCanvas.gameObject.activeSelf != visible) testDriveCanvas.gameObject.SetActive(visible);
                 float scale = Mathf.Max(0.01f, testDriveCanvas.transform.lossyScale.x);
-                if (visible && (Mathf.Abs(scale - testDrivePixelScale) > 0.001f || testDriveScreenWidth != Screen.width || testDriveScreenHeight != Screen.height))
+                bool touch = TouchControlsPresenter.IsShown;
+                if (visible && (Mathf.Abs(scale - testDrivePixelScale) > 0.001f || testDriveScreenWidth != Screen.width || testDriveScreenHeight != Screen.height || testDriveTouch != touch))
                 {
                     testDrivePixelScale = scale; testDriveScreenWidth = Screen.width; testDriveScreenHeight = Screen.height;
+                    testDriveTouch = touch;
                     var button = (RectTransform)testDriveTimer.transform.parent;
-                    float width = Mathf.Min(380f, Screen.width * 0.44f) / scale;
+                    float widthPixels = Mathf.Min(380f, Screen.width * 0.44f);
+                    if (hud != null) widthPixels = hud.ConstrainTopCenterWidth(widthPixels);
+                    float width = widthPixels / scale;
                     float height = Mathf.Max(44f, 68f * scale) / scale;
-                    float top = Mathf.Max(64f, 110f * scale) / scale;
+                    float top = Mathf.Max(44f, 110f * scale) / scale;
                     button.offsetMin = new Vector2(-width * 0.5f, -top - height);
                     button.offsetMax = new Vector2(width * 0.5f, -top);
                     testDriveTimer.fontSizeMax = Mathf.Max(26f, 14f / scale);

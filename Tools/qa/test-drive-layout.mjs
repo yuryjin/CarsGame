@@ -7,8 +7,9 @@ const output = process.env.OUT || '/tmp/cars-polish-20261024/test-drive';
 await fs.mkdir(output, { recursive: true });
 const browser = await chromium.launch({ channel: 'chrome', args: [...process.env.WEBTEST_CHROME_ARGS.split(' '), '--no-proxy-server'] });
 const evidence = [], errors = [];
+const languages = (process.env.CG_TESTDRIVE_LANGS || 'ru').split(',');
 try {
-  for (const [width, height] of [[1280, 720], [812, 375], [640, 360]]) {
+  for (const [width, height, language] of [[1280, 720], [812, 375], [640, 360]].flatMap(size => languages.map(language => [...size, language]))) {
     const mobile = width < 1000;
     const context = await browser.newContext({ viewport: { width, height }, hasTouch: mobile, isMobile: mobile });
     let page;
@@ -18,6 +19,7 @@ try {
       page.on('pageerror', e => errors.push(e.message));
       page.on('console', m => { if (/Exception|\[Loc\] missing key|character with Unicode.*not found/.test(m.text())) errors.push(m.text()); });
       const url = new URL(process.env.URL || 'http://127.0.0.1:8795/?sdk=mock');
+      url.searchParams.set('lang', language);
       if (mobile) url.searchParams.set('device', 'mobile');
       await page.goto(url.href);
       await page.waitForFunction(() => window.CarsPlatform?.debug?.log?.some(l => /LoadingAPI.ready|ready\(\)/.test(l)), null, { timeout: 180000 });
@@ -57,13 +59,15 @@ try {
       const during = await cmd('ui'); assert.equal(during.evt, 'garage_test');
       const button = during.buttons.find(b => b.name === 'ReturnToGarage'); assert(button);
       const label = during.labels.find(l => l.parent === 'ReturnToGarage'); assert(label);
-      evidence.push({ width, height, renderer, phase: 'drive', before, during });
-      await page.screenshot({ path: `${output}/${width}-drive.png` });
+      evidence.push({ width, height, language, renderer, phase: 'drive', before, during });
+      await page.screenshot({ path: `${output}/${language}-${width}-drive.png` });
       if (process.env.CG_BASELINE !== '1') {
         assert(button.height >= 43.5, 'Return to garage needs a usable touch target');
         assert(label.fontPixels >= 13.9 && !label.truncated && label.lines === 1, 'Return text must be legible');
+        for (const field of during.labels.filter(l => ['HpText','ActiveWeapon','Ammo','Hints','Timer'].includes(l.name)))
+          assert(!(Math.abs(button.x-field.x)*width<(button.width+field.width)/2-1 && Math.abs(button.y-field.y)*height<(button.height+field.height)/2-1), `Return button overlaps ${field.name}`);
         assert(!during.buttons.some(b => b.name === 'LiveGoals'), 'Practice must not promise permanent stars');
-        if (mobile) await click('PauseButton'); else await page.keyboard.press('Escape');
+        if (mobile) await click('PauseButton'); else await page.keyboard.press('Escape', { delay: 80 });
         const paused = await cmd('ui');
         assert(!paused.buttons.some(b => b.name === 'ReturnToGarage'), 'The test-drive overlay must yield to pause');
         await page.waitForTimeout(500);
@@ -75,12 +79,12 @@ try {
       assert.equal(after.screen, 'garage'); assert.equal(after.flow, 'Menu');
       assert.equal(after.coins, before.coins); assert.equal(after.races, before.races);
       assert.deepEqual(after.upgrades, before.upgrades);
-      evidence.push({ width, height, phase: 'returned', after });
-      console.log('PASS test drive', width, 'button height', button.height, 'font', label.fontPixels);
+      evidence.push({ width, height, language, phase: 'returned', after });
+      console.log('PASS test drive', language, width, 'button height', button.height, 'font', label.fontPixels);
     } catch (error) {
       if (page && !page.isClosed()) {
-        await page.screenshot({ path: `${output}/failure-${width}.png` }).catch(() => {});
-        evidence.push({ width, height, phase: 'failure', error: String(error),
+        await page.screenshot({ path: `${output}/failure-${language}-${width}.png` }).catch(() => {});
+        evidence.push({ width, height, language, phase: 'failure', error: String(error),
           state: await page.evaluate(() => window.CarsPlatform?.debug?.state).catch(() => null) });
       }
       throw error;

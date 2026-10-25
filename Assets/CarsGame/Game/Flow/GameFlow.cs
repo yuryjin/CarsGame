@@ -250,7 +250,11 @@ namespace RacingGame
             unchecked
             {
                 uint h = 2166136261u;
-                string s = (ev != null ? ev.eventId : "e1") + "|" + (track != null && track.reversed ? "R" : "F") + "|" + LayoutVersion + "|" + (track != null ? Mathf.RoundToInt(track.Length) : 0);
+                int version = track != null && track.Fork != null ? TrackFork.LayoutVersion
+                    : abyssTrack != null ? AbyssTrack.LayoutVersion
+                    : starRing != null ? StarRingTrack.LayoutVersion
+                    : wasteland != null ? WastelandTrack.LayoutVersion : LayoutVersion;
+                string s = (ev != null ? ev.eventId : "e1") + "|" + (track != null && track.reversed ? "R" : "F") + "|" + version + "|" + (track != null ? Mathf.RoundToInt(track.Length) : 0);
                 foreach (char c in s) h = (h ^ c) * 16777619u;
                 return (int)h;
             }

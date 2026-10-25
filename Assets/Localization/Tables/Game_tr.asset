@@ -1816,6 +1816,18 @@ MonoBehaviour:
     m_Localized: "3. tur: yol darald\u0131. Merkezde kal!"
     m_Metadata:
       m_Items: []
+  - m_Id: 18889347927715840
+    m_Localized: HEMEN OYNA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881664
+    m_Localized: "KAR\u0130YER \xB7 K\u0130L\u0130TL\u0130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881665
+    m_Localized: "A\xE7mak i\xE7in {name} yar\u0131\u015F\u0131nda ilk 3"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

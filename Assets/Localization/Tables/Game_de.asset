@@ -1794,6 +1794,18 @@ MonoBehaviour:
     m_Localized: 'Runde 3: Die Fahrbahn ist schmaler. Bleib in der Mitte!'
     m_Metadata:
       m_Items: []
+  - m_Id: 18889347927715840
+    m_Localized: JETZT SPIELEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881664
+    m_Localized: "KARRIERE \xB7 GESPERRT"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881665
+    m_Localized: Top 3 in {name} zum Freischalten
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

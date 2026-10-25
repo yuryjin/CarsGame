@@ -1798,6 +1798,18 @@ MonoBehaviour:
     m_Localized: "Tour 3 : la route est plus \xE9troite. Vise le centre !"
     m_Metadata:
       m_Items: []
+  - m_Id: 18889347927715840
+    m_Localized: JOUER MAINTENANT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881664
+    m_Localized: "CARRI\xC8RE \xB7 VERROUILL\xC9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881665
+    m_Localized: "Top 3 dans \xAB {name} \xBB pour d\xE9bloquer"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

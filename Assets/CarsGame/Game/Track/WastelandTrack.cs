@@ -16,6 +16,8 @@ namespace RacingGame
     /// </summary>
     public sealed class WastelandTrack : MonoBehaviour
     {
+        // Earlier ghosts used separate coplanar road/tunnel floor colliders.
+        public const int LayoutVersion = 3;
         public const float RailHeight = 1f, RailWidth = 0.5f, SkinDepth = 1.2f;
         public const float PadHalfWidth = 2f, PadLength = 6f, PadRadius = 2.2f;
         /// <summary>Tunnel cross-section: flat floor ±<see cref="TubeFloor"/>, fillets of <see cref="TubeFillet"/>, walls to the road edge.</summary>
@@ -333,7 +335,10 @@ namespace RacingGame
                     {
                         if (!TubePresent(j, ra) || !TubePresent(j + 1, ra) || !TubePresent(j, rb) || !TubePresent(j + 1, rb)) continue;
                         Vector2 pa = TubePoint(j, fa), qa = TubePoint(j + 1, fa), pb = TubePoint(j, fb), qb = TubePoint(j + 1, fb);
-                        tube.AddQuad(At(a, pa.x, pa.y), At(b, pb.x, pb.y), At(b, qb.x, qb.y), At(a, qa.x, qa.y), stripe ? TubePanel[tunnel] : TubeBase[tunnel]);
+                        // Keep the flat floor in the continuous road collider. A separate
+                        // coplanar tunnel edge can catch a wheel and launch the car at the exit.
+                        bool flatFloor = pa.y == 0f && qa.y == 0f && pb.y == 0f && qb.y == 0f;
+                        (flatFloor ? road : tube).AddQuad(At(a, pa.x, pa.y), At(b, pb.x, pb.y), At(b, qb.x, qb.y), At(a, qa.x, qa.y), stripe ? TubePanel[tunnel] : TubeBase[tunnel]);
                         // Outer shell, facing out, so the tube is solid from outside too.
                         Vector2 oa = Outward(pa), ob = Outward(pb), oq = Outward(qb), op = Outward(qa);
                         skin.AddQuad(At(a, op.x, op.y), At(b, oq.x, oq.y), At(b, ob.x, ob.y), At(a, oa.x, oa.y), underside);

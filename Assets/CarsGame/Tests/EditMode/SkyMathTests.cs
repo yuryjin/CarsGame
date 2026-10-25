@@ -63,6 +63,43 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void DefaultReflectionMatchesTheVisibleSky()
+        {
+            var preset = ScriptableObject.CreateInstance<SkyPreset>();
+            try
+            {
+                foreach (var direction in new[] { Vector3.up, Vector3.forward, Vector3.down, new Vector3(1f, .4f, -1f) })
+                    AssertColor(SkyMath.Evaluate(direction, preset.ToParams()), SkyMath.Evaluate(direction, preset.ToReflectionParams()));
+            }
+            finally { Object.DestroyImmediate(preset); }
+        }
+
+        [Test]
+        public void ReflectionFillRevealsMetalWithoutBrighteningTheVisibleSky()
+        {
+            var preset = ScriptableObject.CreateInstance<SkyPreset>();
+            try
+            {
+                preset.sunDiscColor = preset.moonColor = Color.black;
+                preset.zenith = preset.horizon = preset.ground = Color.black;
+                preset.reflectionFill = new Color(.55f, .6f, .7f);
+                var reflection = preset.ToReflectionParams();
+                Color top = SkyMath.Evaluate(Vector3.up, reflection);
+                Color middle = SkyMath.Evaluate(Vector3.forward, reflection);
+                Color bottom = SkyMath.Evaluate(Vector3.down, reflection);
+                Assert.Greater(top.grayscale, middle.grayscale);
+                Assert.Greater(middle.grayscale, bottom.grayscale);
+                Assert.Greater(bottom.grayscale, 0f);
+                AssertColor(Color.black, SkyMath.Evaluate(Vector3.up, preset.ToParams()));
+                AssertColor(Color.black, SkyMath.Evaluate(Vector3.forward, preset.ToParams()));
+                AssertColor(Color.black, SkyMath.Evaluate(Vector3.down, preset.ToParams()));
+                preset.reflectionFill = Color.black;
+                AssertColor(Color.black, SkyMath.Evaluate(Vector3.up, preset.ToReflectionParams()));
+            }
+            finally { Object.DestroyImmediate(preset); }
+        }
+
+        [Test]
         public void FillCubemapWritesEveryFaceWithOpaqueClampedColors()
         {
             var cube = new Cubemap(4, TextureFormat.RGBA32, false);

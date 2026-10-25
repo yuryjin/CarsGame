@@ -76,6 +76,9 @@ namespace RacingGame
         [SerializeField] private GroundSurface groundSurface;
 
         private Rigidbody rb;
+        // All cars use identical immutable contact settings. A material per spawn survives
+        // destroying its colliders and accumulates across races; keep one shared instance.
+        private static PhysicsMaterial frictionlessBodyMaterial;
         private ICarInputSource inputSource;
         private CarCannon cannon;
         private CarWeapons weapons;
@@ -287,18 +290,19 @@ namespace RacingGame
 
         public static void ApplyFrictionlessBodyMaterial(GameObject car)
         {
-            var bodyMaterial = new PhysicsMaterial("CarBody_NoFriction")
-            {
-                dynamicFriction = 0f,
-                staticFriction = 0f,
-                bounciness = 0f,
-                frictionCombine = PhysicsMaterialCombine.Minimum,
-                bounceCombine = PhysicsMaterialCombine.Minimum
-            };
+            if (frictionlessBodyMaterial == null)
+                frictionlessBodyMaterial = new PhysicsMaterial("CarBody_NoFriction")
+                {
+                    dynamicFriction = 0f,
+                    staticFriction = 0f,
+                    bounciness = 0f,
+                    frictionCombine = PhysicsMaterialCombine.Minimum,
+                    bounceCombine = PhysicsMaterialCombine.Minimum
+                };
 
             foreach (var bodyCollider in car.GetComponentsInChildren<Collider>())
             {
-                bodyCollider.sharedMaterial = bodyMaterial;
+                bodyCollider.sharedMaterial = frictionlessBodyMaterial;
             }
         }
 

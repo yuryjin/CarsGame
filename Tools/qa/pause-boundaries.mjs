@@ -45,14 +45,14 @@ try {
   };
   await check('paused-reset', async () => {
     await cmd('startRace', 'e1', 'easy'); await waitRacing();
-    await page.keyboard.press('Escape'); await page.waitForTimeout(200);
+    await page.keyboard.press('Escape', { delay: 80 }); await page.waitForTimeout(200);
     const before = await cmd('ui');
     assert(before.buttons.some(b => b.name === 'Resume'), 'Escape must open the actual pause menu');
-    await page.keyboard.press('r'); await page.waitForTimeout(300);
-    await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+    await page.keyboard.press('r', { delay: 80 }); await page.waitForTimeout(300);
+    await page.keyboard.press('Escape', { delay: 80 }); await page.waitForTimeout(300);
     const after = await cmd('state'); evidence.push({ name: 'paused-reset', before, after });
     assert.equal(after.resets, before.resets, 'A reset entered in a pause menu must not teleport the car on resume');
-    await page.keyboard.press('r'); await page.waitForTimeout(300);
+    await page.keyboard.press('r', { delay: 80 }); await page.waitForTimeout(300);
     const deliberate = await cmd('state'); evidence.push({ name: 'fresh-reset', deliberate });
     assert.equal(deliberate.resets, after.resets + 1, 'Fresh driving input after resume must still recover the car');
   });
@@ -69,9 +69,9 @@ try {
   });
   await check('overlapping-pause', async () => {
     await cmd('startRace', 'e1', 'easy'); await waitRacing();
-    await page.keyboard.press('Escape'); await page.waitForTimeout(200);
+    await page.keyboard.press('Escape', { delay: 80 }); await page.waitForTimeout(200);
     await visible(true);
-    await page.keyboard.press('Escape'); await page.waitForTimeout(200);
+    await page.keyboard.press('Escape', { delay: 80 }); await page.waitForTimeout(200);
     const before = await cmd('state'); await page.waitForTimeout(900);
     const stillHidden = await cmd('state');
     assert(Math.abs(stillHidden.raceSeconds - before.raceSeconds) < .001, 'User resume cannot dismiss a visibility pause');

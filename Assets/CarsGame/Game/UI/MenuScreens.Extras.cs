@@ -39,14 +39,40 @@ namespace RacingGame
         }
 
         // ---------- main screen: daily race card ----------
+        private TMP_Text dailyCountdown;
+        private int dailyCardDay;
+        private long dailyCountdownMinute;
+        private float nextDailyRefresh;
+        private string dailyFooterPrefix, dailyFooterSuffix;
+
+        // Keep a menu left open overnight truthful without rebuilding it every second.
+        // Show() preserves the selected control and scroll position when the day changes.
+        private bool RefreshDailyCard()
+        {
+            if (dailyCountdown == null || !dailyCountdown.gameObject.activeInHierarchy || Time.unscaledTime < nextDailyRefresh) return false;
+            nextDailyRefresh = Time.unscaledTime + 1f;
+            long now = DailyRace.NowUnixMs;
+            if (DailyChallenge.DayIndex(now) != dailyCardDay) { Rebuild(); return true; }
+            UpdateDailyCountdown(now);
+            return false;
+        }
+
+        private void UpdateDailyCountdown(long now)
+        {
+            long minutes = DailyChallenge.MsUntilNextDay(now) / 60000;
+            if (minutes == dailyCountdownMinute) return;
+            dailyCountdownMinute = minutes;
+            dailyCountdown.text = dailyFooterPrefix + Loc.Format("daily.new_in", "h", minutes / 60, "m", minutes % 60) + dailyFooterSuffix;
+        }
+
         private void BuildDailyCard(Transform content)
         {
             var save = PlatformGlue.Save;
             if (save == null || save.Data.Races == 0) return;   // the first session stays on the guided first race
             var ev = flow.DailyEvent;
-            var spec = DailyRace.TodaySpec;
+            var spec = DailyChallenge.For(DailyRace.DayOf(ev));
             var d = save.Data.progress.daily;
-            int today = DailyRace.Today;
+            int today = DailyRace.DayOf(ev);
             var card = Item(content, "DailyCard", Narrow ? 370f : 250f);
             UiFactory.Panel(card, "Accent", Vector2.zero, new Vector2(0f, 1f), new Vector2(0f, 18f), new Vector2(5f, -18f), DailyColor, false);
             Label(card, "Eyebrow", Loc.Get("daily.title"), 24f, Top, Vector2.one, new Vector2(30f, -60f), new Vector2(-300f, -16f), DailyColor).fontStyle = FontStyles.Bold;
@@ -62,14 +88,15 @@ namespace RacingGame
             string line = reward + (streak > 0 ? "   /   " + Loc.Format("daily.streak", "n", streak) : "");
             Label(card, "Reward", line, 24f, Top, Vector2.one, new Vector2(30f, -198f), new Vector2(-300f, -160f), bonusTaken ? UiFactory.Muted : UiFactory.Positive);
 
-            long left = DailyChallenge.MsUntilNextDay(DailyRace.NowUnixMs);
-            int hours = (int)(left / 3600000), minutes = (int)(left / 60000 % 60);
-            string foot = Loc.Format("daily.new_in", "h", hours, "m", minutes);
             var best = save.Data.progress.bests.Find(b => b.eventId == ev.eventId);
-            if (best != null && best.bestTimeMs > 0) foot = Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) + "   /   " + foot;
-            if (PlatformGlue.Platform?.Sessions != null) foot += "\n" + Loc.Get("daily.ghosts");
+            dailyFooterPrefix = best != null && best.bestTimeMs > 0
+                ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) + "   /   " : "";
+            dailyFooterSuffix = PlatformGlue.Platform?.Sessions != null ? "\n" + Loc.Get("daily.ghosts") : "";
             // Narrow: the Play button takes the bottom strip, the foot text sits between it and the reward line.
-            Label(card, "Foot", foot, 21f, Vector2.zero, new Vector2(1f, 0f), new Vector2(30f, Narrow ? 88f : 12f), new Vector2(Narrow ? -30f : -300f, Narrow ? 164f : 58f), UiFactory.Muted, TextAlignmentOptions.BottomLeft);
+            dailyCountdown = Label(card, "Foot", "", 21f, Vector2.zero, new Vector2(1f, 0f), new Vector2(30f, Narrow ? 88f : 12f), new Vector2(Narrow ? -30f : -300f, Narrow ? 164f : 58f), UiFactory.Muted, TextAlignmentOptions.BottomLeft);
+            dailyCardDay = today; dailyCountdownMinute = -1;
+            nextDailyRefresh = Time.unscaledTime + 1f;
+            UpdateDailyCountdown(DailyRace.NowUnixMs);
 
             var tiers = Tiers();
             if (Narrow)

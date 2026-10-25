@@ -20,7 +20,7 @@ namespace RacingGame.Tests
 
         [Serializable] private sealed class Sample
         {
-            public int round, meshes, materials, renderTextures, gameObjects;
+            public int round, meshes, materials, physicsMaterials, textures, renderTextures, gameObjects;
             public long nativeBytes, managedBytes;
             public string[] meshNames, materialNames;
         }
@@ -57,6 +57,9 @@ namespace RacingGame.Tests
             originalLanguage = PlatformGlue.Save.Data.settings.lang ?? "";
             string languageList = Environment.GetEnvironmentVariable("CG_LIFETIME_LANGS");
             var languages = string.IsNullOrEmpty(languageList) ? new[] { originalLanguage } : languageList.Split(',');
+            var bodies = Environment.GetEnvironmentVariable("CG_LIFETIME_BODIES") == "all"
+                ? Array.ConvertAll(CarBodies.All, b => b.Id)
+                : new[] { CarBodies.DefaultId, "dune", "rhino", "tortoise" };
             int rounds = int.TryParse(Environment.GetEnvironmentVariable("CG_LIFETIME_ROUNDS"), out int value) ? Mathf.Clamp(value, 5, 100) : 8;
             Sample baseline = null;
             for (int round = 0; round < rounds; round++)
@@ -71,7 +74,7 @@ namespace RacingGame.Tests
                         Assert.IsTrue(Loc.Ready, "Locale table must finish loading before opening the garage: " + language);
                         yield return null; yield return null;
                     }
-                    foreach (string body in new[] { CarBodies.DefaultId, "dune", "rhino", "tortoise" })
+                    foreach (string body in bodies)
                     {
                         menu.PreviewBody(body);
                         yield return null; yield return null;
@@ -99,6 +102,8 @@ namespace RacingGame.Tests
                 var materials = Resources.FindObjectsOfTypeAll<Material>();
                 var sample = new Sample {
                     round = round, meshes = meshes.Length, materials = materials.Length,
+                    physicsMaterials = Resources.FindObjectsOfTypeAll<PhysicsMaterial>().Length,
+                    textures = Resources.FindObjectsOfTypeAll<Texture2D>().Length,
                     renderTextures = Resources.FindObjectsOfTypeAll<RenderTexture>().Length,
                     gameObjects = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include).Length,
                     nativeBytes = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong(),
@@ -107,13 +112,15 @@ namespace RacingGame.Tests
                 };
                 Array.Sort(sample.meshNames); Array.Sort(sample.materialNames);
                 samples.Add(sample);
-                Debug.Log($"[Lifetime] round={round} mesh={sample.meshes} material={sample.materials} RT={sample.renderTextures} GO={sample.gameObjects} bytes={sample.nativeBytes}");
+                Debug.Log($"[Lifetime] round={round} mesh={sample.meshes} material={sample.materials} physics={sample.physicsMaterials} texture={sample.textures} RT={sample.renderTextures} GO={sample.gameObjects} bytes={sample.nativeBytes}");
                 // Warm all body/weapon/shader caches before comparing identical subsequent rounds.
                 if (round == 2) baseline = sample;
             }
             var last = samples[samples.Count - 1];
             Assert.LessOrEqual(last.meshes, baseline.meshes + 3, "Meshes grow after identical warmed-up scene transitions; inspect the lifetime report.");
             Assert.LessOrEqual(last.materials, baseline.materials + 3, "Materials grow after identical warmed-up scene transitions; inspect the lifetime report.");
+            Assert.LessOrEqual(last.physicsMaterials, baseline.physicsMaterials, "Physics materials accumulate after returning to the same menu.");
+            Assert.LessOrEqual(last.textures, baseline.textures + 1, "Textures accumulate after identical warmed-up scene transitions.");
             Assert.LessOrEqual(last.renderTextures, baseline.renderTextures + 1, "Render textures grow after leaving the garage.");
             Assert.LessOrEqual(last.gameObjects, baseline.gameObjects + 5, "Scene objects accumulate after returning to the same menu.");
             Assert.AreEqual(saved, JsonUtility.ToJson(PlatformGlue.Save.Data.progress), "Aborted countdowns and viewing car bodies must not modify progression.");

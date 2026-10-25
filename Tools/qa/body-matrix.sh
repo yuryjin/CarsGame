@@ -18,7 +18,7 @@ for event in ${CG_BODY_EVENTS:-e1 e16 e17 e19 e20}; do
     tag="${event}_${body}"
     started=$(date +%s)
     echo "START $tag $(date -Is)"
-    timeout 900 bash "$(dirname "$0")/race.sh" "$tag" "CG_EVENT=$event" "CG_BODY=$body" "CG_LAPS=$laps" CG_TIER=normal CG_AI=0 CG_SEED=12345 > "$WORK/$tag.run.log" 2>&1
+    timeout -k 20 900 bash "$(dirname "$0")/race.sh" "$tag" "CG_EVENT=$event" "CG_BODY=$body" "CG_LAPS=$laps" CG_TIER=normal CG_AI=0 CG_SEED=12345 > "$WORK/$tag.run.log" 2>&1
     status=$?
     printf '%s %s %s\n' "$tag" "$status" "$(($(date +%s)-started))" >> "$WORK/status.txt"
     echo "END $tag status=$status $(date -Is)"

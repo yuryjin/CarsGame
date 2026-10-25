@@ -60,6 +60,15 @@ namespace RacingGame.Tests
                     Assert.IsTrue(Physics.Raycast(path.Position(tunnel) + Vector3.up * 5f, Vector3.up,
                         out var ceiling, 10f, mask));
                     Assert.IsNotNull(ceiling.collider.GetComponent<GravitySurface>());
+                    Collider continuousFloor = null;
+                    foreach (float d in new[] { t.x - 2f, t.x + 2f, tunnel, t.y - 2f, t.y + 2f })
+                    {
+                        Assert.IsTrue(Physics.Raycast(path.Position(d) + Vector3.up * 2f, Vector3.down,
+                            out var floor, 4f, mask), "The tunnel floor meets the road at both mouths.");
+                        Assert.IsNull(floor.collider.GetComponent<GravitySurface>(), "The flat floor uses ordinary road physics.");
+                        if (continuousFloor == null) continuousFloor = floor.collider;
+                        Assert.AreSame(continuousFloor, floor.collider, "One continuous collider avoids wheel catches at coplanar seams.");
+                    }
                 }
                 Assert.AreEqual(3, map.Pads.Count);
 

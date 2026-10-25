@@ -1797,6 +1797,18 @@ MonoBehaviour:
     m_Localized: 'Lap 3: the road is narrower. Aim for the centre!'
     m_Metadata:
       m_Items: []
+  - m_Id: 18889347927715840
+    m_Localized: PLAY NOW
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881664
+    m_Localized: "CAREER \xB7 LOCKED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881665
+    m_Localized: Unlock with top 3 in {name}
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

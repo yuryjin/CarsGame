@@ -12,9 +12,12 @@ menu.leaderboard,main menu button,14,LEADERS,ЛИДЕРЫ,LİDERLER,排行榜,BE
 menu.settings,main menu button,12,SETTINGS,НАСТРОЙКИ,AYARLAR,设置,EINSTELLUNGEN,AJUSTES,OPTIONS,OPÇÕES,НАЛАШТУВАННЯ
 menu.coins,currency label {n},16,Coins: {n},Монеты: {n},Para: {n},金币：{n},Münzen: {n},Monedas: {n},Pièces : {n},Moedas: {n},Монети: {n}
 events.title,screen title,16,CHOOSE RACE,ВЫБОР ГОНКИ,YARIŞ SEÇ,选择比赛,RENNEN WÄHLEN,ELIGE CARRERA,CHOISIR COURSE,ESCOLHER CORRIDA,ВИБІР ГОНКИ
+events.available,playable event group,24,PLAY NOW,ДОСТУПНО СЕЙЧАС,HEMEN OYNA,立即开赛,JETZT SPIELEN,JUEGA AHORA,JOUER MAINTENANT,JOGUE AGORA,ДОСТУПНО ЗАРАЗ
+events.career_locked,locked career event group,28,CAREER · LOCKED,КАРЬЕРА · ЗАКРЫТО,KARİYER · KİLİTLİ,生涯 · 未解锁,KARRIERE · GESPERRT,CARRERA · BLOQUEADO,CARRIÈRE · VERROUILLÉ,CARREIRA · BLOQUEADO,КАР’ЄРА · ЗАКРИТО
 events.laps,{n} laps,12,{n} laps,{n} кругов,{n} tur,{n} 圈,{n} Runden,{n} vueltas,{n} tours,{n} voltas,{n} кіл
 events.rivals,{n} rivals,12,{n} rivals,{n} соперников,{n} rakip,{n} 对手,{n} Gegner,{n} rivales,{n} rivaux,{n} rivais,{n} суперників
 events.locked,locked event hint,60,Finish top 3 in the previous race to unlock,"Займите топ-3 в прошлой гонке, чтобы открыть",Açmak için önceki yarışta ilk 3'e gir,在上一场比赛中进入前三名即可解锁,"Werde Top 3 im vorherigen Rennen, um freizuschalten",Termina top 3 en la carrera anterior para desbloquear,Finis dans le top 3 de la course précédente pour débloquer,Termine no top 3 da corrida anterior para desbloquear,"Посядьте топ-3 у попередній гонці, щоб відкрити"
+events.locked_after,prerequisite event name {name},80,Unlock with top 3 in {name},Для открытия — топ-3: {name},Açmak için {name} yarışında ilk 3,在「{name}」中进入前三名解锁,Top 3 in {name} zum Freischalten,Top 3 en {name} para desbloquear,Top 3 dans « {name} » pour débloquer,Top 3 em {name} para desbloquear,Для відкриття — топ-3: {name}
 events.best,best time label,16,Best: {t},Рекорд: {t},En iyi: {t},最佳：{t},Beste: {t},Mejor: {t},Record : {t},Melhor: {t},Рекорд: {t}
 events.e1.name,event name,16,Sprint,Спринт,Sprint,冲刺赛,Sprint,Sprint,Sprint,Sprint,Спринт
 events.e2.name,event name,16,Reverse Cup,Кубок наоборот,Ters Kupa,逆向杯,Rückwärts-Cup,Copa Inversa,Coupe Inversée,Copa Reversa,Кубок навпаки

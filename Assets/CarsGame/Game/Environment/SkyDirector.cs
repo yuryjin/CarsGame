@@ -134,7 +134,7 @@ namespace RacingGame.World
 
             if (reflection != null)
             {
-                SkyMath.FillCubemap(reflection, sp, scratch);
+                SkyMath.FillCubemap(reflection, p.ToReflectionParams(), scratch);
                 RenderSettings.defaultReflectionMode = DefaultReflectionMode.Custom;
                 RenderSettings.customReflectionTexture = reflection;
                 RenderSettings.reflectionIntensity = p.reflectionIntensity;

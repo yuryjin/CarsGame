@@ -54,23 +54,12 @@
   }
 
   // ---- boot: SDK (or mock) before Unity ----
-  function showRetry(reason) {
-    log('boot blocked: ' + reason);
-    var el = document.getElementById('cars-retry');
-    if (!el) {
-      el = document.createElement('div'); el.id = 'cars-retry';
-      el.innerHTML = '<div>Не удалось загрузить игру.<br><button id="cars-retry-btn">Повторить</button></div>';
-      document.body.appendChild(el);
-      document.getElementById('cars-retry-btn').onclick = function () { location.reload(); };
-    }
-    el.style.display = 'flex';
-  }
 
   function boot() {
     return new Promise(function (resolve, reject) {
       var finished = false;
       function finish() { if (!finished) { finished = true; resolve(); } }
-      function fail(reason) { if (!finished) { finished = true; showRetry(reason); reject(new Error(reason)); } }
+      function fail(reason) { if (!finished) { finished = true; clearTimeout(timer); log('boot blocked: ' + reason); reject(new Error(reason)); } }
       var timer = setTimeout(function () { fail('init timeout'); }, 20000);
       function useMock() {
         if (window.CarsMockSdk) { window.YaGames = window.CarsMockSdk; realInit(); return; }

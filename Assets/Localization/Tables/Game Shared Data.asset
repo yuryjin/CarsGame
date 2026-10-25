@@ -1759,6 +1759,18 @@ MonoBehaviour:
     m_Key: abyss.narrow
     m_Metadata:
       m_Items: []
+  - m_Id: 18889347927715840
+    m_Key: events.available
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881664
+    m_Key: events.career_locked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18889347952881665
+    m_Key: events.locked_after
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

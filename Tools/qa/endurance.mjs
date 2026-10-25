@@ -68,14 +68,27 @@ try {
   };
   const pause = async hidden => {
     if (hidden) await visible(true);
-    else { await page.keyboard.press('Escape'); await page.waitForTimeout(200); }
+    else { await page.keyboard.press('Escape', { delay: 80 }); await page.waitForTimeout(200); }
     const a = await cmd('state'); await page.waitForTimeout(500); const b = await cmd('state');
     assert(Math.abs(a.raceSeconds - b.raceSeconds) < .001, `${hidden ? 'Visibility' : 'User'} pause advanced the clock`);
     if (hidden) await visible(false);
-    else { await page.keyboard.press('Escape'); await page.waitForTimeout(200); }
+    else { await page.keyboard.press('Escape', { delay: 80 }); await page.waitForTimeout(200); }
   };
   await cmd('perf', 'on');
   report.initial = await cmd('state');
+  if (process.env.CG_SOAK_WARM_GARAGE === '1') {
+    // A five-event cycle does not necessarily spawn every rival body. Visit the
+    // complete catalog through real preview controls before comparing resources.
+    const before = await cmd('resources');
+    await cmd('goto', 'garage');
+    for (let i = 0; i < 20; i++) await click('NextBody');
+    await cmd('goto', 'main'); await page.waitForTimeout(500);
+    const after = await cmd('resources');
+    assert.equal(after.coins, report.initial.coins, 'Previewing the catalog costs no coins');
+    assert.equal(after.races, report.initial.races, 'Previewing the catalog grants no progress');
+    report.catalogWarmup = { previews: 20, before: before.resources, after: after.resources };
+    await write();
+  }
   const deadline = Date.now() + seconds * 1000;
   for (let round = 0; Date.now() < deadline; round++) {
     const event = events[round % events.length], tier = tiers[Math.floor(round / events.length) % tiers.length];
@@ -115,6 +128,10 @@ try {
         console.log('RACE', round, event, tier, s.race, `lap=${s.lap}/${s.laps}`, `t=${s.raceSeconds.toFixed(1)}`, `resets=${s.resets}`, `fps=${s.perf?.fps?.toFixed(1)}`);
         await write();
       }
+      if (process.env.CG_SOAK_SHOTS === '1' && round < events.length && !run.gameplayShot && s.raceSeconds > 15 && s.health > 0) {
+        await page.screenshot({ path: `${out}/gameplay-${event}.png` });
+        run.gameplayShot = true;
+      }
       assert.deepEqual(report.errors, []);
       await page.waitForTimeout(1000);
     }
@@ -143,7 +160,10 @@ try {
   const warmed = report.menus.filter(m => m.round >= events.length * 2);
   if (warmed.length >= events.length) {
     const base = warmed.slice(0, events.length), last = warmed.at(-1);
-    for (const [key, allowance] of Object.entries({ materials: 8, meshes: 8, renderTextures: 0, gameObjects: 12, audioClips: 20 })) {
+    const allowances = { materials: 8, meshes: 8, renderTextures: 0, gameObjects: 12, audioClips: 20 };
+    if (Number.isFinite(last.resources.physicsMaterials)) allowances.physicsMaterials = 0;
+    if (Number.isFinite(last.resources.textures)) allowances.textures = 1;
+    for (const [key, allowance] of Object.entries(allowances)) {
       const high = Math.max(...base.map(m => m.resources[key]));
       assert(last.resources[key] <= high + allowance, `${key} keep growing after warmed identical menu returns: ${high} -> ${last.resources[key]}`);
     }

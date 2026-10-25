@@ -15,7 +15,7 @@ r = json.load(open(sys.argv[1]))
 print(f"evt={r['evt']} tier={r['tier']} params='{r['parameters']}' race={r['raceSeconds']:.1f}s shots={r['shots']} hits={r['hits']}")
 for c in r['cars']:
     laps = ' '.join(f"{x:.1f}" for x in c['lapSeconds']); at = ' '.join(str(int(x)) for x in c['impactAt'][:12])
-    print(f"  {c['name']:12}{'*' if c['player'] else ' '} laps[{laps}] off={c['offTrackSeconds']:.1f}s walls={c['wallImpacts']} D={c['deaths']} K={c['kills']} autoRes={c['autoResets']} maxLat={c['maxLateral']:.1f} at[{at}]")
+    print(f"  {c['name']:12}{'*' if c['player'] else ' '} laps[{laps}] off={c['offTrackSeconds']:.1f}s walls={c['wallImpacts']} D={c['deaths']} K={c['kills']} autoRes={c['autoResets']} totalRes={c.get('resets', 'unmeasured')} maxLat={c['maxLateral']:.1f} at[{at}]")
 if 'CG_MAX_LAP_SECONDS' in os.environ:
     limit = float(os.environ['CG_MAX_LAP_SECONDS'])
     players = [c for c in r['cars'] if c['player']]

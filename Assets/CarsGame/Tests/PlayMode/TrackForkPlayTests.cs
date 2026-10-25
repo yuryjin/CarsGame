@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -66,21 +67,63 @@ namespace RacingGame.Tests
             DifficultyTier normal = null;
             foreach (var tier in flow.tiers) if (tier != null && tier.tierId == "normal") normal = tier;
             int trackMask = 1 << LayerMask.NameToLayer("Track");
+            var mainRoad = GameObject.Find("RaceTrack/Track_Road").GetComponent<Collider>();
+            var barriers = GameObject.Find("RaceTrack/Barriers");
+            var originalMeshes = new Dictionary<MeshFilter, Mesh>();
+            var originalKerbs = new Dictionary<MeshCollider, Mesh>();
+            var originalColliders = new Dictionary<BoxCollider, bool>();
+            foreach (var filter in barriers.GetComponentsInChildren<MeshFilter>()) originalMeshes.Add(filter, filter.sharedMesh);
+            foreach (var collider in barriers.GetComponentsInChildren<BoxCollider>()) originalColliders.Add(collider, collider.enabled);
+            foreach (string name in new[] { "Track_LeftKerb", "Track_RightKerb" })
+            {
+                var kerb = GameObject.Find("RaceTrack/" + name);
+                var filter = kerb.GetComponent<MeshFilter>();
+                var collider = kerb.GetComponent<MeshCollider>();
+                originalMeshes.Add(filter, filter.sharedMesh);
+                originalKerbs.Add(collider, collider.sharedMesh);
+            }
             foreach (bool reverse in new[] { false, true })
             {
                 ev.reversed = reverse;
                 flow.StartRace(ev, normal);
                 var fork = path.Fork;
                 Assert.IsNotNull(fork);
+                foreach (var pair in originalMeshes)
+                {
+                    Assert.AreNotSame(pair.Value, pair.Key.sharedMesh, "Fork openings use a private visual mesh");
+                    if (pair.Key.transform.IsChildOf(barriers.transform))
+                        Assert.Less(pair.Key.sharedMesh.triangles.Length, pair.Value.triangles.Length, "Barrier openings must be visible as well as driveable");
+                }
+                foreach (var pair in originalKerbs) Assert.AreSame(pair.Key.GetComponent<MeshFilter>().sharedMesh, pair.Key.sharedMesh, "Kerb collision and rendering agree");
                 Assert.Less(fork.Length, (TrackFork.Exit - TrackFork.Entry) * 0.85f, "a meaningful shortcut");
                 Debug.Log($"[TrackFork] bridge={fork.Length:F1}m main={TrackFork.Exit - TrackFork.Entry:F1}m reverse={reverse}");
                 if (!reverse) CaptureOverview();
                 Physics.SyncTransforms();
+                // The shortcut must not create a raised lip or pillar in the
+                // driving space of the ordinary route, including either lane.
+                for (float distance = 0f; distance < path.Length; distance += 2f)
+                foreach (float lane in new[] { -1.5f, 0f, 1.5f })
+                {
+                    path.Pose(distance, lane, out var position, out var rotation);
+                    var roadRay = new Ray(position + Vector3.up, Vector3.down);
+                    Assert.IsTrue(mainRoad.Raycast(roadRay, out var mainHit, 2f));
+                    Assert.IsTrue(Physics.Raycast(roadRay, out var surfaceHit, 2f, trackMask));
+                    Assert.LessOrEqual(surfaceHit.point.y, mainHit.point.y + 0.002f,
+                        $"shortcut creates a wheel-catching lip at {distance}m lane {lane}: {surfaceHit.collider.name}");
+                    foreach (var obstacle in Physics.OverlapBox(position + Vector3.up * 0.85f,
+                        new Vector3(1.2f, 0.55f, 1f), rotation, trackMask, QueryTriggerInteraction.Ignore))
+                        Assert.IsFalse(obstacle.transform.IsChildOf(fork.transform),
+                            $"shortcut obstructs main-road driving space at {distance}m lane {lane}: {obstacle.name}");
+                }
                 for (int i = 1; i < 100; i++)
                 {
                     Vector3 p = fork.Position(i / 100f);
                     Assert.IsTrue(Physics.Raycast(p + Vector3.up * 0.5f, Vector3.down, out var hit, 0.8f, trackMask), $"road at {i}%");
-                    Assert.AreEqual(fork.transform, hit.transform.parent, $"baked scenery blocks bridge at {i}%: {hit.collider.name}");
+                    if (hit.transform.parent != fork.transform)
+                    {
+                        Assert.AreSame(mainRoad, hit.collider, $"baked scenery blocks bridge at {i}%: {hit.collider.name}");
+                        Assert.AreEqual(p.y, hit.point.y, 0.002f, "merge shares the main road's physical surface");
+                    }
                     Assert.Greater(hit.normal.y, 0.9f, "road faces up and has a driveable grade");
                     foreach (var obstacle in Physics.OverlapBox(p + Vector3.up * 0.8f, new Vector3(0.8f, 0.5f, 0.8f), Quaternion.identity,
                         Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
@@ -202,6 +245,9 @@ namespace RacingGame.Tests
                 flow.EnterMenu();
                 Assert.IsNull(path.Fork);
                 Assert.IsFalse(fork.gameObject.activeSelf);
+                foreach (var pair in originalMeshes) Assert.AreSame(pair.Value, pair.Key.sharedMesh, "Menu restores the authored barrier mesh");
+                foreach (var pair in originalColliders) Assert.AreEqual(pair.Value, pair.Key.enabled, "Menu restores barrier collisions");
+                foreach (var pair in originalKerbs) Assert.AreSame(pair.Value, pair.Key.sharedMesh, "Menu restores original kerbs");
                 yield return null;
             }
             Object.Destroy(ev);

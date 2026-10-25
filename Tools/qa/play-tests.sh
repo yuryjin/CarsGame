@@ -18,7 +18,7 @@ else
   runner=(xvfb-run -a -s '-screen 0 1280x720x24' "$UNITY" -force-vulkan)
 fi
 status=0
-taskset -c "${CG_CPU_SET:-0-3}" timeout "${CG_TEST_TIMEOUT:-1800}" "${runner[@]}" "${args[@]}" > /dev/null 2>&1 || status=$?
+taskset -c "${CG_CPU_SET:-0-3}" timeout -k 20 "${CG_TEST_TIMEOUT:-1800}" "${runner[@]}" "${args[@]}" > /dev/null 2>&1 || status=$?
 sync_meta
 echo "Unity exit=$status; log=$log; results=$result"
 if [ -f "$result" ]; then
