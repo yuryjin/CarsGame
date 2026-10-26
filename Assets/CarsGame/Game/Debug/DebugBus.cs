@@ -24,10 +24,13 @@ namespace RacingGame
             public string flow, race, evt, tier, screen, lastCommand, error;
             public int coins, lastReward, lastDailyBonus, lastTotalReward, position, lap, laps, races, liveShells;
             public int[] upgrades;
-            public bool touch, autopilot;
+            public bool touch, autopilot, dynamicCamera, localWriteFailed, localReadFailed;
             public int equippedPrimary, reservePrimary, activePrimary, driftBoosts, shortcuts, ceilingBoosts, bombPasses, resets;
             public bool fullArsenal;
             public double raceSeconds;
+            public double raceClock;
+            public float countdownSeconds;
+            public bool perfectStart;
             public float speedKmh, health, trackDistance, lateral, throttle, steer;
             public int deaths, aiResets, raceSeed;
             public float aiStuckTime;
@@ -363,6 +366,8 @@ namespace RacingGame
                 lap = p != null && p.Progress != null ? p.Progress.LapsCompleted : 0, laps = race != null ? race.laps : 0,
                 liveShells = director != null ? director.LiveProjectiles : 0,
                 touch = TouchControlsPresenter.IsShown, autopilot = autopilot,
+                dynamicCamera = save?.Data.settings.dynamicCamera ?? true,
+                localWriteFailed = save?.LocalWriteFailed ?? false, localReadFailed = save?.LocalReadFailed ?? false,
                 equippedPrimary = save?.Data.progress.equippedPrimary ?? 0,
                 reservePrimary = save?.Data.progress.reservePrimary ?? 2,
                 fullArsenal = save?.Data.progress.fullArsenal ?? false,
@@ -370,6 +375,8 @@ namespace RacingGame
                 driftBoosts = p?.DriftBoosts ?? 0, shortcuts = p?.Shortcuts ?? 0,
                 ceilingBoosts = p?.CeilingBoosts ?? 0, bombPasses = p?.BombPasses ?? 0, resets = p?.Resets ?? 0,
                 raceSeconds = race != null ? race.RaceTime : 0d,
+                raceClock = RaceClock.Now, countdownSeconds = race != null ? race.countdownSeconds : 0f,
+                perfectStart = flow.GetComponent<PerfectStart>()?.Awarded ?? false,
                 speedKmh = car != null ? car.SpeedKmh : 0f, health = p != null && p.Health != null ? p.Health.Health : 0f,
                 trackDistance = progress != null ? progress.Distance : 0f,
                 lateral = progress != null && progress.Path != null ? progress.Path.Spline.LateralOffset(p.transform.position, progress.Distance) : 0f,

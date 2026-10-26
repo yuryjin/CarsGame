@@ -1,4 +1,5 @@
 # Graph Report - /home/user/projects/games/Unity/newgames/CarsGame  (2026-10-25)
+> Status refresh 2026-10-25: CG-RISK-001/004 verification; CG-RISK-006/010 closed with explicit evidence. All existing graph IDs and endpoints preserved. Base code AST still retains its previous snapshot; host semantic work is not separately metered.
 > Update 2026-10-25: adds CG-RISK-001…010 and README/AGENTS/CLAUDE. Base code index retains its previous snapshot. Risk status and closure evidence: `Docs/AI/UnityProjectHealth.md`.
 
 ## Corpus Check

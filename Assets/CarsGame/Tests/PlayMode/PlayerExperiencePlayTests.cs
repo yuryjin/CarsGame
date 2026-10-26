@@ -106,6 +106,8 @@ namespace RacingGame.Tests
             PauseController.Set(PauseReason.User, true); yield return null;
             Button("Hint").onClick.Invoke(); yield return null;
             Assert.NotNull(Button("CloseHelp"));
+            var lessons = System.Array.Find(Object.FindObjectsByType<TMPro.TextMeshProUGUI>(), label => label.name == "Lessons");
+            StringAssert.Contains(Loc.Get("help.launch"), lessons.text);
             var hud = Object.FindAnyObjectByType<HudScreen>();
             PauseController.Set(PauseReason.HostPause, true);
             var reasons = PauseController.Reasons;

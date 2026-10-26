@@ -12,6 +12,7 @@ namespace RacingGame.Tests
     public sealed class PerfectStartPausePlayTests
     {
         private Keyboard keyboard;
+        private Touchscreen touch;
         private GameFlow flow;
         private RaceManager race;
         private PerfectStart launch;
@@ -35,6 +36,7 @@ namespace RacingGame.Tests
         {
             if (flow != null) flow.EnterMenu();
             InputSystem.RemoveDevice(keyboard);
+            if (touch != null) InputSystem.RemoveDevice(touch);
             Time.captureDeltaTime = capture;
             InputSystem.settings.backgroundBehavior = background;
             InputSystem.settings.editorInputBehaviorInPlayMode = editorInput;
@@ -79,6 +81,42 @@ namespace RacingGame.Tests
             InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W));
             while (RaceClock.Now < race.countdownSeconds + 0.6f) yield return null;
             Assert.IsTrue(launch.Awarded, "A deliberate post-resume press inside the launch window still counts.");
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator TouchLaunchRequiresATimedPressAndDisappearsAfterTheStart()
+        {
+            yield return Boot();
+            touch = InputSystem.AddDevice<Touchscreen>();
+            Object.FindAnyObjectByType<TouchControlsPresenter>().forceShow = true;
+            // Timed tap, early hold, and no tap: auto-throttle must never award the skill.
+            for (int attempt = 0; attempt < 3; attempt++)
+            {
+                flow.StartRace(System.Array.Find(flow.events, e => e.eventId == "e1"), flow.tiers[0]);
+                yield return null; yield return null;
+                var button = System.Array.Find(Object.FindObjectsByType<UnityEngine.UI.Button>(), b => b.name == "Launch");
+                Assert.NotNull(button, "Touch players need an explicit throttle press during the countdown.");
+                var rect = (RectTransform)button.transform;
+                Assert.GreaterOrEqual(rect.rect.height * rect.lossyScale.y, 43.9f);
+                Vector2 point = RectTransformUtility.WorldToScreenPoint(null, rect.TransformPoint(rect.rect.center));
+                if (attempt == 0)
+                    while (RaceClock.Now < race.countdownSeconds - 0.15f) yield return null;
+                if (attempt < 2)
+                {
+                    InputSystem.QueueStateEvent(touch, new TouchState { touchId = attempt + 1,
+                        phase = UnityEngine.InputSystem.TouchPhase.Began, position = point });
+                    yield return null; yield return null;
+                    Assert.Greater(race.Player.GetComponent<PlayerDriverInput>().RawThrottle, 0.9f);
+                }
+                while (RaceClock.Now < race.countdownSeconds + 0.6f) yield return null;
+                Assert.AreEqual(attempt == 0, launch.Awarded, "Only a fresh press near GO earns the boost.");
+                Assert.IsFalse(button.gameObject.activeInHierarchy, "The launch action must leave the driving view.");
+                if (attempt < 2)
+                    InputSystem.QueueStateEvent(touch, new TouchState { touchId = attempt + 1,
+                        phase = UnityEngine.InputSystem.TouchPhase.Ended, position = point });
+                yield return null; yield return null;
+                Assert.Less(race.Player.GetComponent<PlayerDriverInput>().RawThrottle, 0.01f);
+            }
         }
     }
 }

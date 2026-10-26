@@ -12,10 +12,15 @@ namespace RacingGame.Tests
         {
             public string StoredJson;
             public int WriteCount;
+            public bool FailWrite;
+            public bool FailRead;
+            public int WriteAttempts;
 
-            public string Read() => StoredJson;
+            public string Read() => FailRead ? throw new System.IO.IOException("QA read blocked") : StoredJson;
             public void Write(string json)
             {
+                WriteAttempts++;
+                if (FailWrite) throw new System.IO.IOException("QA disk full");
                 StoredJson = json;
                 WriteCount++;
             }
@@ -55,6 +60,100 @@ namespace RacingGame.Tests
                 StoredJson = QueuedJson;
                 return Task.FromResult(Result.Success);
             }
+        }
+
+        [Test]
+        public async Task FailedLocalWriteStaysRecoverableAndCannotReportOfflineSuccess()
+        {
+            double now = 1d;
+            var local = new MockLocalStore { FailWrite = true };
+            var service = new SaveService(local, () => null, () => now, "local_failure");
+            await service.LoadAsync();
+            service.Local.coinsEarned = 123;
+            Assert.DoesNotThrow(() => service.MarkDirty(), "Storage failure must not interrupt granting race rewards");
+            Assert.AreEqual(123, service.Data.Coins);
+            Assert.IsTrue(service.LocalWriteFailed);
+            int attempts = local.WriteAttempts;
+            for (int i = 0; i < 100; i++) service.Tick();
+            Assert.AreEqual(attempts, local.WriteAttempts, "A full disk must not cause a write attempt every frame");
+            Assert.IsFalse((await service.FlushAsync()).Ok, "No cloud and no local write cannot mean saved");
+            Assert.IsNull(local.StoredJson);
+            local.FailWrite = false;
+            now += 6d;
+            service.Tick();
+            Assert.AreEqual(123, SaveMigrator.FromJson(local.StoredJson).Coins);
+            Assert.IsTrue((await service.FlushAsync()).Ok);
+            Assert.IsFalse(service.LocalWriteFailed);
+            var reopened = new SaveService(local, () => null, () => now, "local_failure");
+            await reopened.LoadAsync();
+            Assert.AreEqual(123, reopened.Data.Coins);
+        }
+
+        [Test]
+        public async Task CloudSuccessDoesNotDiscardThePendingLocalRetry()
+        {
+            double now = 1d;
+            var local = new MockLocalStore { FailWrite = true };
+            var cloud = new MockCloudSave();
+            var service = new SaveService(local, () => cloud, () => now, "local_failure");
+            await service.LoadAsync();
+            service.Local.coinsEarned = 123; service.MarkDirty();
+            Assert.IsFalse((await service.FlushAsync()).Ok);
+            Assert.AreEqual(123, SaveMigrator.FromJson(cloud.StoredJson).Coins, "Cloud protection still works while local storage is full");
+            service.Local.coinsEarned = 200; service.MarkDirty();
+            local.FailWrite = false; now += 6d; service.Tick();
+            Assert.IsFalse(service.LocalWriteFailed);
+            Assert.AreEqual(200, SaveMigrator.FromJson(local.StoredJson).Coins, "Retry serializes current progress, not the old failure payload");
+        }
+
+        [Test]
+        public async Task SuccessfulCloudMergeIsMirroredForTheNextOfflineLaunch()
+        {
+            var local = new MockLocalStore { StoredJson = CoinsOnDevice("here", 100) };
+            var cloud = new MockCloudSave { StoredJson = CoinsOnDevice("other", 200) };
+            var service = new SaveService(local, () => cloud, () => 1d, "here");
+            await service.LoadAsync();
+            var reopened = new SaveService(local, () => null, () => 2d, "here");
+            await reopened.LoadAsync();
+            Assert.AreEqual(300, reopened.Data.Coins, "A read/merge must not need an unrelated purchase or setting change before it becomes durable");
+        }
+
+        [Test]
+        public async Task UnreadableLocalStoreCannotBeOverwrittenUntilItIsReadAndMerged()
+        {
+            double now = 1d;
+            var local = new MockLocalStore { StoredJson = CoinsOnDevice("other", 200), FailRead = true };
+            var service = new SaveService(local, () => null, () => now, "here");
+            await service.LoadAsync();
+            Assert.IsTrue(service.LocalReadFailed);
+            service.Local.coinsEarned = 30; service.MarkDirty();
+            Assert.IsFalse((await service.FlushAsync()).Ok);
+            Assert.AreEqual(0, local.WriteCount);
+            Assert.AreEqual(200, SaveMigrator.FromJson(local.StoredJson).Coins);
+            local.FailRead = false; now += 6d; service.Tick();
+            Assert.IsFalse(service.LocalReadFailed);
+            Assert.IsFalse(service.LocalWriteFailed);
+            Assert.AreEqual(230, service.Data.Coins);
+            Assert.AreEqual(230, SaveMigrator.FromJson(local.StoredJson).Coins);
+        }
+
+        [Test]
+        public async Task ReadRecoveryThatFindsAFutureProfileCannotPublishPartialDataToCloud()
+        {
+            var local = new MockLocalStore { StoredJson = "{\"version\":999,\"futureProgress\":\"keep\"}", FailRead = true };
+            var cloud = new MockCloudSave();
+            var service = new SaveService(local, () => cloud, () => 1d, "here");
+            await service.LoadAsync();
+            service.Local.coinsEarned = 30; service.MarkDirty();
+            service.Tick();
+            Assert.IsFalse((await service.FlushAsync()).Ok);
+            Assert.AreEqual(0, cloud.QueueCalls, "An unread local profile must not be replaced indirectly through cloud sync");
+            local.FailRead = false;
+            Assert.IsFalse((await service.FlushAsync()).Ok);
+            Assert.IsTrue(service.LocalVersionTooNew);
+            Assert.AreEqual(0, local.WriteCount);
+            Assert.AreEqual(0, cloud.QueueCalls, "Read recovery must recheck the version guard before cloud writes too");
+            StringAssert.Contains("keep", local.StoredJson);
         }
 
         [Test]

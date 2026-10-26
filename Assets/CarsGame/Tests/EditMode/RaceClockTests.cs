@@ -40,7 +40,7 @@ namespace RacingGame.Tests
         [Test]
         public void AdvanceClampsLargeStepsToMaxFrameStep()
         {
-            RaceClock.Advance(1.0f); // greater than MaxFrameStep (0.25f)
+            RaceClock.Advance(RaceClock.MaxFrameStep + 1f);
             Assert.AreEqual((double)RaceClock.MaxFrameStep, RaceClock.Now, 1e-5d);
         }
 

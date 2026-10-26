@@ -26,6 +26,7 @@ namespace RacingGame
         private float dipUntil;
         private bool wasBoosting, running;
         private float nextCrash;
+        private float screechGain;
 
         public float EnginePitch => engine != null ? engine.pitch : 0f;
         public float ScreechVolume => screech != null ? screech.volume : 0f;
@@ -101,7 +102,9 @@ namespace RacingGame
 
             float slip = car.IsGrounded && speed > 15f ? car.SideSlipSpeed : 0f;
             float s01 = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(screechFrom, screechFull, slip));
-            screech.volume = Mathf.Lerp(screech.volume, s01 * 0.45f * master, 1f - Mathf.Exp(-12f * Time.unscaledDeltaTime));
+            // Smooth the tyre movement, then apply the user's master level immediately.
+            screechGain = Mathf.Lerp(screechGain, s01 * 0.45f, 1f - Mathf.Exp(-12f * Time.unscaledDeltaTime));
+            screech.volume = screechGain * master;
             screech.pitch = 0.9f + 0.2f * s01;
 
             wind.volume = speedNorm * speedNorm * speedNorm * 0.3f * master;

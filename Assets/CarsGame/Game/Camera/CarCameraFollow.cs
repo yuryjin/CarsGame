@@ -27,6 +27,8 @@ namespace RacingGame
         public float fovAttack = 8f, fovRelease = 3f;
         [Tooltip("Extra distance behind the car at top speed (m); at rest the camera sits 0.4 m closer than offset.")]
         public float distanceAtTopSpeed = 1.3f;
+        [Tooltip("Fixed field of view when speed zoom and corner lean are disabled.")]
+        public float steadyFov = 64f;
 
         [Header("Corners")]
         [Tooltip("How far the aim point moves into the turn at full yaw rate (m).")]
@@ -46,6 +48,7 @@ namespace RacingGame
         private Vector3 up = Vector3.up;
 
         public float CurrentRoll => roll;
+        private static bool DynamicView => PlatformGlue.Save == null || PlatformGlue.Save.Data.settings.dynamicCamera;
 
         private void Awake()
         {
@@ -93,10 +96,10 @@ namespace RacingGame
             Vector3 forward = Heading(up);
             var frame = Quaternion.LookRotation(forward, up);
             Vector3 restOffset = offset;
-            restOffset.z += .4f;
+            restOffset.z += DynamicView ? .4f : -.5f;
             transform.position = target.position + frame * restOffset;
             transform.rotation = Quaternion.LookRotation(target.position + up * lookAtHeightOffset + forward * 1.5f - transform.position, up);
-            if (cam != null) cam.fieldOfView = car != null ? fovAtRest : initialFov;
+            if (cam != null) cam.fieldOfView = !DynamicView ? steadyFov : car != null ? fovAtRest : initialFov;
         }
 
         private static float Smooth(float speed, float dt) => 1f - Mathf.Exp(-speed * dt);
@@ -105,6 +108,7 @@ namespace RacingGame
         {
             if (target == null) { DetachTarget(); return; }
             float dt = Time.deltaTime;
+            bool dynamicView = DynamicView;
             if (carFor != target) SetTarget(target);
 
             // The car's own "up": world up, or the wall/ceiling normal while it wall rides; eased so the view rolls over smoothly.
@@ -126,11 +130,11 @@ namespace RacingGame
             float targetTurn = Mathf.Clamp(yawRate * Mathf.Rad2Deg / 90f, -1f, 1f);
             turn = Mathf.Lerp(turn, targetTurn, Smooth(4f, dt));
             float targetRoll = Mathf.Clamp(-speed * yawRate * rollPerAccel, -maxRoll, maxRoll);          // v·ω = lateral accel
-            roll = Mathf.Lerp(roll, targetRoll, Smooth(3f, dt));
+            roll = dynamicView ? Mathf.Lerp(roll, targetRoll, Smooth(3f, dt)) : 0f;
 
             Vector3 localOffset = offset;
-            localOffset.z = Mathf.Lerp(offset.z + 0.4f, offset.z - distanceAtTopSpeed, speedNorm);
-            if (car != null && car.IsBoosting) localOffset.y -= 0.2f;
+            localOffset.z = dynamicView ? Mathf.Lerp(offset.z + 0.4f, offset.z - distanceAtTopSpeed, speedNorm) : offset.z - .5f;
+            if (dynamicView && car != null && car.IsBoosting) localOffset.y -= 0.2f;
             Vector3 desiredPosition = target.position + frame * localOffset - right * (turn * shiftAgainstTurn);
             transform.position = Vector3.Lerp(transform.position, desiredPosition, Smooth(positionSmoothSpeed, dt));
 
@@ -140,7 +144,8 @@ namespace RacingGame
 
             if (cam == null) return;
             float targetFov;
-            if (car != null) targetFov = Mathf.Lerp(fovAtRest, fovAtTopSpeed, speedNorm) + (car.IsBoosting ? nitroFovKick : 0f);
+            if (!dynamicView) targetFov = steadyFov;
+            else if (car != null) targetFov = Mathf.Lerp(fovAtRest, fovAtTopSpeed, speedNorm) + (car.IsBoosting ? nitroFovKick : 0f);
             else targetFov = Mathf.Clamp(initialFov + speed * speedFovMultiplier, 55f, 85f);
             float rate = targetFov > cam.fieldOfView ? fovAttack : fovRelease;
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFov, Smooth(rate, dt));

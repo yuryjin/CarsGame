@@ -11,7 +11,7 @@ mkdir -p "$XDG_CONFIG_HOME"
 # fontTools for loc-bake.sh lives in an older user site-packages on this machine.
 export PYTHONPATH=${PYTHONPATH:-$HOME/.local/lib/python3.10/site-packages}
 
-# First use: copy the project (with Library, so nothing reimports); later calls only resync Assets.
+# First use: copy the project cache; later calls refresh every build input.
 # Never run batch Unity on $PROJECT itself while the Editor has it open: it overwrites Logs/Editor.log
 # and deletes the Pipeline bridge descriptor (Library/Pipeline/.unity-pipeline-port).
 ensure_sim() {
@@ -22,8 +22,12 @@ ensure_sim() {
     # drop the asset database once and let the copy reimport (~5 min).
     rm -rf "$SIM/Library/ArtifactDB"* "$SIM/Library/SourceAssetDB"* "$SIM/Library/Artifacts" "$SIM/Library/ScriptAssemblies" "$SIM/Library/Bee"
   fi
-  rsync -a --delete "$PROJECT/Assets/" "$SIM/Assets/"
-  cp "$PROJECT/ProjectSettings/ProjectSettings.asset" "$SIM/ProjectSettings/"
+  # Check content too: rapid same-sized edits can have the same mtime on the source
+  # and copy. A stale package lock, quality/input setting or script invalidates QA.
+  for input_dir in Assets Packages ProjectSettings; do
+    mkdir -p "$SIM/$input_dir"
+    rsync -a --checksum --delete "$PROJECT/$input_dir/" "$SIM/$input_dir/"
+  done
 }
 
 # Copy Unity-generated .meta files back for new assets the main project has no meta for yet.

@@ -79,6 +79,10 @@ namespace RacingGame.Tests
             Assert.IsTrue(car.GetComponent<PlayerDriverInput>().autoThrottle);
             Button("AutoThrottleOff").onClick.Invoke(); yield return null;
             Assert.IsFalse(car.GetComponent<PlayerDriverInput>().autoThrottle);
+            bool shake = PlatformGlue.Save.Data.settings.cameraShake;
+            Button("DynamicCameraOff").onClick.Invoke(); yield return null;
+            Assert.IsFalse(PlatformGlue.Save.Data.settings.dynamicCamera);
+            Assert.AreEqual(shake, PlatformGlue.Save.Data.settings.cameraShake);
             for (int frame = 0; frame < 20; frame++) yield return null;
             Assert.AreEqual(time, race.RaceTime, 0.00001);
             Assert.AreEqual(position, car.transform.position);
@@ -112,6 +116,10 @@ namespace RacingGame.Tests
             Assert.AreEqual(0.72f, PlatformGlue.Save.Data.settings.music, 0.0001f);
             Assert.IsTrue(PlatformGlue.Save.Data.settings.touchLargeButtons);
             Assert.IsTrue(PlatformGlue.Save.Data.settings.touchLeftHanded);
+            for (int frame = 0; frame < 60; frame++) yield return null;
+            var camera = Camera.main;
+            Assert.AreEqual(camera.GetComponent<CarCameraFollow>().steadyFov, camera.fieldOfView, .05f,
+                "The changed view takes effect in the same race after resume");
         }
     }
 }

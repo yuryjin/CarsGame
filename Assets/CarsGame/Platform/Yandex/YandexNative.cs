@@ -6,6 +6,8 @@ namespace RacingGame.Platform.Yandex
 {
     internal static class YandexNative
     {
+        [DllImport("__Internal")] public static extern int CarsLocal_Write(string key, string json);
+        [DllImport("__Internal")] public static extern IntPtr CarsLocal_Read(string key);
         [DllImport("__Internal")] public static extern int CarsYa_Available();
         [DllImport("__Internal")] public static extern void CarsYa_Init(int reqId);
         [DllImport("__Internal")] public static extern IntPtr CarsYa_GetEnv();
@@ -17,6 +19,7 @@ namespace RacingGame.Platform.Yandex
         [DllImport("__Internal")] public static extern void CarsYa_GameplayStart();
         [DllImport("__Internal")] public static extern void CarsYa_GameplayStop();
         [DllImport("__Internal")] public static extern void CarsYa_Ready();
+        [DllImport("__Internal")] public static extern void CarsYa_BootFailed(string reason);
         [DllImport("__Internal")] public static extern void CarsYa_RequestAuth(int reqId);
         [DllImport("__Internal")] public static extern void CarsYa_SubmitScore(int reqId, string board, double score, string extra);   // double: JS Number, no i64 ABI games
         [DllImport("__Internal")] public static extern void CarsYa_GetLeaderboard(int reqId, string board, int top, int includeUser, int around);

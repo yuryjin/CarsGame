@@ -1968,6 +1968,56 @@ MonoBehaviour:
     m_Localized: Total received
     m_Metadata:
       m_Items: []
+  - m_Id: 19041856738635776
+    m_Localized: 'GAS
+
+      at GO!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19052585529192448
+    m_Localized: 'Perfect start: press gas at GO! for a short boost. Holding gas
+      early or using auto-throttle does not earn it.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19055832478330880
+    m_Localized: Camera zoom and lean
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19066674489929728
+    m_Localized: Language could not load. Check your connection and choose it again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158564483072
+    m_Localized: Progress is not saved on this device
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871680
+    m_Localized: Your progress is still in memory. Free some storage or allow browser
+      storage, then retry. Closing the game may lose unsaved progress.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871681
+    m_Localized: Retry saving
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871682
+    m_Localized: Continue without saving
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871683
+    m_Localized: Progress saved on this device
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871684
+    m_Localized: Saved progress is unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871685
+    m_Localized: The game could not read storage. Your saved profile has not been
+      replaced. Allow browser storage and retry. Changes made now stay in memory
+      until storage works again.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

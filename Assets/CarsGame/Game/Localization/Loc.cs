@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using RacingGame.Platform;
 using RacingGame.Core.Localization;
 
 namespace RacingGame
@@ -20,54 +23,81 @@ namespace RacingGame
         public static string Language { get; private set; } = "en";
         public static bool RightToLeft => LanguageResolver.IsRightToLeft(Language);
         public static event Action LanguageChanged;
+        public static event Action<string> LoadFailed;
 
         private static readonly HashSet<string> missingLogged = new HashSet<string>();
-        private static readonly Dictionary<string, object> args = new Dictionary<string, object>(4);
 
         /// <summary>Pick the locale and load its table. Waits for the localization system to initialise
         /// (never blocks: WebGL cannot WaitForCompletion). Safe to call more than once.</summary>
-        public static void Initialize(string platformLanguage, string userOverride)
+        public static void Initialize(string platformLanguage, string userOverride, Action<bool> completed = null)
         {
+            int request = ++loadGeneration;
             var init = LocalizationSettings.InitializationOperation;
             void Proceed()
             {
+                if (request != loadGeneration) return;
+                if (!init.IsValid() || init.Status != AsyncOperationStatus.Succeeded)
+                { NotifyFailure(userOverride ?? platformLanguage, completed); return; }
                 var supported = new List<string>();
                 var locales = LocalizationSettings.AvailableLocales;
                 if (locales != null) foreach (var l in locales.Locales) supported.Add(l.Identifier.Code.ToLowerInvariant());
                 if (supported.Count == 0) supported.Add("en");
-                SetLanguage(LanguageResolver.Resolve(platformLanguage, userOverride, supported));
+                SetLanguage(LanguageResolver.Resolve(platformLanguage, userOverride, supported), completed);
             }
             if (init.IsDone) Proceed(); else init.Completed += _ => Proceed();
         }
 
         private static int loadGeneration;
         private static StringTable loadedTable;
+        // SelectedLocale releases the database's tables. Own one reference to keep the last
+        // working translation alive until its replacement has actually arrived.
+        private static AsyncOperationHandle<StringTable> loadedHandle;
+        private static Locale loadedLocale;
 
-        public static void SetLanguage(string code)
+        public static void SetLanguage(string code, Action<bool> completed = null)
         {
             code = LanguageResolver.Normalize(code);
             var locales = LocalizationSettings.AvailableLocales;
             Locale target = null;
             if (locales != null) foreach (var l in locales.Locales) if (l.Identifier.Code.Equals(code, StringComparison.OrdinalIgnoreCase)) { target = l; break; }
-            if (target == null) return;
-            Language = code;
+            if (target == null) { NotifyFailure(code, completed); return; }
+            int generation = ++loadGeneration;
             if (LocalizationSettings.SelectedLocale != target) LocalizationSettings.SelectedLocale = target;
 
-            // Ready only once THIS locale's table is in memory: a locale switch starts a new async
-            // table load, and reading before it lands yields "No translation" fallbacks.
-            Ready = false;
-            loadedTable = null;
-            int generation = ++loadGeneration;
             var op = LocalizationSettings.StringDatabase.GetTableAsync(Table, target);
             void Done()
             {
                 if (generation != loadGeneration) return;
-                if (op.Status != UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded || op.Result == null)
-                { Debug.LogError("[Loc] table load failed for " + code + ": " + op.OperationException); return; }
+                if (!op.IsValid() || op.Status != AsyncOperationStatus.Succeeded || op.Result == null)
+                {
+                    // Restoring the selected locale also clears failed cached operations, so
+                    // choosing the same language again can make a fresh download attempt.
+                    if (Ready && loadedLocale != null && LocalizationSettings.SelectedLocale != loadedLocale)
+                        LocalizationSettings.SelectedLocale = loadedLocale;
+                    else
+                        LocalizationSettings.StringDatabase.ReleaseAllTables();
+                    NotifyFailure(code, completed);
+                    return;
+                }
+                var previous = loadedHandle;
+                loadedHandle = Addressables.ResourceManager.Acquire(op);
                 loadedTable = op.Result;
-                Ready = true; LanguageChanged?.Invoke();
+                loadedLocale = target;
+                Language = code;
+                Ready = true;
+                if (previous.IsValid()) Addressables.Release(previous);
+                completed?.Invoke(true);
+                LanguageChanged?.Invoke();
             }
             if (op.IsDone) Done(); else op.Completed += _ => Done();
+        }
+
+        private static void NotifyFailure(string code, Action<bool> completed)
+        {
+            Debug.LogWarning("[Loc] table load failed for " + code);
+            completed?.Invoke(false);
+            LoadFailed?.Invoke(code);
+            if (!Ready) PlatformRuntime.ReportBootFailure("localization: " + code);
         }
 
         public static string Get(string key)

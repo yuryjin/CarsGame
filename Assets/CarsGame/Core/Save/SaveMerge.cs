@@ -129,7 +129,8 @@ namespace RacingGame.Core.Save
         {
             lang = s.lang, sfx = s.sfx, music = s.music, musicChosen = s.musicChosen, quality = s.quality, qualityAuto = s.qualityAuto,
             autoThrottle = s.autoThrottle, cameraShake = s.cameraShake, autoAim = s.autoAim, tier = s.tier, hintsSeen = s.hintsSeen,
-            touchLargeButtons = s.touchLargeButtons, touchLeftHanded = s.touchLeftHanded
+            touchLargeButtons = s.touchLargeButtons, touchLeftHanded = s.touchLeftHanded,
+            dynamicCamera = s.dynamicCamera
         };
     }
 }

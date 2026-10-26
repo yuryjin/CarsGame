@@ -32,6 +32,8 @@ namespace RacingGame
         private TMPro.TextMeshProUGUI secondaryLabel;
         private TMPro.TextMeshProUGUI fireLabel;
         private Button swapButton;
+        private TMPro.TextMeshProUGUI launchLabel;
+        private PerfectStart launch;
         private RectTransform resetButton, brakeButton, leftButton, rightButton;
         private float targetScale = -1f;
         private bool targetLarge, targetLeft;
@@ -83,6 +85,8 @@ namespace RacingGame
             if (!shown && input != null && PlatformGlue.Save != null && PlatformGlue.Save.Data.settings.autoThrottle && !input.autoThrottle) input.autoThrottle = true;
             if (shown)
             {
+                if (launch == null && race != null) launch = race.GetComponent<PerfectStart>();
+                launchLabel.transform.parent.gameObject.SetActive(launch != null && launch.AcceptingInput);
                 ApplyTouchTargets();
                 var weapons = input != null ? input.GetComponent<CarWeapons>() : null;
                 var cannon = input != null ? input.GetComponent<CarCannon>() : null;
@@ -124,6 +128,8 @@ namespace RacingGame
             secondaryLabel.transform.parent.gameObject.SetActive(false);
             brakeButton = (RectTransform)Button(root, "Brake", Loc.Get("touch.brake"), "<Gamepad>/buttonSouth", new Vector2(1f, 0f), new Vector2(-480f, 40f), new Vector2(-280f, 160f)).transform.parent;
             resetButton = (RectTransform)Button(root, "Reset", "R", "<Gamepad>/buttonNorth", new Vector2(1f, 1f), new Vector2(-140f, -140f), new Vector2(-40f, -40f)).transform.parent;
+            launchLabel = Button(root, "Launch", Loc.Get("touch.launch"), "<Gamepad>/rightTrigger",
+                new Vector2(0.5f, 0f), new Vector2(-200f, 40f), new Vector2(200f, 190f));
             targetScale = -1f;
         }
 
@@ -175,6 +181,10 @@ namespace RacingGame
             MinimumHeight((RectTransform)swapButton.transform);
             var secondary = (RectTransform)secondaryLabel.transform.parent;
             MinimumHeight(secondary);
+            var launchRect = (RectTransform)launchLabel.transform.parent;
+            launchRect.offsetMax = new Vector2(200f, 40f + Mathf.Max(150f, 64f / scale));
+            launchLabel.enableWordWrapping = true;
+            launchLabel.fontSizeMin = launchLabel.fontSizeMax = Mathf.Max(30f, 14f / scale);
             var swapLabel = swapButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
             swapLabel.rectTransform.offsetMin = new Vector2(8f, 8f);
             swapLabel.rectTransform.offsetMax = new Vector2(-8f, -8f);

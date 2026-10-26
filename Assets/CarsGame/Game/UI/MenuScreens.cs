@@ -61,17 +61,19 @@ namespace RacingGame
 
         private void OnEnable()
         {
-            flow.StateChanged += OnFlowState; Loc.LanguageChanged += Rebuild; PlatformGlue.Ready += Rebuild;
+            flow.StateChanged += OnFlowState; Loc.LanguageChanged += Rebuild; Loc.LoadFailed += OnLanguageLoadFailed; PlatformGlue.Ready += Rebuild;
         }
 
         private void OnDisable()
         {
-            flow.StateChanged -= OnFlowState; Loc.LanguageChanged -= Rebuild; PlatformGlue.Ready -= Rebuild;
+            HideSaveRecovery();
+            flow.StateChanged -= OnFlowState; Loc.LanguageChanged -= Rebuild; Loc.LoadFailed -= OnLanguageLoadFailed; PlatformGlue.Ready -= Rebuild;
             PauseController.Set(PauseReason.Orientation, false);
         }
 
         private void Update()
         {
+            UpdateSaveRecovery();
             menuScaler.scaleFactor = UiFactory.ReadableScale(Screen.width, Screen.height);
             if (toastPanel != null && toastPanel.gameObject.activeSelf && Time.unscaledTime > toastUntil) toastPanel.gameObject.SetActive(false);
             bool portrait = PlatformGlue.IsReady && PlatformGlue.IsMobileDevice && Screen.height > Screen.width;
@@ -149,6 +151,11 @@ namespace RacingGame
                     break;
             }
         }
+        private void OnLanguageLoadFailed(string language)
+        {
+            if (Loc.Ready) Toast(Loc.Get("settings.language.failed"));
+        }
+
         private void Rebuild() { Show(current); if (portraitText != null && Loc.Ready) portraitText.text = Loc.Get("ui.rotate_phone"); }
 
         public void Show(string name)
@@ -632,6 +639,9 @@ namespace RacingGame
             string lang = save != null ? save.Data.settings.lang : "";
             int index = Array.IndexOf(LanguageCycle, lang);
             string language = index <= 0 ? Loc.Get("settings.language.system") + " (" + Loc.Language + ")" : LanguageNames[index];
+            if (save != null && save.LocalWriteFailed)
+                UiFactory.Button(Item(content, "LocalSaveRetry", 86f, false), "RetryLocalSave", Loc.Get("save.local.retry"),
+                    () => { saveWarningAcknowledged = false; UpdateSaveRecovery(); }, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 28f);
             var row = SettingRow(content, "Language", "settings.language");
             var value = SettingValue(row);
             UiFactory.Button(value, "LanguagePrevious", "‹", () => PlatformGlue.SetLanguageOverride(LanguageCycle[(Mathf.Max(0, index) + LanguageCycle.Length - 1) % LanguageCycle.Length]), Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(64f, 0f), 36f, UiFactory.Raised);
@@ -681,6 +691,8 @@ namespace RacingGame
             }
             ToggleRow(content, "Shake", "settings.shake", save == null || save.Data.settings.cameraShake, enabled =>
             { if (save == null) return; save.Data.settings.cameraShake = enabled; save.MarkDirty(); Show("settings"); });
+            ToggleRow(content, "DynamicCamera", "settings.dynamic_camera", save == null || save.Data.settings.dynamicCamera, enabled =>
+            { if (save == null) return; save.Data.settings.dynamicCamera = enabled; save.MarkDirty(); Show("settings"); });
             var hints = SettingValue(SettingRow(content, "Hints", "settings.hints"));
             UiFactory.Button(hints, "ReplayHints", Loc.Get("settings.hints.replay"), () =>
             {

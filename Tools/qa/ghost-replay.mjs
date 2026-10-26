@@ -88,6 +88,7 @@ try {
   assert.equal(joined.race,'Racing','Delayed opponents join after GO');
   for(const g of joined.replay.ghosts) {
     assert.equal(g.colliders,0);assert.equal(g.rigidbodies,0);assert(g.active);
+    assert.deepEqual(g.meshes,[`GhostVisual_${g.bodyId || 'classic'}`],'Each replay uses one combined visual mesh on WebGL');
     if(g.bodyId) {
       assert(g.meshes.some(name=>name===`Body_${g.bodyId}_Paint`||name===`GhostVisual_${g.bodyId}`));
       assert(Math.abs(g.rotation.z)>.96&&Math.abs(g.rotation.w)>.25&&Math.abs(g.rotation.w)<.27);

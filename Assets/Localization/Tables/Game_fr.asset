@@ -1969,6 +1969,58 @@ MonoBehaviour:
     m_Localized: "Total re\xE7u"
     m_Metadata:
       m_Items: []
+  - m_Id: 19041856738635776
+    m_Localized: 'GAZ
+
+      au GO !'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19052585529192448
+    m_Localized: "D\xE9part parfait : appuie sur le gaz au GO ! pour un bref boost.
+      Maintenir le gaz avant ou utiliser le gaz automatique ne donne pas le bonus."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19055832478330880
+    m_Localized: Zoom et inclinaison
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19066674489929728
+    m_Localized: "La langue n\u2019a pas pu \xEAtre charg\xE9e. V\xE9rifiez la connexion
+      et s\xE9lectionnez-la \xE0 nouveau."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158564483072
+    m_Localized: "Progression non enregistr\xE9e sur cet appareil"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871680
+    m_Localized: "Votre progression reste en m\xE9moire. Lib\xE9rez de l\u2019espace
+      ou autorisez le stockage du navigateur, puis r\xE9essayez. Fermer le jeu peut
+      faire perdre la progression non enregistr\xE9e."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871681
+    m_Localized: "R\xE9essayer l\u2019enregistrement"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871682
+    m_Localized: Continuer sans enregistrer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871683
+    m_Localized: "Progression enregistr\xE9e sur cet appareil"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871684
+    m_Localized: "Progression enregistr\xE9e indisponible"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871685
+    m_Localized: "Le stockage est inaccessible. Votre profil enregistr\xE9 n\u2019a
+      pas \xE9t\xE9 remplac\xE9. Autorisez le stockage du navigateur et r\xE9essayez.
+      Les nouvelles modifications restent en m\xE9moire."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

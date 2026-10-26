@@ -38,6 +38,8 @@ namespace RacingGame
 
         private const float DuckFrom = 0.75f, DuckMinSeconds = 0.35f;
         private AudioSource[] world, ui;
+        private float[] worldGain, uiGain;
+        private float appliedVolume = -1f;
         private SfxVoicePicker worldPicker, uiPicker;
         private AudioListener listener;
         // Advances only while audio runs, so voices paused by AudioListener.pause stay reserved.
@@ -49,6 +51,8 @@ namespace RacingGame
             instance = this;
             world = MakeVoices("Voice_", worldVoices, spatialBlend);
             ui = MakeVoices("UiVoice_", uiVoices, 0f);
+            worldGain = new float[world.Length];
+            uiGain = new float[ui.Length];
             worldPicker = new SfxVoicePicker(world.Length, maxPerClip);
             uiPicker = new SfxVoicePicker(ui.Length, maxPerUiClip);
         }
@@ -71,6 +75,12 @@ namespace RacingGame
         private void Update()
         {
             if (!AudioListener.pause) clock += Time.unscaledDeltaTime;
+            if (world == null || ui == null) return;
+            float master = Mathf.Clamp01(volume);
+            if (master == appliedVolume) return;
+            appliedVolume = master;
+            for (int i = 0; i < world.Length; i++) world[i].volume = worldGain[i] * master;
+            for (int i = 0; i < ui.Length; i++) ui[i].volume = uiGain[i] * master;
         }
 
         private void OnDestroy() { if (instance == this) instance = null; }
@@ -85,8 +95,9 @@ namespace RacingGame
             if (i < 0) return;
             var s = world[i];
             s.transform.position = position;
+            worldGain[i] = vol;
             Launch(s, clip, vol, pitch);
-            DuckMusic(clip, vol * heard);
+            DuckMusic(clip, vol * heard * Mathf.Clamp01(volume));
         }
 
         /// <summary>A 2D sound (interface, stings, the player's own cues).</summary>
@@ -95,8 +106,9 @@ namespace RacingGame
             if (clip == null || ui == null) return;
             int i = uiPicker.Pick(clip, vol, Seconds(clip, pitch), clock);
             if (i < 0) return;
+            uiGain[i] = vol;
             Launch(ui[i], clip, vol, pitch);
-            DuckMusic(clip, vol);
+            DuckMusic(clip, vol * Mathf.Clamp01(volume));
         }
 
         /// <summary>A loud, long-ish effect (explosion near the player, finish, kill sting) dips the music.</summary>
@@ -109,7 +121,7 @@ namespace RacingGame
 
         private void Launch(AudioSource s, AudioClip clip, float vol, float pitch)
         {
-            s.pitch = pitch; s.volume = vol * volume; s.clip = clip; s.Play();
+            s.pitch = pitch; s.volume = vol * Mathf.Clamp01(volume); s.clip = clip; s.Play();
         }
 
         private static float Seconds(AudioClip clip, float pitch) => SfxLibrary.LengthOf(clip) / Mathf.Max(0.05f, Mathf.Abs(pitch));

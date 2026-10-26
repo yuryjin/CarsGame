@@ -11,15 +11,28 @@ namespace RacingGame.Tests
     {
         private GameFlow flow;
         private float capture;
+        private bool hadSettings, oldDynamic;
         [SetUp] public void Setup() { capture = Time.captureDeltaTime; }
         [TearDown] public void Cleanup()
         {
             if (flow != null) flow.EnterMenu();
+            if (hadSettings && PlatformGlue.Save != null) PlatformGlue.Save.Data.settings.dynamicCamera = oldDynamic;
             PauseController.ResetAll(); Time.captureDeltaTime = capture;
         }
 
         [UnityTest, Timeout(180000)]
         public IEnumerator RecoveringFromTheCeilingImmediatelyRestoresTheCameraAndNewRacesStartUpright()
+        {
+            yield return RunRecovery(true);
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator SteadyViewStillFollowsCeilingGravityAndRecovery()
+        {
+            yield return RunRecovery(false);
+        }
+
+        private IEnumerator RunRecovery(bool dynamicView)
         {
             Time.captureDeltaTime = SimulationDriver.FixedStep;
             yield return SceneManager.LoadSceneAsync("SampleScene");
@@ -27,6 +40,8 @@ namespace RacingGame.Tests
             while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < until) yield return null;
             Assert.IsTrue(PlatformGlue.IsReady);
             yield return null; yield return null;
+            hadSettings = true; oldDynamic = PlatformGlue.Save.Data.settings.dynamicCamera;
+            PlatformGlue.Save.Data.settings.dynamicCamera = dynamicView;
             flow = Object.FindAnyObjectByType<GameFlow>();
             var race = Object.FindAnyObjectByType<RaceManager>();
             Assert.IsTrue(flow.StartPractice(PracticeLesson.WallRide));
@@ -51,7 +66,7 @@ namespace RacingGame.Tests
             Assert.Less(Vector3.Distance(camera.transform.position, car.transform.position), 10f);
             var follow = camera.GetComponent<CarCameraFollow>();
             Assert.AreEqual(0f, follow.CurrentRoll, .001f);
-            Assert.AreEqual(follow.fovAtRest, camera.fieldOfView, .01f);
+            Assert.AreEqual(dynamicView ? follow.fovAtRest : follow.steadyFov, camera.fieldOfView, .01f);
 
             car.Teleport(car.transform.position + new Vector3(180f, 0f, 50f), Quaternion.Euler(0f, 90f, 0f));
             Assert.Less(Vector3.Distance(camera.transform.position, car.transform.position), 10f,

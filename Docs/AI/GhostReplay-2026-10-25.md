@@ -44,6 +44,8 @@ Artifacts are under `/tmp/cars-improve-20261025` with source manifests:
 - `ghost-geometry-after2`:5/5. All20bodies have one submesh and preserve all triangle vertices; maximum error below0.0001m. Native before/after contact sheets differ in only9of3,686,400channel values.
 - `ghost-lifetime12`:9/9. Includes100additional cached spawns and5unknown-ID fallbacks without mesh-count growth, plus finish/playback/camera integration.
 - `edit12`:390/390. WebGL candidates12–14 built successfully.
-- `ghost-browser11`: passed v1/v2 loading, selected body/full rotation, pause, late loading, recovery cut, natural-finish recording/metadata and rejection of a stale response after leaving. No captured browser/game exceptions. Candidate11 predates mesh merging; merged geometry is verified by the native comparisons above.
+- `ghost-browser11`: passed v1/v2 loading, selected body/full rotation, pause, late loading, recovery cut, natural-finish recording/metadata and rejection of a stale response after leaving. No captured browser/game exceptions. Candidate11 predates mesh merging; merged geometry was initially verified by the native comparisons above.
 
 The temporary `GetInstanceID` compilation error in the first merge attempt was fixed by using the prefab reference in the cache key. Those failed logs are retained. No publication or real SDK session write was performed.
+
+- `ghost-browser15`: passed the same end-to-end scenarios on the merged-mesh build; each v1/v2 replay has exactly one `GhostVisual_<body>` mesh in WebGL. Natural finish committed a valid bounded v2 record and matching integer-millisecond session metadata. Captured errors remained empty.

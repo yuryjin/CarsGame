@@ -1,6 +1,22 @@
 // Thin marshalling layer only. All Yandex SDK logic lives in TemplateData/cars-platform.js
 // (window.CarsPlatform) so it can be debugged in DevTools and changed without an IL2CPP rebuild.
 mergeInto(LibraryManager.library, {
+  CarsLocal_Write: function (keyPtr, jsonPtr) {
+    try {
+      var key = 'cars.local.' + UTF8ToString(keyPtr), json = UTF8ToString(jsonPtr);
+      localStorage.setItem(key, json);
+      return localStorage.getItem(key) === json ? 1 : 0;
+    } catch (e) { return 0; }
+  },
+  CarsLocal_Read: function (keyPtr) {
+    var reply;
+    try {
+      var value = localStorage.getItem('cars.local.' + UTF8ToString(keyPtr));
+      reply = { ok: true, found: value !== null, value: value || '' };
+    } catch (e) { reply = { ok: false }; }
+    var json = JSON.stringify(reply), size = lengthBytesUTF8(json) + 1;
+    var ptr = _malloc(size); stringToUTF8(json, ptr, size); return ptr;
+  },
   CarsYa_Free: function (ptr) { _free(ptr); },
   CarsYa_Available: function () { return (typeof window !== 'undefined' && window.CarsPlatform) ? 1 : 0; },
   CarsYa_Init: function (reqId) { window.CarsPlatform.init(reqId); },
@@ -15,6 +31,7 @@ mergeInto(LibraryManager.library, {
   CarsYa_ShowRewarded: function (reqId) { window.CarsPlatform.rewarded(reqId); },
   CarsYa_GameplayStart: function () { window.CarsPlatform.gameplayStart(); },
   CarsYa_GameplayStop: function () { window.CarsPlatform.gameplayStop(); },
+  CarsYa_BootFailed: function (reasonPtr) { if (window.CarsBootFailure) window.CarsBootFailure(UTF8ToString(reasonPtr)); },
   CarsYa_Ready: function () { window.CarsPlatform.ready(); },
   CarsYa_RequestAuth: function (reqId) { window.CarsPlatform.requestAuth(reqId); },
   CarsYa_SubmitScore: function (reqId, boardPtr, score, extraPtr) { window.CarsPlatform.submitScore(reqId, UTF8ToString(boardPtr), Number(score), UTF8ToString(extraPtr)); },

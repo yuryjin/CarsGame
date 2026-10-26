@@ -1990,6 +1990,57 @@ MonoBehaviour:
     m_Localized: "Toplam al\u0131nan"
     m_Metadata:
       m_Items: []
+  - m_Id: 19041856738635776
+    m_Localized: "GAZ\nBA\u015ELA\u2019da!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19052585529192448
+    m_Localized: "M\xFCkemmel ba\u015Flang\u0131\xE7: k\u0131sa bir h\u0131zlanma
+      i\xE7in BA\u015ELA! an\u0131nda gaza bas. Gaz\u0131 \xF6nceden bas\u0131l\u0131
+      tutmak veya otomatik gaz bonus kazand\u0131rmaz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19055832478330880
+    m_Localized: "Kamera yak\u0131nla\u015Fma ve e\u011Fimi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19066674489929728
+    m_Localized: "Dil y\xFCklenemedi. Ba\u011Flant\u0131n\u0131 kontrol edip tekrar
+      se\xE7."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158564483072
+    m_Localized: "\u0130lerleme bu cihazda kaydedilmedi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871680
+    m_Localized: "\u0130lerleme h\xE2l\xE2 bellekte. Yer a\xE7 veya taray\u0131c\u0131
+      depolamas\u0131na izin ver, sonra tekrar dene. Oyunu kapatmak kaydedilmemi\u015F
+      ilerlemeyi kaybettirebilir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871681
+    m_Localized: Tekrar kaydet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871682
+    m_Localized: Kaydetmeden devam et
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871683
+    m_Localized: "\u0130lerleme bu cihazda kaydedildi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871684
+    m_Localized: "Kay\u0131tl\u0131 ilerlemeye eri\u015Filemiyor"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871685
+    m_Localized: "Depolama okunamad\u0131. Kay\u0131tl\u0131 profilin de\u011Fi\u015Ftirilmedi.
+      Taray\u0131c\u0131 depolamas\u0131na izin verip tekrar dene. Yeni de\u011Fi\u015Fiklikler
+      \u015Fimdilik bellekte kal\u0131r."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

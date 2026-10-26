@@ -122,7 +122,8 @@ namespace RacingGame
             foreach (var e in entries)
             {
                 if (e.P == null) { e.Rt.gameObject.SetActive(false); e.Leader.gameObject.SetActive(false); continue; }
-                e.Screen = cam.WorldToScreenPoint(e.P.transform.position + Vector3.up * heightAboveCar);
+                Vector3 above = e.P.Car != null ? e.P.Car.GravityUp : Vector3.up;
+                e.Screen = cam.WorldToScreenPoint(e.P.transform.position + above * heightAboveCar);
                 bool show = e.P.gameObject.activeInHierarchy && e.Screen.z > 0f && e.Screen.z < 120f
                     && e.Screen.x >= 0f && e.Screen.x <= Screen.width && e.Screen.y >= 0f && e.Screen.y <= Screen.height
                     && race.State >= RaceState.Countdown && race.State < RaceState.Finished && !PauseController.IsPaused;

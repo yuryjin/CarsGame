@@ -1,7 +1,7 @@
 {
     "name": "RacingGame.Tests.PlayMode",
     "rootNamespace": "RacingGame.Tests",
-    "references": [ "RacingGame.Core", "RacingGame.Platform", "RacingGame.Game", "Unity.InputSystem", "UnityEngine.UI", "Unity.TextMeshPro", "UnityEngine.TestRunner", "UnityEditor.TestRunner" ],
+    "references": [ "RacingGame.Core", "RacingGame.Platform", "RacingGame.Game", "Unity.Localization", "Unity.Addressables", "Unity.ResourceManager", "Unity.InputSystem", "UnityEngine.UI", "Unity.TextMeshPro", "UnityEngine.TestRunner", "UnityEditor.TestRunner" ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

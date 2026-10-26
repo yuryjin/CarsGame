@@ -22,6 +22,8 @@ namespace RacingGame
 
         /// <summary>Test hook: the last race awarded a perfect start.</summary>
         public bool Awarded { get; private set; }
+        public bool AcceptingInput => !judged && race != null
+            && (race.State == RaceState.Countdown || race.State == RaceState.Racing);
 
         private void Awake() { race = GetComponent<RaceManager>(); hud = GetComponent<HudScreen>(); }
         private void OnEnable() { race.OnFieldSpawned += ResetState; race.OnRaceStarted += OnGo; }

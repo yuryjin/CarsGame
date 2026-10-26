@@ -15,6 +15,17 @@ namespace RacingGame.Tests
         public void TearDown() => PlayerPrefs.DeleteKey(Key);
 
         [Test]
+        public void WriteAndFlushFailuresAreObservableByTheSaveService()
+        {
+            var setFails = new PlayerPrefsSaveStore(Key,
+                (_, _) => throw new System.IO.IOException("QA full storage"), () => { });
+            Assert.Throws<System.IO.IOException>(() => setFails.Write("progress"));
+            var flushFails = new PlayerPrefsSaveStore(Key,
+                (_, _) => { }, () => throw new System.IO.IOException("QA flush denied"));
+            Assert.Throws<System.IO.IOException>(() => flushFails.Write("progress"));
+        }
+
+        [Test]
         public void MissingValueReadsAsEmptyString()
         {
             Assert.AreEqual(string.Empty, new PlayerPrefsSaveStore(Key).Read());

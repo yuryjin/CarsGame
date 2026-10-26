@@ -4,6 +4,7 @@ using RacingGame.Core.Platform;
 
 namespace RacingGame.Core.Save
 {
+    /// <summary>Write must throw when persistence fails; callers must not silently acknowledge it.</summary>
     public interface ILocalSaveStore { string Read(); void Write(string json); }
 
     /// <summary>
@@ -23,6 +24,11 @@ namespace RacingGame.Core.Save
         public bool CloudSynced { get; private set; }
         public int CloudWrites { get; private set; }
         public int CloudFailures { get; private set; }
+        public bool LocalWriteFailed { get; private set; }
+        public bool LocalReadFailed { get; private set; }
+        private bool localDirty;
+        private double nextLocalRetryAt = double.NegativeInfinity;
+        private const double LocalRetrySeconds = 5d;
         public string DeviceId { get; }
         public DeviceLedger Local => Data.Local(DeviceId);
         public event Action<SaveData> Changed;
@@ -58,8 +64,17 @@ namespace RacingGame.Core.Save
 
         private async Task LoadCoreAsync()
         {
-            var localData = SaveMigrator.Parse(local?.Read(), out var localStatus);
-            LastLocalStatus = localStatus;
+            SaveData localData = null;
+            try
+            {
+                localData = SaveMigrator.Parse(local?.Read(), out var localStatus);
+                LastLocalStatus = localStatus;
+            }
+            catch (Exception)
+            {
+                LocalReadFailed = LocalWriteFailed = localDirty = true;
+                nextLocalRetryAt = clock() + LocalRetrySeconds;
+            }
             if (!Loaded) { Data = SaveMerge.Merge(Data, localData) ?? Data; Data.deviceId = DeviceId; Loaded = true; Changed?.Invoke(Data); }
 
             var c = cloud?.Invoke();
@@ -90,6 +105,7 @@ namespace RacingGame.Core.Save
             {
                 Data = SaveMerge.Merge(Data, cloudData) ?? Data;   // merge into whatever the game changed meanwhile
                 Data.deviceId = DeviceId;
+                if (!LocalVersionTooNew) { localDirty = true; RetryLocalWrite(); }
                 Changed?.Invoke(Data);
             }
             CloudSynced = true;
@@ -125,17 +141,51 @@ namespace RacingGame.Core.Save
         {
             if (LocalVersionTooNew) return;
             Data.updatedAtUnixMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            local?.Write(SaveMigrator.ToJson(Data));
+            localDirty = true;
+            if (!LocalWriteFailed || clock() >= nextLocalRetryAt) RetryLocalWrite();
             dirty = true;
             Changed?.Invoke(Data);
         }
 
-        /// <summary>Poll from Update; sends a coalesced cloud write when due.</summary>
+        /// <summary>Retry the local mirror without waiting for a network request. Keeps all progress
+        /// in memory on failure, and never substitutes an older serialized payload.</summary>
+        public bool RetryLocalWrite()
+        {
+            if (LocalVersionTooNew) return false;
+            if (!localDirty) return !LocalWriteFailed;
+            try
+            {
+                if (local == null) throw new InvalidOperationException("local save store unavailable");
+                if (LocalReadFailed)
+                {
+                    var recovered = SaveMigrator.Parse(local.Read(), out var status);
+                    LastLocalStatus = status;
+                    LocalReadFailed = false;
+                    if (LocalVersionTooNew) return false;
+                    Data = SaveMerge.Merge(Data, recovered) ?? Data;
+                    Data.deviceId = DeviceId;
+                    Changed?.Invoke(Data);
+                }
+                local.Write(SaveMigrator.ToJson(Data));
+                localDirty = false;
+                LocalWriteFailed = false;
+                return true;
+            }
+            catch (Exception)
+            {
+                LocalWriteFailed = true;
+                nextLocalRetryAt = clock() + LocalRetrySeconds;
+                return false;
+            }
+        }
+
+        /// <summary>Poll from Update; retries the local mirror and sends a coalesced cloud write when due.</summary>
         public void Tick()
         {
             if (LocalVersionTooNew) return;
-            if (!dirty) return;
             double now = clock();
+            if (localDirty && now >= nextLocalRetryAt) RetryLocalWrite();
+            if (LocalVersionTooNew || !dirty) return;
             if (!CloudSynced) { if (now >= nextCloudRetryAt) _ = RetryCloudAsync(); return; }
             if (now - lastCloudAt < cloudMinIntervalSeconds) return;
             SendToCloud();
@@ -145,17 +195,28 @@ namespace RacingGame.Core.Save
         public async Task<Result> FlushAsync()
         {
             if (LocalVersionTooNew) return Result.Fail(ResultCategory.Error, "newer local save version", false);
+            RetryLocalWrite();
+            if (LocalVersionTooNew) return Result.Fail(ResultCategory.Error, "newer local save version", false);
+            if (LocalReadFailed) return Result.Fail(ResultCategory.Error, "local save read failed", true);
             var c = cloud?.Invoke();
-            if (c == null) { dirty = false; return Result.Success; }
+            if (c == null)
+            {
+                dirty = false;
+                return LocalWriteFailed ? Result.Fail(ResultCategory.Error, "local save write failed", true) : Result.Success;
+            }
             if (!CloudSynced) { await RetryCloudAsync(); if (!CloudSynced) return Result.Fail(ResultCategory.Error, "cloud not synced", true); }
             if (dirty) SendToCloud();
             var r = await c.FlushAsync();
             if (!r.Ok) { dirty = true; CloudFailures++; }
+            if (r.Ok && LocalWriteFailed) return Result.Fail(ResultCategory.Error, "local save write failed", true);
             return r;
         }
 
         private void SendToCloud()
         {
+            // An unread local profile may belong to a future schema. Read/merge it before
+            // publishing a replacement anywhere, just as we do for an unread cloud profile.
+            if (LocalVersionTooNew || LocalReadFailed) return;
             var c = cloud?.Invoke();
             lastCloudAt = clock();
             if (c == null) { dirty = false; return; }

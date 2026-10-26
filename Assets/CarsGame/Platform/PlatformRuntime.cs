@@ -42,6 +42,14 @@ namespace RacingGame.Platform
             return instance;
         }
 
+        /// <summary>Recover from a failed asynchronous boot dependency after Unity itself loaded.</summary>
+        public static void ReportBootFailure(string reason)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            Yandex.YandexNative.CarsYa_BootFailed(reason);
+#endif
+        }
+
         public static void Install(IPlatformServices services) { Ensure(); Current = services; }
 
         private void Awake()

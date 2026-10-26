@@ -51,6 +51,43 @@ namespace RacingGame.Tests
         private static Bounds Bounds(RectTransform rect) => RectTransformUtility.CalculateRelativeRectTransformBounds(rect.root, rect);
 
         [UnityTest, Timeout(30000)]
+        public IEnumerator MouseAndMouseEmulatedTouchesRecoverWhenTheUiLosesPointerUp()
+        {
+            syntheticTouch = InputSystem.AddDevice<Touchscreen>();
+            var mouse = InputSystem.AddDevice<Mouse>();
+            var target = new GameObject("MouseReleaseTest");
+            try
+            {
+                var button = target.AddComponent<TouchButton>();
+                button.controlPath = "<Gamepad>/dpad/left";
+                Vector2 point = new Vector2(-100f, -100f);
+                foreach (bool emulatedTouch in new[] { false, true })
+                {
+                    InputSystem.QueueStateEvent(mouse, new MouseState { position = point, buttons = 1 });
+                    if (emulatedTouch)
+                        InputSystem.QueueStateEvent(syntheticTouch, new TouchState { touchId = 1,
+                            phase = UnityEngine.InputSystem.TouchPhase.Began, position = point });
+                    yield return null; yield return null;
+                    button.OnPointerDown(new ExtendedPointerEventData(EventSystem.current) {
+                        pointerId = -1, device = mouse, position = point, button = PointerEventData.InputButton.Left });
+                    for (int i = 0; i < 3; i++) yield return null;
+                    Assert.IsTrue(((ButtonControl)button.control).isPressed);
+                    if (emulatedTouch)
+                        InputSystem.QueueStateEvent(syntheticTouch, new TouchState { touchId = 1,
+                            phase = UnityEngine.InputSystem.TouchPhase.Ended, position = point });
+                    else InputSystem.QueueStateEvent(mouse, new MouseState { position = point });
+                    // No PointerUp. The emulated Mouse deliberately stays pressed after the finger lifts.
+                    for (int i = 0; i < 3; i++) yield return null;
+                    Assert.IsFalse(((ButtonControl)button.control).isPressed,
+                        emulatedTouch ? "The physical finger wins over a stale emulated Mouse" : "Physical mouse release recovers the control");
+                    InputSystem.QueueStateEvent(mouse, new MouseState { position = point });
+                    yield return null; yield return null;
+                }
+            }
+            finally { Object.DestroyImmediate(target); InputSystem.RemoveDevice(mouse); }
+        }
+
+        [UnityTest, Timeout(30000)]
         public IEnumerator PhysicalTouchReleaseRecoversAMissingPointerUpWithoutReleasingAnotherFinger()
         {
             syntheticTouch = InputSystem.AddDevice<Touchscreen>();

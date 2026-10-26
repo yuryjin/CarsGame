@@ -57,8 +57,9 @@ namespace RacingGame.Tests
             saved = JsonUtility.ToJson(PlatformGlue.Save.Data);
             Loc.SetLanguage("ru");
             until = Time.realtimeSinceStartup + 30f;
-            while (!Loc.Ready && Time.realtimeSinceStartup < until) yield return null;
+            while ((!Loc.Ready || Loc.Language != "ru") && Time.realtimeSinceStartup < until) yield return null;
             Assert.IsTrue(Loc.Ready);
+            Assert.AreEqual("ru", Loc.Language);
             flow = Object.FindAnyObjectByType<GameFlow>();
             spawner = Object.FindAnyObjectByType<RaceSpawner>();
             var race = Object.FindAnyObjectByType<RaceManager>();

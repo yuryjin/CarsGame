@@ -1974,6 +1974,57 @@ MonoBehaviour:
     m_Localized: Total recibido
     m_Metadata:
       m_Items: []
+  - m_Id: 19041856738635776
+    m_Localized: "ACELERA\nal \xA1YA!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19052585529192448
+    m_Localized: "Salida perfecta: pulsa el acelerador al \xA1YA! para un impulso
+      breve. Mantenerlo pulsado antes o usar aceleraci\xF3n autom\xE1tica no da el
+      bonus."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19055832478330880
+    m_Localized: "Zoom e inclinaci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19066674489929728
+    m_Localized: "No se pudo cargar el idioma. Comprueba la conexi\xF3n y vuelve
+      a elegirlo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158564483072
+    m_Localized: "El progreso no est\xE1 guardado en este dispositivo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871680
+    m_Localized: "Tu progreso sigue en la memoria. Libera espacio o permite el almacenamiento
+      del navegador y reintenta. Al cerrar el juego podr\xEDas perder el progreso
+      sin guardar."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871681
+    m_Localized: Reintentar guardado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871682
+    m_Localized: Continuar sin guardar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871683
+    m_Localized: Progreso guardado en este dispositivo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871684
+    m_Localized: "El progreso guardado no est\xE1 disponible"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871685
+    m_Localized: No se pudo leer el almacenamiento. Tu perfil guardado no se ha reemplazado.
+      Permite el almacenamiento del navegador y reintenta. Los cambios nuevos siguen
+      en la memoria.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

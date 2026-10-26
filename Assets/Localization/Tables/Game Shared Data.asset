@@ -1927,6 +1927,50 @@ MonoBehaviour:
     m_Key: results.payout.total
     m_Metadata:
       m_Items: []
+  - m_Id: 19041856738635776
+    m_Key: touch.launch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19052585529192448
+    m_Key: help.launch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19055832478330880
+    m_Key: settings.dynamic_camera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19066674489929728
+    m_Key: settings.language.failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158564483072
+    m_Key: save.local.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871680
+    m_Key: save.local.message
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871681
+    m_Key: save.local.retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871682
+    m_Key: save.local.continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871683
+    m_Key: save.local.restored
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871684
+    m_Key: save.local.read_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871685
+    m_Key: save.local.read_message
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

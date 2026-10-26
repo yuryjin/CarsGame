@@ -223,3 +223,95 @@ Camera-survey14 не дошёл до выполнения: снимок захв
 Camera-survey14b:1/1, получены и просмотрены20реальныхкадров640×360. Все кузова целиком перед камерой и в кадре; тонкие антенны поднимают bounding ymax до0.84, но основная масса кузова не перекрывает дальнюю дорогу. Изменение настроек камеры по этому исследованию не требуется. Contact:camera-survey14b/images/contact.png, точныеviewportbounds:framing.csv. Runner снова изменился внешней работой во время исполнения и напечатал syntax error после успешного XML. Для последующих запусков скопирован неизменяемый qa-runner-0755 в/tmp.
 
 Roof-nameplate-before был ложноположительным: отключение CarController в фикстуре сбрасывает GravityUp. Перед проекцией теперь останавливается SimulationDriver с сохранением настоящего прилипания; добавлена повторная проверка gravity-down. Before2 выполняется. Runtime WorldHealthBars пока не изменён.
+
+
+### Итерация 19 — подпись соперника на потолке
+
+Roof-nameplate-before2:0/1, реальное прилипание GravityUp.y<−0.9, ошибка положения полосы160.56px. WorldHealthBars теперь использует GravityUp машины для смещения над кузовом; обычная дорога сохраняет world-up. After включает потолок, плотную группу имён, локализацию и награды. Дополнительно toast после рекламы теперь сообщает точный +N вместо неточного «вся награда удвоена», поскольку ежедневный бонус не удваивается.
+
+Roof-nameplate-after:4/4 passed, manifest сохранён. Hybrid-browser13:PASS1280/640, реальное первое касаниеPause после клавиатуры, трициклакаждыйразмер. Practice-full14 не запускал упражнения: Mono/native assertion в NamedPipeServerStream/FcntlSetCloseOnExec при компиляции; новый запуск14b на томже snapshot с неизменяемым qa-runner. Причина сбоя редактора не установлена; runtime игры здесь не выполнялся.
+
+
+### Итерация 20 — идеальный старт на сенсорном экране
+
+Touch-launch-before:0/1, отсутствует физическая кнопка газа для PerfectStart. Добавлена временная Launch→rightTrigger в центре снизу; видна только до решения PerfectStart, минимум64pxвысота/14pxтекст. Автогаз не считается нажатием. Новый реальныйtouch-тест проверяет своевременныйтап,раннееудержание,отсутствиетапа,скрытиеиобнулениегаза; запущен вместе с pause/input. Loc15:479keys×9languages,721chars,missing-empty.
+
+Practice-full14b:80/80в одном прогоне, Unity1/1, actualSIMmanifest сохранён. Все20кузовов×drift/aim/shortcut/ceiling; физические подготовленные маршруты, без изменения физики ради теста. Touch-launch-after:7/7, включая три реальныеtouch-попытки и pause/layout.
+
+### Итерация 21 — эмулированная мышь при первом касании
+
+Touch-diagnostic14 повторил browser7:640normal/right и large/right passed, large/left залипLeft. Диагностика: Left.device=Mouse,touchId0,down3/up2,tracked0 при touches0; Fire.device=Touchscreen,up5/down5 и корректно отпущен. Это смешанная доставка первого/второго пальцев, не проблема IL2CPP-dispatch. TouchButton теперь отслеживает физическую Mouse/Pen; MouseDown в пределах4pxотактивногоTouch связывается с егоID, чтобы пережить staleMouse/missingPointerUp. Новый нативный тест специально оставляет emulatedMouse нажатой после физическогоTouchEnd. Candidate15 и targetedafter выполняются.
+
+Touch-mouse-after15:10/10 passed. Candidate15 собран; prebuild50.4s/0walls/0deaths/0resets,manifestсохранён,локальный8844. Touch-browser15 и launch-browser15 ждут webtest. Reward-browser14:27/27(9языков×3размера), wallet/headline/expandedrows/ad/repeatdaily,errors[].
+
+
+### Итерация 22 — громкость уже запущенных эффектов
+
+Audio-mixer-before:0/2. При volume=0 ранее запущенный world-voice оставался0.2; inaudibleUIeffect вызывал1musicduck. Теперь SfxPlayer хранит исходный gain20pooledvoices и при изменении master обновляет их громкость, включая уже звучащие; послеunmute сохраняются пропорции. DuckMusic получает слышимую громкость с учётом master. After выполняется с AudioSettings. Снимки Reward-browser14 ru/zh640 просмотрены: состав и итог награды читаемы, footer доступен.
+
+Audio-mixer-after:3/3. Отдельный Skid-mute-before:0/1 — при master0 реальное боковое скольжение оставляетScreechVolume0.0565наследующийкадр. EngineAudio теперь сглаживает tiregain до применения master, так что mute действует сразу.
+Launch-browser15:29/29,9языков×3размераплюсearly/none,errors[]. НастоящиекасаниядаютPerfectStartтольковокне;послестартаLaunchскрыт,автогазработает; минимум64px,14px,безпересеченийкнопок.640screenshot просмотрен.
+
+Touch-browser15:12/12layouts (4prefs×3sizes),reload,pause,multitouch,errors[]. Именно прежнийfailure640largeleft теперьпоказываетLeft.deviceMouse/tracked1/touchId1наDown,послеTouchEndrecovered1,tracked0,padLeft0,steer0. Причина и исправление подтверждены WebGL.
+
+Edit16:408/408passed, manifestсохранён. Число включает внешние Grandstand/SaveMergeInvariant проверки; их изменения не приписываются этому циклу. ПолныйPlay16 запущен на актуальной версии с окончательнымmuteскольжения.
+
+Audio-complete-after:4/4passed, включая физическое скольжение. Ghost-browser15:PASSсonecombinedmeshassertion вWebGL,естественнымфинишемиполнымv1/v2pipeline,errors[]. Help.launch добавлен в pausehelp9языков. Первыйзапросloc16упёрсявтайм-аутautomatedapproval(неоценканебезопасности); единственныйповторразрешён,выполняется.
+
+Help-launch-loc16:480keys×9languages,721chars,missing-empty. Candidate16 строится с SfxPlayer/EngineAudio/help.launch; candidate15 ещё без этих последних звуковых изменений.
+
+
+### Итерация 23 — отключаемые зум и наклон камеры
+
+Добавлен независимый dynamicCamera toggle(defaulttrueдлястарыхсохранений). Off задаёт64°постоянныйFOV/фиксированнуюдистанцию,безnitroсдвигаикамерногокрена; сопровождениеповоротаинаправлениягравитациисохранено. CameraShakeостаётсяотдельнойнастройкой. NewsettingscopyвSaveMerge,newlegacyroundtrip,тестпереключения/скоростей/реальногопотолка выполняются. Локализацияновойстрокиещёнеимпортирована; candidate16ещёбезэтойнастройки.
+
+Full-play16:94/94passed,sourcesmanifestсохранён;доdynamicCameraиhelp.launch. Steady-camera17:5/5,включаяреальныйпотолок/сбросвобоихрежимах. Camera-loc17:481keys×9languages,724chars,missing-empty. Edit17/candidate17 выполняются. SfxPlayer.Updateдобавленаnullзащитадляэкземпляра,которыйAwakeотклоняеткакдубликат;неизменяетобычнуюветку.
+
+Edit17:409/409. Camera-ui17:5/5,включаяреальныйUItoggleизпаузы/FOVпослевозвратавтужегонку,help.launch,финальныйaudio. Candidate17собран50.4s/0walls/0deaths/0resets,manifestсохранён,сервер8846. Camera-settings-browser17поставленвочередьсновымипроверкамитекста/настроек/справки/reload.
+
+Audio-duck-browser-before(candidate15):0/1,mutedfinishвызвал1реальныйWebAudiodip. After16:2/2,приeffects0duckgain1безавтоматизации,приeffects1dipсохранён(gain0.636вснимке),musicbus0.55вобоих,errors[].
+
+### Итерация 24 — секундомер при долгих кадрах
+
+Clock-hitch-before:0/1. Шестьреальных300msзадержекнаглавномпотокеUnity:physics1.840s,clock1.500s. Причина:RaceClockcap0.25меньшеTime.maximumDeltaTime0.3333. Capтеперьmax(0.25,Time.maximumDeltaTime),чтобыприступеняхUnityтаймернеотставалотфизики;оченьдолгиезагрузкипопрежнемуограничены. AfterсGhostPlayback/PerfectStart/FlowPauseвыполняется. Старые времена не переписываются; обычные кадры до250ms считаются как прежде.
+
+Clock-hitch-after: **10/10**, вместе с GhostPlayback, PerfectStartPause и FlowPause. Снимок исходников из фактической тестовой копии сохранён. Начата проверка отказа Addressables-перевода: прежняя Loc.SetLanguage сразу обнуляла Ready/таблицу и никогда не восстанавливалась после ошибки. Браузерный тест ожидает общую очередь; первый запрос разрешения завершился таймаутом автоматического review, единственный повтор разрешён.
+
+### Итерация 25 — отказ загрузки перевода
+
+Первый native fixture оказался некорректен: ITableProvider при failed operation штатно переключается на обычные Addressables, поэтому перевод всё же загрузился. Этот FAIL не считается воспроизведением игрового дефекта. Исправленный fixture использует отсутствующую таблицу, затем восстановленный provider. Locale-recovery-after: **1/1**, прежний текст и меню остаются рабочими, неудачный выбор не сохраняется, повторная загрузка не застревает на ошибочном кэше. Snapshot сохранён. Поздняя защита от запоздавшей Initialize и проверка быстрых последовательных выборов ещё требуют нового прогона.
+
+Loc удерживает одну собственную ссылку на рабочую таблицу между сменами SelectedLocale; после успешной загрузки освобождает предыдущую. Стартовый отказ WebGL вызывает локализованную HTML-кнопку повторной загрузки страницы. Locale-recovery-loc18:482ключа×9языков,727glyphs,missing-empty. Browser before/after пока ожидает очередь.
+
+Locale-failure-before browser(candidate17): **оба дефекта воспроизведены**. Block Turkish bundle на switch и Russian на startup: по2заблокированных запроса, buttons[], retry0. Candidate18 собран, контрольный круг50.4s/0walls/deaths/resets; manifest сохранён, сервер8847. Locale-recovery-browser18 ожидает очередь.
+
+Camera-settings-browser17: видимость/подписи/help прошли27комбинаций; reload640/812сохранилdynamicCamera=false. Desktop1280 провалил ожидание сохранения. Дамп показал кнопку наy664px за границей scrollviewport: fixture проверял canvasbottom715 вместо нижней границы списка около657. Исправлен безопасный нижний предел прокрутки; добавлена диагностика обоих browser-storage и assertion actual dynamicCamera для нового DebugBus. Browser17b повторяется; до результата не считать полный27/27PASS.
+
+### Итерация 26 — ошибки локальной записи и чтения
+
+Local-write-before:0/1 — исключение хранилища прерываетMarkDirty. PlayerPrefsSaveStore больше не поглощает отказ. SaveService удерживает местную очередь независимо от clouddirty, повторяет через5s, Flushбезуспешнойместнойзаписи возвращаетошибку, подтверждённыйcloudmergeсразузеркалируетсялокально. Local-write-after: **18/18** SaveService/PlayerPrefsStore, снимок сохранён. Проверены offlinefailure/recovery/reopen,backoff,cloudsuccess+localfailure,свежаяочередь,mergeoffline,readdeny+mergebeforereplace.
+
+Исходники Unity WebGL подтвердили, что IDBFS-flush асинхронен и PlayerPrefs.Save не доказывает durable success. WebGL-ветка теперь хранит проверяемую копию `cars.local.cars.save.v1` через localStorage; при отсутствии копии читает legacyPlayerPrefs. Чтение/запись дают явный отказ; deniedread блокирует замену до успешного чтения+merge. Node-тест actualjslib:7сценариев PASS, безбраузера. Это не гарантия сохранности при очистке данных сайта браузером.
+
+Новый диалог появляется на безопасном меню/паузе/results, сохраняет имеющиеся причины паузы, предлагаетRetry/Continue; в езде только предупреждение. UI/native/browser ещё проверяются. Loc19:489ключей×9,742glyphs,missing-empty. Повреждённый JSON и его резервная копия (CG-RISK-005) этой итерацией пока не закрыты.
+
+Edit19:414/414,manifest. Recovery-ui19:3/4:SaveRecoveryPlayTests (9языков,отказ/Retry/Continue/пауза),SaveCompatibility,PauseSettings PASS. Rapidlocaleaddition FAILоставляетitвместоenчерез60кадров;выясняется,реальна ли гонка или fixture слишком рано проверяет asyncзагрузку. Новыйпрогонждётдо10секундреального времени и пишет elapsed.
+
+Camera-browser17b подтверждаетdynamicCamera=false наdesktopпослеисправленияscroll, нооборвалсянапропущенномCloseHelpclick (безвыдержкиDown/Up). Fixture теперьиспользует80msmousepressипроверяетзакрытиеhelpдоследующегодействия. Browser17cвочереди.
+
+CG-RISK-006:common.sh теперь checksum-sync Assets,Packages,ProjectSettings и удаляетустаревшиевходывSIM. Новыйtest_sim_sync воспроизвёлтакжеsame-size/same-second устаревшийAssetsфайл;after1/1. Существующие15runner-тестовпоследобавленияPackagesвихfixture:15/15. ВсеPackages/ProjectSettingsтрёхфактическихкопийдоизмененияскрипта уже совпадалисосновнымпроектом (хэши),поэтомуихпрошлые результаты не инвалидированыэтимриском.
+
+Candidate19собран,50.4scontrol/0walls/deaths/resets,manifest. Не включает поздний guard:еслипослеdeniedreadоткрываетсяfutureversion,Tick/Flush/SendToCloudповторнопроверяютблокировку. Новыйlocal-read-future-before запущен; исходникпослезапускаисправлендляследующегокандидата.
+
+Local-read-future-before:0/1, cloud.QueueCalls=1 при найденномlocalversion999. GuardдобавленпослеповторногочтенияивSendToCloud;такжеотправкапокаLocalReadFailedзапрещена:непрочитанныйпрофильможетбытьнесовместимым. Candidate20предшествуетпоследнемублокированиюпокаreadfailed;finalпотребуетследующейпересборки.
+
+Locale-rapid20:FAILдоrapidсценариянаinitialENsetup(240ускоренныхкадров),не доказательство гонки. Новыйfixtureждётреальныезавершения/deadline30s иLoadFailed event;cleanupтакжедожидаетсязаменытаблицыпередDestroyтестовойкопии. Recovery-timing21 выполняется. Full-play20 выполняетсянаruntimeсguardпослеповторногочтения,ноещёбезguardпокаLocalReadFailed.
+
+Recovery-timing21: **2/2PASS**, реальныеasyncdeadline/event. Full-play20такжезаписалrapidchoiceenза0.151s; отдельныйcorrectedfixtureза0.153s. Гонка языка не подтвердилась, причиной прежних проверок было недостаточное число ускоренных кадров. LocalRead/Write-дилогпрогнан9языковNativeвтомженаборе. Первыйзапусклокальногосервера8848получилтаймаутapprovalreview; единственныйповторразрешён,серверработает. Browser19ожидаетобщуюочередь.
+
+
+Edit21: **415/415**, guard future-version и unread-local прошли. Full-play20:98/99; единственный FAIL — Practice locale fixture ждал Ready, который теперь означает наличие прежней рабочей таблицы. Practice/RacerNames/UniqueRivalNames fixtures ждут фактический целевой язык; Full-play21 выполняется.
+
+Camera-settings-browser17c: **27/27 + 3 reloads**, исправленный реальный scroll/click fixture. Locale-recovery-browser18: **3/3**, отказ смены языка, загрузки стартовой таблицы и инициализации; retry действительно восстанавливает игру. Save-recovery-browser19 остановился до injection: MusicVolume находился за viewport на640×360, поэтому click не изменил настройку. Fixture использует видимый SoundVolume; отказ игры этим запуском не установлен.
+
+При восстановлении local-read интерфейс ранее сохранял старый кошелёк и громкость эффектов. Теперь текущий экран перестраивается, восстановленные sfx/quality/autothrottle применяются сразу. Read-recovery-ui22: **2/2**, включая321монету иsfx0, плюс9языков/Retry/Continue/пауза. Candidate21 собран50.4s/0walls/deaths/resets, snapshot сохранён; он предшествует этому UI-исправлению. Candidate22 и полныйPlay22 запущены на новом runtime.

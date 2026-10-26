@@ -7,11 +7,13 @@ const out = process.env.OUT || '/tmp/cars-pause-settings';
 await fs.mkdir(out, { recursive: true });
 const browser = await chromium.launch({ channel:'chrome', args:[...process.env.WEBTEST_CHROME_ARGS.split(' '),'--no-proxy-server'] });
 const evidence = [], errors = [];
+const cameraSettings=process.env.CG_CAMERA_SETTINGS==='1';
+const launchHelp={ru:'Идеальный старт',en:'Perfect start',tr:'Mükemmel başlangıç',zh:'完美起步',de:'Perfekter Start',es:'Salida perfecta',fr:'Départ parfait',pt:'Largada perfeita',uk:'Ідеальний старт'};
 try {
   for (const [width,height] of [[640,360],[812,375],[1280,720]]) {
     const mobile = width < 1000;
     const context = await browser.newContext({viewport:{width,height},hasTouch:mobile,isMobile:mobile});
-    await context.addInitScript(() => localStorage.setItem('cars.mock.playerdata', JSON.stringify({save:JSON.stringify({version:6,updatedAtUnixMs:Date.now(),settings:{lang:'ru',hintsSeen:65535}})})));
+    await context.addInitScript(() => { if(!localStorage.getItem('cars.mock.playerdata')) localStorage.setItem('cars.mock.playerdata', JSON.stringify({save:JSON.stringify({version:6,updatedAtUnixMs:Date.now(),settings:{lang:'ru',hintsSeen:65535}})})); });
     const page = await context.newPage();
     try {
       const cdp = await context.newCDPSession(page);
@@ -37,7 +39,7 @@ try {
           await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}]});
           await page.waitForTimeout(80);
           await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-        } else await page.mouse.click(x,y);
+        } else await page.mouse.click(x,y,{delay:80});
         await page.waitForTimeout(250);
       };
       const reveal = async (name, collection='buttons',scroll=false) => {
@@ -46,9 +48,12 @@ try {
           const control=(await cmd('ui'))[collection].find(c=>c.name===name);
           assert(control?.interactable,name);
           const top=scroll?(mobile?72:110):0;
-          if(control.y*height-control.height/2>=top && control.y*height+control.height/2<=height-5) return control;
+          // The list is clipped above the shell/footer, not at the canvas edge. A dump can
+          // include an interactable button whose center is already outside its viewport.
+          const bottom=scroll?height-(mobile?45:80):height-5;
+          if(control.y*height-control.height/2>=top && control.y*height+control.height/2<=bottom) return control;
           assert(scroll,`${name} outside viewport`);
-          const y=control.y*height, delta=y-(top+height-5)/2;
+          const y=control.y*height, delta=y-(top+bottom)/2;
           if(mobile) {
             // A real swipe in the list's left margin avoids grabbing a volume slider.
             const x=30, from=delta>0?height-45:top+45;
@@ -104,6 +109,19 @@ try {
           assert.equal((await cmd('ui')).sliders.find(s=>s.name==='MusicVolume').value,50);
           await click('TouchLargeOn',true); await click('TouchLeftOn',true);
         }
+        if(cameraSettings) {
+          await click('DynamicCameraOff',true);
+          await reveal('DynamicCameraOff','buttons',true);
+          const controls=await cmd('ui');
+          if ('dynamicCamera' in controls) assert.equal(controls.dynamicCamera,false,'The actual setting changed');
+          const caption=controls.labels.find(l=>l.parent==='DynamicCamera');
+          assert(caption && !caption.truncated && caption.fontPixels>=14,`${language}: readable camera setting`);
+          for(const name of ['DynamicCameraOff','DynamicCameraOn']) {
+            const b=controls.buttons.find(b=>b.name===name);assert(b?.interactable && b.height>=43.5 && b.width>=43.5);
+          }
+          if(width===640 && ['ru','zh'].includes(language)) await page.screenshot({path:`${out}/${width}-${language}-camera-setting.png`,scale:'css'});
+          evidence.push({width,height,language,phase:'camera-setting',controls});
+        }
         sameRace(await cmd('state'));
         await click('Back');
         const back=await cmd('ui'); sameRace(back); assert.equal(back.screen,'');
@@ -112,6 +130,17 @@ try {
         await page.keyboard.press('Escape',{delay:80}); await page.waitForTimeout(250);
         const escaped=await cmd('ui'); sameRace(escaped); assert.equal(escaped.screen,'');
         assert(escaped.buttons.some(b=>b.name==='Resume'),'Escape closes only settings');
+        if(cameraSettings) {
+          await click('Hint');
+          const help=await cmd('ui');sameRace(help);
+          const text=help.labels.find(l=>l.name==='Lessons');
+          assert(text && text.fontPixels>=16 && !text.truncated);
+          assert(text.text.includes(launchHelp[language]),`${language}: launch technique is explained`);
+          await click('CloseHelp');
+          const closedHelp=await cmd('ui');sameRace(closedHelp);
+          assert(!closedHelp.buttons.some(b=>b.name==='CloseHelp') && closedHelp.buttons.some(b=>b.name==='Resume'&&b.interactable),'Back closes help before another menu action');
+          evidence.push({width,height,language,phase:'launch-help',help});
+        }
         evidence.push({width,height,language,renderer,paused,back,escaped});
         console.log('PASS paused settings',width,language);
         if(language!=='uk') {
@@ -128,9 +157,20 @@ try {
         assert(fire.x<left.x,'Updated layout applies to the same race');
         evidence.push({width,phase:'resumed',ui});
       }
+      if(cameraSettings) {
+        await page.waitForFunction(()=>{
+          const data=JSON.parse(JSON.parse(localStorage.getItem('cars.mock.playerdata')||'{}').save||'{}');
+          return data.settings?.dynamicCamera===false;
+        },null,{timeout:15000});
+        await page.reload();
+        await page.waitForFunction(()=>window.CarsPlatform?.debug?.log?.some(l=>/LoadingAPI.ready|ready\(\)/.test(l)),null,{timeout:180000});
+        const restored=await page.evaluate(()=>JSON.parse(JSON.parse(localStorage.getItem('cars.mock.playerdata')).save).settings);
+        assert.equal(restored.dynamicCamera,false,'The view choice survives reload');
+        evidence.push({width,phase:'camera-reload',restored});
+      }
     } catch(error) {
       await page.screenshot({path:`${out}/failure-${width}.png`,scale:'css'}).catch(()=>{});
-      evidence.push({width,error:String(error),state:await page.evaluate(()=>window.CarsPlatform?.debug?.state).catch(()=>null)});
+      evidence.push({width,error:String(error),state:await page.evaluate(()=>window.CarsPlatform?.debug?.state).catch(()=>null),storage:await page.evaluate(()=>({mock:localStorage.getItem('cars.mock.playerdata'),local:localStorage.getItem('cars.local.cars.save.v1')})).catch(()=>null)});
       throw error;
     } finally { await context.close(); }
   }

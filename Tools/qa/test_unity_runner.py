@@ -79,7 +79,7 @@ class RunnerTests(unittest.TestCase):
         project = self.folder / "source"
         sim = self.folder / "sim"
         for base in (project, sim):
-            for name in ("Assets", "ProjectSettings", "Library"):
+            for name in ("Assets", "Packages", "ProjectSettings", "Library"):
                 (base / name).mkdir(parents=True)
         (project / "ProjectSettings/ProjectSettings.asset").write_text("test settings")
         self.fake_unity = self.folder / "fake-unity"

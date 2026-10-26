@@ -145,8 +145,9 @@ namespace RacingGame.Tests
                     {
                         PlatformGlue.SetLanguageOverride(language);
                         until = Time.realtimeSinceStartup + 30f;
-                        while (!Loc.Ready && Time.realtimeSinceStartup < until) yield return null;
+                        while ((!Loc.Ready || PlatformGlue.Save.Data.settings.lang != language) && Time.realtimeSinceStartup < until) yield return null;
                         Assert.IsTrue(Loc.Ready, "Locale table must finish loading before opening the garage: " + language);
+                        Assert.AreEqual(language, PlatformGlue.Save.Data.settings.lang, "The requested locale must have committed, not merely retained the previous ready table");
                         yield return null; yield return null;
                     }
                     foreach (string body in bodies)

@@ -437,6 +437,7 @@ namespace RacingGame
         {
             helpText.text = Loc.Get(touchLayout ? "help.drive.touch" : "help.drive.keys");
             if (!touchLayout) helpText.text += "\n\n" + Loc.Get("help.drive.gamepad");
+            helpText.text += "\n\n" + Loc.Get("help.launch");
             string context = ControlsHint(touchLayout);
             string drift = Loc.Get(touchLayout ? "lesson.drift.touch" : "lesson.drift.keys");
             // Special-event advice supplements the controls rather than replacing them.

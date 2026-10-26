@@ -138,9 +138,13 @@ namespace RacingGame
         /// <summary>Settings screen: "" = follow the platform.</summary>
         public static void SetLanguageOverride(string code)
         {
-            Save.Data.settings.lang = code ?? "";
-            Save.MarkDirty();
-            Loc.Initialize(Platform != null ? Platform.LanguageCode : "", Save.Data.settings.lang);
+            string requested = code ?? "";
+            Loc.Initialize(Platform != null ? Platform.LanguageCode : "", requested, loaded =>
+            {
+                if (!loaded || Save == null) return;
+                Save.Data.settings.lang = requested;
+                Save.MarkDirty();
+            });
         }
 
         private void Update()

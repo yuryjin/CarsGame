@@ -66,8 +66,9 @@ namespace RacingGame.Tests
             before = JsonUtility.ToJson(PlatformGlue.Save.Data);
             Loc.SetLanguage("ru");
             until = Time.realtimeSinceStartup + 30f;
-            while (!Loc.Ready && Time.realtimeSinceStartup < until) yield return null;
+            while ((!Loc.Ready || Loc.Language != "ru") && Time.realtimeSinceStartup < until) yield return null;
             Assert.IsTrue(Loc.Ready);
+            Assert.AreEqual("ru", Loc.Language);
             var failures = new List<string>();
             Expect(failures, Loc.Get("ai.name.vega") + " 2", HudScreen.GetLocalizedRacerName("Vega 2"), "numbered rival");
             Expect(failures, "Guest 42", HudScreen.GetLocalizedRacerName("Guest 42"), "literal guest name");

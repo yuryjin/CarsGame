@@ -1965,6 +1965,58 @@ MonoBehaviour:
     m_Localized: Insgesamt erhalten
     m_Metadata:
       m_Items: []
+  - m_Id: 19041856738635776
+    m_Localized: 'GAS
+
+      bei LOS!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19052585529192448
+    m_Localized: "Perfekter Start: Dr\xFCcke bei LOS! aufs Gas f\xFCr einen kurzen
+      Schub. Fr\xFChes Gedr\xFCckthalten und automatisches Gas geben keinen Bonus."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19055832478330880
+    m_Localized: Kamerazoom und Neigung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19066674489929728
+    m_Localized: "Die Sprache konnte nicht geladen werden. Pr\xFCfe deine Verbindung
+      und w\xE4hle sie erneut."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158564483072
+    m_Localized: "Fortschritt auf diesem Ger\xE4t nicht gespeichert"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871680
+    m_Localized: "Dein Fortschritt ist noch im Arbeitsspeicher. Schaffe Platz oder
+      erlaube Browser-Speicher und versuche es erneut. Beim Schlie\xDFen kann ungesicherter
+      Fortschritt verloren gehen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871681
+    m_Localized: Erneut speichern
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871682
+    m_Localized: Ohne Speichern fortfahren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871683
+    m_Localized: "Fortschritt auf diesem Ger\xE4t gespeichert"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871684
+    m_Localized: "Gespeicherter Fortschritt nicht verf\xFCgbar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871685
+    m_Localized: "Der Speicher konnte nicht gelesen werden. Dein Profil wurde nicht
+      ersetzt. Erlaube Browser-Speicher und versuche es erneut. Neue \xC4nderungen
+      bleiben vorerst im Arbeitsspeicher."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

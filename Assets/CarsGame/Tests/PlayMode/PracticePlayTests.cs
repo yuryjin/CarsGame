@@ -63,7 +63,9 @@ namespace RacingGame.Tests
             yield return Boot();
             restoreLanguage = PlatformGlue.Save.Data.settings.lang ?? "";
             PlatformGlue.SetLanguageOverride("en");
-            while (!Loc.Ready) yield return null;
+            float languageUntil = Time.realtimeSinceStartup + 30f;
+            while ((!Loc.Ready || Loc.Language != "en" || PlatformGlue.Save.Data.settings.lang != "en") && Time.realtimeSinceStartup < languageUntil) yield return null;
+            Assert.AreEqual("en", Loc.Language);
             Assert.IsTrue(flow.StartPractice(PracticeLesson.Drift));
             while (race.State == RaceState.Countdown) yield return null;
             yield return null;
@@ -71,7 +73,8 @@ namespace RacingGame.Tests
             Button("PauseButton").onClick.Invoke(); yield return null;
             Button("PauseSettings").onClick.Invoke(); yield return null;
             Button("LanguageNext").onClick.Invoke();
-            while (!Loc.Ready) yield return null;
+            languageUntil = Time.realtimeSinceStartup + 30f;
+            while ((!Loc.Ready || Loc.Language != "tr") && Time.realtimeSinceStartup < languageUntil) yield return null;
             yield return null;
             Assert.AreEqual("tr", Loc.Language);
             Button("Back").onClick.Invoke(); yield return null;

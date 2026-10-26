@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.OnScreen;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.InputSystem.Controls;
 
 namespace RacingGame
 {
@@ -16,12 +18,14 @@ namespace RacingGame
         {
             public int pointerId, touchId;
             public Touchscreen screen;
+            public ButtonControl button;
 
             public bool IsPressed
             {
                 get
                 {
-                    if (screen == null || !screen.added) return false;
+                    if (screen == null) return button != null && button.device.added && button.isPressed;
+                    if (!screen.added) return false;
                     foreach (var touch in screen.touches)
                         if (touch.touchId.ReadValue() == touchId && touch.press.isPressed) return true;
                     return false;
@@ -44,10 +48,35 @@ namespace RacingGame
             var pointer = eventData as ExtendedPointerEventData;
             LastDevice = pointer?.device?.layout ?? eventData?.GetType().Name;
             LastTouchId = pointer?.touchId ?? 0;
-            if (eventData is ExtendedPointerEventData input && input.device is Touchscreen screen && input.touchId != 0)
+            if (pointer != null)
             {
-                Remove(input.pointerId);
-                presses.Add(new Press { pointerId = input.pointerId, touchId = input.touchId, screen = screen });
+                Remove(pointer.pointerId);
+                var press = new Press { pointerId = pointer.pointerId };
+                if (pointer.device is Touchscreen screen && pointer.touchId != 0)
+                {
+                    press.screen = screen; press.touchId = pointer.touchId;
+                }
+                else
+                {
+                    // WebGL may route the first finger through its emulated Mouse. Associate
+                    // that exact screen position with the finger, whose release is reliable.
+                    var touchscreen = Touchscreen.current;
+                    if (touchscreen != null)
+                        foreach (var touch in touchscreen.touches)
+                            if (touch.press.isPressed && (touch.position.ReadValue() - pointer.position).sqrMagnitude <= 16f)
+                            {
+                                press.screen = touchscreen; press.touchId = touch.touchId.ReadValue(); break;
+                            }
+                    if (press.screen == null && pointer.device is Mouse mouse)
+                        press.button = pointer.button == PointerEventData.InputButton.Right ? mouse.rightButton
+                            : pointer.button == PointerEventData.InputButton.Middle ? mouse.middleButton : mouse.leftButton;
+                    else if (press.screen == null && pointer.device is Pen pen) press.button = pen.tip;
+                }
+                if (press.screen != null || press.button != null)
+                {
+                    presses.Add(press);
+                    LastTouchId = press.touchId;
+                }
             }
             base.OnPointerDown(eventData);
         }

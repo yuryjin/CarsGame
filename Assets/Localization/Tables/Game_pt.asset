@@ -1970,6 +1970,58 @@ MonoBehaviour:
     m_Localized: Total recebido
     m_Metadata:
       m_Items: []
+  - m_Id: 19041856738635776
+    m_Localized: 'ACELERE
+
+      no VAI!'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19052585529192448
+    m_Localized: "Largada perfeita: acelere no VAI! para um impulso curto. Segurar
+      o acelerador antes ou usar acelera\xE7\xE3o autom\xE1tica n\xE3o d\xE1 o b\xF4nus."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19055832478330880
+    m_Localized: "Zoom e inclina\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19066674489929728
+    m_Localized: "N\xE3o foi poss\xEDvel carregar o idioma. Verifique a conex\xE3o
+      e selecione-o novamente."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158564483072
+    m_Localized: "Progresso n\xE3o salvo neste dispositivo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871680
+    m_Localized: "O progresso ainda est\xE1 na mem\xF3ria. Libere espa\xE7o ou permita
+      o armazenamento do navegador e tente de novo. Fechar o jogo pode perder o progresso
+      n\xE3o salvo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871681
+    m_Localized: Tentar salvar novamente
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871682
+    m_Localized: Continuar sem salvar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871683
+    m_Localized: Progresso salvo neste dispositivo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871684
+    m_Localized: "Progresso salvo indispon\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19075158572871685
+    m_Localized: "N\xE3o foi poss\xEDvel ler o armazenamento. Seu perfil salvo n\xE3o
+      foi substitu\xEDdo. Permita o armazenamento do navegador e tente de novo. As
+      novas mudan\xE7as ficam na mem\xF3ria."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
