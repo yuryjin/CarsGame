@@ -61,6 +61,21 @@ namespace RacingGame.Tests
             Assert.IsFalse(UpgradeCatalog.TryBuy(max, UpgradeKind.Armor, long.MaxValue, out _));
         }
 
+        [TestCase(1, true, 1, 1, .8f, 240, 54, 294)]
+        [TestCase(4, true, 1, 1, 1f, 110, 68, 178)]
+        [TestCase(8, true, 1, 1, 1.5f, 60, 102, 162)]
+        [TestCase(9, false, 2, 3, 1.5f, 30, 102, 132)]
+        [TestCase(9, false, 0, 3, 1.5f, 0, 0, 0)]
+        public void PayoutComponentsPreserveOriginalRoundingAndDnfRules(int position, bool finished,
+            int laps, int required, float multiplier, int placement, int combat, int total)
+        {
+            var payout = Economy.Payout(position, finished, laps, required, new[] { 3, 1 }, multiplier);
+            Assert.AreEqual(placement, payout.BaseCoins);
+            Assert.AreEqual(combat, payout.CombatCoins);
+            Assert.AreEqual(total, payout.Total);
+            Assert.AreEqual(total, Economy.RaceReward(position, finished, laps, required, new[] { 3, 1 }, multiplier));
+        }
+
         [Test]
         public void WeaponCatalogCostsAndEffectsScaleCorrectly()
         {

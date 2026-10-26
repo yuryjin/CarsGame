@@ -105,9 +105,7 @@ namespace RacingGame
             if (victory)
             {
                 double t = RaceClock.Now - RaceStartTime;
-                var order = new List<RaceParticipant>(participants);
-                order.Sort((a, b) => b.Kills != a.Kills ? b.Kills.CompareTo(a.Kills) : a.Deaths.CompareTo(b.Deaths));
-                for (int i = 0; i < order.Count; i++) if (order[i] != null) finishTimes[order[i]] = t + i * 0.001;
+                foreach (var p in participants) if (p != null) finishTimes[p] = t;
             }
             EndRace();
         }
@@ -199,14 +197,14 @@ namespace RacingGame
         private void Go()
         {
             RaceStartTime = RaceClock.Now;
-            bool isArena = IsArenaMode;
+            bool combatRanking = IsArenaMode || IsMissionMode;
             foreach (var p in participants)
             {
                 SetFrozen(p, false);
                 if (p.Progress != null)
                 {
                     p.Progress.BeginRace();
-                    if (!isArena)
+                    if (!combatRanking)
                     {
                         var participant = p;
                         Action<int, double> handler = (lap, time) => OnLap(participant, lap);
@@ -231,6 +229,7 @@ namespace RacingGame
         private void OnLap(RaceParticipant p, int lap)
         {
             if (State == RaceState.Finished || State == RaceState.Idle) return;
+            if (RaceSetup.Event != null && RaceSetup.Event.IsPractice) return;
             if (lap >= laps && !finishTimes.ContainsKey(p)) Finish(p);
         }
 
@@ -304,7 +303,7 @@ namespace RacingGame
         private void Rank()
         {
             rankBuffer.Clear();
-            bool isArena = IsArenaMode;
+            bool combatRanking = IsArenaMode || IsMissionMode;
             for (int i = 0; i < participants.Count; i++)
             {
                 var p = participants[i];
@@ -320,7 +319,7 @@ namespace RacingGame
                 });
             }
             if (rankPositions.Length < rankBuffer.Count) rankPositions = new int[rankBuffer.Count];
-            if (isArena)
+            if (combatRanking)
                 RaceRanking.RankArena(rankBuffer, rankOrder, rankPositions);
             else
                 RaceRanking.Rank(rankBuffer, rankOrder, rankPositions);
@@ -363,6 +362,7 @@ namespace RacingGame
             entry.Name = p.displayName; entry.IsPlayer = p.isPlayer;
             entry.Position = PositionOf(p);
             entry.Finished = finishTimes.TryGetValue(p, out double time);
+            entry.Eliminated = !entry.Finished && IsOut(p);
             entry.TotalTime = entry.Finished ? time : RaceTime;
             entry.BestLap = finishedEntry != null ? finishedEntry.BestLap : p.Progress != null ? p.Progress.BestLapTime : double.PositiveInfinity;
             entry.Laps = finishedEntry != null ? finishedEntry.Laps : p.Progress != null ? p.Progress.LapsCompleted : 0;
@@ -390,7 +390,7 @@ namespace RacingGame
             var results = new RaceResults
             {
                 IsArena = isArena,
-                LapsRequired = isArena ? 0 : laps,
+                LapsRequired = isArena || IsMissionMode ? 0 : laps,
                 RaceDuration = RaceClock.Now - RaceStartTime
             };
             foreach (var p in participants)
@@ -401,6 +401,7 @@ namespace RacingGame
                 if (isArena)
                 {
                     entry.Finished = true;
+                    entry.Eliminated = false;
                     entry.Survived = p.Deaths == 0;
                 }
                 results.Entries.Add(entry);

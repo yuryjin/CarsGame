@@ -12,6 +12,8 @@ namespace RacingGame
     [CreateAssetMenu(menuName = "Racing/Race Event", fileName = "Event")]
     public sealed class RaceEventDefinition : ScriptableObject
     {
+        // Runtime-only lesson configuration; authored campaign events always retain their race rules.
+        public bool IsPractice { get; internal set; }
         public string eventId = "e1";
         public EventMode mode;
         [Tooltip("Match duration in seconds for Arena mode.")]

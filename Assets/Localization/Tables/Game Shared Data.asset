@@ -1771,6 +1771,162 @@ MonoBehaviour:
     m_Key: events.locked_after
     m_Metadata:
       m_Items: []
+  - m_Id: 18967065176387584
+    m_Key: results.eliminated
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967065184776192
+    m_Key: results.laps_completed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758234791936
+    m_Key: practice.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180544
+    m_Key: practice.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180545
+    m_Key: practice.drift
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180546
+    m_Key: practice.shortcut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180547
+    m_Key: practice.wallride
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180548
+    m_Key: practice.aim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180549
+    m_Key: practice.aim.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180550
+    m_Key: practice.start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180551
+    m_Key: practice.return
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180552
+    m_Key: practice.completed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758247374848
+    m_Key: settings.hints
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758247374849
+    m_Key: settings.hints.replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758247374850
+    m_Key: settings.hints.reset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712024817664
+    m_Key: record.unknown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400576
+    m_Key: record.upgrades
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400577
+    m_Key: record.continued
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400578
+    m_Key: results.pb_other_setup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400579
+    m_Key: results.pb_unknown_setup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18974832884789248
+    m_Key: settings.touch_large
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18974832897372160
+    m_Key: settings.touch_left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18981564478468096
+    m_Key: save.newer.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18981564486856704
+    m_Key: save.newer.message
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18985758732136448
+    m_Key: results.defeat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653584441344
+    m_Key: results.double_amount
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829952
+    m_Key: results.ad_received
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829953
+    m_Key: results.payout.show
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829954
+    m_Key: results.payout.hide
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829955
+    m_Key: results.payout.tier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829956
+    m_Key: results.payout.place
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829957
+    m_Key: results.payout.progress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829958
+    m_Key: results.payout.mission
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829959
+    m_Key: results.payout.combat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829960
+    m_Key: results.payout.turrets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829961
+    m_Key: results.payout.first
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653597024256
+    m_Key: results.payout.daily
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653597024257
+    m_Key: results.payout.ad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653597024258
+    m_Key: results.payout.total
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

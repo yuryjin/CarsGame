@@ -498,12 +498,16 @@ namespace RacingGame
 
         /// <summary>Coins for the mission: a win pays well above a race; a loss pays for the damage done.</summary>
         public int Reward(RaceResultEntry me, float tierMultiplier)
+            => Payout(me, tierMultiplier).Total;
+
+        public Core.Economy.RacePayout Payout(RaceResultEntry me, float tierMultiplier)
         {
-            if (me == null) return 0;
+            if (me == null) return new Core.Economy.RacePayout(0, 0, tierMultiplier);
             int kills = me.Kills;
             float damage = Boss != null ? 1f - Boss.CoreFraction : 0f;
-            int coins = Result == Outcome.Victory ? 320 + Mathf.Min(kills * 6, 240) : Mathf.RoundToInt(40f + 200f * damage) + Mathf.Min(kills * 4, 120);
-            return Mathf.RoundToInt(coins * Mathf.Max(0.1f, tierMultiplier));
+            int baseCoins = Result == Outcome.Victory ? 320 : Mathf.RoundToInt(40f + 200f * damage);
+            int combatCoins = Result == Outcome.Victory ? Mathf.Min(kills * 6, 240) : Mathf.Min(kills * 4, 120);
+            return new Core.Economy.RacePayout(baseCoins, combatCoins, tierMultiplier);
         }
 
         private void Update() { if (Strikes != null && SimulationDriver.Current != null) Strikes.UpdateVisuals(SimulationDriver.Current.Tick, 0f); }

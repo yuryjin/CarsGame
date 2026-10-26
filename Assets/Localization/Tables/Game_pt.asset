@@ -193,7 +193,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4014288900
-    m_Localized: DNF
+    m_Localized: "N\xE3o terminou"
     m_Metadata:
       m_Items: []
   - m_Id: 4014288901
@@ -1531,8 +1531,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488784
-    m_Localized: "Entre no t\xFAnel acima de 55 km/h. Suba pela parede at\xE9 o turbo
-      no teto e mantenha a velocidade."
+    m_Localized: "Entre acima de 55 km/h. Vire cedo para a parede, continue at\xE9
+      o teto e mire na faixa dourada de turbo."
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488785
@@ -1808,6 +1808,166 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 18889347952881665
     m_Localized: Top 3 em {name} para desbloquear
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967065176387584
+    m_Localized: Eliminado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967065184776192
+    m_Localized: 'Voltas: {n}/{total}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758234791936
+    m_Localized: Treino
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180544
+    m_Localized: "Repita qualquer exerc\xEDcio. Sem limite de tempo ou pr\xEAmios;
+      o progresso n\xE3o muda."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180545
+    m_Localized: Turbo de derrapagem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180546
+    m_Localized: Atalho
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180547
+    m_Localized: Turbo do teto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180548
+    m_Localized: "Acerto de canh\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180549
+    m_Localized: "Alcance o carro \xE0 frente e acerte com o canh\xE3o. Ele n\xE3o
+      revida."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180550
+    m_Localized: "Iniciar exerc\xEDcio"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180551
+    m_Localized: Voltar ao treino
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180552
+    m_Localized: "Exerc\xEDcio conclu\xEDdo! Continue praticando ou volte para escolher
+      outro."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758247374848
+    m_Localized: "Dicas de dire\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758247374849
+    m_Localized: Mostrar novamente
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758247374850
+    m_Localized: "As dicas reaparecer\xE3o nas pr\xF3ximas corridas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712024817664
+    m_Localized: "Condi\xE7\xF5es do recorde desconhecidas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400576
+    m_Localized: "Motor {engine} \xB7 Blindagem {armor} \xB7 Canh\xE3o {cannon}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400577
+    m_Localized: "Com continua\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400578
+    m_Localized: "Recorde com outra configura\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400579
+    m_Localized: "Condi\xE7\xF5es do recorde anterior desconhecidas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18974832884789248
+    m_Localized: "Bot\xF5es de toque grandes"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18974832897372160
+    m_Localized: Controles de toque para canhotos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18981564478468096
+    m_Localized: "Atualiza\xE7\xE3o necess\xE1ria"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18981564486856704
+    m_Localized: "Este dispositivo tem um jogo salvo de uma vers\xE3o mais recente.
+      Atualize e reabra o jogo para continuar com seu progresso."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18985758732136448
+    m_Localized: Derrota
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653584441344
+    m_Localized: "Ganhe +{n} (an\xFAncio)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829952
+    m_Localized: "B\xF4nus de an\xFAncio recebido"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829953
+    m_Localized: Detalhes da recompensa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829954
+    m_Localized: Ocultar detalhes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829955
+    m_Localized: "Corrida: {tier} \xB7 \xD7{n} aplicado"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829956
+    m_Localized: "Posi\xE7\xE3o final"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829957
+    m_Localized: "Voltas conclu\xEDdas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829958
+    m_Localized: "Resultado da miss\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829959
+    m_Localized: "B\xF4nus por destrui\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829960
+    m_Localized: Pontos de torres
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829961
+    m_Localized: "B\xF4nus da primeira chegada"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653597024256
+    m_Localized: Primeira chegada de hoje
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653597024257
+    m_Localized: "B\xF4nus de an\xFAncio"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653597024258
+    m_Localized: Total recebido
     m_Metadata:
       m_Items: []
   references:

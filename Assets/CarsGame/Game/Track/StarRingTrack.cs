@@ -13,11 +13,11 @@ namespace RacingGame
     /// </summary>
     public sealed class StarRingTrack : MonoBehaviour
     {
-        // Ghosts recorded before the continuous tunnel floor use different physics.
-        public const int LayoutVersion = 3;
+        // Version 4 uses the full painted width of flat boost strips.
+        public const int LayoutVersion = 4;
         public const float RailHeight = 1f, RailWidth = 0.5f, SkinDepth = 1.2f;
         public const float NarrowHalfWidth = 6f;
-        public const float PadHalfWidth = 2f, PadLength = 6f, PadRadius = 2.2f;
+        public const float PadHalfWidth = 2f, PadLength = 6f;
         /// <summary>Tunnel cross-section: flat floor ±<see cref="TubeFloor"/>, fillets of <see cref="TubeFillet"/>, walls at the road edge.</summary>
         public const float TubeFloor = 5f, TubeFillet = 4f, TubeWallTop = 7f, TubeHeight = 11f;
         private const int FilletSteps = 6;
@@ -32,16 +32,18 @@ namespace RacingGame
         private readonly List<BoostGate> pads = new List<BoostGate>();
         private readonly List<RaceProgress> observed = new List<RaceProgress>();
         private GameObject railsGroup, shouldersGroup, warningGroup, narrowEdgeGroup;
+        private bool practice;
         public int Stage { get; private set; }
 
         public StarRingLayout Layout => layout;
         public IReadOnlyList<SpaceTurret> Turrets => turrets;
         public IReadOnlyList<BoostGate> Pads => pads;
 
-        public static StarRingTrack Create(TrackPath path, RaceManager race)
+        public static StarRingTrack Create(TrackPath path, RaceManager race, bool practice = false)
         {
             var map = new GameObject("StarRingTrack").AddComponent<StarRingTrack>();
             map.path = path;
+            map.practice = practice;
             map.layout = new StarRingLayout();
             path.UseLayout(map.layout.Points, StarRingLayout.HalfWidth, map.layout.StartLine);
             path.RespawnGuard = map.layout.SafeRespawn;
@@ -257,7 +259,7 @@ namespace RacingGame
             warningGroup = Add("Warnings", warnings, glow, false, false);
             narrowEdgeGroup = Add("NarrowEdge", narrowEdge, glow, false, false);
             SetStage(1);
-            PlaceTurrets(race);
+            if (!practice) PlaceTurrets(race);
         }
 
         private static Vector2 Outward(Vector2 p)
@@ -343,17 +345,23 @@ namespace RacingGame
         private void BuildPads(MeshChunkWriter w)
         {
             AddPad(w, layout.BoostPad, false);
-            AddPad(w, (layout.TunnelStart + layout.TunnelEnd) * 0.5f, true);
+            float centre = (layout.TunnelStart + layout.TunnelEnd) * 0.5f;
+            float start = centre - PadLength * .5f;
+            // The lesson gives slower-turning bodies time to straighten after climbing.
+            // Keep the same entry edge and width, and stop before the exit ceiling opens.
+            float end = practice ? layout.TunnelEnd - 2f * StarRingLayout.TunnelFlare - 2f : centre + PadLength * .5f;
+            AddPad(w, (start + end) * .5f, true, end - start);
         }
 
-        private void AddPad(MeshChunkWriter w, float d, bool ceiling)
+        private void AddPad(MeshChunkWriter w, float d, bool ceiling, float length = PadLength)
         {
             Ring r = RingAt(d);
             Vector3 fwd = Vector3.Cross(r.right, r.up);
             var orange = new Color32(255, 140, 30, 255);
             var gold = new Color32(255, 225, 80, 255);
-            for (int k = 0; k < 3; k++)
-                Arrow(w, RingAt(d - PadLength * 0.5f + 1f + k * 2f), 0f, PadHalfWidth * 0.9f, 0.035f, k % 2 == 0 ? orange : gold, ceiling);
+            int arrows = Mathf.Max(3, Mathf.CeilToInt((length - 2f) * .5f));
+            for (int k = 0; k < arrows; k++)
+                Arrow(w, RingAt(d - length * 0.5f + 1f + k * 2f), 0f, PadHalfWidth * 0.9f, 0.035f, k % 2 == 0 ? orange : gold, ceiling);
             float surface = ceiling ? TubeHeight : 0f;
             Vector3 up = ceiling ? -Vector3.up : Vector3.up;
             var go = new GameObject(ceiling ? "CeilingBoostPad" : "BoostPad", typeof(BoostGate), typeof(BoxCollider));
@@ -361,9 +369,9 @@ namespace RacingGame
             go.transform.SetPositionAndRotation(At(r, 0f, surface) + up * 1.5f, Quaternion.LookRotation(fwd, up));
             var trigger = go.GetComponent<BoxCollider>();
             trigger.isTrigger = true;
-            trigger.size = new Vector3(PadHalfWidth * 2.2f, 3f, PadLength);
+            trigger.size = new Vector3(PadHalfWidth * 2.2f, 3f, length);
             var gate = go.GetComponent<BoostGate>();
-            gate.radius = PadRadius;
+            gate.stripHalfWidth = PadHalfWidth;
             gate.ceiling = ceiling;
             pads.Add(gate);
         }
@@ -452,7 +460,7 @@ namespace RacingGame
                 }
         }
 
-        private void OnLapCompleted(int completed, double seconds) => SetStage(completed + 1);
+        private void OnLapCompleted(int completed, double seconds) { if (!practice) SetStage(completed + 1); }
 
         public void SetStage(int stage)
         {

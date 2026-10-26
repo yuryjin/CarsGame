@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using RacingGame.Core.Economy;
 using RacingGame.Platform;
 
@@ -21,7 +22,7 @@ namespace RacingGame
         public class Snapshot
         {
             public string flow, race, evt, tier, screen, lastCommand, error;
-            public int coins, lastReward, position, lap, laps, races, liveShells;
+            public int coins, lastReward, lastDailyBonus, lastTotalReward, position, lap, laps, races, liveShells;
             public int[] upgrades;
             public bool touch, autopilot;
             public int equippedPrimary, reservePrimary, activePrimary, driftBoosts, shortcuts, ceilingBoosts, bombPasses, resets;
@@ -32,11 +33,90 @@ namespace RacingGame
             public float aiStuckTime;
             public bool braking, aiReversing, frozen;
             public UiButton[] buttons;
+            public UiSlider[] sliders;
             public string[] texts;
             public UiLabel[] labels;
             public UiReticle reticle;
             public Perf perf;
             public ResourceCounts resources;
+            public InputSnapshot input;
+            public ReplaySnapshot replay;
+        }
+
+        [Serializable] public class ReplaySnapshot
+        {
+            public bool recording;
+            public int trackHash, samples;
+            public string bodyId;
+            public float duration;
+            public GhostView[] ghosts;
+        }
+
+        [Serializable] public class GhostView
+        {
+            public string name, bodyId;
+            public bool active;
+            public int samples, colliders, rigidbodies;
+            public float duration;
+            public Vector3 position;
+            public Quaternion rotation;
+            public string[] meshes;
+        }
+
+        private ReplaySnapshot ReadReplay()
+        {
+            var recorder = GetComponent<GhostRecorder>();
+            var record = recorder != null ? recorder.Record : null;
+            var ghosts = FindObjectsByType<GhostCar>(FindObjectsInactive.Include);
+            var views = new GhostView[ghosts.Length];
+            for (int i = 0; i < ghosts.Length; i++)
+            {
+                var ghost = ghosts[i];
+                views[i] = new GhostView { name = ghost.Record.PlayerName, bodyId = ghost.Record.BodyId,
+                    active = ghost.gameObject.activeInHierarchy, samples = ghost.Record.Samples.Count, duration = ghost.Record.Duration,
+                    position = ghost.transform.position, rotation = ghost.transform.rotation,
+                    colliders = ghost.GetComponentsInChildren<Collider>(true).Length,
+                    rigidbodies = ghost.GetComponentsInChildren<Rigidbody>(true).Length,
+                    meshes = Array.ConvertAll(ghost.GetComponentsInChildren<MeshFilter>(true), filter => filter.sharedMesh != null ? filter.sharedMesh.name : "") };
+            }
+            return new ReplaySnapshot { recording = recorder != null && recorder.Recording,
+                trackHash = record?.TrackHash ?? 0, samples = record?.Samples.Count ?? 0,
+                bodyId = record?.BodyId ?? "", duration = record?.Duration ?? 0f, ghosts = views };
+        }
+
+        [Serializable] public class InputSnapshot
+        {
+            public float steer, padLeft, padRight;
+            public bool padFire;
+            public int touches;
+            public TouchControlSnapshot[] controls;
+        }
+
+        [Serializable] public class TouchControlSnapshot
+        {
+            public string name, device;
+            public int tracked, down, up, recovered, touchId;
+            public bool pressed;
+        }
+
+        private static InputSnapshot ReadInput()
+        {
+            var pad = Gamepad.current;
+            var input = new InputSnapshot {
+                steer = InputSystem.actions?.FindAction("Driving/Steer", false)?.ReadValue<float>() ?? 0f,
+                padLeft = pad != null ? pad.dpad.left.ReadValue() : 0f,
+                padRight = pad != null ? pad.dpad.right.ReadValue() : 0f,
+                padFire = pad != null && pad.rightShoulder.isPressed
+            };
+            var touch = Touchscreen.current;
+            if (touch != null) foreach (var finger in touch.touches) if (finger.press.isPressed) input.touches++;
+            input.controls = Array.ConvertAll(FindObjectsByType<TouchButton>(), button => new TouchControlSnapshot {
+                name = button.name, device = button.LastDevice, touchId = button.LastTouchId,
+                tracked = button.TrackedPressCount, down = button.DownCount, up = button.UpCount,
+                recovered = button.RecoveredCount,
+                pressed = button.control is UnityEngine.InputSystem.Controls.ButtonControl control && control.isPressed
+            });
+            return input;
         }
 
         [Serializable] public class ResourceCounts
@@ -54,6 +134,13 @@ namespace RacingGame
         {
             public string name, text;
             public float x, y, width, height;
+            public bool interactable;
+        }
+
+        [Serializable] public class UiSlider
+        {
+            public string name;
+            public float x, y, width, height, value;
             public bool interactable;
         }
 
@@ -142,6 +229,7 @@ namespace RacingGame
                 {
                     case "state": break;
                     case "ui": break;
+                    case "ghosts": break;
                     case "resources":
                         lastResources = new ResourceCounts {
                             materials = Resources.FindObjectsOfTypeAll<Material>().Length,
@@ -270,7 +358,8 @@ namespace RacingGame
                 evt = RaceSetup.Event != null ? RaceSetup.Event.eventId : "", tier = RaceSetup.Tier != null ? RaceSetup.Tier.tierId : "",
                 coins = save != null ? (int)save.Data.Coins : 0, races = save != null ? save.Data.Races : 0,
                 upgrades = save != null ? save.Data.progress.upgrades : null,
-                lastReward = flow.LastReward, position = p != null ? race.PositionOf(p) : 0,
+                lastReward = flow.LastReward, lastDailyBonus = flow.LastDailyBonus, lastTotalReward = flow.LastTotalReward,
+                position = p != null ? race.PositionOf(p) : 0,
                 lap = p != null && p.Progress != null ? p.Progress.LapsCompleted : 0, laps = race != null ? race.laps : 0,
                 liveShells = director != null ? director.LiveProjectiles : 0,
                 touch = TouchControlsPresenter.IsShown, autopilot = autopilot,
@@ -285,6 +374,8 @@ namespace RacingGame
                 trackDistance = progress != null ? progress.Distance : 0f,
                 lateral = progress != null && progress.Path != null ? progress.Path.Spline.LateralOffset(p.transform.position, progress.Distance) : 0f,
                 throttle = car != null ? car.LastCommand.Throttle : 0f, steer = car != null ? car.LastCommand.Steer : 0f,
+                input = ReadInput(),
+                replay = lastCommand == "ghosts" ? ReadReplay() : null,
                 braking = car != null && car.LastCommand.Brake, deaths = p?.Deaths ?? 0,
                 aiResets = ai != null ? ai.ResetCount : 0,
                 raceSeed = director != null ? director.raceSeed : 0,
@@ -292,6 +383,7 @@ namespace RacingGame
                 aiReversing = ai != null && ai.Reversing,
                 frozen = p != null && p.Status != null && p.Status.IsFrozen,
                 buttons = lastCommand == "ui" ? ReadButtons() : null,
+                sliders = lastCommand == "ui" ? ReadSliders() : null,
                 texts = lastCommand == "ui" ? ReadTexts() : null,
                 labels = lastCommand == "ui" ? ReadLabels() : null,
                 reticle = lastCommand == "ui" ? ReadReticle() : null,
@@ -311,6 +403,21 @@ namespace RacingGame
                 list.Add(new UiButton { name = button.name, text = button.GetComponentInChildren<TMPro.TMP_Text>()?.text ?? "",
                     x = center.x / Screen.width, y = 1f - center.y / Screen.height,
                     width = rect.rect.width * rect.lossyScale.x, height = rect.rect.height * rect.lossyScale.y, interactable = button.IsInteractable() });
+            }
+            return list.ToArray();
+        }
+
+        private static UiSlider[] ReadSliders()
+        {
+            var list = new System.Collections.Generic.List<UiSlider>();
+            foreach (var slider in FindObjectsByType<UnityEngine.UI.Slider>())
+            {
+                if (!slider.isActiveAndEnabled) continue;
+                var rect = (RectTransform)slider.transform;
+                Vector2 center = RectTransformUtility.WorldToScreenPoint(null, rect.TransformPoint(rect.rect.center));
+                list.Add(new UiSlider { name = slider.name, x = center.x / Screen.width, y = 1f - center.y / Screen.height,
+                    width = rect.rect.width * rect.lossyScale.x, height = rect.rect.height * rect.lossyScale.y,
+                    value = slider.value, interactable = slider.IsInteractable() });
             }
             return list.ToArray();
         }

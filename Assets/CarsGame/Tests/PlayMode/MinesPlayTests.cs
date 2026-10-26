@@ -10,8 +10,22 @@ namespace RacingGame.Tests
     public sealed class MinesPlayTests
     {
         private float savedCaptureDelta;
-        [SetUp] public void Save() { savedCaptureDelta = Time.captureDeltaTime; }
-        [TearDown] public void Restore() { Time.captureDeltaTime = savedCaptureDelta; LogAssert.ignoreFailingMessages = false; }
+        private string savedProfile;
+        private RaceEventDefinition testEvent;
+        [SetUp] public void Save() { savedCaptureDelta = Time.captureDeltaTime; savedProfile = null; testEvent = null; }
+        [TearDown] public void Restore()
+        {
+            if (flow != null) flow.EnterMenu();
+            if (savedProfile != null && PlatformGlue.Save != null)
+            {
+                JsonUtility.FromJsonOverwrite(savedProfile, PlatformGlue.Save.Data);
+                PlatformGlue.Save.MarkDirty();
+            }
+            if (testEvent != null) Object.DestroyImmediate(testEvent);
+            PauseController.ResetAll();
+            Time.captureDeltaTime = savedCaptureDelta;
+            LogAssert.ignoreFailingMessages = false;
+        }
 
         private GameFlow flow; private RaceManager race; private RaceDirector director;
         private int fieldHits, carMineHits;
@@ -26,8 +40,11 @@ namespace RacingGame.Tests
             Assert.IsTrue(PlatformGlue.IsReady);
             yield return null; yield return null;   // GameFlow.Start (EnterMenu) must run before a race starts
             flow = Object.FindAnyObjectByType<GameFlow>();
+            savedProfile = JsonUtility.ToJson(PlatformGlue.Save.Data);
             race = Object.FindAnyObjectByType<RaceManager>();
             director = RaceDirector.Instance;
+            // Keep opponent decisions reproducible; wall-clock seeds made charge placement intermittent.
+            director.Reseed(1555773982);
             fieldHits = carMineHits = 0;
             director.MineHit += (owner, victim) => { if (owner == null) fieldHits++; else carMineHits++; };
         }
@@ -65,7 +82,7 @@ namespace RacingGame.Tests
             RaceEventDefinition e6 = null;
             foreach (var e in flow.events) if (e != null && e.eventId == "e6") e6 = e;
             Assert.IsNotNull(e6);
-            var ev = Object.Instantiate(e6); ev.aiCountOverride = 3; ev.laps = 1;
+            var ev = testEvent = Object.Instantiate(e6); ev.aiCountOverride = 3; ev.laps = 1;
             yield return Start(ev, true);
 
             Assert.AreEqual(12, director.Field.Count, "two slalom gates of six mines");
@@ -90,7 +107,7 @@ namespace RacingGame.Tests
         public IEnumerator ArenaLaysAFieldArmsEveryoneAndThePlayerChargeWorks()
         {
             yield return Boot();
-            var ev = ScriptableObject.CreateInstance<RaceEventDefinition>();
+            var ev = testEvent = ScriptableObject.CreateInstance<RaceEventDefinition>();
             ev.eventId = "arena_mines_test"; ev.nameKey = "events.e1.name"; ev.mode = EventMode.Arena;
             ev.matchDuration = 120f; ev.aiCountOverride = 3;
             yield return Start(ev, false);
@@ -109,11 +126,18 @@ namespace RacingGame.Tests
                 Assert.AreNotEqual(SecondaryWeaponType.None, p.Weapons.secondaryType, p.name + " has mines or charges in the arena");
 
             int planted = 0;
+            var observedCharges = new System.Collections.Generic.HashSet<(int car, int tick)>();
             for (int i = 0; i < 50 * 40; i++)
             {
-                foreach (var p in race.Participants) if (!p.isPlayer && p.Weapons.PlantedCharge != null && p.Weapons.PlantedCharge.SpawnTick == SimulationDriver.Instance.Tick - 1) planted++;
+                foreach (var p in race.Participants)
+                {
+                    var observedCharge = p.Weapons.PlantedCharge;
+                    if (!p.isPlayer && observedCharge != null && observedCharges.Add((p.Car.CarId, observedCharge.SpawnTick))) planted++;
+                }
                 yield return null;
             }
+            foreach (var p in race.Participants)
+                Debug.Log($"[ArenaChargeTrace] seed={director.raceSeed} {p.name} secondary={p.Weapons.secondaryType} ammo={p.Weapons.SecondaryAmmo} planted={p.Weapons.PlantedCharge != null} requests={p.GetComponent<AiGunner>()?.SecondaryRequested} deaths={p.Deaths}");
             Assert.Greater(planted, 0, "arena bots plant charges");
             int charges = 0;
             foreach (var m in director.LiveMineHazards) if (m.Kind == MineKind.Charge) charges++;

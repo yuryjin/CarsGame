@@ -128,5 +128,33 @@ namespace RacingGame.Tests
             Assert.AreEqual(0f, MusicDirector.MusicLevel(new SettingsData { sfx = 1f, music = 0f }));
             Assert.AreEqual(0f, MusicDirector.MusicLevel(null));
         }
+
+        [TestCase(0f)]
+        [TestCase(1f)]
+        public void ExplicitEightyPercentSurvivesSaveAndMergeWithoutFollowingEffects(float effects)
+        {
+            var legacy = SaveMigrator.FromJson("{\"version\":5,\"settings\":{\"sfx\":0,\"music\":0.8}}");
+            Assert.AreEqual(0f, MusicDirector.MusicLevel(legacy.settings));
+            var chosen = new SaveData { updatedAtUnixMs = 100 };
+            chosen.settings.music = 0.8f;
+            chosen.settings.musicChosen = true;
+            chosen.settings.sfx = effects;
+            var restored = SaveMigrator.FromJson(SaveMigrator.ToJson(chosen));
+            var merged = SaveMerge.Merge(legacy, restored);
+            Assert.IsTrue(merged.settings.musicChosen);
+            Assert.AreEqual(0.8f, MusicDirector.MusicLevel(merged.settings));
+        }
+
+        [TestCase(0f)]
+        [TestCase(1f)]
+        public void OldExplicitMusicToggleKeepsItsChoice(float level)
+        {
+            var legacy = new SaveData { version = 5 };
+            legacy.settings.sfx = 1f - level;
+            legacy.settings.music = level;
+            var migrated = SaveMigrator.FromJson(SaveMigrator.ToJson(legacy));
+            Assert.IsTrue(migrated.settings.musicChosen);
+            Assert.AreEqual(level, MusicDirector.MusicLevel(migrated.settings));
+        }
     }
 }

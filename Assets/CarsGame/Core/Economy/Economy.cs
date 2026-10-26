@@ -2,6 +2,22 @@ using System;
 
 namespace RacingGame.Core.Economy
 {
+    /// <summary>Credited coin components after difficulty scaling. The components always sum exactly.</summary>
+    public readonly struct RacePayout
+    {
+        public readonly int BaseCoins, CombatCoins;
+        public readonly float Multiplier;
+        public int Total => BaseCoins + CombatCoins;
+
+        public RacePayout(int baseCoins, int combatCoins, float multiplier)
+        {
+            Multiplier = Math.Max(0.1f, multiplier);
+            BaseCoins = (int)Math.Round(baseCoins * Multiplier);
+            // Preserve the original single rounding of the combined payout.
+            CombatCoins = (int)Math.Round((baseCoins + combatCoins) * Multiplier) - BaseCoins;
+        }
+    }
+
     /// <summary>
     /// Coin payout for one race. Pure and unit-tested. Tuned so a normal-tier mid-field finish
     /// pays 100–200 and the first garage upgrade (150) arrives after 1–2 races.
@@ -22,19 +38,23 @@ namespace RacingGame.Core.Economy
 
         /// <summary>DNF pays only for laps actually completed (no idle/retry farming); zero laps = zero coins.</summary>
         public static int RaceReward(int position, bool finished, int lapsCompleted, int lapsRequired, int[] killsPerVictim, float tierMultiplier)
+            => Payout(position, finished, lapsCompleted, lapsRequired, killsPerVictim, tierMultiplier).Total;
+
+        public static RacePayout Payout(int position, bool finished, int lapsCompleted, int lapsRequired, int[] killsPerVictim, float tierMultiplier)
         {
-            if (!finished && lapsCompleted <= 0) return 0;
-            int coins = finished ? PositionPayout[Math.Clamp(position, 1, PositionPayout.Length) - 1] : (int)Math.Round(DnfPayout * Math.Clamp(lapsCompleted / (double)Math.Max(1, lapsRequired), 0, 1));
+            if (!finished && lapsCompleted <= 0) return new RacePayout(0, 0, tierMultiplier);
+            int baseCoins = finished ? PositionPayout[Math.Clamp(position, 1, PositionPayout.Length) - 1] : (int)Math.Round(DnfPayout * Math.Clamp(lapsCompleted / (double)Math.Max(1, lapsRequired), 0, 1));
+            int combatCoins = 0;
             if (killsPerVictim != null)
             {
                 foreach (int k in killsPerVictim)
                 {
                     // 25, 12, 6, 3 … for the 1st, 2nd, 3rd kill of the same rival.
                     int bonus = KillBonus;
-                    for (int i = 0; i < k; i++) { coins += bonus; bonus = Math.Max(1, bonus / 2); }
+                    for (int i = 0; i < k; i++) { combatCoins += bonus; bonus = Math.Max(1, bonus / 2); }
                 }
             }
-            return (int)Math.Round(coins * Math.Max(0.1f, tierMultiplier));
+            return new RacePayout(baseCoins, combatCoins, tierMultiplier);
         }
     }
 

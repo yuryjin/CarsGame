@@ -47,12 +47,14 @@ namespace RacingGame
 
         private void OnRaceStarted()
         {
-            if (GetComponent<GameFlow>()?.IsTestDrive == true) { tracker = null; return; }
+            if (watchedCar != null) watchedCar.Teleported -= OnTeleported;
+            watchedCar = null;
+            var flow = GetComponent<GameFlow>();
+            if (flow != null && flow.IsTestDrive && !flow.IsPractice) { tracker = null; return; }
             var save = PlatformGlue.Save;
-            tracker = new HintTracker(save != null ? save.Data.settings.hintsSeen : 0);
+            tracker = new HintTracker(flow != null && flow.IsPractice ? 0 : save != null ? save.Data.settings.hintsSeen : 0);
             grassTime = lockedTime = stuckTime = 0f;
             stuckShown = stuckReset = false;
-            if (watchedCar != null) watchedCar.Teleported -= OnTeleported;
             watchedCar = race.Player != null ? race.Player.Car : null;
             if (watchedCar != null) watchedCar.Teleported += OnTeleported;
             var director = RaceDirector.Instance;
@@ -69,13 +71,16 @@ namespace RacingGame
             var ev = RaceSetup.Event;
             if (ev != null)
             {
-                if (player.DriftBoosts > 0) Try(Hint.DriftSuccess, "lesson.drift.done");
-                if (player.Shortcuts > 0) Try(Hint.ShortcutSuccess, "lesson.shortcut.done");
-                if (player.CeilingBoosts > 0) Try(Hint.CeilingSuccess, "lesson.wall.done");
+                var lesson = GetComponent<GameFlow>()?.CurrentPractice ?? PracticeLesson.None;
+                bool normal = lesson == PracticeLesson.None;
+                if ((normal || lesson == PracticeLesson.Drift) && player.DriftBoosts > 0) Try(Hint.DriftSuccess, "lesson.drift.done");
+                if ((normal || lesson == PracticeLesson.Shortcut) && player.Shortcuts > 0)
+                    Try(Hint.ShortcutSuccess, normal ? "lesson.shortcut.done" : "practice.completed");
+                if ((normal || lesson == PracticeLesson.WallRide) && player.CeilingBoosts > 0) Try(Hint.CeilingSuccess, "lesson.wall.done");
                 if (ev.starRingTrack || ev.wastelandTrack) Try(Hint.WallRide, "lesson.wall");
-                else if (ev.eventId == "e3" && player.Progress != null && player.Progress.Path != null && player.Progress.Path.Fork != null)
+                else if ((ev.eventId == "e3" || ev.eventId == "practice_shortcut") && player.Progress != null && player.Progress.Path != null && player.Progress.Path.Fork != null)
                     Try(Hint.Shortcut, "lesson.shortcut");
-                else if (ev.eventId != "e1" && player.Car.SpeedKmh >= 40f)
+                else if ((normal || lesson == PracticeLesson.Drift) && ev.eventId != "e1" && player.Car.SpeedKmh >= 40f)
                     Try(Hint.Drift, hud.TouchLayout ? "lesson.drift.touch" : "lesson.drift.keys");
             }
 
@@ -152,6 +157,7 @@ namespace RacingGame
             // Only while the HUD is up: a pickup rolled into on the results screen must not use up its tip.
             if (tracker == null || race.State != RaceState.Racing || (race.RaceTime < quietAfterGoSeconds && !early) || !tracker.TryShow(hint, Time.unscaledTime)) return;
             hud.ShowHint(Loc.Get(key), hintSeconds);
+            if (GetComponent<GameFlow>()?.IsTestDrive == true) return;
             var save = PlatformGlue.Save;
             if (save == null) return;
             save.Data.settings.hintsSeen = tracker.Mask;

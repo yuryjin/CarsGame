@@ -37,6 +37,13 @@ namespace RacingGame.Core.Save
                 data.progress.fullArsenal = false;
                 data.version = 5;
             }
+            if (data.version == 5)
+            {
+                // The old UI only wrote 0/1; 0.8 meant an untouched legacy music setting.
+                data.settings ??= new SettingsData();
+                data.settings.musicChosen = data.settings.music != 0.8f;
+                data.version = 6;
+            }
             if (data.version > SaveData.CurrentVersion) { status = SaveParseStatus.NewerVersion; return null; }    // from a newer build: refuse rather than corrupt
             status = SaveParseStatus.Ok;
             data.settings ??= new SettingsData();
@@ -59,6 +66,8 @@ namespace RacingGame.Core.Save
             data.progress.buildPreset = Mathf.Clamp(data.progress.buildPreset, 0, 3);
             data.progress.unlockedEvents ??= new System.Collections.Generic.List<string>();
             data.progress.bests ??= new System.Collections.Generic.List<EventBest>();
+            foreach (var best in data.progress.bests)
+                if (best != null && best.setup != null && !best.setup.IsKnown) best.setup = null;
             data.progress.ledger ??= new System.Collections.Generic.List<DeviceLedger>();
             data.progress.cosmetics ??= new System.Collections.Generic.List<string>();
             data.progress.paint ??= ""; data.progress.livery ??= ""; data.progress.stripe ??= ""; data.progress.body ??= "";

@@ -223,10 +223,7 @@ namespace RacingGame
         {
             var follow = FindAnyObjectByType<CarCameraFollow>();
             if (follow == null) return;
-            follow.target = playerCar.transform;
-            follow.targetRigidbody = playerCar.GetComponent<Rigidbody>();
-            follow.transform.position = playerCar.transform.TransformPoint(follow.offset);
-            follow.transform.LookAt(playerCar.transform.position + Vector3.up * follow.lookAtHeightOffset);
+            follow.SetTarget(playerCar.transform);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace RacingGame.EditorTools
             if (rt == null) return "ERROR: RaceTrack missing";
             var track = Object.FindFirstObjectByType<RacingGame.TrackPath>();
             var spline = track.Spline;
-            var litMat = EnvironmentBaker.EnvMaterial("M_Env_Lit", m => { m.SetFloat("_Flat", 0f); m.SetFloat("_Wrap", 0.35f); m.SetFloat("_ShadowFloor", 0.4f); m.SetFloat("_EmissionBoost", 0f); m.SetFloat("_FogOverride", 0f); m.SetFloat("_EmissionByLamps", 0f); });
+            var litMat = EnvironmentBaker.EnvMaterial("M_Env_Lit", m => { m.SetFloat("_Flat", 0f); m.SetFloat("_Wrap", 0.35f); m.SetFloat("_ShadowFloor", 0.4f); m.SetFloat("_EmissionBoost", GrandstandGeometry.IndirectFill); m.SetFloat("_FogOverride", 0f); m.SetFloat("_EmissionByLamps", 0f); });
 
             // Remember authored tree positions before anything is deleted.
             PropBaker.AuthoredTrees();

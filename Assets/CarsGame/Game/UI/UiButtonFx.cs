@@ -19,13 +19,13 @@ namespace RacingGame
         private Vector3 targetScale = Vector3.one;
         private bool isHovered;
         private bool isPressed;
-        private Button button;
+        private Selectable button;
 
         private void Awake()
         {
             baseScale = transform.localScale;
             targetScale = baseScale;
-            button = GetComponent<Button>();
+            button = GetComponent<Selectable>();
         }
 
         private void OnEnable()

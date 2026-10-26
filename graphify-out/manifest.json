@@ -1903,5 +1903,25 @@
     "mtime": 1792736505.0220675,
     "ast_hash": "e413a590c8163695ba4c8237dfaf11bf",
     "semantic_hash": ""
+  },
+  "Docs/AI/UnityProjectHealth.md": {
+    "mtime": 1792913695.4663663,
+    "ast_hash": "",
+    "semantic_hash": "b5c1ff39e525fa5a140a4535cf87546d"
+  },
+  "README.md": {
+    "mtime": 1792913695.4693663,
+    "ast_hash": "",
+    "semantic_hash": "3fa8b98179d453f63c1e2d51a27d0087"
+  },
+  "AGENTS.md": {
+    "mtime": 1792913695.4723666,
+    "ast_hash": "",
+    "semantic_hash": "3ca84bf3930aea092211ccec1a3a8e89"
+  },
+  "CLAUDE.md": {
+    "mtime": 1792913695.4783666,
+    "ast_hash": "",
+    "semantic_hash": "72e099afe5d517012f7f54a63952c0b0"
   }
 }

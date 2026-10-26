@@ -37,9 +37,8 @@ namespace RacingGame
         public const int WinPlaces = 3;
         private const PauseReason HardPause = PauseReason.Ad | PauseReason.HostPause | PauseReason.Hidden;
         /// <summary>
-        /// <see cref="SettingsData.music"/> before the music toggle existed. The toggle only writes
-        /// 0 or 1, so this value means "never chosen": follow the sound toggle, so a player who
-        /// muted the game does not suddenly get music.
+        /// <see cref="SettingsData.music"/> before a music control existed. Without an explicit
+        /// choice this value follows the old sound toggle, preserving muted legacy saves.
         /// </summary>
         public const float UnsetMusicSetting = 0.8f;
 
@@ -60,7 +59,7 @@ namespace RacingGame
         public static float MusicLevel(SettingsData s)
         {
             if (s == null) return 0f;
-            if (s.music == UnsetMusicSetting) return s.sfx > 0f ? 1f : 0f;
+            if (!s.musicChosen && s.music == UnsetMusicSetting) return s.sfx > 0f ? 1f : 0f;
             return s.music < 0f ? 0f : (s.music > 1f ? 1f : s.music);
         }
 

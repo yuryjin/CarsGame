@@ -129,6 +129,24 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public async Task NewerLocalProfileIsNeverOverwrittenByAnOlderClient()
+        {
+            const string future = "{\"version\":999,\"progress\":{\"futureProgress\":\"keep me\"}}";
+            var local = new MockLocalStore { StoredJson = future };
+            var cloud = new MockCloudSave { StoredJson = SaveMigrator.ToJson(new SaveData()) };
+            var service = new SaveService(local, () => cloud, () => 100d, "old_client");
+            await service.LoadAsync();
+            Assert.IsTrue(service.LocalVersionTooNew);
+            Assert.AreEqual(SaveParseStatus.NewerVersion, service.LastLocalStatus);
+            service.Local.coinsEarned = 200;
+            service.MarkDirty(); service.Tick();
+            Assert.IsFalse((await service.FlushAsync()).Ok);
+            Assert.AreEqual(future, local.StoredJson, "An unreadable future profile must remain intact");
+            Assert.AreEqual(0, local.WriteCount);
+            Assert.AreEqual(0, cloud.QueueCalls, "An old client must not publish a partial replacement profile");
+        }
+
+        [Test]
         public void MarkDirtyWritesToLocalStoreAndFiresChanged()
         {
             var local = new MockLocalStore();

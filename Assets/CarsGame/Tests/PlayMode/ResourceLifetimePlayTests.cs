@@ -16,15 +16,18 @@ namespace RacingGame.Tests
         private GameFlow flow;
         private MenuScreens menu;
         private string originalLanguage;
+        private float originalCapture;
         private readonly List<Sample> samples = new List<Sample>();
 
         [Serializable] private sealed class Sample
         {
-            public int round, meshes, materials, physicsMaterials, textures, renderTextures, gameObjects;
+            public int round, meshes, materials, physicsMaterials, textures, renderTextures, gameObjects, events;
             public long nativeBytes, managedBytes;
             public string[] meshNames, materialNames;
         }
         [Serializable] private sealed class Report { public List<Sample> samples; }
+
+        [SetUp] public void Setup() { originalCapture = Time.captureDeltaTime; samples.Clear(); }
 
         [TearDown]
         public void Cleanup()
@@ -33,12 +36,84 @@ namespace RacingGame.Tests
             if (originalLanguage != null && PlatformGlue.Save != null)
                 PlatformGlue.SetLanguageOverride(originalLanguage);
             PauseController.ResetAll();
+            Time.captureDeltaTime = originalCapture;
             string output = Environment.GetEnvironmentVariable("CG_LIFETIME_REPORT");
             if (!string.IsNullOrEmpty(output))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(output));
                 File.WriteAllText(output, JsonUtility.ToJson(new Report { samples = samples }, true));
             }
+        }
+
+        [UnityTest, Timeout(900000)]
+        public IEnumerator RepeatedPracticeRetriesReleaseSessionsAndPreserveCampaign()
+        {
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float until = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < until) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null; yield return null;
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            menu = Object.FindAnyObjectByType<MenuScreens>();
+            var race = Object.FindAnyObjectByType<RaceManager>();
+            string progress = JsonUtility.ToJson(PlatformGlue.Save.Data.progress);
+            int hints = PlatformGlue.Save.Data.settings.hintsSeen;
+            int rounds = int.TryParse(Environment.GetEnvironmentVariable("CG_PRACTICE_ROUNDS"), out int value)
+                ? Mathf.Clamp(value, 5, 100) : 8;
+            Sample baseline = null;
+            for (int round = 0; round < rounds; round++)
+            {
+                foreach (var lesson in new[] { PracticeLesson.Drift, PracticeLesson.Shortcut, PracticeLesson.WallRide, PracticeLesson.Aim })
+                {
+                    Assert.IsTrue(flow.StartPractice(lesson));
+                    for (int attempt = 0; attempt < 2; attempt++)
+                    {
+                        while (race.State == RaceState.Countdown) yield return null;
+                        Assert.AreEqual(RaceState.Racing, race.State);
+                        var input = race.Player.gameObject.AddComponent<ScriptedDriverInput>();
+                        race.Player.Car.SetInputSource(input);
+                        input.Set(1f, 0.15f, false, true);
+                        for (int frame = 0; frame < 35; frame++) yield return null;
+                        Assert.IsTrue(flow.IsPractice);
+                        if (attempt == 0) flow.RetryRace();
+                    }
+                    flow.EnterMenu();
+                    for (int frame = 0; frame < 4; frame++) yield return null;
+                    Assert.AreEqual(0, RaceDirector.Instance.Cars.Count);
+                    Assert.IsFalse(TrackPath.Instance.HasLayout);
+                    Assert.IsNull(GameObject.Find("TestDrive"));
+                    Assert.IsFalse(flow.IsTestDrive);
+                    Assert.IsFalse(flow.PracticeCompleted);
+                    Assert.AreEqual(progress, JsonUtility.ToJson(PlatformGlue.Save.Data.progress));
+                    Assert.AreEqual(hints, PlatformGlue.Save.Data.settings.hintsSeen);
+                }
+                menu.Show("main");
+                for (int frame = 0; frame < 4; frame++) yield return null;
+                var sample = new Sample {
+                    round = round,
+                    meshes = Resources.FindObjectsOfTypeAll<Mesh>().Length,
+                    materials = Resources.FindObjectsOfTypeAll<Material>().Length,
+                    physicsMaterials = Resources.FindObjectsOfTypeAll<PhysicsMaterial>().Length,
+                    textures = Resources.FindObjectsOfTypeAll<Texture2D>().Length,
+                    renderTextures = Resources.FindObjectsOfTypeAll<RenderTexture>().Length,
+                    gameObjects = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include).Length,
+                    events = Resources.FindObjectsOfTypeAll<RaceEventDefinition>().Length,
+                    nativeBytes = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong(),
+                    managedBytes = UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong()
+                };
+                samples.Add(sample);
+                Debug.Log($"[PracticeLifetime] round={round} mesh={sample.meshes} material={sample.materials} physics={sample.physicsMaterials} texture={sample.textures} RT={sample.renderTextures} GO={sample.gameObjects} events={sample.events} bytes={sample.nativeBytes}");
+                if (round == 2) baseline = sample;
+            }
+            var last = samples[samples.Count - 1];
+            Assert.LessOrEqual(last.meshes, baseline.meshes + 3);
+            Assert.LessOrEqual(last.materials, baseline.materials + 3);
+            Assert.LessOrEqual(last.physicsMaterials, baseline.physicsMaterials);
+            Assert.LessOrEqual(last.textures, baseline.textures + 1);
+            Assert.LessOrEqual(last.renderTextures, baseline.renderTextures);
+            Assert.LessOrEqual(last.gameObjects, baseline.gameObjects + 5);
+            Assert.AreEqual(baseline.events, last.events, "Runtime lesson definitions must be destroyed on every retry and exit");
         }
 
         [UnityTest, Timeout(900000)]

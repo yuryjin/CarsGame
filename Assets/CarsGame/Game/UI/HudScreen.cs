@@ -55,10 +55,11 @@ namespace RacingGame
         private PrimaryWeaponType lastPrimaryType = PrimaryWeaponType.Cannon;
         private bool lastOverheated;
         private int lastHeatPct = -1;
-        private Button resumeButton, restartButton, menuButton;
+        private Button resumeButton, restartButton, menuButton, settingsButton;
         private RectTransform helpPanel;
         private ScrollRect helpScroll;
         private int layoutScreenWidth, layoutScreenHeight;
+        private bool layoutTouchLarge, layoutTouchLeft;
         private TextMeshProUGUI helpText;
         private CanvasGroup pauseControls;
         private string shownCenter;
@@ -379,7 +380,7 @@ namespace RacingGame
             // Above the touch-control canvas, including its raycaster.
             var overlay = pausePanel.gameObject.AddComponent<Canvas>(); overlay.overrideSorting = true; overlay.sortingOrder = 20;
             pausePanel.gameObject.AddComponent<GraphicRaycaster>();
-            var card = UiFactory.Card(pausePanel, "PauseCard", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-300f, -300f), new Vector2(300f, 300f));
+            var card = UiFactory.Card(pausePanel, "PauseCard", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-360f, -300f), new Vector2(360f, 300f));
             pauseControls = card.gameObject.AddComponent<CanvasGroup>();
             UiFactory.Panel(card, "Accent", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(40f, -40f), new Vector2(112f, -36f), UiFactory.Accent, false);
             pauseText = UiFactory.Text(card, "PauseText", "", 56f, TextAlignmentOptions.MidlineLeft, new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -140f), new Vector2(-40f, -58f));
@@ -387,7 +388,8 @@ namespace RacingGame
             pauseText.enableAutoSizing = true; pauseText.fontSizeMin = 32f; pauseText.fontSizeMax = 56f;
             var flow = GetComponent<GameFlow>();
             resumeButton = UiFactory.Button(card, "Resume", "", () => PauseController.Set(PauseReason.User, false), new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -266f), new Vector2(-40f, -180f), 32f);
-            restartButton = UiFactory.Button(card, "Restart", "", () => flow.RetryRace(), new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -366f), new Vector2(-40f, -286f), 30f, UiFactory.Raised);
+            restartButton = UiFactory.Button(card, "Restart", "", () => flow.RetryRace(), new Vector2(0f, 1f), new Vector2(0.5f, 1f), new Vector2(40f, -366f), new Vector2(-8f, -286f), 28f, UiFactory.Raised);
+            settingsButton = UiFactory.Button(card, "PauseSettings", "", () => GetComponent<MenuScreens>()?.OpenRaceSettings(), new Vector2(0.5f, 1f), Vector2.one, new Vector2(8f, -366f), new Vector2(-40f, -286f), 28f, UiFactory.Raised);
             menuButton = UiFactory.Button(card, "MainMenu", "", () => flow.EnterMenu(), new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -466f), new Vector2(-40f, -386f), 30f, UiFactory.Raised);
             pauseHint = UiFactory.Text(card, "Hint", "", 26f, TextAlignmentOptions.Center, Vector2.zero, new Vector2(1f, 0f), new Vector2(40f, 26f), new Vector2(-40f, 110f), UiFactory.Muted);
             pauseHint.raycastTarget = true;
@@ -412,8 +414,23 @@ namespace RacingGame
         {
             if (helpPanel == null || !helpPanel.gameObject.activeInHierarchy) return false;
             helpPanel.gameObject.SetActive(false);
-            if (resumeButton != null) EventSystem.current?.SetSelectedGameObject(resumeButton.gameObject);
+            FocusPauseControls();
             return true;
+        }
+
+        public void FocusPauseControls()
+        {
+            RefreshPauseInteractivity();
+            if (resumeButton != null) EventSystem.current?.SetSelectedGameObject(resumeButton.gameObject);
+        }
+
+        private void RefreshPauseInteractivity()
+        {
+            if (pauseControls == null) return;
+            bool covered = helpPanel.gameObject.activeSelf || GetComponent<MenuScreens>()?.RaceSettingsOpen == true;
+            pauseControls.interactable = !covered && (PauseController.Reasons & ~PauseReason.User) == PauseReason.None;
+            pauseControls.alpha = covered ? 0f : 1f;
+            pauseControls.blocksRaycasts = !covered;
         }
 
         private void ShowHelp()
@@ -443,7 +460,9 @@ namespace RacingGame
                     helpText.text += " " + Loc.Get("help.charge");
             }
             var ev = RaceSetup.Event;
-            if (ev != null) helpText.text += "\n\n" + StarGoalText.Description(ev, 0) + "\n" + StarGoalText.Description(ev, 1) + "\n" + StarGoalText.Description(ev, 2);
+            if (ev != null && ev.IsPractice) helpText.text += "\n\n" + Loc.Get("practice.note");
+            else if (ev != null && (gameFlow == null || !gameFlow.IsTestDrive))
+                helpText.text += "\n\n" + StarGoalText.Description(ev, 0) + "\n" + StarGoalText.Description(ev, 1) + "\n" + StarGoalText.Description(ev, 2);
             helpPanel.gameObject.SetActive(true);
             ApplyReadableOverlays();
             Canvas.ForceUpdateCanvases();
@@ -556,6 +575,7 @@ namespace RacingGame
             pauseText.text = Loc.Get("pause.title"); pauseHint.text = Loc.Get("experience.help");
             resumeButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.resume");
             restartButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.restart");
+            settingsButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("menu.settings");
             menuButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.menu");
             speedUnit.text = Loc.Get("hud.speed_unit");
             nitroText.text = Loc.Get("hud.nitro");
@@ -712,6 +732,9 @@ namespace RacingGame
             rt.offsetMin = offsetMin; rt.offsetMax = offsetMax;
         }
 
+        internal static float PauseButtonBottomPixels(float canvasScale) =>
+            Mathf.Max(24f * canvasScale, 8f) + Mathf.Max(76f * canvasScale, 44f);
+
         /// <summary>
         /// Keyboard/gamepad: speed bottom-left, HP and ammo bottom-right. Touch: the on-screen buttons own
         /// both bottom corners (steer 40–420 × 40–200 left; Fire/Brake −480…−40 × 40–260 right, Reset top-right),
@@ -724,7 +747,17 @@ namespace RacingGame
             hintText.text = ControlsHint(touch);
             layoutWidth = hudRoot != null ? hudRoot.rect.width : 1920f;
             layoutScreenWidth = Screen.width; layoutScreenHeight = Screen.height;
+            layoutTouchLarge = PlatformGlue.Save?.Data.settings.touchLargeButtons == true;
+            layoutTouchLeft = PlatformGlue.Save?.Data.settings.touchLeftHanded == true;
             ApplyReadableOverlays();
+            // The first touch can change the input layout between PointerDown and PointerUp.
+            // Keep this shared action stationary, with a usable target even on a small display.
+            float scale = Mathf.Max(0.1f, hudRoot.lossyScale.x);
+            float pauseEdge = Mathf.Max(76f, 44f / scale);
+            float pauseRight = Mathf.Max(30f, 10f / scale);
+            float pauseTop = Mathf.Max(24f, 8f / scale);
+            Place(pauseButton, Vector2.one, new Vector2(-pauseRight - pauseEdge, -pauseTop - pauseEdge),
+                new Vector2(-pauseRight, -pauseTop));
             // Portrait phones give the canvas ~1000 reference units of width: the timer (±200 around the
             // centre) would collide with a top-right HP bar, so HP/ammo drop to a row below it.
             bool narrow = layoutWidth < 1400f;
@@ -732,8 +765,9 @@ namespace RacingGame
             {
                 float edge = Mathf.Max(100f, 44f / Mathf.Max(0.1f, hudRoot.lossyScale.x));
                 float statusRight = Mathf.Min(-170f, -64f - edge);
-                Place(pauseButton, Vector2.one, new Vector2(-40f - edge, -54f - edge * 2f), new Vector2(-40f, -54f - edge));
-                Place(speedPanel, Vector2.zero, new Vector2(40f, 224f), new Vector2(284f, 448f));
+                float speedBottom = 224f + (layoutTouchLarge ? 40f : 0f);
+                Place(speedPanel, layoutTouchLeft ? new Vector2(1f, 0f) : Vector2.zero,
+                    new Vector2(layoutTouchLeft ? -284f : 40f, speedBottom), new Vector2(layoutTouchLeft ? -40f : 284f, speedBottom + 224f));
                 float row = narrow ? -90f : 0f;
                 Place(healthPanel, Vector2.one, new Vector2(statusRight - 324f, -134f + row), new Vector2(statusRight, -34f + row));
                 Place(ammoPanel, Vector2.one, new Vector2(statusRight - 324f, -234f + row), new Vector2(statusRight, -138f + row));
@@ -746,7 +780,6 @@ namespace RacingGame
             }
             else
             {
-                Place(pauseButton, Vector2.one, new Vector2(-106f, -100f), new Vector2(-30f, -24f));
                 Place(speedPanel, Vector2.zero, new Vector2(30f, 30f), new Vector2(274f, 254f));
                 Place(healthPanel, new Vector2(1f, 0f), new Vector2(-354f, 30f), new Vector2(-30f, 130f));
                 Place(ammoPanel, new Vector2(1f, 0f), new Vector2(-354f, 138f), new Vector2(-30f, 234f));
@@ -898,7 +931,7 @@ namespace RacingGame
             hitMarker.fontSize = Mathf.Max(64f, 28f / pixelScale);
             finishPanel.localScale = Vector3.one * (Mathf.Min(readable, (Screen.width - 32f) / 600f) / pixelScale);
             // Pause stays fully visible; help may scroll without shrinking the lesson text.
-            float pauseScale = Mathf.Min(readable, Mathf.Min(Screen.width - 32f, Screen.height - 32f) / 600f);
+            float pauseScale = Mathf.Min(readable, Mathf.Min((Screen.width - 32f) / 720f, (Screen.height - 32f) / 600f));
             pauseControls.transform.localScale = Vector3.one * Mathf.Max(0.1f, pauseScale / pixelScale);
             helpPanel.localScale = Vector3.one * (readable / pixelScale);
             helpPanel.sizeDelta = new Vector2(Mathf.Min(1000f, (Screen.width - 32f) / readable), Mathf.Min(720f, (Screen.height - 32f) / readable));
@@ -932,7 +965,9 @@ namespace RacingGame
             if (race == null) return;
             UpdateCombatAndGoals();
             UpdateFinishCard();
-            if (hudRoot != null && (Mathf.Abs(hudRoot.rect.width - layoutWidth) > 1f || Screen.width != layoutScreenWidth || Screen.height != layoutScreenHeight)) ApplyLayout(touchLayout);
+            if (hudRoot != null && (Mathf.Abs(hudRoot.rect.width - layoutWidth) > 1f || Screen.width != layoutScreenWidth || Screen.height != layoutScreenHeight
+                || layoutTouchLarge != (PlatformGlue.Save?.Data.settings.touchLargeButtons == true)
+                || layoutTouchLeft != (PlatformGlue.Save?.Data.settings.touchLeftHanded == true))) ApplyLayout(touchLayout);
             if (playerCar == null && race.Player != null)
             {
                 playerCar = race.Player.Car;
@@ -1120,8 +1155,9 @@ namespace RacingGame
             if (ev != null && ev.spaceTrack) return Loc.Get("lesson.space");
             if (ev != null && ev.abyssTrack) return Loc.Get("lesson.abyss");
             if (ev != null && (ev.starRingTrack || ev.wastelandTrack)) return Loc.Get("lesson.wall");
-            if (ev != null && ev.eventId == "e2") return Loc.Get(touch ? "lesson.drift.touch" : "lesson.drift.keys");
-            if (ev != null && ev.eventId == "e3") return Loc.Get("lesson.shortcut");
+            if (ev != null && (ev.eventId == "e2" || ev.eventId == "practice_drift")) return Loc.Get(touch ? "lesson.drift.touch" : "lesson.drift.keys");
+            if (ev != null && (ev.eventId == "e3" || ev.eventId == "practice_shortcut")) return Loc.Get("lesson.shortcut");
+            if (ev != null && ev.eventId == "practice_aim") return Loc.Get(touch ? "hint.aim.touch" : "hint.aim.keys");
             return Loc.Get(touch ? "lesson.drive.touch" : "lesson.drive.keys");
         }
 
@@ -1189,9 +1225,7 @@ namespace RacingGame
             }
             if (pausePanel.gameObject.activeSelf)
             {
-                pauseControls.interactable = !helpPanel.gameObject.activeSelf && (PauseController.Reasons & ~PauseReason.User) == PauseReason.None;
-                pauseControls.alpha = helpPanel.gameObject.activeSelf ? 0f : 1f;
-                pauseControls.blocksRaycasts = !helpPanel.gameObject.activeSelf;
+                RefreshPauseInteractivity();
             }
         }
 
@@ -1549,6 +1583,9 @@ namespace RacingGame
             finishPanel.gameObject.SetActive(false);
             if (visible)
             {
+                bool practice = gameFlow != null && gameFlow.IsPractice;
+                racePanel.gameObject.SetActive(!practice);
+                timerPanel.gameObject.SetActive(!practice);
                 SetTimer(0d);
                 goalsExpanded = false;
                 hintText.text = ControlsHint(touchLayout);

@@ -33,15 +33,7 @@ namespace RacingGame.EditorTools
         private static readonly Color32 TireBlack = MeshChunkWriter.Srgb(0.13f, 0.13f, 0.14f);
         private static readonly Color32[] Bands = { MeshChunkWriter.Srgb(0.88f, 0.16f, 0.16f), MeshChunkWriter.Srgb(0.92f, 0.92f, 0.92f), MeshChunkWriter.Srgb(0.96f, 0.80f, 0.16f) };
         private static readonly Color32 Steel = MeshChunkWriter.Srgb(0.36f, 0.38f, 0.42f);
-        private static readonly Color32 Concrete = MeshChunkWriter.Srgb(0.58f, 0.60f, 0.64f);
-        private static readonly Color32 Roof = MeshChunkWriter.Srgb(0.14f, 0.28f, 0.60f);
         private static readonly Color32 LampHead = new Color32(255, 225, 170, 255);
-        private static readonly Color32[] Crowd =
-        {
-            MeshChunkWriter.Srgb(0.90f, 0.20f, 0.20f), MeshChunkWriter.Srgb(0.20f, 0.40f, 0.90f), MeshChunkWriter.Srgb(0.95f, 0.85f, 0.20f),
-            MeshChunkWriter.Srgb(0.92f, 0.92f, 0.92f), MeshChunkWriter.Srgb(0.20f, 0.70f, 0.35f), MeshChunkWriter.Srgb(0.95f, 0.55f, 0.15f),
-            MeshChunkWriter.Srgb(0.15f, 0.15f, 0.18f), MeshChunkWriter.Srgb(0.70f, 0.30f, 0.75f)
-        };
 
         [MenuItem("Racing/Environment/Bake Props")]
         public static void Menu() { Debug.Log(BakeProps()); }
@@ -85,7 +77,7 @@ namespace RacingGame.EditorTools
                 if (o is Mesh m) { if (m.name == "StylizedTreeTrunk") trunkMesh = m; else if (m.name == "StylizedTreeCanopy") canopyMesh = m; }
             if (trunkMesh == null || canopyMesh == null) return "ERROR: tree meshes not found in StylizedTreeMeshes.fbx";
 
-            var litMat = EnvironmentBaker.EnvMaterial("M_Env_Lit", m => { m.SetFloat("_Flat", 0f); m.SetFloat("_Wrap", 0.35f); m.SetFloat("_ShadowFloor", 0.4f); m.SetFloat("_EmissionBoost", 0f); m.SetFloat("_FogOverride", 0f); m.SetFloat("_EmissionByLamps", 0f); });
+            var litMat = EnvironmentBaker.EnvMaterial("M_Env_Lit", m => { m.SetFloat("_Flat", 0f); m.SetFloat("_Wrap", 0.35f); m.SetFloat("_ShadowFloor", 0.4f); m.SetFloat("_EmissionBoost", GrandstandGeometry.IndirectFill); m.SetFloat("_FogOverride", 0f); m.SetFloat("_EmissionByLamps", 0f); });
             var glowMat = EnvironmentBaker.EnvMaterial("M_Env_Emissive", m => { m.SetFloat("_Flat", 0f); m.SetFloat("_Wrap", 0.5f); m.SetFloat("_ShadowFloor", 0.5f); m.SetFloat("_EmissionBoost", 3f); m.SetFloat("_EmissionByLamps", 1f); m.SetFloat("_FogOverride", 0f); });
             var poolMat = AdditiveMaterial("M_LightPool");
 
@@ -144,29 +136,7 @@ namespace RacingGame.EditorTools
             {
                 var g = layout.Grandstand;
                 var c = ChunkAt(g.Position, 15f);
-                var rot = Quaternion.LookRotation(g.Forward, Vector3.up);
-                var m = Matrix4x4.TRS(g.Position, rot, Vector3.one);
-                var rnd = new System.Random(99);
-                int rows = 6;
-                for (int r = 0; r < rows; r++)
-                {
-                    float z = -r * 1.4f, y = r * 0.85f;
-                    LowPoly.Box(c.Lit, m, new Vector3(0f, y + 0.425f, z), new Vector3(g.Length, 0.85f, 1.4f), Concrete);
-                    for (float x = -g.Length * 0.5f + 0.7f; x < g.Length * 0.5f - 0.5f; x += 1.05f)
-                    {
-                        if (rnd.NextDouble() > 0.86) continue;
-                        var col = Crowd[rnd.Next(Crowd.Length)];
-                        float h = 0.6f + (float)rnd.NextDouble() * 0.35f;
-                        LowPoly.Box(c.Lit, m, new Vector3(x, y + 0.85f + h * 0.5f, z - 0.25f), new Vector3(0.5f, h, 0.5f), col);
-                    }
-                }
-                // roof on posts
-                for (int i = 0; i < 5; i++)
-                    LowPoly.Cylinder(c.Lit, m, new Vector3(-g.Length * 0.5f + 2f + i * (g.Length - 4f) / 4f, 0f, -rows * 1.4f - 0.6f), 0.18f, 0.18f, 8.5f, 6, Steel, false);
-                var roofM = m * Matrix4x4.TRS(new Vector3(0f, 8.6f, -rows * 0.7f), Quaternion.Euler(-9f, 0f, 0f), Vector3.one);
-                LowPoly.Box(c.Lit, roofM, Vector3.zero, new Vector3(g.Length + 2f, 0.3f, rows * 1.4f + 3f), Roof);
-                // back wall
-                LowPoly.Box(c.Lit, m, new Vector3(0f, rows * 0.85f * 0.5f, -rows * 1.4f + 0.2f), new Vector3(g.Length, rows * 0.85f, 0.3f), Concrete);
+                GrandstandGeometry.Build(c.Lit, g);
             }
 
             // Write chunk meshes

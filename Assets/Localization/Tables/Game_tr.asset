@@ -1539,8 +1539,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488784
-    m_Localized: "T\xFCnele 55 km/sa \xFCzerinde gir. Tavandaki h\u0131zland\u0131r\u0131c\u0131ya
-      ula\u015Fmak i\xE7in duvara d\xF6n; h\u0131z\u0131n\u0131 koru."
+    m_Localized: "55 km/sa \xFCzerinde gir. Duvara erken d\xF6n, tavana \xE7\u0131kana
+      kadar d\xF6nmeye devam et, sonra alt\u0131n h\u0131zland\u0131r\u0131c\u0131
+      \u015Feride y\xF6nel."
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488785
@@ -1826,6 +1827,167 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 18889347952881665
     m_Localized: "A\xE7mak i\xE7in {name} yar\u0131\u015F\u0131nda ilk 3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967065176387584
+    m_Localized: Elendi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967065184776192
+    m_Localized: 'Tur: {n}/{total}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758234791936
+    m_Localized: "E\u011Fitim"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180544
+    m_Localized: "\u0130stedi\u011Fin dersi tekrarla. S\xFCre s\u0131n\u0131r\u0131
+      veya \xF6d\xFCl yok; ilerlemen de\u011Fi\u015Fmez."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180545
+    m_Localized: "Drift h\u0131zlanmas\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180546
+    m_Localized: Kestirme
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180547
+    m_Localized: "Tavan h\u0131zland\u0131r\u0131c\u0131s\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180548
+    m_Localized: Top isabeti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180549
+    m_Localized: "\xD6ndeki araca yeti\u015F ve topla vur. Hedef kar\u015F\u0131l\u0131k
+      vermez."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180550
+    m_Localized: "Al\u0131\u015Ft\u0131rmay\u0131 ba\u015Flat"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180551
+    m_Localized: "E\u011Fitime d\xF6n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758243180552
+    m_Localized: "Al\u0131\u015Ft\u0131rma tamam! \xC7al\u0131\u015Fmaya devam et
+      veya ba\u015Fka bir ders se\xE7."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758247374848
+    m_Localized: "S\xFCr\xFC\u015F ipu\xE7lar\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758247374849
+    m_Localized: "Tekrar g\xF6ster"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18967758247374850
+    m_Localized: "\u0130pu\xE7lar\u0131 sonraki yar\u0131\u015Flarda tekrar g\xF6sterilecek."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712024817664
+    m_Localized: "Rekor ko\u015Fullar\u0131 bilinmiyor"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400576
+    m_Localized: "Motor {engine} \xB7 Z\u0131rh {armor} \xB7 Top {cannon}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400577
+    m_Localized: "Devam kullan\u0131ld\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400578
+    m_Localized: "Rekor farkl\u0131 ayarla yap\u0131ld\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18971712037400579
+    m_Localized: "\xD6nceki rekor ko\u015Fullar\u0131 bilinmiyor"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18974832884789248
+    m_Localized: "B\xFCy\xFCk dokunmatik d\xFC\u011Fmeler"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18974832897372160
+    m_Localized: "Sol el dokunmatik d\xFCzeni"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18981564478468096
+    m_Localized: "G\xFCncelleme gerekli"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18981564486856704
+    m_Localized: "Bu cihazda oyunun daha yeni s\xFCr\xFCm\xFCnden bir kay\u0131t
+      var. \u0130lerlemeni koruyarak devam etmek i\xE7in oyunu g\xFCncelleyip yeniden
+      a\xE7."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18985758732136448
+    m_Localized: Yenilgi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653584441344
+    m_Localized: +{n} kazan (reklam)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829952
+    m_Localized: "Reklam bonusu al\u0131nd\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829953
+    m_Localized: "\xD6d\xFCl ayr\u0131nt\u0131lar\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829954
+    m_Localized: "\xD6d\xFCl ayr\u0131nt\u0131lar\u0131n\u0131 gizle"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829955
+    m_Localized: "Yar\u0131\u015F: {tier} \xB7 \xD7{n} uyguland\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829956
+    m_Localized: "Biti\u015F s\u0131ras\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829957
+    m_Localized: Tamamlanan turlar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829958
+    m_Localized: "G\xF6rev sonucu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829959
+    m_Localized: "\u0130mha bonuslar\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829960
+    m_Localized: "Taret puanlar\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653592829961
+    m_Localized: "\u0130lk biti\u015F bonusu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653597024256
+    m_Localized: "Bug\xFCnk\xFC ilk biti\u015F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653597024257
+    m_Localized: Reklam bonusu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19025653597024258
+    m_Localized: "Toplam al\u0131nan"
     m_Metadata:
       m_Items: []
   references:

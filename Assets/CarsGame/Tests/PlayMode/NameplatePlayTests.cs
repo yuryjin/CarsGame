@@ -53,6 +53,59 @@ namespace RacingGame.Tests
             }
         }
         [UnityTest, Timeout(180000)]
+        public IEnumerator CeilingRiderHealthBarUsesTheCarsGravityDirection()
+        {
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float until = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < until) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady); yield return null; yield return null;
+            saved = JsonUtility.ToJson(PlatformGlue.Save.Data);
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = Object.FindAnyObjectByType<RaceManager>();
+            flow.StartRace(Resources.Load<RaceEventDefinition>("Events/Event_e19"), flow.tiers[0]);
+            while (race.State == RaceState.Countdown) yield return null;
+            var map = Object.FindAnyObjectByType<StarRingTrack>();
+            foreach (var turret in map.Turrets) turret.enabled = false;
+            foreach (var participant in race.Participants)
+            {
+                participant.Car.SetInputSource(participant.gameObject.AddComponent<ScriptedDriverInput>());
+                participant.Health.SetInvulnerable(120f);
+            }
+            var rival = race.Participants[1];
+            Assert.IsFalse(rival.isPlayer);
+            float distance = map.Layout.TunnelStart + 2f * Core.Track.StarRingLayout.TunnelFlare + 10f;
+            var path = TrackPath.Instance;
+            Vector3 forward = path.Tangent(distance);
+            Vector3 position = path.Position(distance);
+            position.y = map.Layout.Height(distance) + StarRingTrack.TubeHeight - .5f;
+            rival.Car.Teleport(position, Quaternion.LookRotation(forward, Vector3.down));
+            rival.Car.Body.linearVelocity = forward * 25f;
+            Physics.SyncTransforms();
+            for (int i = 0; i < 10; i++) yield return null;
+            Assert.IsTrue(rival.Car.WallRiding, "The test must actually attach to the ceiling surface");
+            Assert.Less(rival.Car.GravityUp.y, -.9f);
+            // Stop simulation without disabling the car: its OnDisable intentionally unsticks it.
+            var simulation = SimulationDriver.Instance;
+            cameraScripts.Add(simulation); simulation.enabled = false;
+            rival.Car.Body.constraints = RigidbodyConstraints.FreezeAll;
+            var cam = Camera.main;
+            foreach (var script in cam.GetComponents<MonoBehaviour>())
+                if (script.enabled) { cameraScripts.Add(script); script.enabled = false; }
+            cam.transform.position = rival.transform.position - forward * 10f + Vector3.down * 3f;
+            cam.transform.rotation = Quaternion.LookRotation(rival.transform.position + forward * 3f + Vector3.down - cam.transform.position, Vector3.down);
+            for (int i = 0; i < 3; i++) yield return null;
+            Assert.Less(rival.Car.GravityUp.y, -.9f, "The projected fixture must remain attached to the roof");
+            var bar = GameObject.Find("Bar_" + rival.displayName);
+            Assert.NotNull(bar);
+            var healthBars = Object.FindAnyObjectByType<WorldHealthBars>();
+            Vector2 expected = cam.WorldToScreenPoint(rival.transform.position + rival.Car.GravityUp * healthBars.heightAboveCar);
+            Vector2 actual = RectTransformUtility.WorldToScreenPoint(null, bar.transform.position);
+            Assert.Less(Vector2.Distance(actual, expected), 1f,
+                "The health bar belongs above the car in its gravity frame, inside the tunnel rather than beyond the ceiling");
+        }
+
+        [UnityTest, Timeout(180000)]
         public IEnumerator DensePackKeepsEveryNameAndCarrierReadableAtTheScreenEdge()
         {
             Time.captureDeltaTime = SimulationDriver.FixedStep;

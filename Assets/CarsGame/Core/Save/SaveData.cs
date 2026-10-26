@@ -13,18 +13,29 @@ namespace RacingGame.Core.Save
         public string lang = "";
         public float sfx = 1f;
         public float music = 0.8f;
+        /// <summary>Distinguishes a chosen 80% level from the legacy "never chosen" value.</summary>
+        public bool musicChosen;
         public int quality = 1;
         public bool qualityAuto = true;
         public bool autoThrottle = false;
         public bool cameraShake = true;
         /// <summary>Turret tracks rivals by itself; off = the mouse aims (desktop only, touch always auto).</summary>
         public bool autoAim = true;
+        public bool touchLargeButtons;
+        public bool touchLeftHanded;
         /// <summary>Last difficulty the player raced ("" = pick by experience).</summary>
         public string tier = "";
         /// <summary>Contextual tips already shown (bit per <c>Core.Onboarding.Hint</c>).</summary>
         public int hintsSeen;
     }
-    [Serializable] public class EventBest { public string eventId; public long bestTimeMs; public int stars; }
+    [Serializable] public class EventBest
+    {
+        public string eventId;
+        public long bestTimeMs;
+        public int stars;
+        // Missing on legacy records: never infer old conditions from today's garage selection.
+        public RecordSetup setup;
+    }
     /// <summary>
     /// Monotonic counters written by ONE device. Every device owns its own row; totals are the
     /// sum of rows, and rows merge component-wise by max — so two devices that both spent
@@ -88,7 +99,7 @@ namespace RacingGame.Core.Save
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 5;
+        public const int CurrentVersion = 6;
         public int version = CurrentVersion;
         public long updatedAtUnixMs;
         public string deviceId = "";

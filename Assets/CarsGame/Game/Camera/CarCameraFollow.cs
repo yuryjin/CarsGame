@@ -47,19 +47,65 @@ namespace RacingGame
 
         public float CurrentRoll => roll;
 
-        private void Start()
+        private void Awake()
         {
             cam = GetComponent<Camera>();
             if (cam != null) initialFov = cam.fieldOfView;
+        }
+
+        private void OnDisable() => DetachTarget();
+        private void OnDestroy() => DetachTarget();
+
+        private void DetachTarget()
+        {
+            if (car != null) car.Teleported -= SnapToTarget;
+            car = null;
+            carFor = null;
+        }
+
+        /// <summary>Bind a new car and start from its clean chase pose, including after a wall ride.</summary>
+        public void SetTarget(Transform next)
+        {
+            DetachTarget();
+            target = next;
+            carFor = next;
+            targetRigidbody = next != null ? next.GetComponent<Rigidbody>() : null;
+            car = next != null ? next.GetComponent<CarController>() : null;
+            if (car != null) car.Teleported += SnapToTarget;
+            SnapToTarget();
+        }
+
+        private Vector3 Heading(Vector3 normal)
+        {
+            Vector3 forward = Vector3.ProjectOnPlane(target.forward, normal);
+            if (forward.sqrMagnitude < 1e-4f)
+                forward = Vector3.ProjectOnPlane(Mathf.Abs(normal.z) < .9f ? Vector3.forward : Vector3.right, normal);
+            return forward.normalized;
+        }
+
+        /// <summary>A recovery is a cut: never smooth from the old side of the track or an inverted horizon.</summary>
+        public void SnapToTarget()
+        {
+            if (target == null || !isActiveAndEnabled) return;
+            GetComponent<CameraImpulse>()?.ResetEnergy();
+            up = car != null ? car.GravityUp : Vector3.up;
+            roll = turn = 0f;
+            Vector3 forward = Heading(up);
+            var frame = Quaternion.LookRotation(forward, up);
+            Vector3 restOffset = offset;
+            restOffset.z += .4f;
+            transform.position = target.position + frame * restOffset;
+            transform.rotation = Quaternion.LookRotation(target.position + up * lookAtHeightOffset + forward * 1.5f - transform.position, up);
+            if (cam != null) cam.fieldOfView = car != null ? fovAtRest : initialFov;
         }
 
         private static float Smooth(float speed, float dt) => 1f - Mathf.Exp(-speed * dt);
 
         private void LateUpdate()
         {
-            if (target == null) return;
+            if (target == null) { DetachTarget(); return; }
             float dt = Time.deltaTime;
-            if (carFor != target) { carFor = target; car = target.GetComponent<CarController>(); }
+            if (carFor != target) SetTarget(target);
 
             // The car's own "up": world up, or the wall/ceiling normal while it wall rides; eased so the view rolls over smoothly.
             up = Vector3.Slerp(up, car != null ? car.GravityUp : Vector3.up, Smooth(5f, dt)).normalized;
@@ -70,9 +116,7 @@ namespace RacingGame
             float speedNorm = Mathf.Clamp01(speed / top);
 
             // Heading used for framing: the bonnet, pulled towards the direction of travel while sliding.
-            Vector3 fwd = Vector3.ProjectOnPlane(target.forward, up);
-            if (fwd.sqrMagnitude < 1e-4f) fwd = Vector3.ProjectOnPlane(Vector3.forward, up);
-            fwd.Normalize();
+            Vector3 fwd = Heading(up);
             if (speed > 8f && Vector3.Dot(flatVel, fwd) > 0f) fwd = Vector3.Slerp(fwd, flatVel / speed, followVelocity).normalized;
             var frame = Quaternion.LookRotation(fwd, up);
             Vector3 right = frame * Vector3.right;

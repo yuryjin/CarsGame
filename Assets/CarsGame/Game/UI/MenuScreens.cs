@@ -23,6 +23,7 @@ namespace RacingGame
         private RectTransform panel;
         private CanvasGroup transition;
         private string current = "", pendingScreen;
+        public bool RaceSettingsOpen { get; private set; }
         private static TextMeshProUGUI toastText;
         private static RectTransform toastPanel;
         private static float toastUntil;
@@ -86,21 +87,21 @@ namespace RacingGame
             if (RefreshDailyCard()) return;
             var rect = ((RectTransform)canvas.transform).rect;
             if (Mathf.Abs(rect.width - layoutWidth) > 1f || Mathf.Abs(rect.height - layoutHeight) > 1f) { Rebuild(); return; }
-            if (current != "main" && (Keyboard.current?.escapeKey.wasPressedThisFrame == true || Gamepad.current?.buttonEast.wasPressedThisFrame == true))
+            if (flow.State != FlowState.Racing && current != "main" && (Keyboard.current?.escapeKey.wasPressedThisFrame == true || Gamepad.current?.buttonEast.wasPressedThisFrame == true))
             {
                 Back();
             }
             if (rewardLabel != null)
             {
                 float k = Mathf.Clamp01((Time.unscaledTime - rewardShownAt) / RewardCountSeconds);
-                int target = flow.LastReward * (flow.LastRewardDoubled ? 2 : 1);
+                int target = flow.LastTotalReward;
                 rewardLabel.text = Loc.Format("results.reward", "n", Mathf.RoundToInt(target * (1f - (1f - k) * (1f - k))));
                 if (k >= 1f) rewardLabel = null;
             }
             if (rewardButton != null)
             {
                 rewardButton.interactable = !flow.IsDoublingReward;
-                rewardButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get(flow.IsDoublingReward ? "common.loading" : "results.double");
+                rewardButton.GetComponentInChildren<TextMeshProUGUI>().text = flow.IsDoublingReward ? Loc.Get("common.loading") : Loc.Format("results.double_amount", "n", flow.LastReward);
             }
         }
 
@@ -111,13 +112,36 @@ namespace RacingGame
         }
 
         public void GoTo(string screen) { pendingScreen = screen; flow.EnterMenu(); }
-        private void Back() { if (current == "results") GoTo("main"); else Show(current == "arsenal" ? "garage" : "main"); }
+        public void OpenRaceSettings()
+        {
+            if (flow.State != FlowState.Racing || race.State < RaceState.Countdown || race.State >= RaceState.Finished) return;
+            PauseController.Set(PauseReason.User, true);
+            GetComponent<HudScreen>()?.CloseHelpIfOpen();
+            RaceSettingsOpen = true;
+            Show("settings");
+        }
+
+        public bool CloseRaceSettingsIfOpen()
+        {
+            if (!RaceSettingsOpen) return false;
+            RaceSettingsOpen = false;
+            Show("");
+            GetComponent<HudScreen>()?.FocusPauseControls();
+            return true;
+        }
+
+        private void Back()
+        {
+            if (CloseRaceSettingsIfOpen()) return;
+            if (current == "results") GoTo("main"); else Show(current == "arsenal" ? "garage" : "main");
+        }
         private void OnFlowState(FlowState state)
         {
+            RaceSettingsOpen = false;
             switch (state)
             {
-                case FlowState.Menu: string target = pendingScreen ?? (flow.ReturningFromTestDrive ? "garage" : "main"); pendingScreen = null; Show(target); break;
-                case FlowState.Racing: Show(""); break;
+                case FlowState.Menu: string target = pendingScreen ?? (flow.ReturningFromPractice ? "practice" : flow.ReturningFromTestDrive ? "garage" : "main"); pendingScreen = null; Show(target); break;
+                case FlowState.Racing: rewardDetailsExpanded = false; Show(""); break;
                 case FlowState.Results:
                     rewardShownAt = Time.unscaledTime;
                     Show("results");
@@ -130,8 +154,8 @@ namespace RacingGame
         public void Show(string name)
         {
             var save = PlatformGlue.Save;
-            if (save != null && RaceCups.GrantCompleted(save.Data.progress)) save.MarkDirty();
-            if (save != null && PlayerProgression.NormalizeLoadout(save.Data.progress)) save.MarkDirty();
+            if (save != null && !save.LocalVersionTooNew && !RaceSettingsOpen && RaceCups.GrantCompleted(save.Data.progress)) save.MarkDirty();
+            if (save != null && !save.LocalVersionTooNew && !RaceSettingsOpen && PlayerProgression.NormalizeLoadout(save.Data.progress)) save.MarkDirty();
             if (current == "garage" && name != "garage" && !flow.IsTestDrive) previewBodyId = null;
             string selected = current == name ? EventSystem.current?.currentSelectedGameObject?.name : null;
             var scrollPositions = new Dictionary<string, float>();
@@ -155,13 +179,20 @@ namespace RacingGame
             var shell = UiFactory.Card(panel, "Shell", new Vector2(0.5f, 0f), new Vector2(0.5f, 1f), new Vector2(-width * 0.5f, margin), new Vector2(width * 0.5f, -margin));
             shell.GetComponent<Image>().color = new Color(0.035f, 0.05f, 0.08f, 0.96f);
             var frame = UiFactory.Panel(shell, "Frame", Vector2.zero, Vector2.one, new Vector2(Compact ? 16f : 32f, Compact ? 8f : 16f), new Vector2(Compact ? -16f : -32f, Compact ? -8f : -24f));
-            switch (name)
+            if (save != null && save.LocalVersionTooNew)
+            {
+                var body = Header(frame, "save.newer.title", false, false);
+                Label(body, "SaveVersionMessage", Loc.Get("save.newer.message"), 32f, Vector2.zero, Vector2.one,
+                    new Vector2(32f, 24f), new Vector2(-32f, -24f), UiFactory.Muted, TextAlignmentOptions.Center);
+            }
+            else switch (name)
             {
                 case "main": BuildMain(frame); break;
                 case "events": BuildEvents(frame); break;
                 case "garage": BuildGarage(frame); break;
                 case "arsenal": BuildArsenal(frame); break;
                 case "settings": BuildSettings(frame); break;
+                case "practice": BuildPractice(frame); break;
                 case "leaders": BuildLeaders(frame); break;
                 case "results": BuildResults(frame); break;
             }
@@ -195,13 +226,13 @@ namespace RacingGame
             return text;
         }
 
-        private RectTransform Header(RectTransform root, string key, bool back = true)
+        private RectTransform Header(RectTransform root, string key, bool back = true, bool showWallet = true)
         {
             if (Compact)
             {
                 if (back) UiFactory.Button(root, "Back", "‹  " + Loc.Get("common.back"), Back, Top, Top, new Vector2(0f, -68f), new Vector2(150f, 0f), 26f, UiFactory.Raised);
-                Label(root, "Title", Loc.Get(key), 40f, Top, Vector2.one, new Vector2(back ? 170f : 12f, -68f), new Vector2(-218f, 0f)).fontStyle = FontStyles.Bold;
-                Label(root, "Coins", Coins(), 24f, Vector2.one, Vector2.one, new Vector2(-206f, -68f), Vector2.zero, UiFactory.Accent, TextAlignmentOptions.MidlineRight);
+                Label(root, "Title", Loc.Get(key), 40f, Top, Vector2.one, new Vector2(back ? 170f : 12f, -68f), new Vector2(showWallet ? -218f : -12f, 0f)).fontStyle = FontStyles.Bold;
+                if (showWallet) Label(root, "Coins", Coins(), 24f, Vector2.one, Vector2.one, new Vector2(-206f, -68f), Vector2.zero, UiFactory.Accent, TextAlignmentOptions.MidlineRight);
                 return UiFactory.Panel(root, "Body", Vector2.zero, Vector2.one, Vector2.zero, new Vector2(0f, -86f));
             }
             if (back) UiFactory.Button(root, "Back", "‹  " + Loc.Get("common.back"), Back, Top, Top, new Vector2(0f, -74f), new Vector2(164f, -6f), 26f, UiFactory.Raised);
@@ -211,10 +242,13 @@ namespace RacingGame
                     var stripe = UiFactory.Panel(root, "Mark" + i, Top, Top, new Vector2(6f + i * 22f, -66f), new Vector2(18f + i * 22f, -12f), UiFactory.Accent, false);
                     stripe.localRotation = Quaternion.Euler(0f, 0f, -15f);
                 }
-            var title = Label(root, "Title", Loc.Get(key), back ? 46f : 60f, Top, Vector2.one, new Vector2(back ? 190f : 94f, -82f), new Vector2(-300f, 0f));
+            var title = Label(root, "Title", Loc.Get(key), back ? 46f : 60f, Top, Vector2.one, new Vector2(back ? 190f : 94f, -82f), new Vector2(showWallet ? -300f : 0f, 0f));
             title.fontStyle = FontStyles.Bold;
-            var wallet = UiFactory.Card(root, "Wallet", Vector2.one, Vector2.one, new Vector2(-276f, -74f), new Vector2(0f, -6f));
-            Label(wallet, "Coins", Coins(), 26f, Vector2.zero, Vector2.one, new Vector2(22f, 8f), new Vector2(-22f, -8f), UiFactory.Accent, TextAlignmentOptions.Center);
+            if (showWallet)
+            {
+                var wallet = UiFactory.Card(root, "Wallet", Vector2.one, Vector2.one, new Vector2(-276f, -74f), new Vector2(0f, -6f));
+                Label(wallet, "Coins", Coins(), 26f, Vector2.zero, Vector2.one, new Vector2(22f, 8f), new Vector2(-22f, -8f), UiFactory.Accent, TextAlignmentOptions.Center);
+            }
             UiFactory.Panel(root, "Rule", Top, Vector2.one, new Vector2(0f, -111f), new Vector2(0f, -110f), new Color(0.4f, 0.5f, 0.65f, 0.3f), false);
             UiFactory.Panel(root, "Accent", Top, Top, new Vector2(0f, -113f), new Vector2(90f, -109f), UiFactory.Accent, false);
             var player = PlatformGlue.Platform?.Player;
@@ -294,6 +328,9 @@ namespace RacingGame
                 Label(button.transform, "Detail", Loc.Get(captions[i]), 22f, Vector2.zero, Vector2.one, new Vector2(82f, 18f), new Vector2(-42f, -82f), UiFactory.Muted);
                 Label(button.transform, "Arrow", "›", 42f, new Vector2(1f, 0f), Vector2.one, new Vector2(-40f, 0f), new Vector2(-14f, 0f), UiFactory.Muted);
             }
+            var practiceLink = Item(content, "PracticeLink", 86f, false);
+            UiFactory.Button(practiceLink, "Practice", Loc.Get("practice.title") + "   ›", () => Show("practice"),
+                Vector2.zero, Vector2.one, new Vector2(4f, 4f), new Vector2(-4f, -4f), 28f, UiFactory.Raised);
             BuildDailyCard(content);
         }
 
@@ -600,17 +637,33 @@ namespace RacingGame
             UiFactory.Button(value, "LanguagePrevious", "‹", () => PlatformGlue.SetLanguageOverride(LanguageCycle[(Mathf.Max(0, index) + LanguageCycle.Length - 1) % LanguageCycle.Length]), Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(64f, 0f), 36f, UiFactory.Raised);
             Label(value, "LanguageName", language, 25f, Vector2.zero, Vector2.one, new Vector2(74f, 4f), new Vector2(-74f, -4f), Color.white, TextAlignmentOptions.Center);
             UiFactory.Button(value, "LanguageNext", "›", () => PlatformGlue.SetLanguageOverride(LanguageCycle[(Mathf.Max(0, index) + 1) % LanguageCycle.Length]), new Vector2(1f, 0f), Vector2.one, new Vector2(-64f, 0f), Vector2.zero, 36f, UiFactory.Raised);
-            ToggleRow(content, "Sound", "settings.sound", save == null || save.Data.settings.sfx > 0f, enabled =>
+            VolumeRow(content, "Sound", "settings.sound", save != null ? save.Data.settings.sfx : 1f, level =>
             {
                 if (save == null) return;
-                save.Data.settings.sfx = enabled ? 1f : 0f; save.MarkDirty();
-                SfxPlayer.Instance.volume = save.Data.settings.sfx * 0.8f; Show("settings");
+                // Freeze the legacy effective music level before moving the independent effects slider.
+                if (!save.Data.settings.musicChosen)
+                {
+                    save.Data.settings.music = MusicDirector.MusicLevel(save.Data.settings);
+                    save.Data.settings.musicChosen = true;
+                }
+                save.Data.settings.sfx = level; save.MarkDirty();
+                SfxPlayer.Instance.volume = level * 0.8f;
             });
-            // MusicPlayer polls the setting; see MusicDirector.MusicLevel for saves from before this toggle.
-            ToggleRow(content, "Music", "settings.music", save != null && MusicDirector.MusicLevel(save.Data.settings) > 0f, enabled =>
-            { if (save == null) return; save.Data.settings.music = enabled ? 1f : 0f; save.MarkDirty(); Show("settings"); });
+            // MusicPlayer observes changes, including an explicitly chosen 80% value.
+            VolumeRow(content, "Music", "settings.music", save != null ? MusicDirector.MusicLevel(save.Data.settings) : 0f, level =>
+            { if (save == null) return; save.Data.settings.music = level; save.Data.settings.musicChosen = true; save.MarkDirty(); });
             ToggleRow(content, "AutoThrottle", "settings.auto_throttle", save != null && save.Data.settings.autoThrottle, enabled =>
-            { if (save == null) return; save.Data.settings.autoThrottle = enabled; save.MarkDirty(); Show("settings"); });
+            {
+                if (save == null) return;
+                save.Data.settings.autoThrottle = enabled; save.MarkDirty();
+                var driver = race.Player != null ? race.Player.GetComponent<PlayerDriverInput>() : null;
+                if (driver != null) driver.autoThrottle = enabled || TouchControlsPresenter.IsShown;
+                Show("settings");
+            });
+            ToggleRow(content, "TouchLarge", "settings.touch_large", save != null && save.Data.settings.touchLargeButtons, enabled =>
+            { if (save == null) return; save.Data.settings.touchLargeButtons = enabled; save.MarkDirty(); Show("settings"); });
+            ToggleRow(content, "TouchLeft", "settings.touch_left", save != null && save.Data.settings.touchLeftHanded, enabled =>
+            { if (save == null) return; save.Data.settings.touchLeftHanded = enabled; save.MarkDirty(); Show("settings"); });
             if (!PlatformGlue.IsMobileDevice)
                 ToggleRow(content, "AutoAim", "settings.auto_aim", save == null || save.Data.settings.autoAim, enabled =>
                 { if (save == null) return; save.Data.settings.autoAim = enabled; save.MarkDirty(); Show("settings"); });
@@ -628,6 +681,14 @@ namespace RacingGame
             }
             ToggleRow(content, "Shake", "settings.shake", save == null || save.Data.settings.cameraShake, enabled =>
             { if (save == null) return; save.Data.settings.cameraShake = enabled; save.MarkDirty(); Show("settings"); });
+            var hints = SettingValue(SettingRow(content, "Hints", "settings.hints"));
+            UiFactory.Button(hints, "ReplayHints", Loc.Get("settings.hints.replay"), () =>
+            {
+                if (save == null) return;
+                save.Data.settings.hintsSeen = 0;
+                save.MarkDirty();
+                Toast(Loc.Get("settings.hints.reset"));
+            }, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 26f, UiFactory.Raised);
         }
         private RectTransform SettingRow(Transform content, string name, string key)
         {
@@ -635,7 +696,7 @@ namespace RacingGame
             Label(row, "Name", Loc.Get(key), 30f, Narrow ? Top : Vector2.zero, Vector2.one, new Vector2(28f, Narrow ? -64f : 16f), new Vector2(Narrow ? -28f : -550f, -16f));
             return row;
         }
-        private RectTransform SettingValue(RectTransform row) => UiFactory.Panel(row, "Value", Narrow ? Vector2.zero : new Vector2(1f, 0.5f), Narrow ? new Vector2(1f, 0f) : new Vector2(1f, 0.5f), Narrow ? new Vector2(26f, 22f) : new Vector2(-528f, -34f), Narrow ? new Vector2(-26f, 88f) : new Vector2(-26f, 34f));
+        private RectTransform SettingValue(RectTransform row) => UiFactory.Panel(row, "Value", Narrow ? Vector2.zero : new Vector2(1f, 0.5f), Narrow ? new Vector2(1f, 0f) : new Vector2(1f, 0.5f), Narrow ? new Vector2(26f, 22f) : new Vector2(-528f, -34f), Narrow ? new Vector2(-26f, 90f) : new Vector2(-26f, 34f));
         private void ToggleRow(Transform content, string name, string key, bool enabled, Action<bool> change)
         {
             var value = SettingValue(SettingRow(content, name, key));
@@ -644,6 +705,32 @@ namespace RacingGame
                 bool state = i == 1;
                 UiFactory.Button(value, name + (state ? "On" : "Off"), Loc.Get(state ? "settings.on" : "settings.off"), () => change(state), new Vector2(i * 0.5f, 0f), new Vector2((i + 1) * 0.5f, 1f), new Vector2(3f, 0f), new Vector2(-3f, 0f), 25f, state == enabled ? UiFactory.Accent : UiFactory.Raised);
             }
+        }
+
+        private void VolumeRow(Transform content, string name, string key, float level, Action<float> change)
+        {
+            var value = SettingValue(SettingRow(content, name, key));
+            int percent = Mathf.RoundToInt(Mathf.Clamp01(level) * 100f);
+            var label = Label(value, "VolumeValue", percent + "%", 27f, new Vector2(1f, 0f), Vector2.one,
+                new Vector2(-92f, 0f), Vector2.zero, Color.white, TextAlignmentOptions.Center);
+            var root = UiFactory.Panel(value, name + "Volume", Vector2.zero, Vector2.one, Vector2.zero, new Vector2(-104f, 0f), new Color(0f, 0f, 0f, 0f));
+            root.GetComponent<Image>().raycastTarget = true;
+            var rail = UiFactory.Panel(root, "Rail", new Vector2(0f, 0.5f), new Vector2(1f, 0.5f),
+                new Vector2(28f, -5f), new Vector2(-28f, 5f), UiFactory.Raised);
+            var fill = UiFactory.Panel(rail, "Fill", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, UiFactory.Accent);
+            var handleArea = UiFactory.Panel(root, "HandleArea", Vector2.zero, Vector2.one, new Vector2(28f, 0f), new Vector2(-28f, 0f));
+            // Slider stretches the handle vertically; offsets inset it inside the target instead of adding a second height.
+            var handle = UiFactory.Panel(handleArea, "Handle", Vector2.zero, new Vector2(0f, 1f),
+                new Vector2(-28f, 4f), new Vector2(28f, -4f), Color.white);
+            var slider = root.gameObject.AddComponent<Slider>();
+            slider.fillRect = fill; slider.handleRect = handle; slider.targetGraphic = handle.GetComponent<Image>();
+            slider.minValue = 0f; slider.maxValue = 100f; slider.wholeNumbers = true;
+            slider.SetValueWithoutNotify(percent);
+            var colors = slider.colors;
+            colors.highlightedColor = colors.selectedColor = UiFactory.Accent;
+            slider.colors = colors;
+            root.gameObject.AddComponent<UiButtonFx>();
+            slider.onValueChanged.AddListener(v => { label.text = Mathf.RoundToInt(v) + "%"; change(v / 100f); });
         }
 
         private void BuildLeaders(RectTransform root)
@@ -655,7 +742,7 @@ namespace RacingGame
             {
                 var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
                 if (best == null || best.bestTimeMs <= 0) continue;
-                BoardRow(content, "Local_" + ev.eventId, (++count).ToString("00"), Loc.Get(ev.nameKey), UiFactory.FormatTime(best.bestTimeMs / 1000.0), true);
+                BoardRow(content, "Local_" + ev.eventId, (++count).ToString("00"), Loc.Get(ev.nameKey), UiFactory.FormatTime(best.bestTimeMs / 1000.0), true, RecordSetupText(best.setup));
             }
             if (count == 0)
             {
@@ -688,12 +775,29 @@ namespace RacingGame
             var row = Item(content, name, 52f, false);
             Label(row, "Title", title, 26f, Vector2.zero, Vector2.one, new Vector2(4f, 0f), Vector2.zero, UiFactory.Accent).fontStyle = FontStyles.Bold;
         }
-        private static void BoardRow(Transform content, string id, string rank, string name, string time, bool highlight)
+        private static string RecordSetupText(Core.Save.RecordSetup setup)
         {
-            var row = Item(content, id, 90f);
+            if (setup == null || !setup.IsKnown) return Loc.Get("record.unknown");
+            string tier = setup.tier == "easy" || setup.tier == "normal" || setup.tier == "hard" ? Loc.Get("difficulty." + setup.tier) : Loc.Get("record.unknown");
+            string body = Loc.Get(CarBodies.Get(setup.body).NameKey);
+            string build = Loc.Get("build." + ((CarBuild)Mathf.Clamp(setup.build, 0, 3)).ToString().ToLowerInvariant());
+            string upgrades = Loc.Format("record.upgrades", "engine", UpgradeCatalog.Level(setup.upgrades, 0),
+                "armor", UpgradeCatalog.Level(setup.upgrades, 1), "cannon", UpgradeCatalog.Level(setup.upgrades, 2));
+            return tier + " · " + body + " · " + build + "\n" + upgrades + (setup.continued ? " · " + Loc.Get("record.continued") : "");
+        }
+
+        private static void BoardRow(Transform content, string id, string rank, string name, string time, bool highlight, string detail = null)
+        {
+            bool hasDetail = !string.IsNullOrEmpty(detail);
+            var row = Item(content, id, hasDetail ? 180f : 90f);
             Label(row, "Rank", rank, 30f, Vector2.zero, new Vector2(0f, 1f), new Vector2(20f, 12f), new Vector2(112f, -12f), highlight ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
-            Label(row, "Name", name, 28f, Vector2.zero, Vector2.one, new Vector2(140f, 12f), new Vector2(-250f, -12f));
-            Label(row, "Time", time, 30f, new Vector2(1f, 0f), Vector2.one, new Vector2(-240f, 12f), new Vector2(-26f, -12f), highlight ? UiFactory.Positive : Color.white, TextAlignmentOptions.MidlineRight);
+            Label(row, "Name", name, 28f, Vector2.zero, Vector2.one, new Vector2(140f, hasDetail ? 96f : 12f), new Vector2(-250f, -12f));
+            Label(row, "Time", time, 30f, new Vector2(1f, 0f), Vector2.one, new Vector2(-240f, hasDetail ? 96f : 12f), new Vector2(-26f, -12f), highlight ? UiFactory.Positive : Color.white, TextAlignmentOptions.MidlineRight);
+            if (hasDetail)
+            {
+                var setupLabel = Label(row, "RecordSetup", detail, 23f, Vector2.zero, new Vector2(1f, 0f), new Vector2(140f, 14f), new Vector2(-26f, 92f), UiFactory.Muted);
+                setupLabel.fontSizeMin = 22f;
+            }
         }
         private async void FillCloudBoard(RectTransform content, ILeaderboards boards)
         {
@@ -720,6 +824,8 @@ namespace RacingGame
         {
             if (me == null || !me.Finished) return "";
             if (!flow.LastHadPreviousBest) return Loc.Get("results.pb_first");
+            if (!flow.LastWasPersonalBest && !flow.LastBestComparable)
+                return Loc.Get(flow.LastBestSetupKnown ? "results.pb_other_setup" : "results.pb_unknown_setup");
             string seconds = (Math.Abs(flow.LastBestDeltaMs) / 1000.0).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
             return flow.LastWasPersonalBest ? Loc.Format("results.pb_new", "t", seconds) : Loc.Format("results.pb_behind", "t", seconds);
         }
@@ -770,22 +876,24 @@ namespace RacingGame
             // Keep the next race, retry and garage available while reading long results.
             // Focusing these buttons must not scroll the reward out of view on arrival.
             var content = UiFactory.Scroll(overview, "ResultsScroll", new Vector2(0f, 104f), Vector2.zero);
-            int reward = flow.LastReward * (flow.LastRewardDoubled ? 2 : 1);
+            int reward = flow.LastTotalReward;
             var summary = Item(content, "Summary", 216f);
             summary.GetComponent<Image>().color = new Color(0.12f, 0.16f, 0.22f);
             UiFactory.Panel(summary, "GoldRule", Top, Vector2.one, new Vector2(28f, -4f), new Vector2(-28f, -1f), UiFactory.Accent, false);
             var medal = UiFactory.Panel(summary, "Medal", Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(194f, -24f), new Color(1f, 0.8f, 0.25f, 0.08f));
             var me = results.Player;
-            Label(medal, "Place", me == null ? "—" : me.Finished ? "#" + me.Position : Loc.Get("results.dnf"), me != null && me.Finished ? 86f : 38f, Vector2.zero, Vector2.one, new Vector2(8f, 8f), new Vector2(-8f, -8f), PlaceColor(me), TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
+            bool missionEvent = flow.CurrentEvent != null && flow.CurrentEvent.mode == EventMode.Mission;
+            string unfinishedKey = missionEvent ? "results.defeat" : "results.dnf";
+            Label(medal, "Place", me == null ? "—" : me.Finished ? "#" + me.Position : Loc.Get(me.Eliminated ? "results.eliminated" : unfinishedKey), me != null && me.Finished ? 86f : 38f, Vector2.zero, Vector2.one, new Vector2(8f, 8f), new Vector2(-8f, -8f), PlaceColor(me), TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
             var rewardText = Label(summary, "Reward", Loc.Format("results.reward", "n", reward), 40f, Top, Vector2.one, new Vector2(234f, -80f), new Vector2(-28f, -20f), UiFactory.Accent);
             rewardText.fontStyle = FontStyles.Bold;
             if (Time.unscaledTime - rewardShownAt < RewardCountSeconds) rewardLabel = rewardText;   // count up once, not on every rebuild
-            bool missionEvent = flow.CurrentEvent != null && flow.CurrentEvent.mode == EventMode.Mission;
-            Label(summary, "Detail", flow.LastRewardDoubled ? Loc.Get("results.doubled") : missionEvent ? Loc.Get(MissionDirector.LastVictory ? "mission.victory" : "mission.defeat")
+            Label(summary, "Detail", flow.LastRewardDoubled ? Loc.Get("results.ad_received") : missionEvent ? Loc.Get(me != null && me.Finished ? "mission.victory" : "mission.defeat")
                 : flow.CurrentEvent != null ? Loc.Get(flow.CurrentEvent.nameKey) : Loc.Get("results.title"), 26f, Top, Vector2.one, new Vector2(234f, -124f), new Vector2(-28f, -84f), UiFactory.Muted);
             string record = RecordLine(me);
             if (record.Length > 0) Label(summary, "Record", record, 24f, Top, Vector2.one, new Vector2(234f, -170f), new Vector2(-28f, -128f), flow.LastWasPersonalBest ? UiFactory.Positive : UiFactory.Muted);
 
+            BuildRewardDetails(content, me, missionEvent);
             BuildResultStars(content);
             var next = RecommendedNext();
             BuildNextGoal(content, next);
@@ -813,7 +921,7 @@ namespace RacingGame
             if (!flow.LastRewardDoubled && flow.LastRewardFinished && flow.LastReward > 0 && ads != null && ads.IsRewardedAvailable)
             {
                 var ad = Item(content, "RewardAction", 68f, false);
-                rewardButton = UiFactory.Button(ad, "Double", Loc.Get("results.double"), () => flow.DoubleReward(), Vector2.zero, Vector2.one, new Vector2(4f, 0f), new Vector2(-8f, 0f), 26f, UiFactory.Raised);
+                rewardButton = UiFactory.Button(ad, "Double", Loc.Format("results.double_amount", "n", flow.LastReward), () => flow.DoubleReward(), Vector2.zero, Vector2.one, new Vector2(4f, 0f), new Vector2(-8f, 0f), 26f, UiFactory.Raised);
                 rewardButton.GetComponentInChildren<TextMeshProUGUI>().color = UiFactory.Positive;
             }
             var standings = columns ? UiFactory.Panel(body, "Standings", new Vector2(0.48f, 0f), Vector2.one, new Vector2(16f, 0f), Vector2.zero) : null;
@@ -826,8 +934,11 @@ namespace RacingGame
                 if (entry.IsPlayer) UiFactory.Panel(row, "Accent", Vector2.zero, new Vector2(0f, 1f), new Vector2(0f, 14f), new Vector2(4f, -14f), UiFactory.Accent, false);
                 Label(row, "Rank", entry.Position.ToString("00"), 42f, Vector2.zero, new Vector2(0f, 1f), new Vector2(22f, 18f), new Vector2(112f, -18f), entry.IsPlayer ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
                 Label(row, "Name", UiFactory.Escape(HudScreen.GetLocalizedRacerName(entry.Name, entry.IsPlayer)), 30f, Top, Vector2.one, new Vector2(120f, -66f), new Vector2(-26f, -14f)).fontStyle = FontStyles.Bold;
-                Label(row, "Detail", Loc.Format("results.best_lap", "t", UiFactory.FormatTime(entry.BestLap)) + "   /   " + Loc.Format("results.kills", "k", entry.Kills, "d", entry.Deaths), 22f, Vector2.zero, Vector2.one, new Vector2(120f, 16f), new Vector2(-224f, -76f), UiFactory.Muted);
-                Label(row, "Time", entry.Finished ? UiFactory.FormatTime(entry.TotalTime) : Loc.Get("results.dnf"), 30f, new Vector2(1f, 0f), Vector2.one, new Vector2(-214f, 16f), new Vector2(-26f, -76f), entry.IsPlayer ? UiFactory.Positive : Color.white, TextAlignmentOptions.MidlineRight);
+                string progress = entry.Finished ? Loc.Format("results.best_lap", "t", UiFactory.FormatTime(entry.BestLap))
+                    : Loc.Format("results.laps_completed", "n", entry.Laps, "total", results.LapsRequired);
+                string combat = Loc.Format("results.kills", "k", entry.Kills, "d", entry.Deaths);
+                Label(row, "Detail", missionEvent || results.IsArena ? combat : progress + "   /   " + combat, 22f, Vector2.zero, Vector2.one, new Vector2(120f, 16f), new Vector2(-224f, -76f), UiFactory.Muted);
+                Label(row, "Time", entry.Finished ? UiFactory.FormatTime(entry.TotalTime) : Loc.Get(entry.Eliminated ? "results.eliminated" : unfinishedKey), 30f, new Vector2(1f, 0f), Vector2.one, new Vector2(-214f, 16f), new Vector2(-26f, -76f), entry.IsPlayer ? UiFactory.Positive : Color.white, TextAlignmentOptions.MidlineRight);
             }
         }
     }

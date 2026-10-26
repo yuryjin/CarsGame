@@ -164,59 +164,7 @@ namespace RacingGame.Tests
                 var input = car.gameObject.AddComponent<ScriptedDriverInput>();
                 car.SetInputSource(input);
                 while (race.State == RaceState.Countdown) yield return null;
-                float first = reverse ? 1f : 0f;
-                Vector3 facing = fork.Position(reverse ? 0.98f : 0.02f) - fork.Position(first);
-                facing.y = 0f;
-                car.Teleport(fork.Position(first) + Vector3.up * 0.5f, Quaternion.LookRotation(facing));
-                input.Set(0f, 0f);
-                for (int i = 0; i < 25; i++) yield return null;
-                int farthest = 0;
-                int ticks = 0;
-                for (; ticks < 1500 && farthest < 198; ticks++)
-                {
-                    int best = farthest;
-                    float error = float.MaxValue;
-                    for (int i = Mathf.Max(0, farthest - 3); i <= Mathf.Min(200, farthest + 20); i++)
-                    {
-                        float t = i / 200f;
-                        float e = (car.transform.position - fork.Position(reverse ? 1f - t : t)).sqrMagnitude;
-                        if (e < error) { error = e; best = i; }
-                    }
-                    farthest = Mathf.Max(farthest, best);
-                    float aim = Mathf.Min(1f, (best + 10) / 200f);
-                    Vector3 target = fork.Position(reverse ? 1f - aim : aim) - car.transform.position;
-                    target.y = 0f;
-                    float angle = Vector3.SignedAngle(car.transform.forward, target, Vector3.up);
-                    Vector3 Route(float t) => fork.Position(reverse ? 1f - Mathf.Clamp01(t) : Mathf.Clamp01(t));
-                    float fraction = best / 200f;
-                    Vector3 p0 = Route(fraction - 0.015f), p1 = Route(fraction), p2 = Route(fraction + 0.015f);
-                    Vector3 tangent = (p2 - p0).normalized;
-                    Vector3 right = Vector3.Cross(Vector3.up, tangent).normalized;
-                    float curvature = best > 3 && best < 197
-                        ? Vector3.SignedAngle(p1 - p0, p2 - p1, Vector3.up) * Mathf.Deg2Rad / (Vector3.Distance(p0, p2) * 0.5f) : 0f;
-                    float speed = car.Body.linearVelocity.magnitude;
-                    float feed = car.SteerForCurvature(curvature, speed);
-                    float lateral = Vector3.Dot(p1 - car.transform.position, right) * 0.6f - Vector3.Dot(car.Body.linearVelocity, right) * 0.15f;
-                    float correction = angle - target.magnitude * curvature * 0.5f * Mathf.Rad2Deg;
-                    float steer = Mathf.Clamp(feed + lateral + correction / 35f - (car.Body.angularVelocity.y - speed * curvature) * 0.7f, -1f, 1f);
-                    float desired = Mathf.Min(45f, car.MaxSpeedForCurvature(curvature) * 3.6f * 0.85f);
-                    input.Set(car.SpeedKmh < desired ? 1f : -0.4f, steer);
-                    yield return null;
-                    Assert.AreEqual(0, race.Player.AutoResets, $"bridge recovery at sample={best} tick={ticks} error={Mathf.Sqrt(error):F2}");
-                }
-                Debug.Log($"[TrackFork] drive reverse={reverse} ticks={ticks} reached={farthest}/200 pos={car.transform.position}");
-                Assert.GreaterOrEqual(farthest, 198, "car physically reaches the other end");
-                Assert.AreEqual(0, race.Player.Deaths);
-
-                // Cross the bridge's exit under normal physics, so the skill goal is credited only on completion.
-                for (int i = 0; i < 120 && race.Player.Shortcuts == 0; i++)
-                {
-                    var target = path.Position(path.Wrap(race.Player.Progress.Distance + 10f)) - car.transform.position;
-                    target.y = 0f;
-                    input.Set(car.SpeedKmh < 45f ? 1f : 0f, Mathf.Clamp(Vector3.SignedAngle(car.transform.forward, target, Vector3.up) / 35f, -1f, 1f));
-                    yield return null;
-                }
-                Assert.AreEqual(1, race.Player.Shortcuts, "a complete physical passage earns one shortcut");
+                yield return DriveBranch(race, fork, input, reverse);
 
                 // Missing the bridge costs time but does not strand the car or jump its progress to another bend.
                 Vector3 middle = fork.Position(0.5f);
@@ -251,6 +199,66 @@ namespace RacingGame.Tests
                 yield return null;
             }
             Object.Destroy(ev);
+        }
+
+        // Shared physical driver for the ordinary bridge and the repeatable shortcut lesson.
+        internal static IEnumerator DriveBranch(RaceManager race, TrackFork fork, ScriptedDriverInput input, bool reverse)
+        {
+            var car = race.Player.Car;
+            var path = race.Player.Progress.Path;
+            float first = reverse ? 1f : 0f;
+            Vector3 facing = fork.Position(reverse ? 0.98f : 0.02f) - fork.Position(first);
+            facing.y = 0f;
+            car.Teleport(fork.Position(first) + Vector3.up * 0.5f, Quaternion.LookRotation(facing));
+            input.Set(0f, 0f);
+            for (int i = 0; i < 25; i++) yield return null;
+            int farthest = 0;
+            int ticks = 0;
+            for (; ticks < 1500 && farthest < 198; ticks++)
+            {
+                int best = farthest;
+                float error = float.MaxValue;
+                for (int i = Mathf.Max(0, farthest - 3); i <= Mathf.Min(200, farthest + 20); i++)
+                {
+                    float t = i / 200f;
+                    float e = (car.transform.position - fork.Position(reverse ? 1f - t : t)).sqrMagnitude;
+                    if (e < error) { error = e; best = i; }
+                }
+                farthest = Mathf.Max(farthest, best);
+                float aim = Mathf.Min(1f, (best + 10) / 200f);
+                Vector3 target = fork.Position(reverse ? 1f - aim : aim) - car.transform.position;
+                target.y = 0f;
+                float angle = Vector3.SignedAngle(car.transform.forward, target, Vector3.up);
+                Vector3 Route(float t) => fork.Position(reverse ? 1f - Mathf.Clamp01(t) : Mathf.Clamp01(t));
+                float fraction = best / 200f;
+                Vector3 p0 = Route(fraction - 0.015f), p1 = Route(fraction), p2 = Route(fraction + 0.015f);
+                Vector3 tangent = (p2 - p0).normalized;
+                Vector3 right = Vector3.Cross(Vector3.up, tangent).normalized;
+                float curvature = best > 3 && best < 197
+                    ? Vector3.SignedAngle(p1 - p0, p2 - p1, Vector3.up) * Mathf.Deg2Rad / (Vector3.Distance(p0, p2) * 0.5f) : 0f;
+                float speed = car.Body.linearVelocity.magnitude;
+                float feed = car.SteerForCurvature(curvature, speed);
+                float lateral = Vector3.Dot(p1 - car.transform.position, right) * 0.6f - Vector3.Dot(car.Body.linearVelocity, right) * 0.15f;
+                float correction = angle - target.magnitude * curvature * 0.5f * Mathf.Rad2Deg;
+                float steer = Mathf.Clamp(feed + lateral + correction / 35f - (car.Body.angularVelocity.y - speed * curvature) * 0.7f, -1f, 1f);
+                float desired = Mathf.Min(45f, car.MaxSpeedForCurvature(curvature) * 3.6f * 0.85f);
+                input.Set(car.SpeedKmh < desired ? 1f : -0.4f, steer);
+                yield return null;
+                Assert.AreEqual(0, race.Player.AutoResets, $"bridge recovery at sample={best} tick={ticks} error={Mathf.Sqrt(error):F2}");
+            }
+            Debug.Log($"[TrackFork] drive reverse={reverse} ticks={ticks} reached={farthest}/200 pos={car.transform.position}");
+            Assert.GreaterOrEqual(farthest, 198, "car physically reaches the other end");
+            Assert.AreEqual(0, race.Player.Deaths);
+
+            // Cross the bridge's exit under normal physics, so the skill goal is credited only on completion.
+            for (int i = 0; i < 120 && race.Player.Shortcuts == 0; i++)
+            {
+                var target = path.Position(path.Wrap(race.Player.Progress.Distance + 10f)) - car.transform.position;
+                target.y = 0f;
+                input.Set(car.SpeedKmh < 45f ? 1f : 0f, Mathf.Clamp(Vector3.SignedAngle(car.transform.forward, target, Vector3.up) / 35f, -1f, 1f));
+                yield return null;
+            }
+            Assert.AreEqual(1, race.Player.Shortcuts, "a complete physical passage earns one shortcut");
         }
     }
 }

@@ -25,7 +25,7 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _EmissionBoost: 0
+    - _EmissionBoost: 0.16
     - _EmissionByLamps: 0
     - _Flat: 0
     - _FogOverride: 0

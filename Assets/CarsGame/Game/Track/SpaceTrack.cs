@@ -7,6 +7,8 @@ namespace RacingGame
     /// <summary>Space dressing and boost gates over the existing suspended circuit.</summary>
     public sealed class SpaceTrack : MonoBehaviour
     {
+        // Previously shared AbyssTrack's version 3. Gates now also accept late centring.
+        public const int LayoutVersion = 4;
         private GameObject mountains;
         private Material glow;
         private readonly List<Mesh> meshes = new List<Mesh>();

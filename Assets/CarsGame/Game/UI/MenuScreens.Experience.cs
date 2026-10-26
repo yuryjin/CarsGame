@@ -10,6 +10,26 @@ namespace RacingGame
         private int loadoutSlot;
         private ArsenalGroup arsenalGroup;
 
+        private void BuildPractice(RectTransform root)
+        {
+            var content = UiFactory.Scroll(Header(root, "practice.title"), "PracticeScroll", Vector2.zero, Vector2.zero);
+            var note = Item(content, "PracticeNote", 100f, false);
+            Label(note, "Text", Loc.Get("practice.note"), 26f, Vector2.zero, Vector2.one, new Vector2(20f, 8f), new Vector2(-20f, -8f), UiFactory.Muted);
+            foreach (var lesson in new[] { PracticeLesson.Drift, PracticeLesson.Shortcut, PracticeLesson.WallRide, PracticeLesson.Aim })
+            {
+                var selected = lesson;
+                var row = Item(content, "Lesson" + lesson, 270f);
+                Label(row, "Name", Loc.Get(GameFlow.PracticeTitleKey(lesson)), 32f, Top, Vector2.one,
+                    new Vector2(24f, -66f), new Vector2(-24f, -12f)).fontStyle = FontStyles.Bold;
+                string key = lesson == PracticeLesson.Drift ? (PlatformGlue.IsMobileDevice ? "lesson.drift.touch" : "lesson.drift.keys")
+                    : lesson == PracticeLesson.Shortcut ? "lesson.shortcut" : lesson == PracticeLesson.WallRide ? "lesson.wall" : "practice.aim.help";
+                Label(row, "Instruction", Loc.Get(key), 26f, Top, Vector2.one,
+                    new Vector2(24f, -174f), new Vector2(-24f, -70f));
+                UiFactory.Button(row, "Practice" + lesson, Loc.Get("practice.start"), () => flow.StartPractice(selected),
+                    Vector2.zero, new Vector2(1f, 0f), new Vector2(24f, 16f), new Vector2(-24f, 84f), 27f);
+            }
+        }
+
         private void BuildLoadout(Transform content)
         {
             var save = PlatformGlue.Save;

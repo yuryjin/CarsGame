@@ -112,18 +112,24 @@ namespace RacingGame.Core.Save
             if (e == null || string.IsNullOrEmpty(e.eventId)) return;
             if (!d.TryGetValue(e.eventId, out var cur))
             {
-                d[e.eventId] = new EventBest { eventId = e.eventId, bestTimeMs = e.bestTimeMs, stars = e.stars };
+                d[e.eventId] = new EventBest { eventId = e.eventId, bestTimeMs = e.bestTimeMs, stars = e.stars, setup = e.bestTimeMs > 0 ? e.setup?.Copy() : null };
             }
             else
             {
-                if (e.bestTimeMs > 0 && (cur.bestTimeMs <= 0 || e.bestTimeMs < cur.bestTimeMs)) cur.bestTimeMs = e.bestTimeMs;
+                if (e.bestTimeMs > 0 && (cur.bestTimeMs <= 0 || e.bestTimeMs < cur.bestTimeMs
+                    || e.bestTimeMs == cur.bestTimeMs && RecordSetup.Compare(e.setup, cur.setup) < 0))
+                {
+                    cur.bestTimeMs = e.bestTimeMs;
+                    cur.setup = e.setup?.Copy();
+                }
                 cur.stars |= e.stars;
             }
         }
         private static SettingsData Clone(SettingsData s) => new SettingsData
         {
-            lang = s.lang, sfx = s.sfx, music = s.music, quality = s.quality, qualityAuto = s.qualityAuto,
-            autoThrottle = s.autoThrottle, cameraShake = s.cameraShake, autoAim = s.autoAim, tier = s.tier, hintsSeen = s.hintsSeen
+            lang = s.lang, sfx = s.sfx, music = s.music, musicChosen = s.musicChosen, quality = s.quality, qualityAuto = s.qualityAuto,
+            autoThrottle = s.autoThrottle, cameraShake = s.cameraShake, autoAim = s.autoAim, tier = s.tier, hintsSeen = s.hintsSeen,
+            touchLargeButtons = s.touchLargeButtons, touchLeftHanded = s.touchLeftHanded
         };
     }
 }

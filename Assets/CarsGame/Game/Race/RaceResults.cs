@@ -8,6 +8,8 @@ namespace RacingGame
         public bool IsPlayer;
         public int Position;
         public bool Finished;
+        // An unfinished car may still be racing when the player opens the results.
+        public bool Eliminated;
         public bool Survived;
         public double TotalTime;    // seconds from GO to the finish line (or race end)
         public double BestLap;      // seconds, +inf if none

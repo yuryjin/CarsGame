@@ -31,6 +31,9 @@ namespace RacingGame.Core.Save
         private int identityGeneration;
         private Task loadTask;
         public SaveParseStatus LastCloudStatus { get; private set; } = SaveParseStatus.Empty;
+        public SaveParseStatus LastLocalStatus { get; private set; } = SaveParseStatus.Empty;
+        /// <summary>An older build cannot safely modify a newer profile on this device.</summary>
+        public bool LocalVersionTooNew => LastLocalStatus == SaveParseStatus.NewerVersion;
 
         private readonly ILocalSaveStore local;
         private readonly Func<ICloudSave> cloud;
@@ -55,7 +58,8 @@ namespace RacingGame.Core.Save
 
         private async Task LoadCoreAsync()
         {
-            var localData = SaveMigrator.FromJson(local?.Read());
+            var localData = SaveMigrator.Parse(local?.Read(), out var localStatus);
+            LastLocalStatus = localStatus;
             if (!Loaded) { Data = SaveMerge.Merge(Data, localData) ?? Data; Data.deviceId = DeviceId; Loaded = true; Changed?.Invoke(Data); }
 
             var c = cloud?.Invoke();
@@ -119,6 +123,7 @@ namespace RacingGame.Core.Save
         /// <summary>Call after any progress change. Writes locally now; the cloud write is coalesced.</summary>
         public void MarkDirty()
         {
+            if (LocalVersionTooNew) return;
             Data.updatedAtUnixMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             local?.Write(SaveMigrator.ToJson(Data));
             dirty = true;
@@ -128,6 +133,7 @@ namespace RacingGame.Core.Save
         /// <summary>Poll from Update; sends a coalesced cloud write when due.</summary>
         public void Tick()
         {
+            if (LocalVersionTooNew) return;
             if (!dirty) return;
             double now = clock();
             if (!CloudSynced) { if (now >= nextCloudRetryAt) _ = RetryCloudAsync(); return; }
@@ -138,6 +144,7 @@ namespace RacingGame.Core.Save
         /// <summary>Checkpoint: race end, purchase, settings, pause/hidden, before an ad. Data stays dirty if the write fails.</summary>
         public async Task<Result> FlushAsync()
         {
+            if (LocalVersionTooNew) return Result.Fail(ResultCategory.Error, "newer local save version", false);
             var c = cloud?.Invoke();
             if (c == null) { dirty = false; return Result.Success; }
             if (!CloudSynced) { await RetryCloudAsync(); if (!CloudSynced) return Result.Fail(ResultCategory.Error, "cloud not synced", true); }
