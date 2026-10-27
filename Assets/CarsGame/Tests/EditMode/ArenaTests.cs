@@ -27,7 +27,8 @@ namespace RacingGame.Tests
                 Assert.IsTrue(Physics.Raycast(positions[0], Vector3.down, out var ground, 2f));
                 Assert.AreEqual(LayerMask.NameToLayer("Track"), ground.collider.gameObject.layer);
 
-                var car = CreateCar(cars.transform, arena.transform.position + Vector3.up * 0.5f);
+                // Keep this pursuit check outside the bridge approach, with clear sight of the first spawn.
+                var car = CreateCar(cars.transform, arena.transform.position + new Vector3(0f, 0.5f, 80f));
                 var rival = CreateCar(cars.transform, positions[0]);
                 var driver = car.gameObject.AddComponent<ArenaDriver>();
                 driver.Initialize(arena, null);

@@ -4,8 +4,7 @@ using UnityEngine;
 namespace RacingGame
 {
     /// <summary>
-    /// Where a map allows mines. The arena box implements it today; the planned dune map
-    /// (Docs/AI/ArenaMode.md) implements it for its canyon floor without touching <see cref="MineField"/>.
+    /// Where a map allows mines. The desert arena supplies its basin floor; circuit events use TrackMineSite.
     /// </summary>
     public interface IMineFieldSite
     {

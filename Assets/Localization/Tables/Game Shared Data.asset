@@ -1971,6 +1971,26 @@ MonoBehaviour:
     m_Key: save.local.read_message
     m_Metadata:
       m_Items: []
+  - m_Id: 19951951802609664
+    m_Key: arena.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998272
+    m_Key: arena.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998273
+    m_Key: arena.lesson
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998274
+    m_Key: arena.ready
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998275
+    m_Key: arena.dropped
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

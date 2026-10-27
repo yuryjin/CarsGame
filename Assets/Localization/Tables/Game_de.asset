@@ -2017,6 +2017,28 @@ MonoBehaviour:
       bleiben vorerst im Arbeitsspeicher."
     m_Metadata:
       m_Items: []
+  - m_Id: 19951951802609664
+    m_Localized: "W\xFCstenschlacht"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998272
+    m_Localized: "3 Minuten / {n} Gegner / die meisten Absch\xFCsse gewinnen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998273
+    m_Localized: "Beschleunige auf der Br\xFCcke. Halte beim Sprung \xFCber die Mitte
+      Feuer, um eine Bombe abzuwerfen. Verlasse den roten Kreis vor dem Einschlag.
+      Die meisten Absch\xFCsse gewinnen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998274
+    m_Localized: "FEUER \u2192 BOMBE ABWERFEN"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998275
+    m_Localized: "BOMBE ABGEWORFEN \u2014 RAUS AUS DEM ROTEN KREIS"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

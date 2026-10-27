@@ -67,6 +67,7 @@ namespace RacingGame
             {
                 var renderer = raceCarPrefab.GetComponentInChildren<Renderer>();
                 Arena = ArenaLayout.Create(renderer != null ? renderer.sharedMaterial : null);
+                Arena.Initialize(this, GetComponent<RaceManager>());
             }
             int total = aiCount + 1;
             bool introTarget = RaceSetup.IsIntroRace && total > 1 && !site;
@@ -96,6 +97,7 @@ namespace RacingGame
                 participant.isPlayer = isPlayer;
                 participant.laneOffset = lane;
                 participant.Arena = Arena;
+                if (arena) go.AddComponent<ArenaBombDrop>().Initialize(Arena);
                 participant.Site = site ? Site : null;
                 participant.Progress.enabled = !arena && !site;
                 if (participant.Health != null)

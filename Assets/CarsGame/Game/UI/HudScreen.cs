@@ -26,6 +26,9 @@ namespace RacingGame
 
         private TextMeshProUGUI speedText, lapText, positionText, timerText, centerText, hintText, hpText, pauseText, pauseHint, ammoText, hitMarker;
         private CarCannon playerCannon;
+        private ArenaBombDrop playerBomb;
+        private bool bombWasReady;
+        private int shownDrops;
         private CarStatus playerStatus;
         private CarWeapons playerWeapons;
         private PlayerDriverInput playerInput;
@@ -977,6 +980,8 @@ namespace RacingGame
                 if (playerWeapons != null) { playerWeapons.PrimarySwitched -= OnPrimarySwitched; playerWeapons.PrimarySwitchDenied -= OnPrimarySwitchDenied; }
                 playerHealth = race.Player.Health;
                 playerCannon = playerCar.GetComponent<CarCannon>();
+                playerBomb = playerCar.GetComponent<ArenaBombDrop>();
+                bombWasReady = false; shownDrops = 0;
                 playerStatus = playerCar.GetComponent<CarStatus>();
                 playerWeapons = playerCar.GetComponent<CarWeapons>();
                 playerInput = playerCar.GetComponent<PlayerDriverInput>();
@@ -995,6 +1000,14 @@ namespace RacingGame
                 RefreshPosition();
             }
 
+            if (playerBomb != null && race.State == RaceState.Racing && !PauseController.IsPaused)
+            {
+                bool ready = playerBomb.Ready;
+                if (ready && !bombWasReady) ShowEvent(Loc.Get("arena.ready"), UiFactory.Accent);
+                if (playerBomb.Drops != shownDrops) ShowEvent(Loc.Get("arena.dropped"), UiFactory.Accent);
+                bombWasReady = ready;
+                shownDrops = playerBomb.Drops;
+            }
             UpdateWeaponWheel();
             if (playerCar != null)
             {
@@ -1099,7 +1112,7 @@ namespace RacingGame
             }
 
             if (hitMarker.gameObject.activeSelf && Time.unscaledTime > hitMarkerUntil) hitMarker.gameObject.SetActive(false);
-            if (race.State >= RaceState.Racing) SetTimer(race.PlayerElapsedTime);
+            if (race.State >= RaceState.Racing) SetTimer(race.IsArenaMode ? race.RemainingTime : race.PlayerElapsedTime);
 
             bool hintVisible = Time.unscaledTime <= hintUntil && !(touchLayout && (goalsExpanded || race.State == RaceState.Countdown))
                 && race.State >= RaceState.Countdown && race.State <= RaceState.Finishing;
@@ -1151,6 +1164,7 @@ namespace RacingGame
         public static string ControlsHint(bool touch)
         {
             var ev = RaceSetup.Event;
+            if (ev != null && ev.mode == EventMode.Arena) return Loc.Get("arena.lesson");
             if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.HotBomb) return Loc.Get("lesson.bomb");
             if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.MinesOnly) return Loc.Get(touch ? "lesson.mines.touch" : "lesson.mines.keys");
             if (ev != null && ev.spaceTrack) return Loc.Get("lesson.space");
@@ -1554,7 +1568,7 @@ namespace RacingGame
             if (race.Player == null) return;
             var progress = race.Player.Progress;
             int lap = Mathf.Clamp(progress.LapsCompleted + 1, 1, race.laps);
-            lapText.text = Loc.Format("hud.lap", "cur", lap, "total", race.laps);
+            lapText.text = race.IsArenaMode ? Loc.Get("arena.title") : Loc.Format("hud.lap", "cur", lap, "total", race.laps);
             positionText.text = Loc.Format("hud.position", "pos", race.PositionOf(race.Player), "n", race.Participants.Count);
         }
 

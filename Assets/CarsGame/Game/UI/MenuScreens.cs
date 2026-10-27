@@ -295,6 +295,7 @@ namespace RacingGame
             var tiers = Tiers();
             int rivals = ev != null && ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[ResolveTierIndex(tiers)].aiCount : 3;
             string detail = ev == null ? "" : ev.mode == EventMode.Mission ? Loc.Format("mission.detail", "n", rivals)
+                : ev.mode == EventMode.Arena ? Loc.Format("arena.detail", "n", rivals)
                 : Loc.Format("events.laps", "n", ev.laps) + "  /  " + Loc.Format("events.rivals", "n", rivals);
             int maxStars = list.Count * 3;
             int earnedStars = PlatformGlue.Save != null ? PlatformGlue.Save.Data.TotalStars : 0;
@@ -427,6 +428,7 @@ namespace RacingGame
                     Label(row, "Name", Loc.Get(ev.nameKey), 34f, Top, Vector2.one, new Vector2(144f, -60f), new Vector2(-236f, -12f)).fontStyle = FontStyles.Bold;
                     int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[tierIndex].aiCount : 3;
                     string detail = ev.mode == EventMode.Mission ? Loc.Format("mission.detail", "n", rivals)
+                        : ev.mode == EventMode.Arena ? Loc.Format("arena.detail", "n", rivals)
                         : Loc.Format("events.laps", "n", ev.laps) + "   /   " + Loc.Format("events.rivals", "n", rivals) + TwistSuffix(ev);
                     Label(row, "Stats", detail, 23f, Top, Vector2.one, new Vector2(144f, -96f), new Vector2(-236f, -58f), UiFactory.Muted);
                     var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);

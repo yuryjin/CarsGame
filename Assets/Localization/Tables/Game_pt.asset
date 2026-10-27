@@ -2022,6 +2022,28 @@ MonoBehaviour:
       novas mudan\xE7as ficam na mem\xF3ria."
     m_Metadata:
       m_Items: []
+  - m_Id: 19951951802609664
+    m_Localized: Batalha no deserto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998272
+    m_Localized: "3 minutos / {n} rivais / mais destrui\xE7\xF5es vence"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998273
+    m_Localized: "Acelere na ponte. Ao saltar sobre o centro, pressione tiro para
+      soltar uma bomba. Saia do c\xEDrculo vermelho antes do impacto. Mais destrui\xE7\xF5es
+      vence."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998274
+    m_Localized: "TIRO \u2192 SOLTAR BOMBA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998275
+    m_Localized: "BOMBA LAN\xC7ADA \u2014 SAIA DO C\xCDRCULO VERMELHO"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

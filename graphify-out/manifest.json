@@ -390,8 +390,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/RaceSpawner.cs": {
-    "mtime": 1792907395.4326537,
-    "ast_hash": "d7dddd6177c8d8658d8808667e699744",
+    "mtime": 1793133242.4391534,
+    "ast_hash": "c7fa583c0416beb1a5e7ee93f016df26",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/SimulationDriver.cs": {
@@ -415,13 +415,13 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/UI/HudScreen.cs": {
-    "mtime": 1792918811.7315545,
-    "ast_hash": "f5b978c7341e575c59ce05b707f0192e",
+    "mtime": 1793133319.9586756,
+    "ast_hash": "bde730c48777bc20dc4931afd90ef3a5",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/UI/MenuScreens.cs": {
-    "mtime": 1792923484.8403077,
-    "ast_hash": "e61951d3861b5d91faeac50a6dc9f0e5",
+    "mtime": 1793133762.0699816,
+    "ast_hash": "812d48f32f95f5cccb307b01ce483eed",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/UI/UiFactory.cs": {
@@ -445,8 +445,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Vehicle/CarController.cs": {
-    "mtime": 1792889512.6298687,
-    "ast_hash": "07ea9bfb667109dbcae06e6f4f8edf57",
+    "mtime": 1793133762.0702727,
+    "ast_hash": "68a3a5658e8ff430b1352b6e75d06abd",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Vehicle/CarHealth.cs": {
@@ -735,8 +735,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/AI/ArenaDriver.cs": {
-    "mtime": 1790284512.331444,
-    "ast_hash": "a4feffbf756322372c3206ea6bc9e1c7",
+    "mtime": 1793133506.1747677,
+    "ast_hash": "7e8e4d834582d41fb5af3bf237a2560d",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Debug/CrashProbe.cs": {
@@ -745,13 +745,13 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Race/ArenaLayout.cs": {
-    "mtime": 1790284315.700671,
-    "ast_hash": "af92de0382665c1bab8e17ec11b8c561",
+    "mtime": 1793134494.2918239,
+    "ast_hash": "6619a7ff7809cf1da016e70a0b69e448",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Tests/EditMode/ArenaTests.cs": {
-    "mtime": 1789976227.621426,
-    "ast_hash": "0638274e6815b91ebc1969ac2393fa89",
+    "mtime": 1793133878.9764154,
+    "ast_hash": "7ba5725c59ecc9f42fdc5c640bd5ba59",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Tests/EditMode/StarGoalsTests.cs": {
@@ -1195,13 +1195,13 @@
     "semantic_hash": ""
   },
   "Docs/AI/ArenaMode.md": {
-    "mtime": 1790285134.1042244,
-    "ast_hash": "caf71bdc5d4fee6191f4468270ac8f1d",
-    "semantic_hash": ""
+    "mtime": 1793134609.7600386,
+    "ast_hash": "",
+    "semantic_hash": "855445d27c51c3caaae06a093a35380f"
   },
   "Assets/CarsGame/Game/Race/MineField.cs": {
-    "mtime": 1790284307.6468935,
-    "ast_hash": "028c9c20d05829ed416cecd73b937d6e",
+    "mtime": 1793133601.5762465,
+    "ast_hash": "07dab8a7eab9598e4893bff35e0119c3",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Vehicle/MineVisual.cs": {
@@ -1545,8 +1545,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Mission/MissionArt.cs": {
-    "mtime": 1790380262.3141174,
-    "ast_hash": "6ca0a10ace8bf3e5456de7a71fde5fcc",
+    "mtime": 1793134300.9997559,
+    "ast_hash": "c51413b313f8f093d5596c71ecb03e38",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Mission/MissionDirector.cs": {
@@ -1570,8 +1570,8 @@
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Mission/MissionStrikes.cs": {
-    "mtime": 1790380934.860416,
-    "ast_hash": "71ee9a9f28b987df429ba3310e6d575f",
+    "mtime": 1793133662.2207823,
+    "ast_hash": "658cbc13ea2c8c9813e4903a05dbf4cb",
     "semantic_hash": ""
   },
   "Assets/CarsGame/Game/Mission/MissionUnit.cs": {
@@ -2387,6 +2387,21 @@
   "Tools/qa/README.md": {
     "mtime": 1792915725.8850183,
     "ast_hash": "242f0af88197ea160dbf14df906d230e",
+    "semantic_hash": ""
+  },
+  ".": {
+    "mtime": 1793133799.250578,
+    "ast_hash": "",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Game/Race/ArenaBombDrop.cs": {
+    "mtime": 1793133762.0703743,
+    "ast_hash": "09573b5a2cfc777cb83582c901a4d03c",
+    "semantic_hash": ""
+  },
+  "Assets/CarsGame/Tests/PlayMode/DesertArenaPlayTests.cs": {
+    "mtime": 1793134300.9999554,
+    "ast_hash": "706d8cbd2c19fda2d367fc14c3c58456",
     "semantic_hash": ""
   }
 }

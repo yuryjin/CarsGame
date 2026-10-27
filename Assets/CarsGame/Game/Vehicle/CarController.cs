@@ -81,6 +81,7 @@ namespace RacingGame
         private static PhysicsMaterial frictionlessBodyMaterial;
         private ICarInputSource inputSource;
         private CarCannon cannon;
+        internal ArenaBombDrop ArenaBomb { get; set; }
         private CarWeapons weapons;
         private CarStatus status;
         private CarHealth health;
@@ -342,11 +343,13 @@ namespace RacingGame
             ApplyFriction();
             ApplyDownforce();
 
+            bool bombing = ArenaBomb != null && ArenaBomb.Step(command.Fire, tick);
+
             if (cannon != null && !cannon.locked)   // locked by the mines-only rule
             {
                 if (command.SelectPrimary != 0 && weapons != null)
                     weapons.TrySwitchPrimary((PrimaryWeaponType)(command.SelectPrimary - 1), tick);
-                cannon.SetWantsFire(command.Fire);
+                cannon.SetWantsFire(command.Fire && !bombing);
                 cannon.SimulationStep(tick);
             }
 

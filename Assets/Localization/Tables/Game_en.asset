@@ -2018,6 +2018,27 @@ MonoBehaviour:
       until storage works again.
     m_Metadata:
       m_Items: []
+  - m_Id: 19951951802609664
+    m_Localized: Desert battle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998272
+    m_Localized: 3 minutes / {n} rivals / most kills wins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998273
+    m_Localized: Accelerate up a bridge. In the jump over the centre, hold fire to
+      drop a bomb. Leave the red ring before impact. Most kills wins.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998274
+    m_Localized: "FIRE \u2192 DROP BOMB"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998275
+    m_Localized: "BOMB AWAY \u2014 LEAVE THE RED RING"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

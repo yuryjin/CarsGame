@@ -58,12 +58,18 @@ namespace RacingGame
 
         public static void Clear()
         {
-            foreach (var m in owned) if (m != null) UnityEngine.Object.Destroy(m);
+            foreach (var m in owned) if (m != null) Release(m);
             owned.Clear();
             cache.Clear();
-            foreach (var m in ownedMaterials) if (m != null) UnityEngine.Object.Destroy(m);
+            foreach (var m in ownedMaterials) if (m != null) Release(m);
             ownedMaterials.Clear();
             Solid = Glow = EnemyShell = MarkerRed = null;
+        }
+
+        private static void Release(UnityEngine.Object resource)
+        {
+            if (Application.isPlaying) UnityEngine.Object.Destroy(resource);
+            else UnityEngine.Object.DestroyImmediate(resource);
         }
 
         /// <summary>Meshes built once per key.</summary>

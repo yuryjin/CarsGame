@@ -1,30 +1,38 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using RacingGame.World.Gen;
 
 namespace RacingGame
 {
-    /// <summary>A runtime arena with a floor, four walls and inward-facing spawn points.</summary>
-    public sealed class ArenaLayout : MonoBehaviour, IMineFieldSite
+    /// <summary>Desert basin with six bridge approaches, an open centre and safe perimeter spawns.</summary>
+    public sealed class ArenaLayout : MonoBehaviour, IMineFieldSite, ISimulated
     {
-        public const float HalfSize = 50f;
+        public const float HalfSize = 120f;
+        public const float BridgeEnd = 9f, BridgeStart = 65f, BridgeHeight = 12f;
+        public const float BombRadius = 16f, BombDelay = 2f;
+        private MissionStrikes strikes;
+        private RaceSpawner spawner;
+        private RaceManager race;
+        private bool ownsArt;
+        public int SimulationOrder => 2100;
+        public int LiveBombs => strikes != null ? strikes.Count : 0;
+        public bool Running => race != null && race.State == RaceState.Racing;
         /// <summary>The fight zone the minefield covers: a ring between the centre and the spawn circle.</summary>
-        public const float MineInnerRadius = 7f, MineOuterRadius = HalfSize - 16f, MineSpacing = 7f;
+        public const float MineInnerRadius = 7f, MineOuterRadius = 34f, MineSpacing = 7f;
 
         public static ArenaLayout Create(Material material)
         {
             var arena = new GameObject("Arena").AddComponent<ArenaLayout>();
             // Keep the runtime arena clear of the circuit and its baked environment.
             arena.transform.position = new Vector3(1000f, 0f, 0f);
-            arena.AddBox("Floor", new Vector3(0f, -1f, 0f), new Vector3(102f, 2f, 102f), material);
-            arena.AddBox("North", new Vector3(0f, 2.5f, HalfSize), new Vector3(102f, 5f, 2f), material);
-            arena.AddBox("South", new Vector3(0f, 2.5f, -HalfSize), new Vector3(102f, 5f, 2f), material);
-            arena.AddBox("East", new Vector3(HalfSize, 2.5f, 0f), new Vector3(2f, 5f, 98f), material);
-            arena.AddBox("West", new Vector3(-HalfSize, 2.5f, 0f), new Vector3(2f, 5f, 98f), material);
+            MissionArt.Init(AbyssTrack.SceneryMaterial());
+            arena.ownsArt = true;
+            arena.BuildDesert();
             return arena;
         }
 
-        private void AddBox(string boxName, Vector3 position, Vector3 size, Material material)
+        private Transform AddBox(string boxName, Vector3 position, Vector3 size, Color32 color)
         {
             var box = GameObject.CreatePrimitive(PrimitiveType.Cube);
             box.name = boxName;
@@ -33,7 +41,127 @@ namespace RacingGame
             box.transform.localScale = size;
             int trackLayer = LayerMask.NameToLayer("Track");
             if (trackLayer >= 0) box.layer = trackLayer;
-            if (material != null) box.GetComponent<Renderer>().sharedMaterial = material;
+            var meshes = MissionArt.Cached("ArenaBox" + color, (w, g) =>
+                LowPoly.Box(color.a > 0 ? g : w, Matrix4x4.identity, Vector3.zero, Vector3.one, color));
+            box.GetComponent<MeshFilter>().sharedMesh = meshes[0];
+            box.GetComponent<Renderer>().sharedMaterial = color.a > 0 ? MissionArt.Glow : MissionArt.Solid;
+            return box.transform;
+        }
+
+        private void BuildDesert()
+        {
+            var sand = MissionArt.Sand;
+            var rock = MissionArt.Rock;
+            var deck = MissionArt.Iron;
+            var edge = MissionArt.HazardGlow;
+            AddBox("SandBasin", new Vector3(0f, -1f, 0f), new Vector3(244f, 2f, 244f), sand);
+            // Broad approaches are climbable from the sand; all six face the central gap.
+            float run = BridgeStart - BridgeEnd;
+            float slope = Mathf.Atan2(BridgeHeight, run) * Mathf.Rad2Deg;
+            for (int arm = 0; arm < 6; arm++)
+            {
+                var yaw = Quaternion.Euler(0f, arm * 60f, 0f);
+                var centre = yaw * new Vector3(0f, BridgeHeight * 0.5f - 0.5f, (BridgeStart + BridgeEnd) * 0.5f);
+                var ramp = AddBox("BridgeApproach" + arm, centre,
+                    new Vector3(14f, 1f, Mathf.Sqrt(run * run + BridgeHeight * BridgeHeight)), deck);
+                ramp.localRotation = yaw * Quaternion.Euler(slope, 0f, 0f);
+                for (int side = -1; side <= 1; side += 2)
+                {
+                    var stripe = AddBox("BridgeEdge", centre + yaw * new Vector3(side * 6.6f, 0.6f, 0f),
+                        new Vector3(0.3f, 0.08f, ramp.localScale.z), edge);
+                    stripe.localRotation = ramp.localRotation;
+                }
+                // Buttresses sit outside the driving lanes; the basin remains accessible between arms.
+                var mesa = AddBox("SandstoneMesa" + arm, Quaternion.Euler(0f, arm * 60f + 30f, 0f) * new Vector3(0f, 6f, 78f),
+                    new Vector3(17f, 12f, 24f), rock);
+                mesa.localRotation = Quaternion.Euler(0f, arm * 60f + 15f, 0f);
+                mesa.GetComponent<MeshFilter>().sharedMesh = MissionArt.Cached("ArenaMesa", (w, g) =>
+                    LowPoly.Pyramid(w, Matrix4x4.identity, Vector3.down * 0.5f, Vector2.one, 1f, new Vector2(0.12f, -0.1f), MissionArt.Rock))[0];
+            }
+            // Distant dunes dress the boundary without adding runtime mesh colliders.
+            var backdrop = new GameObject("Dunes").transform;
+            backdrop.SetParent(transform, false);
+            MissionArt.Attach(backdrop, MissionArt.Cached("ArenaDunes", (w, g) =>
+            {
+                LowPoly.Box(w, Matrix4x4.identity, new Vector3(0f, -3f, 0f), new Vector3(700f, 2f, 700f), MissionArt.SandDark);
+                for (int i = 0; i < 32; i++)
+                {
+                    float a = i * Mathf.PI * 2f / 32f;
+                    var point = new Vector3(Mathf.Sin(a) * 175f, -2f, Mathf.Cos(a) * 175f);
+                    LowPoly.Pyramid(w, Matrix4x4.identity, point, new Vector2(48f, 48f), 10f + i % 4 * 4f,
+                        new Vector2(i % 3 * 3f, -4f), i % 2 == 0 ? MissionArt.SandDark : MissionArt.Rock);
+                }
+            }), LayerMask.NameToLayer("Track"));
+            AddBox("NorthRim", new Vector3(0f, 3f, HalfSize), new Vector3(244f, 6f, 3f), rock);
+            AddBox("SouthRim", new Vector3(0f, 3f, -HalfSize), new Vector3(244f, 6f, 3f), rock);
+            AddBox("EastRim", new Vector3(HalfSize, 3f, 0f), new Vector3(3f, 6f, 238f), rock);
+            AddBox("WestRim", new Vector3(-HalfSize, 3f, 0f), new Vector3(3f, 6f, 238f), rock);
+        }
+
+        public void Initialize(RaceSpawner field, RaceManager manager)
+        {
+            spawner = field;
+            race = manager;
+            strikes = new MissionStrikes(_ => transform.position.y, transform, Blast);
+        }
+
+        private void OnEnable() => SimulationDriver.Instance.Register(this);
+        private void OnDisable()
+        {
+            if (SimulationDriver.Current != null) SimulationDriver.Current.Unregister(this);
+            strikes?.Clear();
+            if (ownsArt) { MissionArt.Clear(); ownsArt = false; }
+        }
+
+        public void SimulationStep(int tick)
+        {
+            if (!Running) { strikes?.Clear(); return; }
+            strikes?.Step(tick);
+        }
+
+        private void LateUpdate()
+        {
+            if (Running && SimulationDriver.Current != null) strikes?.UpdateVisuals(SimulationDriver.Current.Tick, 0f);
+        }
+
+        public bool IsBombZone(Vector3 world)
+        {
+            var p = transform.InverseTransformPoint(world);
+            return p.y > BridgeHeight - 2f && p.x * p.x + p.z * p.z < 14f * 14f;
+        }
+
+        public Vector3 BombLanding(CarController car)
+        {
+            // Retain a little forward motion, keeping the attack in the central basin.
+            var point = car.transform.position + car.Body.linearVelocity * 0.25f * BombDelay;
+            var local = transform.InverseTransformPoint(point);
+            var flat = Vector3.ClampMagnitude(new Vector3(local.x, 0f, local.z), BridgeEnd - 1f);
+            return transform.TransformPoint(flat);
+        }
+
+        public bool DropBomb(CarController car, int tick)
+        {
+            if (!Running || strikes == null || !IsBombZone(car.transform.position)) return false;
+            strikes.Add(BombLanding(car), BombRadius, 125f, BombDelay, car.gameObject, tick,
+                launchPoint: car.transform.position - Vector3.up);
+            return true;
+        }
+
+        public bool Threatens(Vector3 world) => strikes != null && strikes.Threatens(world, 5f);
+
+        private void Blast(GameObject source, Vector3 point, float radius, float damage)
+        {
+            if (spawner == null) return;
+            foreach (var p in spawner.Participants)
+            {
+                if (p == null || p.Health == null || p.Health.IsDead) continue;
+                float distance = Vector3.Distance(p.transform.position, point);
+                if (distance > radius) continue;
+                // The bomber is vulnerable too. ApplyHit preserves shield, respawn protection and kill credit.
+                var hit = new Core.Combat.HitInfo(source, damage * Mathf.Lerp(1f, 0.35f, distance / radius), Core.Combat.HitType.Explosion)
+                    { Point = p.transform.position, Normal = Vector3.up };
+                p.Health.ApplyHit(in hit);
+            }
         }
 
         public void GetSpawnPose(int slot, int total, out Vector3 position, out Quaternion rotation)

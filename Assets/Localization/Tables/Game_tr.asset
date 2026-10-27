@@ -2041,6 +2041,28 @@ MonoBehaviour:
       \u015Fimdilik bellekte kal\u0131r."
     m_Metadata:
       m_Items: []
+  - m_Id: 19951951802609664
+    m_Localized: "\xC7\xF6l sava\u015F\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998272
+    m_Localized: "3 dakika / {n} rakip / en \xE7ok imha kazan\u0131r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998273
+    m_Localized: "K\xF6pr\xFCde h\u0131zlan. Merkezin \xFCzerinden atlarken bomba
+      b\u0131rakmak i\xE7in ate\u015Fe bas. Patlamadan \xF6nce k\u0131rm\u0131z\u0131
+      \xE7emberden \xE7\u0131k. En \xE7ok imha kazan\u0131r."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998274
+    m_Localized: "ATE\u015E \u2192 BOMBA BIRAK"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998275
+    m_Localized: "BOMBA BIRAKILDI \u2014 KIRMIZI \xC7EMBERDEN \xC7IK"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

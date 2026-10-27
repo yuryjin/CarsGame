@@ -17,9 +17,11 @@ namespace RacingGame
             public int StartTick, ImpactTick, RevealTick;
             public GameObject Source;
             public Transform Marker, Shell;
+            public Vector3? LaunchPoint;
         }
 
-        private readonly DesertMap map;
+        private readonly System.Func<Vector3, float> height;
+        private readonly System.Action<GameObject, Vector3, float, float> blast;
         private readonly Transform root;
         private readonly List<Strike> live = new List<Strike>();
         private readonly Stack<Transform> markers = new Stack<Transform>();
@@ -28,17 +30,22 @@ namespace RacingGame
 
         public int Count => live.Count;
 
-        public MissionStrikes(DesertMap map, Transform parent)
+        public MissionStrikes(DesertMap map, Transform parent) : this(map.Height, parent, null) { }
+
+        public MissionStrikes(System.Func<Vector3, float> height, Transform parent,
+            System.Action<GameObject, Vector3, float, float> blast)
         {
-            this.map = map;
+            this.height = height;
+            this.blast = blast;
             root = new GameObject("Strikes").transform;
             root.SetParent(parent, false);
         }
 
         /// <summary>A blast <paramref name="delaySeconds"/> from now; the ring shows for the last <paramref name="revealSeconds"/> (0 = at once).</summary>
-        public void Add(Vector3 point, float radius, float damage, float delaySeconds, GameObject source, int tick, float revealSeconds = 0f)
+        public void Add(Vector3 point, float radius, float damage, float delaySeconds, GameObject source, int tick, float revealSeconds = 0f,
+            Vector3? launchPoint = null)
         {
-            point.y = map.Height(point);
+            point.y = height(point);
             var marker = markers.Count > 0 ? markers.Pop() : NewMarker();
             marker.position = point + Vector3.up * 0.25f;
             marker.localScale = new Vector3(radius, 1f, radius);
@@ -47,7 +54,7 @@ namespace RacingGame
             live.Add(new Strike
             {
                 Point = point, Radius = radius, Damage = damage, Source = source, Marker = marker, Shell = shell,
-                StartTick = tick, ImpactTick = tick + SimulationDriver.SecondsToTicks(delaySeconds),
+                StartTick = tick, ImpactTick = tick + SimulationDriver.SecondsToTicks(delaySeconds), LaunchPoint = launchPoint,
                 RevealTick = revealSeconds > 0f ? tick + SimulationDriver.SecondsToTicks(Mathf.Max(0f, delaySeconds - revealSeconds)) : tick
             });
         }
@@ -58,7 +65,8 @@ namespace RacingGame
             {
                 var s = live[i];
                 if (tick < s.ImpactTick) continue;
-                MissionUnit.Blast(s.Source, s.Point, s.Radius, s.Damage, 8f);
+                if (blast != null) blast(s.Source, s.Point, s.Radius, s.Damage);
+                else MissionUnit.Blast(s.Source, s.Point, s.Radius, s.Damage, 8f);
                 MissionUnit.Explode(s.Point + Vector3.up * 0.5f, s.Radius > 6f ? 2f : 1.2f);
                 Release(s);
                 live.RemoveAt(i);
@@ -79,9 +87,16 @@ namespace RacingGame
                 float pulse = 1f + 0.08f * Mathf.Sin(Time.time * Mathf.Lerp(6f, 30f, t));
                 s.Marker.localScale = new Vector3(s.Radius * pulse, 1f, s.Radius * pulse);
                 float remaining = (s.ImpactTick - now) * SimulationDriver.FixedStep;
-                bool falling = remaining < ShellFallSeconds;
+                bool falling = s.LaunchPoint.HasValue || remaining < ShellFallSeconds;
                 if (s.Shell.gameObject.activeSelf != falling) s.Shell.gameObject.SetActive(falling);
-                if (falling) s.Shell.position = s.Point + Vector3.up * (ShellHeight * Mathf.Max(0f, remaining) / ShellFallSeconds + 0.5f);
+                if (s.LaunchPoint.HasValue)
+                {
+                    float flight = Mathf.Clamp01((now - s.StartTick) / Mathf.Max(1f, s.ImpactTick - s.StartTick));
+                    var position = Vector3.Lerp(s.LaunchPoint.Value, s.Point, flight);
+                    position.y = Mathf.Lerp(s.LaunchPoint.Value.y, s.Point.y + 0.5f, flight * flight);
+                    s.Shell.position = position;
+                }
+                else if (falling) s.Shell.position = s.Point + Vector3.up * (ShellHeight * Mathf.Max(0f, remaining) / ShellFallSeconds + 0.5f);
             }
         }
 

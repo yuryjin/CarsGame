@@ -12,6 +12,10 @@ namespace RacingGame
         private CarController car;
         private AiGunner gunner;
         private float stuckTime;
+        private ArenaBombDrop bomb;
+        private bool crossing, approaching;
+        private int nextBridgeTick;
+        private int bridgeArm;
 
         private void Awake()
         {
@@ -21,7 +25,7 @@ namespace RacingGame
 
         private void OnEnable() { if (car != null) car.Teleported += OnTeleported; }
         private void OnDisable() { if (car != null) car.Teleported -= OnTeleported; }
-        private void OnTeleported() { stuckTime = 0f; }
+        private void OnTeleported() { stuckTime = 0f; crossing = approaching = false; }
 
         public void Initialize(ArenaLayout layout, AiDriverProfile driverProfile)
         {
@@ -30,6 +34,8 @@ namespace RacingGame
             car = GetComponent<CarController>();
             gunner = GetComponent<AiGunner>();
             stuckTime = 0f;
+            bomb = GetComponent<ArenaBombDrop>();
+            bridgeArm = car.CarId % 6;
         }
 
         public DriveCommand Sample(int tick)
@@ -42,6 +48,30 @@ namespace RacingGame
             var target = TargetFinder.Find(car, transform.position + Vector3.up * 0.5f,
                 transform.forward, 180f, 0.1f, ArenaLayout.HalfSize * 3f);
             Vector3 aim = !nearWall && target != null ? target.transform.position : arena.transform.position;
+            // Alternate bridge runs and low-ground combat. The lane stays fixed throughout a jump.
+            if (arena.Running && !approaching && !crossing && tick >= nextBridgeTick)
+            {
+                approaching = true;
+                bridgeArm = Mathf.RoundToInt(Mathf.Atan2(localPosition.x, localPosition.z) * Mathf.Rad2Deg / 60f);
+            }
+            if (crossing || approaching)
+            {
+                var radial = Quaternion.Euler(0f, bridgeArm * 60f, 0f) * Vector3.forward;
+                var approach = arena.transform.TransformPoint(radial * (ArenaLayout.BridgeStart + 12f));
+                if (!crossing && (transform.position - approach).sqrMagnitude < 10f * 10f) { crossing = true; approaching = false; }
+                aim = crossing ? arena.transform.TransformPoint(-radial * (ArenaLayout.BridgeStart + 18f)) : approach;
+                if (crossing && Vector3.Dot(localPosition, radial) < -ArenaLayout.BridgeStart - 5f)
+                {
+                    crossing = false;
+                    nextBridgeTick = tick + SimulationDriver.SecondsToTicks(12f + car.CarId % 3 * 5f);
+                }
+            }
+            if (!crossing && arena.Threatens(transform.position))
+            {
+                var away = localPosition; away.y = 0f;
+                if (away.sqrMagnitude < 1f) away = transform.forward;
+                aim = arena.transform.TransformPoint(away.normalized * 55f);
+            }
             Vector3 delta = aim - transform.position;
             delta.y = 0f;
             bool overturned = Vector3.Dot(transform.up, Vector3.up) < 0.2f;
@@ -56,7 +86,7 @@ namespace RacingGame
             bool reverse = Mathf.Abs(angle) > 110f;
             float steer = Mathf.Clamp(angle / 35f - car.Body.angularVelocity.y * 0.2f + MineSwerve(), -1f, 1f);
             var p = profile != null ? profile : AiDriverProfile.Default;
-            float desiredSpeed = Mathf.Min(60f, car.maxSpeed * p.topSpeedFactor)
+            float desiredSpeed = Mathf.Min(crossing ? 125f : 85f, car.maxSpeed * p.topSpeedFactor)
                 * Mathf.Lerp(1f, 0.35f, Mathf.Clamp01(Mathf.Abs(angle) / 90f));
             bool brake = Mathf.Abs(car.SpeedKmh) > desiredSpeed + 5f;
 
@@ -70,7 +100,7 @@ namespace RacingGame
                 Throttle = brake ? 0f : (reverse ? -1f : 1f),
                 Steer = reverse ? -steer : steer,
                 Brake = brake,
-                Fire = !reverse && gunner != null && gunner.WantsFire(tick),
+                Fire = bomb != null && bomb.Ready || !reverse && gunner != null && gunner.WantsFire(tick),
                 Secondary = !reverse && gunner != null && gunner.WantsSecondary(tick),
                 ResetEdge = reset
             };

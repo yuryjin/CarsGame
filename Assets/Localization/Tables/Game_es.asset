@@ -2025,6 +2025,28 @@ MonoBehaviour:
       en la memoria.
     m_Metadata:
       m_Items: []
+  - m_Id: 19951951802609664
+    m_Localized: Batalla del desierto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998272
+    m_Localized: "3 minutos / {n} rivales / gana quien m\xE1s destruya"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998273
+    m_Localized: "Acelera por el puente. Al saltar sobre el centro, pulsa disparo
+      para soltar una bomba. Sal del c\xEDrculo rojo antes del impacto. Gana quien
+      m\xE1s destruya."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998274
+    m_Localized: "DISPARO \u2192 SOLTAR BOMBA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998275
+    m_Localized: "BOMBA FUERA \u2014 SAL DEL C\xCDRCULO ROJO"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

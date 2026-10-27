@@ -2021,6 +2021,28 @@ MonoBehaviour:
       Les nouvelles modifications restent en m\xE9moire."
     m_Metadata:
       m_Items: []
+  - m_Id: 19951951802609664
+    m_Localized: "Bataille du d\xE9sert"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998272
+    m_Localized: 3 minutes / {n} adversaires / le plus de destructions gagne
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998273
+    m_Localized: "Acc\xE9l\xE8re sur le pont. Pendant le saut au-dessus du centre,
+      appuie sur tir pour l\xE2cher une bombe. Quitte le cercle rouge avant l\u2019impact.
+      Le plus de destructions gagne."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998274
+    m_Localized: "TIR \u2192 L\xC2CHER UNE BOMBE"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19951951810998275
+    m_Localized: "BOMBE LARGU\xC9E \u2014 QUITTE LE CERCLE ROUGE"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
