@@ -13,10 +13,11 @@ namespace RacingGame
     /// </summary>
     public sealed class StarRingTrack : MonoBehaviour
     {
-        // Version 4 uses the full painted width of flat boost strips.
-        public const int LayoutVersion = 4;
+        // Version 5 gives the field time to leave the shoulders before they detach.
+        public const int LayoutVersion = 5;
         public const float RailHeight = 1f, RailWidth = 0.5f, SkinDepth = 1.2f;
         public const float NarrowHalfWidth = 6f;
+        public const float RailSinkSeconds = 1.2f, CollapseDelay = 3f, CollapseSeconds = 1.2f;
         public const float PadHalfWidth = 2f, PadLength = 6f;
         /// <summary>Tunnel cross-section: flat floor ±<see cref="TubeFloor"/>, fillets of <see cref="TubeFillet"/>, walls at the road edge.</summary>
         public const float TubeFloor = 5f, TubeFillet = 4f, TubeWallTop = 7f, TubeHeight = 11f;
@@ -24,7 +25,7 @@ namespace RacingGame
 
         private TrackPath path;
         private StarRingLayout layout;
-        private Material solid, glow, shells, ownedSolid;
+        private Material solid, glow, warningGlow, shells, ownedSolid;
         private readonly List<GameObject> hidden = new List<GameObject>();
         private readonly List<Renderer> hiddenMarkers = new List<Renderer>();
         private readonly List<Mesh> meshes = new List<Mesh>();
@@ -32,8 +33,11 @@ namespace RacingGame
         private readonly List<BoostGate> pads = new List<BoostGate>();
         private readonly List<RaceProgress> observed = new List<RaceProgress>();
         private GameObject railsGroup, shouldersGroup, warningGroup, narrowEdgeGroup;
+        private Collider[] railColliders, shoulderColliders;
+        private float railTime, collapseTime;
         private bool practice;
         public int Stage { get; private set; }
+        public bool EdgesGone { get; private set; }
 
         public StarRingLayout Layout => layout;
         public IReadOnlyList<SpaceTurret> Turrets => turrets;
@@ -54,6 +58,7 @@ namespace RacingGame
             if (map.solid == null) map.solid = map.ownedSolid = new Material(lit) { name = "StarRingSolid" };
             map.glow = new Material(map.solid) { name = "StarRingGlow" };
             map.glow.SetFloat("_EmissionBoost", 3f);
+            map.warningGlow = new Material(map.glow) { name = "StarRingWarning" };
             map.shells = new Material(lit) { name = "TurretShell" };
             map.shells.SetColor(map.shells.HasProperty("_BaseColor") ? "_BaseColor" : "_Color", new Color(1f, 0.2f, 0.35f));
             AbyssTrack.HideScenery(map.hidden, AbyssTrack.Scenery);
@@ -215,12 +220,13 @@ namespace RacingGame
                 {
                     float inner = side * n, outer = side * h;
                     shoulderSkin.AddQuad(At(a, inner, -SkinDepth), At(b, inner, -SkinDepth), At(b, outer, -SkinDepth), At(a, outer, -SkinDepth), underside);
-                    Strip(warnings, a, b, Mathf.Min(outer - side * 1.1f, outer), Mathf.Max(outer - side * 1.1f, outer), 0.035f,
-                        Mathf.FloorToInt(mid / 3f) % 2 == 0 ? new Color32(255, 50, 38, 140) : new Color32(115, 28, 29, 65));
+                    // Mark the entire removable panel, not just the old outer edge.
+                    Strip(warnings, a, b, Mathf.Min(inner, outer), Mathf.Max(inner, outer), 0.04f,
+                        Mathf.FloorToInt(mid / 3f) % 2 == 0 ? new Color32(220, 65, 28, 100) : new Color32(70, 30, 24, 20));
                     Strip(narrowEdge, a, b, Mathf.Min(inner - side * 0.35f, inner), Mathf.Max(inner - side * 0.35f, inner), 0.035f, new Color32(255, 56, 38, 255));
                 }
-                if (Mathf.Abs(d1 - layout.GapStart) < 0.01f) Cap(skin, b, true, underside);
-                if (Mathf.Abs(d0 - layout.GapEnd) < 0.01f) Cap(skin, a, false, underside);
+                if (Mathf.Abs(d1 - layout.GapStart) < 0.01f) Cap(skin, shoulderSkin, b, true, underside);
+                if (Mathf.Abs(d0 - layout.GapEnd) < 0.01f) Cap(skin, shoulderSkin, a, false, underside);
 
                 // Edge lights on the deck.
                 Strip(shoulderLights, a, b, -h + 0.25f, -h + 0.45f, 0.02f, edgeGlow);
@@ -239,10 +245,10 @@ namespace RacingGame
                 }
             }
 
-            DecorateBridge(lights);
+            DecorateBridge(lights, shoulderLights);
             DecorateRuins(structures);
             BuildPads(lights);
-            BuildStartLine(lights, structures);
+            BuildStartLine(lights, shoulderLights, structures);
             SpaceTrack.AddStars(lights, Centre(), 320, 420f);
             AddPlanet(lights);
 
@@ -256,8 +262,11 @@ namespace RacingGame
             Add("RailLights", railLights, glow, false, false).transform.SetParent(railsGroup.transform, true);
             Add("Ruins", structures, solid, false, false);
             Add("Lights", lights, glow, false, false);
-            warningGroup = Add("Warnings", warnings, glow, false, false);
+            warningGroup = Add("Warnings", warnings, warningGlow, false, false);
+            warningGroup.transform.SetParent(shouldersGroup.transform, true);
             narrowEdgeGroup = Add("NarrowEdge", narrowEdge, glow, false, false);
+            railColliders = railsGroup.GetComponentsInChildren<Collider>();
+            shoulderColliders = shouldersGroup.GetComponentsInChildren<Collider>();
             SetStage(1);
             if (!practice) PlaceTurrets(race);
         }
@@ -269,11 +278,25 @@ namespace RacingGame
         }
 
         // End face of the deck at the gap: the slab visibly ends, and a short jump hits it.
-        private static void Cap(MeshChunkWriter w, Ring r, bool facingForward, Color32 color)
+        private static void Cap(MeshChunkWriter core, MeshChunkWriter shoulders, Ring r, bool facingForward, Color32 color)
         {
-            float h = StarRingLayout.HalfWidth;
-            Vector3 a = At(r, -h, 0f), b = At(r, h, 0f), c = At(r, h, -SkinDepth), d = At(r, -h, -SkinDepth);
-            if (facingForward) w.AddQuad(b, a, d, c, color); else w.AddQuad(a, b, c, d, color);
+            float[] xs = { -StarRingLayout.HalfWidth, -NarrowHalfWidth, NarrowHalfWidth, StarRingLayout.HalfWidth };
+            for (int i = 0; i < 3; i++)
+            {
+                var w = i == 1 ? core : shoulders;
+                Vector3 a = At(r, xs[i], 0f), b = At(r, xs[i + 1], 0f), c = At(r, xs[i + 1], -SkinDepth), d = At(r, xs[i], -SkinDepth);
+                if (facingForward) w.AddQuad(b, a, d, c, color); else w.AddQuad(a, b, c, d, color);
+            }
+        }
+
+        // Paint over a removable panel must leave with that panel, including stripes crossing the seam.
+        private static void DeckMarking(MeshChunkWriter core, MeshChunkWriter shoulders, Ring a, Ring b,
+            float x0, float x1, float lift, Color32 color)
+        {
+            if (x0 < -NarrowHalfWidth) Strip(shoulders, a, b, x0, Mathf.Min(x1, -NarrowHalfWidth), lift, color);
+            float left = Mathf.Max(x0, -NarrowHalfWidth), right = Mathf.Min(x1, NarrowHalfWidth);
+            if (left < right) Strip(core, a, b, left, right, lift, color);
+            if (x1 > NarrowHalfWidth) Strip(shoulders, a, b, Mathf.Max(x0, NarrowHalfWidth), x1, lift, color);
         }
 
         private static void Strip(MeshChunkWriter w, Ring a, Ring b, float x0, float x1, float lift, Color32 color)
@@ -314,7 +337,7 @@ namespace RacingGame
         private static Vector2 Inward(Vector2 p) => p + (new Vector2(0f, TubeHeight * 0.5f) - p).normalized * 0.04f;
 
         // Hazard stripes at the lip and the landing edge, arrows on the run-up.
-        private void DecorateBridge(MeshChunkWriter w)
+        private void DecorateBridge(MeshChunkWriter w, MeshChunkWriter shoulders)
         {
             var yellow = new Color32(255, 200, 40, 255);
             var dark = new Color32(30, 28, 40, 0);
@@ -325,7 +348,7 @@ namespace RacingGame
                 for (int k = 0; k < 9; k++)
                 {
                     float x0 = -h + k * 2f;
-                    Strip(w, a, b, x0, x0 + 2f, 0.03f, k % 2 == 0 ? yellow : dark);
+                    DeckMarking(w, shoulders, a, b, x0, x0 + 2f, 0.03f, k % 2 == 0 ? yellow : dark);
                 }
             }
             for (int k = 1; k <= 3; k++) Arrow(w, RingAt(layout.GapStart - 10f - k * 9f), 0f, 1.6f, 0.03f, yellow, false);
@@ -376,13 +399,13 @@ namespace RacingGame
             pads.Add(gate);
         }
 
-        private void BuildStartLine(MeshChunkWriter w, MeshChunkWriter rails)
+        private void BuildStartLine(MeshChunkWriter w, MeshChunkWriter shoulders, MeshChunkWriter rails)
         {
             float h = StarRingLayout.HalfWidth;
             Ring a = RingAt(layout.StartLine - 0.6f), line = RingAt(layout.StartLine), b = RingAt(layout.StartLine + 0.6f);
             for (int k = 0; k < 18; k++)
                 for (int row = 0; row < 2; row++)
-                    Strip(w, row == 0 ? a : line, row == 0 ? line : b, -h + k, -h + k + 1f, 0.03f,
+                    DeckMarking(w, shoulders, row == 0 ? a : line, row == 0 ? line : b, -h + k, -h + k + 1f, 0.03f,
                         (k + row) % 2 == 0 ? new Color32(240, 240, 250, 90) : new Color32(25, 25, 35, 0));
             // A glowing arch over the line.
             var rotation = Quaternion.LookRotation(Vector3.Cross(line.right, line.up), Vector3.up);
@@ -460,17 +483,68 @@ namespace RacingGame
                 }
         }
 
-        private void OnLapCompleted(int completed, double seconds) { if (!practice) SetStage(completed + 1); }
+        private void OnLapCompleted(int completed, double seconds) { if (!practice) SetStage(completed + 1, true); }
 
-        public void SetStage(int stage)
+        public void SetStage(int stage, bool announce = false)
         {
-            if (stage <= Stage) return;
-            Stage = Mathf.Clamp(stage, 1, 3);
-            railsGroup.SetActive(Stage == 1);
-            shouldersGroup.SetActive(Stage < 3);
-            warningGroup.SetActive(Stage == 2);
-            narrowEdgeGroup.SetActive(Stage == 3);
+            stage = Mathf.Clamp(stage, 1, 3);
+            if (stage <= Stage || path == null) return;
+            int previous = Stage;
+            Stage = stage;
+            if (previous < 2 && Stage >= 2)
+            {
+                railTime = 0f;
+                foreach (var collider in railColliders) collider.enabled = false;
+            }
+            if (Stage == 3) collapseTime = 0f;
+            warningGroup.SetActive(Stage >= 2);
+            narrowEdgeGroup.SetActive(Stage >= 2);
+            // AI and recovery aim at the safe corridor during the warning too.
             path.halfWidth = Stage < 3 ? StarRingLayout.HalfWidth : NarrowHalfWidth;
+            if (announce && Stage >= 2)
+            {
+                // These existing, lap-independent warnings are localized in all nine languages.
+                var hud = FindAnyObjectByType<HudScreen>();
+                string message = Loc.Get(Stage == 2 ? "hud.wasteland.rails_off" : "hud.wasteland.narrowing");
+                if (hud != null)
+                {
+                    hud.ShowEvent(message, Stage == 2 ? new Color(1f, 0.67f, 0.24f) : new Color(1f, 0.28f, 0.2f));
+                    hud.ShowHint(message, Stage == 2 ? 4f : CollapseDelay);
+                }
+                SfxPlayer.Current?.PlayUi(SfxLibrary.Get("crash_light"), 0.65f, Stage == 2 ? 0.8f : 0.55f);
+            }
+        }
+
+        private void Update() => Tick(Time.deltaTime);
+
+        /// <summary>Scaled time freezes both the warning and geometry while the race is paused.</summary>
+        public void Tick(float dt)
+        {
+            if (path == null || dt <= 0f) return;
+            if (Stage >= 2 && railsGroup.activeSelf)
+            {
+                railTime += dt;
+                float t = Mathf.Clamp01(railTime / RailSinkSeconds);
+                railsGroup.transform.localPosition = Vector3.down * ((RailHeight + 0.4f) * t * t);
+                if (t >= 1f) railsGroup.SetActive(false);
+            }
+            if (Stage < 3) return;
+            collapseTime += dt;
+            if (collapseTime < CollapseDelay)
+            {
+                warningGlow.SetFloat("_EmissionBoost", 1.5f + 1f * Mathf.Sin(collapseTime * Mathf.PI * 4f));
+                return;
+            }
+            if (!EdgesGone)
+            {
+                EdgesGone = true;
+                foreach (var collider in shoulderColliders) collider.enabled = false;
+                warningGroup.SetActive(false);
+            }
+            if (!shouldersGroup.activeSelf) return;
+            float fall = Mathf.Clamp01((collapseTime - CollapseDelay) / CollapseSeconds);
+            shouldersGroup.transform.localPosition = Vector3.down * (18f * fall * fall);
+            if (fall >= 1f) shouldersGroup.SetActive(false);
         }
 
         private void PlaceTurrets(RaceManager race)
@@ -532,7 +606,7 @@ namespace RacingGame
             Restore();
             foreach (var mesh in meshes)
                 if (mesh != null) { if (Application.isPlaying) Destroy(mesh); else DestroyImmediate(mesh); }
-            foreach (var m in new[] { glow, shells, ownedSolid })
+            foreach (var m in new[] { glow, warningGlow, shells, ownedSolid })
                 if (m != null) { if (Application.isPlaying) Destroy(m); else DestroyImmediate(m); }
         }
     }

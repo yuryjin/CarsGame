@@ -1,33 +1,37 @@
-# Graph Report - /home/user/projects/games/Unity/newgames/CarsGame  (2026-10-25)
-> Status refresh 2026-10-25: CG-RISK-001/004 verification; CG-RISK-006/010 closed with explicit evidence. All existing graph IDs and endpoints preserved. Base code AST still retains its previous snapshot; host semantic work is not separately metered.
-> Update 2026-10-25: adds CG-RISK-001…010 and README/AGENTS/CLAUDE. Base code index retains its previous snapshot. Risk status and closure evidence: `Docs/AI/UnityProjectHealth.md`.
+# Graph Report - CarsGame  (2026-10-26)
 
 ## Corpus Check
-- Targeted documentation update: 4 Markdown files; the existing code graph is preserved, not re-extracted.
+- 480 files · ~432,593 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 5645 nodes · 11361 edges · 354 communities (277 shown, 77 thin omitted)
-- Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 922 edges (avg confidence: 0.8)
-- Token cost: not metered (host-agent semantic extraction; no separate API request).
+- 6680 nodes · 13322 edges · 422 communities (320 shown, 102 thin omitted)
+- Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 1120 edges (avg confidence: 0.8)
+- Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `d4deb895`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - CarLivery
-- BodyMesh
-- CarWeaponsTests
+- BodyDef
+- CarWeapons
 - WastelandTrack
 - PlatformGlue
 - DebugBus
-- BodyDef
+- .BodyRow
 - HudScreen
 - CarController
-- GhostRecord
+- .Spawn
 - MeshChunkWriter
 - MenuScreens
 - MissionDirector
 - YandexNative
-- EnvironmentBaker
+- .BakeProps
 - План рефакторинга CarsGame
-- GameFlow
+- GhostRecorder
 - StarRingTrack
 - BossCrawler
 - CarCannon
@@ -35,19 +39,19 @@
 - cars-platform.js
 - com.unity.modules.unitywebrequest
 - HunyuanSampleCarBaker
-- YandexPlatform
-- MenuScreens
-- RaceEventDefinition
+- StandalonePlatform
+- .ResetAll
+- DailyRace
 - ChasmLayout
 - RaceParticipant
 - KillFeedBuffer
-- AiCombatAndInputTests
+- AiGunner
 - .FireVoice
 - PlatformRuntime
-- com.unity.modules.physics
+- dependencies
 - MissionStrikes
 - TrooperUnit
-- .RaceReward
+- .ApplyTo
 - .Advance
 - RaceManager
 - com.unity.modules.jsonserialize
@@ -60,7 +64,7 @@
 - MissionHud
 - EffectPool
 - MenuCameraDirector
-- RaceOverlays
+- GameFlow
 - WorldHealthBars
 - com.unity.render-pipelines.core
 - MineFieldAndChargeTests
@@ -70,29 +74,29 @@
 - conform_car.py
 - UnityMusicOutput
 - SkyMathTests
-- .Destroy
+- PickupSpawner
 - SpaceTurret
 - ProgressData
 - .BothDirectionsHaveDriveableShortcutValidLapsAndRepair
 - MissionUnit
-- .Hostile
+- MissionPlayTests
 - RaceSpawner
-- FakeOutput
-- RaceHarness
+- .FromJson
+- CarBodyPlayTests
 - com.unity.nuget.mono-cecil
 - Continuing improvement session — 2026-10-23
 - DailyChallenge
-- ArenaLayout
+- ArenaDriver
 - RacingGame
 - EventRulesTests
 - RaceProgress
 - WeaponRig
 - CarsGame: мидкор-слой. Черновик v1 (для адверсариальной проверки)
-- Result
-- .ToJson
+- Task
+- .LoadAsync
 - ArenaMode.md
 - TrackSpline
-- IMusicOutput
+- MusicDirector
 - SkyDirector
 - CarHealth
 - UiButtonFx
@@ -103,58 +107,58 @@
 - MinesPlayTests
 - PlayerDriverInput
 - RankEntry
-- RacingGame
+- .Build
 - MissionDriver
-- RacingGame.Tests
+- PlatformContractsTests
 - TwistPlayTests
 - make_placeholder_music.py
 - RaceDirector
 - EditorMockPlatform
 - PerfectStart
-- OnboardingHints
+- AiCorneringPlayTests
 - RacerNamesPlayTests
 - OilHazardPool
 - Projectile
-- TrackPath
-- .Panel
+- AbyssTrack
+- Итерации
 - AiRecoveryPlayTests
 - Мультиплеер
-- ScriptedDriverInput
+- Result
 - MineField
-- .ResetAll
+- UniqueRivalNamesPlayTests
 - Интерфейс — бриф для Figma AI
-- .BuildDailyCard
+- DifficultyTier
 - TrackProfile
 - WebMusicOutput
 - SfxPlayer
-- WeaponWheelGraphic
+- SpeedometerGraphic
 - .ApplyStatus
-- MineHazardTests
+- MineHazard
 - NameplatePlayTests
 - com.unity.mathematics
 - CarsGame — журнал выполнения плана
 - CarStatus
-- .ApplyTo
-- .OnFieldSpawned
-- .Merge
+- .StartPractice
+- .GrantTrial
+- TouchPreferencesPlayTests
 - AiDriver
 - CrashProbe
-- Profile
+- .GuidanceMatchesDistinctCombatBehaviors
 - .ApplyHit
-- .Part
+- .Material
 - 1. Хронология фактов
 - SaveService
 - WastelandLayout
 - .SecondsToTicks
-- ArsenalExpansionTests
+- RaceDirectorPoolTests
 - CarPaint
 - HotBombPlayTests
 - com.unity.modules.audio
 - com.unity.modules.imageconversion
-- dependencies
+- com.unity.modules.physics2d
 - PlayerExperienceTests
 - RacingGame.Core.Sim
-- RaceResultEntry
+- RaceEventDefinition
 - OilHazardTests
 - PropModelLibrary
 - .LoadoutTouchControlsGoalsAndHelpFollowRaceRules
@@ -162,16 +166,16 @@
 - CarsGame: мидкор-слой. Этапы и промпты для агента
 - com.unity.modules.uielements
 - make_sfx.py
-- .TryShow
+- OnboardingHints
 - .Parse
 - DriveCommand
-- WastelandLayout
-- RaceDirector
+- StarRingLayout
+- TrackFork
 - ArsenalExpansionTests
 - .BuildSleekSportsCar
-- PlayerPrefsSaveStoreTests
+- PlayerPrefsSaveStore
 - CarPaintTests
-- FinishTransitionPlayTests
+- .EnterMenu
 - RecoveryIntentPlayTests
 - 2026-09-02 — M0 (частично), M1, M2, M3 (код)
 - Линзы этого пакета
@@ -187,7 +191,7 @@
 - Линзы этого пакета
 - Линзы этого пакета
 - Линзы этого пакета
-- edit-tests.sh
+- SaveService.cs
 - KillTally
 - SfxSynth
 - Pickup
@@ -195,13 +199,13 @@
 - com.unity.modules.ui
 - Unity Project Context
 - hunyuan_shape.py
-- Проверка сборки на реальном SDK Яндекса
-- TrackPath
-- WastelandLayout
-- TrackSpline
-- AiGunner
-- OpponentDriver
-- MusicDirector
+- CarsGame Claude context
+- ReportTests
+- Investigation around 23:30
+- BarrierTools
+- TouchControlsPresenter
+- FakeOutput
+- MusicPlayer
 - SpeedFx
 - MonoBehaviour
 - CarDamageSmoke
@@ -214,9 +218,9 @@
 - com.unity.ugui
 - SkyPresetFactory
 - .Get
-- Projectile
-- SpeedometerGraphic
-- Result
+- RacingGame.Core.Combat
+- GhostRecord
+- PerfectStartPausePlayTests
 - .ArenaSupportsSpawningPursuitAndUnoccupiedRecovery
 - DriftPlayTests
 - GrassReversePlayTests
@@ -226,35 +230,35 @@
 - RacingGame.EditorTools
 - EngineAudio
 - PropLayout.cs
-- TrackPath
-- .Make
+- SpecialWeaponTargetsPlayTests
+- .Merge
 - TrackSplineTests
 - Арт-направление: «Ржавый карнавал»
 - Миссия «Левиафан»: вшестером против крепости в пустыне
 - 2026-09-23 — S8–S10 (без ИИ), звёзды, пакетный QA без моста (сессия carsgame-8d)
 - Ревью CarsGame (билд WebGL, 2026-10-23)
-- WastelandTrack
+- .Resolve
 - WebZipPostprocessor
-- WebZipPostprocessor
-- RacingGame.EditorTools
-- .BuildSleekSportsCar
-- RaceSpawner
+- .FillCubemap
+- LocImporter
+- GhostRecordTests
+- GhostPlaybackPlayTests
 - .Hostile
-- .ClearAllStatuses
+- .ToJson
 - make_reference.py
-- RacingGame.Core.Combat
-- ICarInputSource
-- RacingGame
-- MineVisual
-- Profile
+- HitInfo
+- PauseSettingsPlayTests
+- .FailedSavingExplainsRecoveryWithoutInterruptingDrivingOrClearingUserPause
+- CarCameraFollow
+- CombatFeedbackPlayTests
 - InputActionAssetTests
 - Readme
 - Weapons — visual brief for Figma
 - hy_python.sh
 - PauseReason
-- DriftCharge
-- WastelandLayout
-- WastelandLayout
+- .EveryRecordedBodyRetainsItsVisibleGeometryWithoutJoiningTheRace
+- .RecordsCaptureAppliedTrialAndCompareOnlyMatchingConfigurations
+- ResultStarsPlayTests
 - AiRecoveryTests
 - PropModelLibraryTests
 - com.unity.profiling.core
@@ -263,18 +267,18 @@
 - play.mjs
 - Карточка игры в консоли Яндекс Игр (черновик)
 - make_prop_reference.py
-- RacingGame.EditorTools
+- WallRideEntry
 - RaceResultsTests
 - SpeedometerTests
-- .SceneLapsFallsRetryAndMenuRestore
+- BoostGatePlayTests
 - .BridgeBoostWallsRamAndCollapseWorkInOwnEvent
 - Bounded AI recovery investigation — 2026-10-23
 - Player experience improvements
 - Racer name consistency — 2026-10-23
-- Project Risks and Validation
+- CG-RISK-003 — устройства, производительность и память
 - com.unity.collab-proxy
 - H
-- RacingGame.EditorTools
+- CameraRecoveryPlayTests
 - SfxVoicePicker
 - BoostGate
 - Arsenal usability — 2026-10-23
@@ -291,12 +295,12 @@
 - Q: Как продолжать развивать игру?
 - com.unity.modules.accessibility
 - com.unity.modules.umbra
-- RacingGame.Core.Combat
+- CameraFeedbackPlayTests
 - Расширение арсенала: 40 новых видов
 - Rival nameplate readability — 2026-10-23
 - Distinct rival names — 2026-10-23
-- Проверка сборки на реальном SDK Яндекса
-- README.md
+- GameFlow.cs
+- art/README.md
 - combat-help.mjs
 - profile-reload.mjs
 - Garage showcase and test drive
@@ -362,30 +366,92 @@
 - build-web.sh
 - loc-bake.sh
 - music-check.mjs
+- EventDiscoveryPlayTests
+- LocalizationRecoveryPlayTests
+- RewardPresentationPlayTests
+- .AddPose
+- LapCounter
+- Loc
+- ResourceLifetimePlayTests
+- Iterative polish, 2026-10-24
+- .VolumeControlsStayIndependentAndPreserveAnExplicitEightyPercent
+- FlowPausePlayTests
+- CameraImpulse
+- RacingGame.Platform
+- SaveMergeInvariantTests
+- MissionResultsPlayTests
+- .ApplyWeapons
+- .MutingEffectsImmediatelySilencesAnOngoingSkid
+- .InterruptedLanguageSwitchKeepsWorkingMenusAndCanRetry
+- Проверки CarsGame
+- GhostCar
+- .GetSlot
+- Envelope
+- ghost-replay.mjs
+- local-storage.mjs
+- .LongFramesCannotCountLessRaceTimeThanThePhysicsTheyAdvance
+- .SpeedAndCornerEffectsCanBeDisabledAndRestoredWithoutChangingShakePreference
+- boot-network.mjs
+- endurance.mjs
+- locale-lifetime.mjs
+- vitals-readability.mjs
+- Ghost replay — 2026-10-25
+- boot-recovery.mjs
+- UiInteractionTests
+- auth-save.mjs
+- drift-feedback.mjs
+- pause-boundaries.mjs
+- pause-settings.mjs
+- practice.mjs
+- test-drive-layout.mjs
+- test_sim_sync.py
+- weapon-labels.mjs
+- audio-duck.mjs
+- audio-settings.mjs
+- combat-feedback.mjs
+- daily-rollover.mjs
+- event-discovery.mjs
+- garage-purchases.mjs
+- hybrid-input.mjs
+- platform-save.mjs
+- record-readability.mjs
+- result-stars.mjs
+- reward-details.mjs
+- safe-area.mjs
+- save-recovery.mjs
+- touch-launch.mjs
+- touch-preferences.mjs
+- Grandstand-2026-10-25/README.md
+- body-matrix.sh
+- edit-tests.sh
+- locale-recovery.mjs
+- play-tests.sh
+- practice-matrix.sh
+- visual-quality.mjs
 
 ## God Nodes (most connected - your core abstractions)
-1. `RacingGame` - 122 edges
-2. `CarController` - 113 edges
-3. `HudScreen` - 101 edges
-4. `MenuScreens` - 98 edges
-5. `RacingGame.Tests` - 90 edges
-6. `GameFlow` - 77 edges
-7. `MeshChunkWriter` - 76 edges
+1. `RacingGame.Tests` - 130 edges
+2. `RacingGame` - 126 edges
+3. `MenuScreens` - 124 edges
+4. `CarController` - 115 edges
+5. `HudScreen` - 109 edges
+6. `GameFlow` - 87 edges
+7. `MeshChunkWriter` - 78 edges
 8. `RaceManager` - 66 edges
 9. `WastelandTrack` - 64 edges
-10. `MissionDirector` - 55 edges
+10. `MissionDirector` - 56 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Fast loops around the canyon (быстрые петли)` --conceptually_related_to--> `ArenaDriver`  [INFERRED]
   Docs/AI/ArenaMode.md → Assets/CarsGame/Game/AI/ArenaDriver.cs
-- `Cloverleaf canyon dune map («клевер»)` --conceptually_related_to--> `ArenaLayout`  [EXTRACTED]
-  Docs/AI/ArenaMode.md → Assets/CarsGame/Game/Race/ArenaLayout.cs
-- `Bridge bomb (бомба с моста)` --references--> `AbyssTrack`  [EXTRACTED]
-  Docs/AI/ArenaMode.md → Assets/CarsGame/Game/Track/AbyssTrack.cs
-- `Cloverleaf canyon dune map («клевер»)` --references--> `AbyssTrack`  [EXTRACTED]
-  Docs/AI/ArenaMode.md → Assets/CarsGame/Game/Track/AbyssTrack.cs
-- `Ugar multiplier («Угар»)` --references--> `SpeedFx`  [EXTRACTED]
-  Docs/AI/ArenaMode.md → Assets/CarsGame/Game/UI/SpeedFx.cs
+- `CarsGame Claude context` --references--> `SaveService`  [EXTRACTED]
+  CLAUDE.md → Assets/CarsGame/Core/Save/SaveService.cs
+- `Ugar multiplier («Угар»)` --references--> `DriftCharge`  [EXTRACTED]
+  Docs/AI/ArenaMode.md → Assets/CarsGame/Core/Sim/DriftCharge.cs
+- `NPC turrets (турели НПС)` --references--> `AiGunner`  [EXTRACTED]
+  Docs/AI/ArenaMode.md → Assets/CarsGame/Game/AI/AiGunner.cs
+- `Arena mode («Арена»)` --conceptually_related_to--> `ArenaDriver`  [EXTRACTED]
+  Docs/AI/ArenaMode.md → Assets/CarsGame/Game/AI/ArenaDriver.cs
 
 ## Import Cycles
 - None detected.
@@ -397,95 +463,95 @@
 - **Gameplay Architecture Patterns** — docs_ai_unityprojectcontext_scene_composition, docs_ai_unityprojectcontext_rigidbody_vehicle_control, docs_ai_unityprojectcontext_track_markings_route, docs_ai_unityprojectcontext_procedural_car_generation [EXTRACTED 1.00]
 - **Ugar multiplier built on drift and speed FX** — docs_ai_arenamode_ugar_multiplier, assets_carsgame_core_sim_driftcharge_racinggame_core_sim_driftcharge, assets_carsgame_game_vehicle_carcontroller_racinggame_carcontroller_stepdrift, assets_carsgame_game_ui_speedfx_racinggame_speedfx [INFERRED 0.85]
 
-## Communities (354 total, 77 thin omitted)
+## Communities (422 total, 102 thin omitted)
 
 ### Community 0 - "CarLivery"
 Cohesion: 0.05
 Nodes (37): float, IList, int, string, Cosmetics, LiveryDef, LiveryPattern, PaintDef (+29 more)
 
-### Community 1 - "BodyMesh"
+### Community 1 - "BodyDef"
 Cohesion: 0.06
-Nodes (36): bool, float, GameObject, PointerEventData, RenderTexture, Transform, GaragePreview, int (+28 more)
+Nodes (43): float, int, string, BodyDef, BodyKit, BodyShape, BodyStats, bool (+35 more)
 
-### Community 2 - "CarWeaponsTests"
+### Community 2 - "CarWeapons"
 Cohesion: 0.07
-Nodes (15): ProgressData, PlayerProgression, bool, float, int, Rigidbody, CarWeapons, SecondaryWeaponType (+7 more)
+Nodes (13): bool, float, int, Rigidbody, CarWeapons, SecondaryWeaponType, CarStatus, CarWeapons (+5 more)
 
 ### Community 3 - "WastelandTrack"
 Cohesion: 0.10
 Nodes (19): bool, Color32, Dictionary, float, GameObject, int, IReadOnlyList, List (+11 more)
 
 ### Community 4 - "PlatformGlue"
-Cohesion: 0.06
-Nodes (15): float, AdPacer, HashSet, ICollection, string, LanguageResolver, bool, Task (+7 more)
+Cohesion: 0.10
+Nodes (8): float, AdPacer, bool, Task, PlatformGlue, Test, AdPacerTests, RacingGame.Core.Ads
 
 ### Community 5 - "DebugBus"
-Cohesion: 0.06
-Nodes (26): bool, double, float, int, long, string, Command, DebugBus (+18 more)
+Cohesion: 0.08
+Nodes (32): bool, double, float, int, long, Quaternion, string, Vector3 (+24 more)
 
-### Community 6 - "BodyDef"
-Cohesion: 0.10
-Nodes (18): float, Func, IList, int, List, string, BodyClass, BodyDef (+10 more)
+### Community 6 - ".BodyRow"
+Cohesion: 0.11
+Nodes (11): Func, IList, List, BodyClass, CarBodies, IList, RectTransform, Transform (+3 more)
 
 ### Community 7 - "HudScreen"
-Cohesion: 0.07
-Nodes (20): bool, Button, CanvasGroup, float, Image, int, IReadOnlyList, long (+12 more)
+Cohesion: 0.05
+Nodes (24): bool, Button, CanvasGroup, Color, float, Image, int, IReadOnlyList (+16 more)
 
 ### Community 8 - "CarController"
-Cohesion: 0.07
-Nodes (13): Quaternion, Vector3, IRespawnPoseProvider, AudioSource, bool, Collision, float, int (+5 more)
+Cohesion: 0.06
+Nodes (16): Quaternion, Vector3, IRespawnPoseProvider, AudioSource, bool, Collision, float, GameObject (+8 more)
 
-### Community 9 - "GhostRecord"
-Cohesion: 0.07
-Nodes (24): byte, float, int, List, string, Vector3, GhostRecord, Sample (+16 more)
+### Community 9 - ".Spawn"
+Cohesion: 0.17
+Nodes (8): Color, GameObject, GameObject, Mesh, IEnumerator, UnityTearDown, UnityTest, GhostSpawnTests
 
 ### Community 10 - "MeshChunkWriter"
-Cohesion: 0.10
-Nodes (20): Color32, Matrix4x4, Vector2, Vector3, LowPoly, Color32, int, Matrix4x4 (+12 more)
+Cohesion: 0.09
+Nodes (22): Color32, Matrix4x4, Vector2, Vector3, LowPoly, Color32, int, List (+14 more)
 
 ### Community 11 - "MenuScreens"
-Cohesion: 0.06
-Nodes (26): Action, Func, Task, Color, MenuScreens, bool, Button, Canvas (+18 more)
+Cohesion: 0.05
+Nodes (49): WeaponKind, ILeaderboards, Action, Func, Task, Color, MenuScreens, Action (+41 more)
 
 ### Community 12 - "MissionDirector"
-Cohesion: 0.08
-Nodes (17): Dictionary, HashSet, int, string, Loc, Color, Dictionary, float (+9 more)
+Cohesion: 0.07
+Nodes (12): Random, Color, Dictionary, float, GameObject, int, List, RacePayout (+4 more)
 
 ### Community 13 - "YandexNative"
-Cohesion: 0.10
-Nodes (7): Task, DllImport, YandexNative, IReadOnlyList, Task, Envelope, IntPtr
+Cohesion: 0.12
+Nodes (4): DllImport, YandexNative, RacingGame.Platform.Yandex, IntPtr
 
-### Community 14 - "EnvironmentBaker"
-Cohesion: 0.08
+### Community 14 - ".BakeProps"
+Cohesion: 0.09
 Nodes (22): Action, GameObject, Material, MenuItem, Mesh, string, Transform, Vector2 (+14 more)
 
 ### Community 15 - "План рефакторинга CarsGame"
 Cohesion: 0.05
 Nodes (39): 1. Цель и исходное состояние, 2. Приоритетные наблюдения, 3. Границы разделения, 4. SOLID, KISS и DRY в этом проекте, 5. Бизнес-требования и тесты, 6. DOTS / ECS: ограниченный эксперимент, 7. Порядок небольших изменений, 8. Границы обзора (+31 more)
 
-### Community 16 - "GameFlow"
-Cohesion: 0.08
-Nodes (15): bool, Color, InputAction, int, List, SaveService, string, Canvas (+7 more)
+### Community 16 - "GhostRecorder"
+Cohesion: 0.22
+Nodes (4): double, int, Transform, GhostRecorder
 
 ### Community 17 - "StarRingTrack"
-Cohesion: 0.12
-Nodes (11): Color32, float, GameObject, int, IReadOnlyList, List, Material, Vector2 (+3 more)
+Cohesion: 0.10
+Nodes (14): Side, bool, Collider, Color32, float, GameObject, int, IReadOnlyList (+6 more)
 
 ### Community 18 - "BossCrawler"
-Cohesion: 0.08
-Nodes (19): Action, Collider, Dictionary, float, Func, GameObject, int, LineRenderer (+11 more)
+Cohesion: 0.11
+Nodes (11): Dictionary, float, int, List, Material, Mesh, Quaternion, Rigidbody (+3 more)
 
 ### Community 19 - "CarCannon"
 Cohesion: 0.09
-Nodes (13): int, Vector3, TargetFinder, bool, Color, float, int, Material (+5 more)
+Nodes (18): Profile, bool, float, int, Material, Quaternion, Rigidbody, Transform (+10 more)
 
 ### Community 20 - "DesertMap"
-Cohesion: 0.12
+Cohesion: 0.13
 Nodes (11): Color32, float, int, IReadOnlyList, List, Material, Quaternion, Vector2 (+3 more)
 
 ### Community 21 - "cars-platform.js"
-Cohesion: 0.13
-Nodes (35): attach(), boot(), byteLength(), cmd(), debugState(), detectDevice(), drainOnce(), env() (+27 more)
+Cohesion: 0.14
+Nodes (34): attach(), boot(), byteLength(), cmd(), debugState(), detectDevice(), drainOnce(), env() (+26 more)
 
 ### Community 22 - "com.unity.modules.unitywebrequest"
 Cohesion: 0.06
@@ -495,61 +561,61 @@ Nodes (37): com.unity.addressables, com.unity.scriptablebuildpipeline, dependenc
 Cohesion: 0.07
 Nodes (21): AssetPostprocessor, string, CarArtModelPostprocessor, Component, Dictionary, GameObject, HashSet, int (+13 more)
 
-### Community 24 - "YandexPlatform"
+### Community 24 - "StandalonePlatform"
 Cohesion: 0.09
-Nodes (26): int, long, string, AdResult, DeviceKind, IAds, IAsyncSessions, IPayments (+18 more)
+Nodes (19): bool, int, long, string, AdResult, DeviceKind, IAds, IPayments (+11 more)
 
-### Community 25 - "MenuScreens"
-Cohesion: 0.16
-Nodes (9): ILeaderboards, Action, RectTransform, TextAlignmentOptions, Transform, RectTransform, Transform, RectTransform (+1 more)
+### Community 25 - ".ResetAll"
+Cohesion: 0.05
+Nodes (26): TearDown, SetUp, float, GameFlow, IEnumerator, RaceEventDefinition, SetUp, TearDown (+18 more)
 
-### Community 26 - "RaceEventDefinition"
+### Community 26 - "DailyRace"
 Cohesion: 0.08
-Nodes (20): Func, int, string, DailyRace, bool, float, int, string (+12 more)
+Nodes (12): Func, int, string, DailyRace, Func, RaceEventDefinition, SetUp, TearDown (+4 more)
 
 ### Community 27 - "ChasmLayout"
-Cohesion: 0.12
-Nodes (15): float, Matrix4x4, Vector2, Vector3, ChasmLayout, ChasmSettings, Action, bool (+7 more)
+Cohesion: 0.14
+Nodes (13): Matrix4x4, Vector2, Vector3, ChasmLayout, Action, bool, Color32, float (+5 more)
 
 ### Community 28 - "RaceParticipant"
-Cohesion: 0.08
-Nodes (12): GameObject, bool, float, int, HotBombRace, bool, Collision, float (+4 more)
+Cohesion: 0.09
+Nodes (11): bool, float, int, HotBombRace, bool, Collision, float, GameObject (+3 more)
 
 ### Community 29 - "KillFeedBuffer"
-Cohesion: 0.13
-Nodes (13): bool, float, int, string, KillFeedBuffer, KillFeedEntry, IEnumerator, RaceParticipant (+5 more)
+Cohesion: 0.11
+Nodes (15): int, KillEvent, bool, float, int, string, KillFeedBuffer, KillFeedEntry (+7 more)
 
-### Community 30 - "AiCombatAndInputTests"
-Cohesion: 0.09
-Nodes (16): bool, float, int, BotAim, BotAimDecision, Action, AiGunner, CarCannon (+8 more)
+### Community 30 - "AiGunner"
+Cohesion: 0.07
+Nodes (20): bool, float, int, AiGunner, bool, float, int, BotAim (+12 more)
 
 ### Community 31 - ".FireVoice"
-Cohesion: 0.13
-Nodes (10): AudioClip, float, string, Vector3, Voice, WeaponSounds, PrimaryWeaponType, Test (+2 more)
+Cohesion: 0.17
+Nodes (9): AudioClip, float, string, Vector3, Voice, WeaponSounds, Test, WeaponSoundsTests (+1 more)
 
 ### Community 32 - "PlatformRuntime"
 Cohesion: 0.09
 Nodes (14): Dictionary, float, int, List, string, Pending, PlatformRuntime, GameObject (+6 more)
 
-### Community 33 - "com.unity.modules.physics"
+### Community 33 - "dependencies"
 Cohesion: 0.07
 Nodes (33): dependencies, depth, source, version, dependencies, depth, source, version (+25 more)
 
 ### Community 34 - "MissionStrikes"
-Cohesion: 0.10
-Nodes (15): Action, List, Mesh, Transform, Vector3, float, GameObject, int (+7 more)
+Cohesion: 0.16
+Nodes (10): float, GameObject, int, List, Transform, Vector3, MissionStrikes, Strike (+2 more)
 
 ### Community 35 - "TrooperUnit"
-Cohesion: 0.12
-Nodes (15): bool, float, GameObject, int, LineRenderer, Rigidbody, Transform, Vector3 (+7 more)
+Cohesion: 0.11
+Nodes (18): Action, List, Mesh, Transform, Vector3, bool, float, int (+10 more)
 
-### Community 36 - ".RaceReward"
-Cohesion: 0.14
-Nodes (11): float, int, Economy, Effects, UpgradeCatalog, WeaponCatalog, WeaponEffects, WeaponKind (+3 more)
+### Community 36 - ".ApplyTo"
+Cohesion: 0.07
+Nodes (22): float, int, BuildCatalog, CarBuild, Economy, Effects, RacePayout, UpgradeCatalog (+14 more)
 
 ### Community 37 - ".Advance"
-Cohesion: 0.10
-Nodes (15): float, RaceClock, SetUp, TearDown, Test, RaceClockTests, TearDown, float (+7 more)
+Cohesion: 0.22
+Nodes (5): RaceClock, SetUp, TearDown, Test, RaceClockTests
 
 ### Community 38 - "RaceManager"
 Cohesion: 0.12
@@ -564,12 +630,12 @@ Cohesion: 0.13
 Nodes (13): int, PropNoise, Color32, float, int, List, Mesh, Vector2 (+5 more)
 
 ### Community 41 - ".Panel"
-Cohesion: 0.16
-Nodes (13): Action, Button, Canvas, Color, Image, RectTransform, Sprite, TextAlignmentOptions (+5 more)
+Cohesion: 0.15
+Nodes (13): Transform, Canvas, Color, Dictionary, Image, RectTransform, Sprite, TextAlignmentOptions (+5 more)
 
 ### Community 42 - "SpecialWeaponAttack"
-Cohesion: 0.12
-Nodes (13): float, GameObject, int, Profile, SpecialWeaponAttack, CarHealth, CarStatus, GameObject (+5 more)
+Cohesion: 0.26
+Nodes (6): float, GameObject, int, Profile, Vector3, SpecialWeaponAttack
 
 ### Community 43 - "NetProbe"
 Cohesion: 0.09
@@ -580,8 +646,8 @@ Cohesion: 0.07
 Nodes (31): com.unity.burst, com.unity.collections, com.unity.test-framework.performance, depth, source, url, version, dependencies (+23 more)
 
 ### Community 45 - "TrackPath"
-Cohesion: 0.10
-Nodes (13): float, int, List, Vector3, TrackFork, bool, float, Func (+5 more)
+Cohesion: 0.12
+Nodes (16): bool, float, Func, Quaternion, Vector3, LaneLure, TrackPath, CarController (+8 more)
 
 ### Community 46 - "MissionHud"
 Cohesion: 0.11
@@ -592,12 +658,12 @@ Cohesion: 0.12
 Nodes (16): bool, Color, float, int, Light, List, Material, MaterialPropertyBlock (+8 more)
 
 ### Community 48 - "MenuCameraDirector"
-Cohesion: 0.09
-Nodes (15): Camera, float, Rigidbody, Transform, Vector3, CarCameraFollow, bool, Camera (+7 more)
+Cohesion: 0.15
+Nodes (9): bool, Camera, float, int, Quaternion, Vector3, MenuCameraDirector, Shot (+1 more)
 
-### Community 49 - "RaceOverlays"
-Cohesion: 0.10
-Nodes (13): IEnumerator, Action, Button, Canvas, Color, float, Image, int (+5 more)
+### Community 49 - "GameFlow"
+Cohesion: 0.04
+Nodes (35): bool, Color, GameObject, IEnumerator, InputAction, int, List, RecordSetup (+27 more)
 
 ### Community 50 - "WorldHealthBars"
 Cohesion: 0.11
@@ -608,20 +674,20 @@ Cohesion: 0.07
 Nodes (29): com.unity.render-pipelines.core, com.unity.render-pipelines.universal-config, com.unity.searcher, com.unity.shadergraph, depth, source, version, dependencies (+21 more)
 
 ### Community 52 - "MineFieldAndChargeTests"
-Cohesion: 0.12
+Cohesion: 0.11
 Nodes (14): CarHealth, CarWeapons, GameObject, List, MineHazard, MineKind, Pose, RaceDirector (+6 more)
 
 ### Community 53 - "MineVisual"
-Cohesion: 0.13
-Nodes (16): MineKind, MineSkin, bool, Color, Dictionary, float, GameObject, int (+8 more)
+Cohesion: 0.08
+Nodes (25): bool, float, GameObject, int, Material, Quaternion, Vector3, MineKind (+17 more)
 
 ### Community 54 - "RacingGame.Tests"
-Cohesion: 0.11
-Nodes (7): TestCase, UiInteractionTests, WastelandTests, SpaceTrackPlayTests, RacingGame.Tests, RacingGame.Core.Combat, RacingGame.Core.Save
+Cohesion: 0.07
+Nodes (6): AbyssTrackPlayTests, RacingGame.Core.Economy, RacingGame.Tests, RacingGame.Core.Ghost, RacingGame.Core.Platform, RacingGame.Core.Save
 
 ### Community 55 - "RaceHarness"
-Cohesion: 0.10
-Nodes (20): AiDriver, bool, Collision, float, GameFlow, IEnumerator, int, List (+12 more)
+Cohesion: 0.08
+Nodes (24): AiDriver, bool, Collision, float, GameFlow, IEnumerator, int, List (+16 more)
 
 ### Community 56 - "conform_car.py"
 Cohesion: 0.11
@@ -632,43 +698,43 @@ Cohesion: 0.13
 Nodes (13): AudioClip, AudioSource, bool, Dictionary, float, HashSet, IEnumerable, IEnumerator (+5 more)
 
 ### Community 58 - "SkyMathTests"
-Cohesion: 0.15
-Nodes (11): Color, Cubemap, float, Vector3, SkyMath, SkyParams, Color, Test (+3 more)
+Cohesion: 0.26
+Nodes (4): Color, Test, Vector3, SkyMathTests
 
-### Community 59 - ".Destroy"
-Cohesion: 0.10
-Nodes (6): bool, float, int, List, PickupSpawner, Object
+### Community 59 - "PickupSpawner"
+Cohesion: 0.24
+Nodes (5): bool, float, int, List, PickupSpawner
 
 ### Community 60 - "SpaceTurret"
 Cohesion: 0.13
 Nodes (12): float, GameObject, int, IReadOnlyList, LineRenderer, List, Material, Transform (+4 more)
 
 ### Community 61 - "ProgressData"
-Cohesion: 0.15
-Nodes (18): int, string, RaceCup, RaceCups, bool, double, float, int (+10 more)
+Cohesion: 0.12
+Nodes (19): int, string, RaceCup, bool, double, float, int, List (+11 more)
 
 ### Community 62 - ".BothDirectionsHaveDriveableShortcutValidLapsAndRepair"
-Cohesion: 0.12
-Nodes (12): bool, float, int, LapCounter, Collider, float, IEnumerator, SetUp (+4 more)
+Cohesion: 0.13
+Nodes (11): Collider, float, IEnumerator, RaceManager, SetUp, TearDown, Timeout, TrackFork (+3 more)
 
 ### Community 63 - "MissionUnit"
-Cohesion: 0.13
-Nodes (10): bool, float, GameObject, int, List, MaterialPropertyBlock, Renderer, Vector3 (+2 more)
+Cohesion: 0.10
+Nodes (11): GameObject, bool, Color, float, GameObject, int, List, MaterialPropertyBlock (+3 more)
 
-### Community 64 - ".Hostile"
+### Community 64 - "MissionPlayTests"
 Cohesion: 0.10
 Nodes (14): Camera, Dictionary, float, GameObject, IEnumerator, List, LogType, MissionDirector (+6 more)
 
 ### Community 65 - "RaceSpawner"
-Cohesion: 0.11
-Nodes (14): BodyDef, bool, Color, float, GameObject, int, IReadOnlyList, List (+6 more)
+Cohesion: 0.08
+Nodes (21): Color, float, string, AiDriverProfile, RivalRole, GameObject, Quaternion, Vector3 (+13 more)
 
-### Community 66 - "FakeOutput"
+### Community 66 - ".FromJson"
+Cohesion: 0.23
+Nodes (5): MusicDirector, Test, TestCase, MusicDirectorTests, FakeOutput
+
+### Community 67 - "CarBodyPlayTests"
 Cohesion: 0.12
-Nodes (10): bool, float, List, MusicDirector, Test, TestCase, FakeOutput, MusicDirectorTests (+2 more)
-
-### Community 67 - "RaceHarness"
-Cohesion: 0.11
 Nodes (17): bool, float, GameFlow, GameObject, IEnumerator, int, RaceEventDefinition, RaceManager (+9 more)
 
 ### Community 68 - "com.unity.nuget.mono-cecil"
@@ -680,24 +746,24 @@ Cohesion: 0.08
 Nodes (25): Completed readability / recovery validation, Continuing improvement session — 2026-10-23, Current iteration: small-screen readability, Final regression underway, Findings from the first long browser run, Finish accounting completed, Finish transition completed, Follow-up: recommendations and repeatable journeys (+17 more)
 
 ### Community 70 - "DailyChallenge"
-Cohesion: 0.16
-Nodes (9): bool, float, int, DailyChallenge, DailySpec, RaceTwist, Test, DailyChallengeTests (+1 more)
+Cohesion: 0.07
+Nodes (26): bool, float, ICollection, int, DailyChallenge, DailySpec, RaceTwist, DeviceLedger (+18 more)
 
-### Community 71 - "ArenaLayout"
+### Community 71 - "ArenaDriver"
 Cohesion: 0.12
-Nodes (11): float, ArenaDriver, float, List, Material, Pose, Quaternion, Vector3 (+3 more)
+Nodes (9): float, ArenaDriver, float, List, Material, Pose, Quaternion, Vector3 (+1 more)
 
 ### Community 72 - "RacingGame"
-Cohesion: 0.13
-Nodes (4): RacingGame.Core.Economy, RacingGame.World, RacingGame, RacingGame.Core.Daily
+Cohesion: 0.05
+Nodes (11): float, ChasmSettings, Dictionary, GhostVisualMesh, WastelandTests, SpaceTrackPlayTests, WastelandPlayTests, RacingGame.World.Gen (+3 more)
 
 ### Community 73 - "EventRulesTests"
 Cohesion: 0.13
 Nodes (12): float, int, EventRules, GameObject, List, RaceEventDefinition, RaceManager, RaceParticipant (+4 more)
 
 ### Community 74 - "RaceProgress"
-Cohesion: 0.15
-Nodes (9): float, int, RaceProgress, GameObject, RaceProgress, SetUp, Test, TrackPath (+1 more)
+Cohesion: 0.13
+Nodes (10): float, int, RaceProgress, GameObject, RaceProgress, SetUp, TearDown, Test (+2 more)
 
 ### Community 75 - "WeaponRig"
 Cohesion: 0.13
@@ -707,37 +773,37 @@ Nodes (14): float, int, LineRenderer, Profile, Transform, Vector3, WeaponRig, fl
 Cohesion: 0.08
 Nodes (24): 0. Факты о текущем коде (проверены по репозиторию 2026-09-10), 10. Прокачка, 11. Порядок работ и критерии, 12. Арт-пайплайн для новых машин (кратко), 13. Открытые вопросы для рецензентов, 1. Цели и ограничения, 2. Система статусов (фундамент), 3. Слоты оружия и ввод (+16 more)
 
-### Community 77 - "Result"
-Cohesion: 0.12
-Nodes (8): bool, IReadOnlyList, Task, ICloudSave, Result, ResultCategory, Task, RuntimeInitializeOnLoadMethod
+### Community 77 - "Task"
+Cohesion: 0.14
+Nodes (5): IReadOnlyList, Task, IAsyncSessions, ICloudSave, RuntimeInitializeOnLoadMethod
 
-### Community 78 - ".ToJson"
-Cohesion: 0.16
+### Community 78 - ".LoadAsync"
+Cohesion: 0.17
 Nodes (8): bool, int, string, Task, Test, MockCloudSave, MockLocalStore, SaveServiceTests
 
 ### Community 79 - "ArenaMode.md"
-Cohesion: 0.16
-Nodes (19): 5. Бомба с моста, Bridge bomb (бомба с моста), Cloverleaf canyon dune map («клевер»), Environment kill credit, Fast loops around the canyon (быстрые петли), Final 30 s double points (финал ×2), Five-share scoring (пять равных долей), Graduated longest-life bonus (+11 more)
+Cohesion: 0.15
+Nodes (23): RaceRanking, EventMode, 5. Бомба с моста, Arena mode («Арена»), Bridge bomb (бомба с моста), Cloverleaf canyon dune map («клевер»), Environment kill credit, Fast loops around the canyon (быстрые петли) (+15 more)
 
 ### Community 80 - "TrackSpline"
-Cohesion: 0.22
-Nodes (7): float, Vector3, TrackSpline, Transform, IList, d, sign
+Cohesion: 0.21
+Nodes (9): float, Vector3, TrackSpline, Transform, IList, List, PropLayout, d (+1 more)
 
-### Community 81 - "IMusicOutput"
+### Community 81 - "MusicDirector"
 Cohesion: 0.13
 Nodes (7): bool, float, int, string, IMusicOutput, MusicDirector, FlowState
 
 ### Community 82 - "SkyDirector"
-Cohesion: 0.12
+Cohesion: 0.13
 Nodes (13): Color, Cubemap, int, Light, Material, SkyDirector, bool, Color (+5 more)
 
 ### Community 83 - "CarHealth"
-Cohesion: 0.12
-Nodes (9): bool, Color, float, GameObject, int, MaterialPropertyBlock, Renderer, Rigidbody (+1 more)
+Cohesion: 0.11
+Nodes (10): bool, Collision, Color, float, GameObject, int, MaterialPropertyBlock, Renderer (+2 more)
 
 ### Community 84 - "UiButtonFx"
-Cohesion: 0.12
-Nodes (13): bool, Button, float, PointerEventData, Vector3, UiButtonFx, BaseEventData, IDeselectHandler (+5 more)
+Cohesion: 0.07
+Nodes (21): int, List, PointerEventData, Touchscreen, Press, TouchButton, bool, float (+13 more)
 
 ### Community 85 - "com.unity.modules.imgui"
 Cohesion: 0.08
@@ -748,36 +814,32 @@ Cohesion: 0.09
 Nodes (24): dependencies, depth, source, version, dependencies, depth, source, version (+16 more)
 
 ### Community 87 - "PlayerEffects"
-Cohesion: 0.11
-Nodes (12): float, Quaternion, Vector3, CameraImpulse, bool, Collision, EmissionModule, float (+4 more)
+Cohesion: 0.15
+Nodes (8): bool, Collision, EmissionModule, float, int, Light, ParticleSystem, PlayerEffects
 
 ### Community 88 - ".CupSuggestsUnlockingTheNextRaceBeforeFarmingOldStars"
-Cohesion: 0.09
-Nodes (13): SetUp, Button, GameFlow, IEnumerator, string, TearDown, Timeout, UnityTest (+5 more)
+Cohesion: 0.20
+Nodes (8): Button, GameFlow, IEnumerator, string, TearDown, Timeout, UnityTest, CupProgressionPlayTests
 
 ### Community 89 - "MinesPlayTests"
-Cohesion: 0.15
-Nodes (13): float, GameFlow, IEnumerator, int, MineHazard, RaceDirector, RaceEventDefinition, RaceManager (+5 more)
+Cohesion: 0.13
+Nodes (14): float, GameFlow, IEnumerator, int, MineHazard, RaceDirector, RaceEventDefinition, RaceManager (+6 more)
 
 ### Community 90 - "PlayerDriverInput"
-Cohesion: 0.13
-Nodes (9): bool, float, InputAction, int, RaycastHit, Vector2, PlayerDriverInput, InputActionMap (+1 more)
+Cohesion: 0.05
+Nodes (27): int, EdgeLatch, bool, float, InputAction, int, RaycastHit, Vector2 (+19 more)
 
 ### Community 91 - "RankEntry"
-Cohesion: 0.20
-Nodes (9): bool, double, int, List, RaceRanking, RankEntry, Test, RaceRankingTests (+1 more)
+Cohesion: 0.22
+Nodes (7): bool, double, int, List, RankEntry, Test, RaceRankingTests
 
-### Community 92 - "RacingGame"
-Cohesion: 0.10
-Nodes (9): Color32, MenuItem, SceneConsolidator, Color32, Mesh, Vector2, Vector3, MountainRingGen (+1 more)
+### Community 92 - ".Build"
+Cohesion: 0.32
+Nodes (5): Color32, Mesh, Vector2, Vector3, MountainRingGen
 
 ### Community 93 - "MissionDriver"
-Cohesion: 0.13
-Nodes (11): Color, float, string, AiDriverProfile, RivalRole, GameObject, float, int (+3 more)
-
-### Community 94 - "RacingGame.Tests"
-Cohesion: 0.13
-Nodes (8): WebMockPlatform, PlatformBootstrap, Test, PlatformContractsTests, RacingGame.Platform, RacingGame.Core.Platform, RacingGame.Platform.Mock, RacingGame.Core.Ads
+Cohesion: 0.18
+Nodes (6): Vector3, float, int, Vector3, MissionDriver, Side
 
 ### Community 95 - "TwistPlayTests"
 Cohesion: 0.18
@@ -788,36 +850,40 @@ Cohesion: 0.20
 Nodes (21): circ_reverb(), env(), fft_filter(), hat(), kick(), main(), note_hz(), pad() (+13 more)
 
 ### Community 97 - "RaceDirector"
-Cohesion: 0.11
-Nodes (8): int, KillEvent, int, IReadOnlyList, List, Transform, Vector3, RaceDirector
+Cohesion: 0.12
+Nodes (7): GameObject, int, IReadOnlyList, List, Transform, Vector3, RaceDirector
 
 ### Community 98 - "EditorMockPlatform"
-Cohesion: 0.18
+Cohesion: 0.17
 Nodes (8): bool, Dictionary, float, IReadOnlyList, Random, string, Task, EditorMockPlatform
 
 ### Community 99 - "PerfectStart"
-Cohesion: 0.10
-Nodes (9): Material, WorldAssets, bool, Color, double, float, PerfectStart, GravitySurface (+1 more)
+Cohesion: 0.18
+Nodes (5): bool, Color, double, float, PerfectStart
 
-### Community 100 - "OnboardingHints"
-Cohesion: 0.12
-Nodes (5): bool, Color, float, GameObject, OnboardingHints
+### Community 100 - "AiCorneringPlayTests"
+Cohesion: 0.08
+Nodes (24): float, GameFlow, IEnumerator, RaceEventDefinition, RaceManager, SetUp, string, TearDown (+16 more)
 
 ### Community 101 - "RacerNamesPlayTests"
-Cohesion: 0.11
-Nodes (13): float, GameFlow, IEnumerator, List, LogType, RaceEventDefinition, RaceManager, SetUp (+5 more)
+Cohesion: 0.13
+Nodes (10): float, GameFlow, List, LogType, RaceEventDefinition, RaceManager, SetUp, string (+2 more)
 
 ### Community 102 - "OilHazardPool"
-Cohesion: 0.16
+Cohesion: 0.15
 Nodes (10): bool, float, GameObject, int, IReadOnlyList, Material, Transform, Vector3 (+2 more)
 
 ### Community 103 - "Projectile"
 Cohesion: 0.12
 Nodes (13): bool, Collider, Collision, float, GameObject, int, List, MaterialPropertyBlock (+5 more)
 
-### Community 104 - "TrackPath"
-Cohesion: 0.15
-Nodes (8): float, GameObject, IEnumerable, List, string, AbyssTrack, Test, AbyssTrackTests
+### Community 104 - "AbyssTrack"
+Cohesion: 0.10
+Nodes (14): float, GameObject, IEnumerable, int, List, string, AbyssTrack, GameObject (+6 more)
+
+### Community 105 - "Итерации"
+Cohesion: 0.06
+Nodes (34): 1 — результаты гонки, 2 — повторяемое обучение, 3 — независимая громкость (в работе), 4 — условия рекордов (в работе), CarsGame — цикл улучшений 25 октября 2026, Итерации, Итерация 10 — настройки без выхода из гонки, Итерация 11 — позднее выравнивание в ускоряющей площадке (+26 more)
 
 ### Community 106 - "AiRecoveryPlayTests"
 Cohesion: 0.10
@@ -827,15 +893,15 @@ Nodes (16): AiDriver, bool, float, GameFlow, IEnumerator, int, RaceEventDefiniti
 Cohesion: 0.10
 Nodes (20): 1. Суть, 2.1. Реального мультиплеера в SDK нет, 2.2. CSP хостинга: сейчас только отчёт, 2.3. Правила, которые меняют дизайн сетевой игры, 2.4. Проверка игрока на своём сервере, 2.5. Прочее, 2. Что говорит Яндекс (проверено 2026-09-25), 3. Варианты (+12 more)
 
-### Community 108 - "ScriptedDriverInput"
-Cohesion: 0.16
-Nodes (7): int, EdgeLatch, bool, float, ScriptedDriverInput, Test, EdgeLatchTests
+### Community 108 - "Result"
+Cohesion: 0.15
+Nodes (11): IServerClock, Result, ResultCategory, Task, IReadOnlyList, PlatformRuntime, Task, EntryList (+3 more)
 
 ### Community 109 - "MineField"
 Cohesion: 0.19
 Nodes (9): float, int, List, Pose, Vector3, IMineFieldSite, MineField, Slot (+1 more)
 
-### Community 110 - ".ResetAll"
+### Community 110 - "UniqueRivalNamesPlayTests"
 Cohesion: 0.11
 Nodes (15): AiDriverProfile, DifficultyTier, float, GameFlow, IEnumerator, List, RaceEventDefinition, RaceManager (+7 more)
 
@@ -843,9 +909,9 @@ Nodes (15): AiDriverProfile, DifficultyTier, float, GameFlow, IEnumerator, List,
 Cohesion: 0.10
 Nodes (19): 10. Результаты, 11. HUD гонки (ПК), 12. Состояния HUD, 13. Пауза, 14. Мобильный HUD, 15. Арена CARNAGE, 16. Загрузочный экран, 17. Логотип, иконка, обложка (+11 more)
 
-### Community 112 - ".BuildDailyCard"
-Cohesion: 0.18
-Nodes (6): ICollection, DeviceLedger, float, int, string, DifficultyTier
+### Community 112 - "DifficultyTier"
+Cohesion: 0.25
+Nodes (6): float, int, string, DifficultyTier, float, RaceSetup
 
 ### Community 113 - "TrackProfile"
 Cohesion: 0.19
@@ -859,21 +925,21 @@ Nodes (3): DllImport, MusicFiles, WebMusicOutput
 Cohesion: 0.20
 Nodes (7): AudioClip, AudioSource, float, int, Vector3, SfxPlayer, AudioListener
 
-### Community 116 - "WeaponWheelGraphic"
-Cohesion: 0.15
-Nodes (7): bool, Color, int, Vector2, VertexHelper, WeaponWheelGraphic, MaskableGraphic
+### Community 116 - "SpeedometerGraphic"
+Cohesion: 0.16
+Nodes (12): Color, float, Vector2, VertexHelper, SpeedometerGraphic, bool, Color, int (+4 more)
 
 ### Community 117 - ".ApplyStatus"
-Cohesion: 0.23
+Cohesion: 0.28
 Nodes (5): CarStatus, GameObject, TearDown, Test, CarStatusTests
 
-### Community 118 - "MineHazardTests"
-Cohesion: 0.16
-Nodes (9): CarController, CarHealth, CarStatus, GameObject, MineHazard, RaceDirector, TearDown, Test (+1 more)
+### Community 118 - "MineHazard"
+Cohesion: 0.11
+Nodes (14): bool, float, GameObject, int, MineHazard, CarController, CarHealth, CarStatus (+6 more)
 
 ### Community 119 - "NameplatePlayTests"
 Cohesion: 0.14
-Nodes (13): float, GameFlow, IEnumerator, List, RaceEventDefinition, Rect, RectTransform, SetUp (+5 more)
+Nodes (14): float, GameFlow, IEnumerator, List, RaceEventDefinition, Rect, RectTransform, SetUp (+6 more)
 
 ### Community 120 - "com.unity.mathematics"
 Cohesion: 0.11
@@ -884,38 +950,38 @@ Cohesion: 0.11
 Nodes (19): 2026-09-10 — мидкор-план и адверсариальная проверка, 2026-09-18 — 2026-09-21 — работа вне журнала (восстановлено по коммитам), 2026-09-21 — проверка в редакторе (мост работает), 2026-09-24 — поворотная турель (сессия carsgame-7b), 2026-09-24 — смена основного оружия в гонке: 1 = пушка, 2 = пулемёт, 2026-09-24 — фикс ИИ и шпилька старт/финиш (сессия carsgame-35/-76), 2026-09-25 — звук, шаг 1: пул голосов SFX, 2026-09-25 — звук, шаг 2: музыка (+11 more)
 
 ### Community 122 - "CarStatus"
-Cohesion: 0.14
+Cohesion: 0.11
 Nodes (7): float, int, StatusEffect, StatusKind, float, int, CarStatus
 
-### Community 123 - ".ApplyTo"
-Cohesion: 0.15
-Nodes (8): BuildCatalog, CarBuild, GameObject, SetUp, TearDown, Test, PlayerProgressionTests, Effects
+### Community 123 - ".StartPractice"
+Cohesion: 0.19
+Nodes (15): Button, float, GameFlow, IEnumerator, MenuScreens, RaceManager, SetUp, string (+7 more)
 
-### Community 124 - ".OnFieldSpawned"
-Cohesion: 0.20
-Nodes (7): UpgradeKind, bool, RewardedOffers, SetUp, TearDown, Test, RewardedOffersTests
+### Community 124 - ".GrantTrial"
+Cohesion: 0.11
+Nodes (15): bool, RewardedOffers, SetUp, TearDown, Test, RewardedOffersTests, float, IEnumerator (+7 more)
 
-### Community 125 - ".Merge"
-Cohesion: 0.21
-Nodes (4): Dictionary, SaveMerge, Test, DailyCosmeticsSaveTests
+### Community 125 - "TouchPreferencesPlayTests"
+Cohesion: 0.13
+Nodes (16): BackgroundBehavior, Bounds, Button, EditorInputBehaviorInPlayMode, float, GameFlow, IEnumerator, Keyboard (+8 more)
 
 ### Community 126 - "AiDriver"
-Cohesion: 0.16
+Cohesion: 0.13
 Nodes (6): bool, float, int, RaycastHit, Vector3, AiDriver
 
 ### Community 127 - "CrashProbe"
-Cohesion: 0.13
-Nodes (11): bool, Collision, float, int, Rigidbody, string, CrashProbe, S (+3 more)
+Cohesion: 0.15
+Nodes (10): bool, Collision, float, int, Rigidbody, string, CrashProbe, S (+2 more)
 
-### Community 128 - "Profile"
+### Community 128 - ".GuidanceMatchesDistinctCombatBehaviors"
 Cohesion: 0.17
-Nodes (8): Profile, ArsenalGroup, WeaponGuide, ArsenalGroup, PrimaryWeaponType, Test, TestCase, WeaponGuideTests
+Nodes (7): ArsenalGroup, WeaponGuide, ArsenalGroup, PrimaryWeaponType, Test, TestCase, WeaponGuideTests
 
 ### Community 129 - ".ApplyHit"
-Cohesion: 0.20
-Nodes (7): Collision, CarHealth, CarStatus, GameObject, TearDown, Test, CarHealthHitTests
+Cohesion: 0.16
+Nodes (9): bool, float, HitResult, CarHealth, CarStatus, GameObject, TearDown, Test (+1 more)
 
-### Community 130 - ".Part"
+### Community 130 - ".Material"
 Cohesion: 0.19
 Nodes (9): Color, Dictionary, Material, Mesh, PrimitiveType, Transform, Vector3, WeaponArt (+1 more)
 
@@ -924,24 +990,28 @@ Cohesion: 0.11
 Nodes (17): 1. Хронология фактов, 2. Таблица «действие → отклик», 3. Числа, замеченные в интерфейсе, 4. Непонятное / что пришлось угадывать (факты без оценки), 5. Сбои, ошибки, задержки, 6. Скриншоты (evidence/shots), Запуск 10 — телефон 812×375 (эмуляция, без включения тач-режима), Запуск 11 — английский интерфейс, бездействие на «Сложно», разбитие машины (+9 more)
 
 ### Community 132 - "SaveService"
-Cohesion: 0.19
-Nodes (8): bool, double, float, Func, string, Task, ILocalSaveStore, SaveService
+Cohesion: 0.10
+Nodes (17): bool, double, float, Func, int, string, Task, ILocalSaveStore (+9 more)
 
 ### Community 133 - "WastelandLayout"
-Cohesion: 0.19
-Nodes (7): Dictionary, int, List, Vector2, Vector3, Kind, WastelandLayout
+Cohesion: 0.10
+Nodes (11): Dictionary, float, int, List, string, Vector2, Vector3, Kind (+3 more)
 
-### Community 135 - "ArsenalExpansionTests"
-Cohesion: 0.15
-Nodes (8): CarController, CarHealth, CarStatus, GameObject, RaceDirector, TearDown, Test, RaceDirectorPoolTests
+### Community 134 - ".SecondsToTicks"
+Cohesion: 0.18
+Nodes (9): Action, Collider, Func, GameObject, LineRenderer, Vector3, BossPart, Material (+1 more)
+
+### Community 135 - "RaceDirectorPoolTests"
+Cohesion: 0.10
+Nodes (13): SetUp, SetUp, SetUp, SetUp, CarController, CarHealth, CarStatus, GameObject (+5 more)
 
 ### Community 136 - "CarPaint"
 Cohesion: 0.21
 Nodes (7): Color, float, int, List, MaterialPropertyBlock, string, CarPaint
 
 ### Community 137 - "HotBombPlayTests"
-Cohesion: 0.18
-Nodes (10): float, GameFlow, IEnumerator, RaceEventDefinition, RaceManager, RaceParticipant, SetUp, Timeout (+2 more)
+Cohesion: 0.17
+Nodes (11): float, GameFlow, IEnumerator, RaceEventDefinition, RaceManager, RaceParticipant, SetUp, TearDown (+3 more)
 
 ### Community 138 - "com.unity.modules.audio"
 Cohesion: 0.12
@@ -951,28 +1021,28 @@ Nodes (17): dependencies, depth, source, version, dependencies, depth, source, v
 Cohesion: 0.12
 Nodes (17): dependencies, depth, source, version, dependencies, depth, source, version (+9 more)
 
-### Community 140 - "dependencies"
+### Community 140 - "com.unity.modules.physics2d"
 Cohesion: 0.12
 Nodes (17): dependencies, depth, source, version, dependencies, depth, source, version (+9 more)
 
 ### Community 141 - "PlayerExperienceTests"
-Cohesion: 0.21
-Nodes (4): Test, TestCase, PlayerExperienceTests, SkillGoal
+Cohesion: 0.13
+Nodes (8): RaceCups, Test, TestCase, PlayerExperienceTests, Test, TestCase, RaceCupBoundaryTests, SkillGoal
 
 ### Community 142 - "RacingGame.Core.Sim"
 Cohesion: 0.17
 Nodes (5): float, RubberBand, Test, RubberBandTests, RacingGame.Core.Sim
 
-### Community 143 - "RaceResultEntry"
-Cohesion: 0.18
-Nodes (8): bool, double, int, List, string, RaceResultEntry, RaceResults, StarGoalText
+### Community 143 - "RaceEventDefinition"
+Cohesion: 0.07
+Nodes (19): bool, float, int, string, FinishGoal, RaceEventDefinition, SkillGoal, bool (+11 more)
 
 ### Community 144 - "OilHazardTests"
-Cohesion: 0.19
-Nodes (7): CarController, CarHealth, CarStatus, GameObject, RaceDirector, Test, OilHazardTests
+Cohesion: 0.12
+Nodes (10): SetUp, CarController, CarHealth, CarStatus, GameObject, RaceDirector, SetUp, TearDown (+2 more)
 
 ### Community 145 - "PropModelLibrary"
-Cohesion: 0.23
+Cohesion: 0.24
 Nodes (10): bool, Dictionary, int, List, Material, Mesh, string, Transform (+2 more)
 
 ### Community 146 - ".LoadoutTouchControlsGoalsAndHelpFollowRaceRules"
@@ -995,45 +1065,45 @@ Nodes (16): dependencies, depth, source, url, version, depth, source, version (+
 Cohesion: 0.23
 Nodes (15): build(), buzz(), fade(), fetch(), load(), lowpass(), main(), mix() (+7 more)
 
-### Community 151 - ".TryShow"
-Cohesion: 0.27
-Nodes (6): float, Hint, HintTracker, Test, HintTrackerTests, RacingGame.Core.Onboarding
+### Community 151 - "OnboardingHints"
+Cohesion: 0.12
+Nodes (11): float, Hint, HintTracker, bool, Color, float, GameObject, OnboardingHints (+3 more)
 
 ### Community 152 - ".Parse"
-Cohesion: 0.27
+Cohesion: 0.32
 Nodes (4): SaveMigrator, SaveParseStatus, Test, SaveMigratorTests
 
 ### Community 153 - "DriveCommand"
-Cohesion: 0.18
-Nodes (6): bool, float, int, DriveCommand, Test, DriveCommandTests
+Cohesion: 0.08
+Nodes (15): bool, float, int, DriveCommand, ICarInputSource, float, int, Transform (+7 more)
 
-### Community 154 - "WastelandLayout"
-Cohesion: 0.24
-Nodes (6): Dictionary, List, Vector2, Vector3, Kind, StarRingLayout
+### Community 154 - "StarRingLayout"
+Cohesion: 0.10
+Nodes (15): Dictionary, float, List, string, Vector2, Vector3, Kind, Segment (+7 more)
 
-### Community 155 - "RaceDirector"
-Cohesion: 0.17
-Nodes (7): GameObject, bool, float, GameObject, int, Transform, MineHazard
+### Community 155 - "TrackFork"
+Cohesion: 0.12
+Nodes (11): Collider, Dictionary, float, Func, int, List, Material, Mesh (+3 more)
 
 ### Community 156 - "ArsenalExpansionTests"
-Cohesion: 0.13
-Nodes (6): SetUp, TearDown, SetUp, SetUp, TearDown, SetUp
+Cohesion: 0.15
+Nodes (9): CarHealth, CarStatus, GameObject, RaceDirector, SetUp, TearDown, Test, Vector3 (+1 more)
 
 ### Community 157 - ".BuildSleekSportsCar"
-Cohesion: 0.27
-Nodes (6): GameObject, Material, Mesh, Transform, Vector3, ProceduralCarBuilder
+Cohesion: 0.16
+Nodes (10): MenuItem, string, Transform, RaceCarPrefabBaker, GameObject, Material, Mesh, Transform (+2 more)
 
-### Community 158 - "PlayerPrefsSaveStoreTests"
+### Community 158 - "PlayerPrefsSaveStore"
 Cohesion: 0.15
-Nodes (7): string, PlayerPrefsSaveStore, SetUp, string, TearDown, Test, PlayerPrefsSaveStoreTests
+Nodes (10): Action, bool, string, PlayerPrefsSaveStore, ReadResult, SetUp, string, TearDown (+2 more)
 
 ### Community 159 - "CarPaintTests"
 Cohesion: 0.29
 Nodes (7): Color, GameObject, Material, MeshRenderer, Renderer, Test, CarPaintTests
 
-### Community 160 - "FinishTransitionPlayTests"
-Cohesion: 0.17
-Nodes (10): Button, float, GameFlow, IEnumerator, RaceEventDefinition, SetUp, string, Timeout (+2 more)
+### Community 160 - ".EnterMenu"
+Cohesion: 0.09
+Nodes (20): Button, float, GameFlow, IEnumerator, RaceEventDefinition, SetUp, string, TearDown (+12 more)
 
 ### Community 161 - "RecoveryIntentPlayTests"
 Cohesion: 0.13
@@ -1059,13 +1129,9 @@ Nodes (3): object, Test, SfxVoicePickerTests
 Cohesion: 0.15
 Nodes (5): ISimulated, bool, float, List, SimulationDriver
 
-### Community 167 - "ArenaModeTests"
-Cohesion: 0.21
-Nodes (4): Test, ArenaModeTests, Test, StarGoalsTests
-
 ### Community 168 - "RuntimeSystemsTests"
-Cohesion: 0.18
-Nodes (6): Action, TearDown, Test, Probe, RuntimeSystemsTests, ISimulated
+Cohesion: 0.24
+Nodes (5): Action, Test, Probe, RuntimeSystemsTests, ISimulated
 
 ### Community 170 - "PropModelPlayTests"
 Cohesion: 0.15
@@ -1091,10 +1157,6 @@ Nodes (13): L28 · Ожидаемая ценность · Expected Value, L29 ·
 Cohesion: 0.14
 Nodes (13): L53 · Управление · Control, L54 · Физический интерфейс · Physical Interface, L55 · Виртуальный интерфейс · Virtual Interface, L56 · Прозрачность · Transparency, L57 · Обратная связь · Feedback, L58 · Сочность · Juiciness, L59 · Каналы и измерения · Channels and Dimensions, L60 · Режимы · Modes (+5 more)
 
-### Community 176 - "edit-tests.sh"
-Cohesion: 0.26
-Nodes (10): Evidence required to close a risk, CG-RISK-002 — приёмка реального SDK, CG-RISK-004 — наблюдаемость ошибок локального сохранения, CG-RISK-005 — восстановление повреждённого локального сейва, CG-RISK-007 — единое доказательство финальной интеграции, CG-RISK-008 — концентрация ответственностей, CG-RISK-010 — достоверность EditMode gate, Tools/qa/play-tests.sh (+2 more)
-
 ### Community 177 - "KillTally"
 Cohesion: 0.26
 Nodes (4): int, KillTally, Test, KillTallyTests
@@ -1104,7 +1166,7 @@ Cohesion: 0.28
 Nodes (6): AudioClip, Func, int, Random, string, SfxSynth
 
 ### Community 179 - "Pickup"
-Cohesion: 0.23
+Cohesion: 0.26
 Nodes (6): float, Material, Transform, Vector3, Pickup, PickupKind
 
 ### Community 180 - "HunyuanCarPlayTests"
@@ -1123,45 +1185,45 @@ Nodes (13): Unity AI Navigation Package, CarsGame Project, Single-Scene Driving 
 Cohesion: 0.23
 Nodes (11): denoise(), encode(), free_mib(), _hop_in(), _hop_out(), Image -> raw shape with the local Hunyuan3D-2 (hunyuan3d-dit-v2-0, fp16),…, Keep `module` resident on `device` except the blocks in `block_lists`, which…, Run fn(device, dtype) with `module` on the GPU. Attempt 1 loads it whole; later… (+3 more)
 
-### Community 184 - "Проверка сборки на реальном SDK Яндекса"
-Cohesion: 0.36
-Nodes (11): webtest NVIDIA Vulkan and AgentSink, CarsGame agent instructions, Isolated Unity QA and PlayerPrefs, Incremental semantic graphify provenance, CarsGame Claude context, CG-RISK-001 — отпускание сенсорного управления, Assets/CarsGame/Game/Input/TouchButton.cs, Docs/AI/ImprovementCycle-2026-10-25.md (+3 more)
+### Community 184 - "CarsGame Claude context"
+Cohesion: 0.27
+Nodes (19): webtest NVIDIA Vulkan and AgentSink, CarsGame agent instructions, Isolated Unity QA and PlayerPrefs, Evidence required to close a risk, Incremental semantic graphify provenance, CarsGame Claude context, CG-RISK-001 — отпускание сенсорного управления, CG-RISK-006 — актуальность изолированной QA-копии (+11 more)
 
-### Community 185 - "TrackPath"
-Cohesion: 0.21
-Nodes (7): CarController, IEnumerator, Timeout, TrackPath, UnityTest, Vector3, StarRingPlayTests
+### Community 185 - "ReportTests"
+Cohesion: 0.18
+Nodes (4): Fast runner regression checks, independent of a Unity installation., ReportTests, result_xml(), RunnerTests
 
-### Community 186 - "WastelandLayout"
-Cohesion: 0.23
-Nodes (5): Side, float, Test, Vector3, StarRingTests
+### Community 186 - "Investigation around 23:30"
+Cohesion: 0.09
+Nodes (21): 03:53 — физические материалы: отдельная подтверждённая утечка, 04:00 — candidate18 собран, 04:03 — дополнительное наложение в тест-драйве, 04:15 — поздний случай Wasteland в дополнительных200заездах, 04:22 — сборка20 готова, сравнение Wasteland продолжается, 04:32 — текущие проверки20, 04:51 — браузер20 и завершённая матрица Wasteland, 05:02 — сохранение естественного входа в wallride (+13 more)
 
-### Community 187 - "TrackSpline"
-Cohesion: 0.26
+### Community 187 - "BarrierTools"
+Cohesion: 0.29
 Nodes (3): MenuItem, Vector2, BarrierTools
 
-### Community 188 - "AiGunner"
-Cohesion: 0.26
-Nodes (4): bool, float, int, AiGunner
+### Community 188 - "TouchControlsPresenter"
+Cohesion: 0.12
+Nodes (10): bool, Button, Canvas, float, RectTransform, string, TextMeshProUGUI, Transform (+2 more)
 
-### Community 189 - "OpponentDriver"
-Cohesion: 0.29
-Nodes (5): float, int, Transform, Vector3, OpponentDriver
+### Community 189 - "FakeOutput"
+Cohesion: 0.10
+Nodes (7): bool, float, List, FakeOutput, int, Output, IMusicOutput
 
 ### Community 191 - "SpeedFx"
 Cohesion: 0.17
 Nodes (8): Canvas, Color, float, Image, int, RectTransform, TextMeshProUGUI, SpeedFx
 
 ### Community 192 - "MonoBehaviour"
-Cohesion: 0.17
-Nodes (7): GameObject, bool, float, Quaternion, Rigidbody, Vector3, TargetCar
+Cohesion: 0.11
+Nodes (10): Material, WorldAssets, GravitySurface, bool, float, Quaternion, Rigidbody, Vector3 (+2 more)
 
 ### Community 193 - "CarDamageSmoke"
-Cohesion: 0.21
+Cohesion: 0.19
 Nodes (6): EmissionModule, float, GameObject, int, ParticleSystem, CarDamageSmoke
 
 ### Community 194 - "DriftCharge"
-Cohesion: 0.35
-Nodes (3): float, Test, DriftChargeTests
+Cohesion: 0.19
+Nodes (6): bool, float, DriftCharge, float, Test, DriftChargeTests
 
 ### Community 196 - "dependencies"
 Cohesion: 0.17
@@ -1184,24 +1246,24 @@ Cohesion: 0.17
 Nodes (12): dependencies, depth, source, version, dependencies, depth, source, url (+4 more)
 
 ### Community 201 - "SkyPresetFactory"
-Cohesion: 0.25
+Cohesion: 0.23
 Nodes (6): Action, Color, MenuItem, string, StringBuilder, SkyPresetFactory
 
 ### Community 202 - ".Get"
 Cohesion: 0.20
 Nodes (6): Collision, AudioClip, Dictionary, RuntimeInitializeOnLoadMethod, string, SfxLibrary
 
-### Community 203 - "Projectile"
-Cohesion: 0.18
-Nodes (8): ProjectileKind, float, GameObject, int, Material, Transform, Vector3, ProjectileSpawn
+### Community 203 - "RacingGame.Core.Combat"
+Cohesion: 0.11
+Nodes (9): ProjectileKind, float, GameObject, int, Material, Transform, Vector3, ProjectileSpawn (+1 more)
 
-### Community 204 - "SpeedometerGraphic"
-Cohesion: 0.47
-Nodes (5): Color, float, Vector2, VertexHelper, SpeedometerGraphic
+### Community 204 - "GhostRecord"
+Cohesion: 0.17
+Nodes (8): List, string, GhostRecord, float, int, GhostRecordCodec, Sample, UTF8Encoding
 
-### Community 205 - "Result"
-Cohesion: 0.22
-Nodes (4): bool, string, StandalonePlatform, SystemLanguage
+### Community 205 - "PerfectStartPausePlayTests"
+Cohesion: 0.15
+Nodes (14): BackgroundBehavior, EditorInputBehaviorInPlayMode, float, GameFlow, IEnumerator, Keyboard, PerfectStart, RaceManager (+6 more)
 
 ### Community 206 - ".ArenaSupportsSpawningPursuitAndUnoccupiedRecovery"
 Cohesion: 0.22
@@ -1224,24 +1286,28 @@ Cohesion: 0.18
 Nodes (10): L48 · Доступность · Accessibility, L49 · Видимый прогресс · Visible Progress, L50 · Параллельность · Parallelism, L51 · Пирамида · The Pyramid, L52 · Головоломка · The Puzzle, Как работать, Линзы этого пакета, Объект ревью (+2 more)
 
 ### Community 211 - "common.sh"
-Cohesion: 0.18
-Nodes (6): CG-RISK-006 — актуальность изолированной QA-копии, CG-RISK-009 — воспроизводимость окружения QA, Tools/qa/freeze-source.py, PYTHONPATH, common.sh script, XDG_CONFIG_HOME
+Cohesion: 0.31
+Nodes (7): ensure_sim(), PYTHONPATH, common.sh script, sync_meta(), XDG_CONFIG_HOME, run_suite(), tests.sh script
 
 ### Community 212 - "RacingGame.EditorTools"
-Cohesion: 0.20
-Nodes (3): string, OpenGameSceneOnStartup, RacingGame.EditorTools
+Cohesion: 0.09
+Nodes (11): Color32, float, GrandstandGeometry, MenuItem, RuntimeWiring, MenuItem, string, FontAtlasBaker (+3 more)
 
 ### Community 213 - "EngineAudio"
 Cohesion: 0.24
 Nodes (6): AudioClip, AudioSource, bool, float, int, EngineAudio
 
 ### Community 214 - "PropLayout.cs"
-Cohesion: 0.38
-Nodes (9): float, int, List, Vector3, GrandstandPlacement, LampPlacement, PropLayout, TireStackPlacement (+1 more)
+Cohesion: 0.46
+Nodes (7): float, int, Vector3, GrandstandPlacement, LampPlacement, TireStackPlacement, TreePlacement
 
-### Community 215 - "TrackPath"
+### Community 215 - "SpecialWeaponTargetsPlayTests"
+Cohesion: 0.17
+Nodes (13): CarController, float, GameFlow, GameObject, IEnumerator, RaceEventDefinition, RaceManager, SetUp (+5 more)
+
+### Community 216 - ".Merge"
 Cohesion: 0.24
-Nodes (5): GameObject, List, Material, SpaceTrack, Quaternion
+Nodes (4): Test, DailyCosmeticsSaveTests, Test, SaveMergeTests
 
 ### Community 218 - "Арт-направление: «Ржавый карнавал»"
 Cohesion: 0.20
@@ -1259,49 +1325,53 @@ Nodes (10): 2026-09-23 — S8–S10 (без ИИ), звёзды, пакетны�
 Cohesion: 0.20
 Nodes (9): Главные находки, Общие замечания ревьюеров, По линзам, Ревью CarsGame (билд WebGL, 2026-10-23), Сводка по группам, Серьёзность: высокая (45), Серьёзность: низкая (66), Серьёзность: средняя (111) (+1 more)
 
+### Community 222 - ".Resolve"
+Cohesion: 0.19
+Nodes (7): HashSet, ICollection, string, LanguageResolver, string, Test, LanguageResolverTests
+
 ### Community 223 - "WebZipPostprocessor"
-Cohesion: 0.42
-Nodes (3): BuildReport, MenuItem, BuildCommands
+Cohesion: 0.18
+Nodes (7): BuildReport, MenuItem, BuildCommands, BuildReport, long, WebZipPostprocessor, IPostprocessBuildWithReport
 
-### Community 224 - "WebZipPostprocessor"
-Cohesion: 0.39
-Nodes (4): BuildReport, long, WebZipPostprocessor, IPostprocessBuildWithReport
+### Community 224 - ".FillCubemap"
+Cohesion: 0.15
+Nodes (11): Color, Cubemap, float, Vector3, SkyMath, SkyParams, CubemapFace, IEnumerator (+3 more)
 
-### Community 225 - "RacingGame.EditorTools"
-Cohesion: 0.33
+### Community 225 - "LocImporter"
+Cohesion: 0.29
 Nodes (4): List, MenuItem, string, LocImporter
 
-### Community 226 - ".BuildSleekSportsCar"
-Cohesion: 0.36
-Nodes (4): MenuItem, string, Transform, RaceCarPrefabBaker
-
-### Community 227 - "RaceSpawner"
-Cohesion: 0.28
-Nodes (5): Quaternion, Vector3, IBattleSite, Quaternion, Vector3
+### Community 227 - "GhostPlaybackPlayTests"
+Cohesion: 0.20
+Nodes (11): float, GameFlow, GhostCar, IEnumerator, RaceManager, RaceParticipant, SetUp, TearDown (+3 more)
 
 ### Community 228 - ".Hostile"
-Cohesion: 0.44
-Nodes (4): GameObject, Team, Teams, TeamTag
+Cohesion: 0.22
+Nodes (7): int, Vector3, TargetFinder, GameObject, Team, Teams, TeamTag
 
-### Community 229 - ".ClearAllStatuses"
-Cohesion: 0.25
-Nodes (3): SetUp, SetUp, SetUp
+### Community 229 - ".ToJson"
+Cohesion: 0.20
+Nodes (6): bool, int, string, RecordSetup, Test, RecordSetupTests
 
-### Community 231 - "RacingGame.Core.Combat"
+### Community 231 - "HitInfo"
 Cohesion: 0.25
 Nodes (6): float, GameObject, int, Vector3, HitInfo, HitType
 
-### Community 232 - "ICarInputSource"
-Cohesion: 0.25
-Nodes (4): ICarInputSource, IEnumerator, Timeout, UnityTest
+### Community 232 - "PauseSettingsPlayTests"
+Cohesion: 0.12
+Nodes (13): BackgroundBehavior, Button, EditorInputBehaviorInPlayMode, float, GameFlow, IEnumerator, Keyboard, SetUp (+5 more)
 
-### Community 234 - "MineVisual"
-Cohesion: 0.25
-Nodes (8): bool, float, GameObject, int, Material, Quaternion, Vector3, MineSpawn
+### Community 233 - ".FailedSavingExplainsRecoveryWithoutInterruptingDrivingOrClearingUserPause"
+Cohesion: 0.19
+Nodes (10): bool, Button, float, IEnumerator, string, Timeout, UnityTearDown, UnityTest (+2 more)
 
-### Community 235 - "Profile"
-Cohesion: 0.32
-Nodes (7): bool, float, int, string, PrimaryWeaponCatalog, Profile, WeaponMode
+### Community 234 - "CarCameraFollow"
+Cohesion: 0.22
+Nodes (6): Camera, float, Rigidbody, Transform, Vector3, CarCameraFollow
+
+### Community 235 - "CombatFeedbackPlayTests"
+Cohesion: 0.13
+Nodes (12): float, GameFlow, IEnumerator, List, MonoBehaviour, RaceEventDefinition, SetUp, string (+4 more)
 
 ### Community 236 - "InputActionAssetTests"
 Cohesion: 0.36
@@ -1319,13 +1389,17 @@ Nodes (7): Page 1 — guns, Page 2 — melee rigs (arm extends from the car and 
 Cohesion: 0.25
 Nodes (7): HF_HOME, HF_HUB_OFFLINE, HY3DGEN_MODELS, PYTHONPATH, hy_python.sh script, U2NET_HOME, XDG_CACHE_HOME
 
-### Community 241 - "DriftCharge"
-Cohesion: 0.38
-Nodes (3): bool, float, DriftCharge
+### Community 241 - ".EveryRecordedBodyRetainsItsVisibleGeometryWithoutJoiningTheRace"
+Cohesion: 0.17
+Nodes (11): GameFlow, GameObject, IEnumerator, List, MeshFilter, TearDown, Timeout, Transform (+3 more)
 
-### Community 242 - "WastelandLayout"
-Cohesion: 0.29
-Nodes (7): float, string, Segment, float, string, Segment, Kind
+### Community 242 - ".RecordsCaptureAppliedTrialAndCompareOnlyMatchingConfigurations"
+Cohesion: 0.14
+Nodes (12): float, GameFlow, IEnumerator, int, RaceEventDefinition, RaceManager, SetUp, string (+4 more)
+
+### Community 243 - "ResultStarsPlayTests"
+Cohesion: 0.14
+Nodes (11): float, GameFlow, IEnumerator, RaceEventDefinition, SetUp, string, TearDown, Timeout (+3 more)
 
 ### Community 244 - "AiRecoveryTests"
 Cohesion: 0.33
@@ -1359,21 +1433,21 @@ Nodes (6): Заметки для модератора, Карточка игры
 Cohesion: 0.43
 Nodes (5): call(), gen(), Reference pictures for props (Tools/art/props_spec.json) from the local ComfyUI…, render(), workflow()
 
-### Community 252 - "RacingGame.EditorTools"
-Cohesion: 0.40
-Nodes (3): MenuItem, string, FontAtlasBaker
+### Community 252 - "WallRideEntry"
+Cohesion: 0.14
+Nodes (12): Report, float, GameFlow, int, List, RaceEventDefinition, SetUp, string (+4 more)
 
 ### Community 254 - "SpeedometerTests"
 Cohesion: 0.33
 Nodes (3): Test, TestCase, SpeedometerTests
 
-### Community 255 - ".SceneLapsFallsRetryAndMenuRestore"
-Cohesion: 0.33
-Nodes (4): IEnumerator, Timeout, UnityTest, AbyssTrackPlayTests
+### Community 255 - "BoostGatePlayTests"
+Cohesion: 0.18
+Nodes (9): float, GameFlow, GameObject, IEnumerator, SetUp, TearDown, Timeout, UnityTest (+1 more)
 
 ### Community 256 - ".BridgeBoostWallsRamAndCollapseWorkInOwnEvent"
-Cohesion: 0.33
-Nodes (4): IEnumerator, Timeout, UnityTest, WastelandPlayTests
+Cohesion: 0.50
+Nodes (3): IEnumerator, Timeout, UnityTest
 
 ### Community 257 - "Bounded AI recovery investigation — 2026-10-23"
 Cohesion: 0.33
@@ -1387,7 +1461,7 @@ Nodes (5): Compatibility and boundaries, Five-player playtest protocol, Player e
 Cohesion: 0.33
 Nodes (5): Campaign baseline, Racer name consistency — 2026-10-23, Reproduction and change, Validation status, Verified archive and next coverage
 
-### Community 260 - "Project Risks and Validation"
+### Community 260 - "CG-RISK-003 — устройства, производительность и память"
 Cohesion: 0.33
 Nodes (6): CG-RISK-003 — устройства, производительность и память, Assets/CarsGame/Tests/PlayMode/ResourceLifetimePlayTests.cs, Assets/Scenes/SampleScene.unity, Docs/AI/Endurance-2026-10-24.md, Tools/qa/endurance.mjs, Tools/qa/visual-quality.mjs
 
@@ -1395,13 +1469,17 @@ Nodes (6): CG-RISK-003 — устройства, производительно�
 Cohesion: 0.33
 Nodes (6): dependencies, depth, source, url, version, com.unity.collab-proxy
 
+### Community 263 - "CameraRecoveryPlayTests"
+Cohesion: 0.21
+Nodes (9): bool, float, GameFlow, IEnumerator, SetUp, TearDown, Timeout, UnityTest (+1 more)
+
 ### Community 264 - "SfxVoicePicker"
 Cohesion: 0.40
 Nodes (4): float, int, object, SfxVoicePicker
 
 ### Community 265 - "BoostGate"
-Cohesion: 0.40
-Nodes (4): bool, Dictionary, float, BoostGate
+Cohesion: 0.23
+Nodes (7): bool, Collider, Dictionary, float, HashSet, BoostGate, Passage
 
 ### Community 266 - "Arsenal usability — 2026-10-23"
 Cohesion: 0.40
@@ -1459,9 +1537,9 @@ Nodes (5): dependencies, depth, source, version, com.unity.modules.accessibility
 Cohesion: 0.40
 Nodes (5): dependencies, depth, source, version, com.unity.modules.umbra
 
-### Community 280 - "RacingGame.Core.Combat"
-Cohesion: 0.50
-Nodes (3): bool, float, HitResult
+### Community 280 - "CameraFeedbackPlayTests"
+Cohesion: 0.18
+Nodes (8): bool, float, GameObject, IEnumerator, SetUp, TearDown, UnityTest, CameraFeedbackPlayTests
 
 ### Community 282 - "Расширение арсенала: 40 новых видов"
 Cohesion: 0.50
@@ -1475,11 +1553,11 @@ Nodes (3): Evidence and correction, Final validation, Rival nameplate readabilit
 Cohesion: 0.50
 Nodes (3): Distinct rival names — 2026-10-23, Evidence and correction, Validation status
 
-### Community 285 - "Проверка сборки на реальном SDK Яндекса"
-Cohesion: 0.50
-Nodes (4): Известные ограничения, Проверка сборки на реальном SDK Яндекса, Список проверки, Что должен сделать пользователь в консоли разработчика
+### Community 285 - "GameFlow.cs"
+Cohesion: 0.25
+Nodes (6): CG-RISK-002 — приёмка реального SDK, CG-RISK-008 — концентрация ответственностей, Известные ограничения, Проверка сборки на реальном SDK Яндекса, Список проверки, Что должен сделать пользователь в консоли разработчика
 
-### Community 286 - "README.md"
+### Community 286 - "art/README.md"
 Cohesion: 0.50
 Nodes (3): Car art pipeline (Hunyuan3D-2 → Blender → Unity), Props: pickups and weapon heads (Z-Image reference → Hunyuan3D-2 → Blender → Unity), Size and performance budget (all future art)
 
@@ -1495,6 +1573,142 @@ Nodes (3): errors, journey, last
 Cohesion: 0.67
 Nodes (3): Linux Standalone Editor Target, Mobile Platform Settings, Target Platforms
 
+### Community 354 - "EventDiscoveryPlayTests"
+Cohesion: 0.21
+Nodes (8): Button, GameFlow, IEnumerator, string, TearDown, Timeout, UnityTest, EventDiscoveryPlayTests
+
+### Community 355 - "LocalizationRecoveryPlayTests"
+Cohesion: 0.22
+Nodes (10): AsyncOperationHandle, bool, float, int, Locale, string, StringTable, LocalizationRecoveryPlayTests (+2 more)
+
+### Community 356 - "RewardPresentationPlayTests"
+Cohesion: 0.17
+Nodes (9): float, GameFlow, IEnumerator, SetUp, string, TearDown, Timeout, UnityTest (+1 more)
+
+### Community 357 - ".AddPose"
+Cohesion: 0.24
+Nodes (6): byte, float, int, Quaternion, Vector3, Sample
+
+### Community 358 - "LapCounter"
+Cohesion: 0.33
+Nodes (4): bool, float, int, LapCounter
+
+### Community 359 - "Loc"
+Cohesion: 0.24
+Nodes (8): Action, AsyncOperationHandle, HashSet, int, Locale, string, StringTable, Loc
+
+### Community 360 - "ResourceLifetimePlayTests"
+Cohesion: 0.20
+Nodes (11): float, GameFlow, int, List, long, MenuScreens, SetUp, string (+3 more)
+
+### Community 361 - "Iterative polish, 2026-10-24"
+Cohesion: 0.17
+Nodes (11): Baseline, Broader validation, Browser iteration, Candidate validation, Current work, Delivery summary, Final package checks, First evidence (+3 more)
+
+### Community 362 - ".VolumeControlsStayIndependentAndPreserveAnExplicitEightyPercent"
+Cohesion: 0.20
+Nodes (8): float, IEnumerator, string, TearDown, Timeout, UnityTest, AudioSettingsPlayTests, Slider
+
+### Community 363 - "FlowPausePlayTests"
+Cohesion: 0.29
+Nodes (7): GameFlow, IEnumerator, RaceManager, TearDown, Timeout, UnityTest, FlowPausePlayTests
+
+### Community 364 - "CameraImpulse"
+Cohesion: 0.27
+Nodes (4): float, Quaternion, Vector3, CameraImpulse
+
+### Community 365 - "RacingGame.Platform"
+Cohesion: 0.22
+Nodes (3): PlatformBootstrap, RacingGame.Platform, RacingGame.Core.Localization
+
+### Community 366 - "SaveMergeInvariantTests"
+Cohesion: 0.50
+Nodes (3): Test, TestCase, SaveMergeInvariantTests
+
+### Community 367 - "MissionResultsPlayTests"
+Cohesion: 0.22
+Nodes (6): float, GameFlow, SetUp, string, TearDown, MissionResultsPlayTests
+
+### Community 369 - ".MutingEffectsImmediatelySilencesAnOngoingSkid"
+Cohesion: 0.46
+Nodes (4): IEnumerator, Timeout, UnityTest, AudioMixerPlayTests
+
+### Community 370 - ".InterruptedLanguageSwitchKeepsWorkingMenusAndCanRetry"
+Cohesion: 0.29
+Nodes (5): Func, IEnumerator, Timeout, UnityTearDown, UnityTest
+
+### Community 371 - "Проверки CarsGame"
+Cohesion: 0.25
+Nodes (7): Браузерные проверки, Когда запускать, Обычный запуск (Linux), Окружение и результаты, Проверка 25 октября 2026, Проверки CarsGame, Что добавлено в этом проходе
+
+### Community 372 - "GhostCar"
+Cohesion: 0.33
+Nodes (4): bool, double, Material, GhostCar
+
+### Community 373 - ".GetSlot"
+Cohesion: 0.33
+Nodes (4): float, Quaternion, Vector3, StartGrid
+
+### Community 374 - "Envelope"
+Cohesion: 0.33
+Nodes (7): bool, int, long, string, Envelope, LeaderboardEntryDto, SessionList
+
+### Community 375 - "ghost-replay.mjs"
+Cohesion: 0.38
+Nodes (5): decodeHeader(), errors, evidence, fixture(), fnv()
+
+### Community 376 - "local-storage.mjs"
+Cohesion: 0.29
+Nodes (4): context, pointers, source, storage
+
+### Community 377 - ".LongFramesCannotCountLessRaceTimeThanThePhysicsTheyAdvance"
+Cohesion: 0.33
+Nodes (4): IEnumerator, Timeout, UnityTest, RaceClockHitchPlayTests
+
+### Community 378 - ".SpeedAndCornerEffectsCanBeDisabledAndRestoredWithoutChangingShakePreference"
+Cohesion: 0.33
+Nodes (4): IEnumerator, Timeout, UnityTest, SteadyCameraPlayTests
+
+### Community 380 - "endurance.mjs"
+Cohesion: 0.33
+Nodes (4): events, report, seconds, tiers
+
+### Community 381 - "locale-lifetime.mjs"
+Cohesion: 0.33
+Nodes (3): report, rounds, url
+
+### Community 382 - "vitals-readability.mjs"
+Cohesion: 0.33
+Nodes (5): errors, evidence, failures, languages, minima
+
+### Community 383 - "Ghost replay — 2026-10-25"
+Cohesion: 0.40
+Nodes (4): Evidence so far, Format, Ghost replay — 2026-10-25, Runtime behaviour
+
+### Community 387 - "drift-feedback.mjs"
+Cohesion: 0.50
+Nodes (3): errors, evidence, languages
+
+### Community 388 - "pause-boundaries.mjs"
+Cohesion: 0.50
+Nodes (3): errors, evidence, failures
+
+### Community 389 - "pause-settings.mjs"
+Cohesion: 0.50
+Nodes (3): errors, evidence, launchHelp
+
+### Community 390 - "practice.mjs"
+Cohesion: 0.50
+Nodes (3): errors, evidence, languages
+
+### Community 391 - "test-drive-layout.mjs"
+Cohesion: 0.50
+Nodes (3): errors, evidence, languages
+
+### Community 393 - "weapon-labels.mjs"
+Cohesion: 0.50
+Nodes (3): errors, evidence, failures
+
 ## Ambiguous Edges - Review These
 - `Official Unity AI/MCP Package` → `Runtime and Play Mode Automation`  [AMBIGUOUS]
   Docs/AI/UnityProjectContext.md · relation: conceptually_related_to
@@ -1504,9 +1718,9 @@ Nodes (3): Linux Standalone Editor Target, Mobile Platform Settings, Target Plat
   Docs/AI/UnityProjectContext.md · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **798 isolated node(s):** `Phase`, `Kind`, `Kind`, `Slot`, `Outcome` (+793 more)
+- **945 isolated node(s):** `Stream`, `Kind`, `Kind`, `Outcome`, `Phase` (+940 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **77 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **102 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -1517,11 +1731,11 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **What is the exact relationship between `Mobile Platform Settings` and `Target Platforms`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `GameFlow` connect `GameFlow` to `WastelandTrack`, `DebugBus`, `HudScreen`, `CarController`, `GhostRecord`, `MenuScreens`, `MissionDirector`, `StarRingTrack`, `RaceEventDefinition`, `RaceParticipant`, `RaceManager`, `TrackPath`, `MenuCameraDirector`, `edit-tests.sh`, `RaceOverlays`, `Проверка сборки на реальном SDK Яндекса`, `.Destroy`, `MusicDirector`, `SpeedFx`, `RacingGame`, `IMusicOutput`, `SkyDirector`, `EngineAudio`, `TrackPath`, `PerfectStart`, `OnboardingHints`, `TrackPath`, `.BuildDailyCard`?**
-  _High betweenness centrality (0.073) - this node is a cross-community bridge._
-- **Why does `RacingGame.Tests` connect `RacingGame.Tests` to `CarLivery`, `Profile`, `CarWeaponsTests`, `.BridgeBoostWallsRamAndCollapseWorkInOwnEvent`, `PlatformGlue`, `ArsenalExpansionTests`, `GhostRecord`, `HotBombPlayTests`, `RacingGame.Core.Sim`, `.LoadoutTouchControlsGoalsAndHelpFollowRaceRules`, `.TryShow`, `DriveCommand`, `RaceEventDefinition`, `AiCombatAndInputTests`, `CarPaintTests`, `PlatformRuntime`, `PlayerPrefsSaveStoreTests`, `.FireVoice`, `FinishTransitionPlayTests`, `.RaceReward`, `.Advance`, `.Pick`, `ArenaModeTests`, `RuntimeSystemsTests`, `RecoveryIntentPlayTests`, `SpecialWeaponAttack`, `PropModelPlayTests`, `KillTally`, `HunyuanCarPlayTests`, `RaceHarness`, `TrackPath`, `WastelandLayout`, `.BothDirectionsHaveDriveableShortcutValidLapsAndRepair`, `.Hostile`, `DriftCharge`, `RaceHarness`, `RacingGame`, `EventRulesTests`, `RaceProgress`, `WeaponRig`, `.ArenaSupportsSpawningPursuitAndUnoccupiedRecovery`, `DriftPlayTests`, `GrassReversePlayTests`, `MinesPlayTests`, `RacingGame.Tests`, `RacerNamesPlayTests`, `TrackPath`, `RacingGame`, `AiRecoveryPlayTests`, `ScriptedDriverInput`, `InputActionAssetTests`, `.ResetAll`, `TrackProfile`, `AiRecoveryTests`, `PropModelLibraryTests`, `MineHazardTests`, `NameplatePlayTests`, `.ApplyTo`, `.OnFieldSpawned`, `RaceResultsTests`, `SpeedometerTests`, `.SceneLapsFallsRetryAndMenuRestore`?**
-  _High betweenness centrality (0.053) - this node is a cross-community bridge._
-- **Why does `RacingGame` connect `RacingGame` to `BodyMesh`, `CarWeaponsTests`, `PlatformGlue`, `DebugBus`, `HudScreen`, `CarController`, `GhostRecord`, `BossCrawler`, `CarCannon`, `RaceEventDefinition`, `RaceParticipant`, `AiCombatAndInputTests`, `.FireVoice`, `MissionStrikes`, `TrooperUnit`, `.Advance`, `RaceManager`, `MissionHud`, `EffectPool`, `MenuCameraDirector`, `RaceOverlays`, `WorldHealthBars`, `MineVisual`, `RacingGame.Tests`, `.Destroy`, `MissionUnit`, `RaceSpawner`, `ArenaLayout`, `RaceProgress`, `WeaponRig`, `IMusicOutput`, `UiButtonFx`, `PlayerEffects`, `RacingGame`, `MissionDriver`, `RacingGame.Tests`, `RaceDirector`, `PerfectStart`, `OilHazardPool`, `Projectile`, `ScriptedDriverInput`, `MineField`, `.BuildDailyCard`, `WebMusicOutput`, `SfxPlayer`, `WeaponWheelGraphic`, `CarStatus`, `AiDriver`, `CrashProbe`, `Profile`, `.Part`, `CarPaint`, `RacingGame.Core.Sim`, `RaceResultEntry`, `PropModelLibrary`, `.TryShow`, `RaceDirector`, `.BuildSleekSportsCar`, `ISimulated`, `edit-tests.sh`, `SfxSynth`, `Pickup`, `AiGunner`, `OpponentDriver`, `MusicDirector`, `SpeedFx`, `MonoBehaviour`, `.Get`, `Projectile`, `SpeedometerGraphic`, `EngineAudio`, `TrackPath`, `RaceSpawner`, `.Hostile`, `RacingGame`, `Profile`, `PauseReason`, `RaceResultsTests`, `SfxVoicePicker`, `BoostGate`?**
-  _High betweenness centrality (0.048) - this node is a cross-community bridge._
-- **What connects `Phase`, `Kind`, `Kind` to the rest of the system?**
-  _798 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Why does `RacingGame` connect `RacingGame` to `CarLivery`, `BodyDef`, `CarWeapons`, `HudScreen`, `CarController`, `CarCannon`, `DailyRace`, `RaceParticipant`, `AiGunner`, `.FireVoice`, `MissionStrikes`, `TrooperUnit`, `.Advance`, `RaceManager`, `MissionHud`, `EffectPool`, `MenuCameraDirector`, `GameFlow`, `WorldHealthBars`, `MineVisual`, `RacingGame.Tests`, `PickupSpawner`, `MissionUnit`, `RaceSpawner`, `ArenaDriver`, `RaceProgress`, `WeaponRig`, `UiButtonFx`, `PlayerEffects`, `PlayerDriverInput`, `MissionDriver`, `RaceDirector`, `PerfectStart`, `OilHazardPool`, `Projectile`, `MineField`, `DifficultyTier`, `WebMusicOutput`, `SfxPlayer`, `SpeedometerGraphic`, `MineHazard`, `CarStatus`, `.GrantTrial`, `AiDriver`, `CrashProbe`, `.GuidanceMatchesDistinctCombatBehaviors`, `.Material`, `CarPaint`, `RacingGame.Core.Sim`, `RaceEventDefinition`, `PropModelLibrary`, `OnboardingHints`, `DriveCommand`, `.BuildSleekSportsCar`, `ISimulated`, `SfxSynth`, `Pickup`, `TouchControlsPresenter`, `MusicPlayer`, `SpeedFx`, `MonoBehaviour`, `CarDamageSmoke`, `.Get`, `RacingGame.Core.Combat`, `EngineAudio`, `.Hostile`, `CarCameraFollow`, `PauseReason`, `RaceResultsTests`, `SfxVoicePicker`, `BoostGate`, `GameFlow.cs`, `CameraImpulse`, `RacingGame.Platform`, `.ApplyWeapons`, `GhostCar`, `.GetSlot`?**
+  _High betweenness centrality (0.084) - this node is a cross-community bridge._
+- **Why does `GameFlow` connect `GameFlow` to `WastelandTrack`, `DebugBus`, `HudScreen`, `CarController`, `MenuScreens`, `MissionDirector`, `RaceEventDefinition`, `GhostRecorder`, `StarRingTrack`, `.LoadoutTouchControlsGoalsAndHelpFollowRaceRules`, `TrackFork`, `RaceParticipant`, `GameFlow.cs`, `.EnterMenu`, `.ApplyTo`, `RaceManager`, `TrackPath`, `MenuCameraDirector`, `CarsGame Claude context`, `PickupSpawner`, `MusicPlayer`, `SpeedFx`, `MonoBehaviour`, `DailyChallenge`, `MusicDirector`, `SkyDirector`, `EngineAudio`, `RaceDirector`, `AbyssTrack`, `DifficultyTier`, `GhostCar`, `.StartPractice`?**
+  _High betweenness centrality (0.075) - this node is a cross-community bridge._
+- **Why does `RacingGame.Tests` connect `RacingGame.Tests` to `.GuidanceMatchesDistinctCombatBehaviors`, `UiInteractionTests`, `CarWeapons`, `PlatformGlue`, `.Spawn`, `RacingGame.Core.Sim`, `RaceEventDefinition`, `OilHazardTests`, `OnboardingHints`, `CameraFeedbackPlayTests`, `DriveCommand`, `DailyRace`, `StarRingLayout`, `ArsenalExpansionTests`, `.ResetAll`, `AiGunner`, `CarPaintTests`, `PlatformRuntime`, `.FireVoice`, `RecoveryIntentPlayTests`, `.Advance`, `.Pick`, `ArenaModeTests`, `PropModelPlayTests`, `SaveService.cs`, `KillTally`, `HunyuanCarPlayTests`, `RaceHarness`, `.BothDirectionsHaveDriveableShortcutValidLapsAndRepair`, `MissionPlayTests`, `DriftCharge`, `RacingGame`, `EventRulesTests`, `RaceProgress`, `RacingGame.Core.Combat`, `WeaponRig`, `.ArenaSupportsSpawningPursuitAndUnoccupiedRecovery`, `DriftPlayTests`, `GrassReversePlayTests`, `SpecialWeaponTargetsPlayTests`, `TrackSplineTests`, `PlayerDriverInput`, `MinesPlayTests`, `EventDiscoveryPlayTests`, `LocalizationRecoveryPlayTests`, `AiCorneringPlayTests`, `RacerNamesPlayTests`, `AbyssTrack`, `AiRecoveryPlayTests`, `InputActionAssetTests`, `RacingGame.Platform`, `UniqueRivalNamesPlayTests`, `MissionResultsPlayTests`, `TrackProfile`, `.MutingEffectsImmediatelySilencesAnOngoingSkid`, `AiRecoveryTests`, `PropModelLibraryTests`, `MineHazard`, `.LongFramesCannotCountLessRaceTimeThanThePhysicsTheyAdvance`, `.SpeedAndCornerEffectsCanBeDisabledAndRestoredWithoutChangingShakePreference`, `WallRideEntry`, `RaceResultsTests`, `SpeedometerTests`, `BoostGatePlayTests`?**
+  _High betweenness centrality (0.075) - this node is a cross-community bridge._
+- **What connects `Stream`, `Kind`, `Kind` to the rest of the system?**
+  _945 weakly-connected nodes found - possible documentation gaps or missing edges._

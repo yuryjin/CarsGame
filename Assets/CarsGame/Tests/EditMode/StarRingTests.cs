@@ -158,6 +158,50 @@ namespace RacingGame.Tests
                 Assert.AreEqual(1, System.Array.FindAll(new[] { map.Pads[0], map.Pads[1] }, g => g.transform.up.y < -0.9f).Length, "one pad on the tunnel ceiling");
                 Assert.IsNotNull(path.RespawnGuard);
                 Assert.IsNotNull(path.Lures);
+
+                map.SetStage(2);
+                Assert.IsFalse(Side(layout.StartLine + 20f, 1f), "retracted rails cannot trap a car");
+                Assert.IsTrue(Down(layout.StartLine, 7f), "lap two retains the wide deck");
+                Assert.IsTrue(map.transform.Find("NarrowEdge").gameObject.activeSelf, "surviving corridor is marked early");
+                map.Tick(StarRingTrack.RailSinkSeconds / 2f);
+                Assert.Less(map.transform.Find("Rails").localPosition.y, 0f, "rails visibly retract");
+                map.Tick(StarRingTrack.RailSinkSeconds);
+                Assert.IsFalse(map.transform.Find("Rails").gameObject.activeSelf);
+
+                map.SetStage(3);
+                Assert.AreEqual(StarRingTrack.NarrowHalfWidth, path.halfWidth, "AI and respawn leave the edges early");
+                map.Tick(StarRingTrack.CollapseDelay - 0.1f);
+                Assert.IsTrue(Down(layout.StartLine, 7f), "the whole warning interval is safe");
+                map.SetStage(3); // Another racer crossing must not restart the warning.
+                map.SetStage(2);
+                map.Tick(0.2f);
+                Assert.IsTrue(map.EdgesGone);
+                Physics.SyncTransforms();
+                foreach (float d in new[] { layout.StartLine, layout.GapStart - 2f, layout.GapEnd + 2f })
+                {
+                    Assert.IsTrue(Down(d, 0f), "core survives the collapse");
+                    Assert.IsFalse(Down(d, -7f) || Down(d, 7f), "both shoulders lose support");
+                }
+                Assert.IsTrue(Physics.Raycast(inside, Vector3.up, out ceiling, 10f, mask), "tunnel remains intact");
+                map.Tick(StarRingTrack.CollapseSeconds);
+                Assert.IsFalse(map.transform.Find("Shoulders").gameObject.activeSelf);
+                Assert.IsTrue(map.transform.Find("NarrowEdge").gameObject.activeSelf);
+
+                // No finish/jump paint or bridge end-cap may suggest a surviving outer lane.
+                foreach (var filter in map.GetComponentsInChildren<MeshFilter>())
+                foreach (var vertex in filter.sharedMesh.vertices)
+                {
+                    Vector3 world = filter.transform.TransformPoint(vertex);
+                    int hint = -1;
+                    float d = path.Project(world, ref hint);
+                    bool finish = Mathf.Abs(d - layout.StartLine) < 0.8f;
+                    bool lip = Mathf.Abs(d - layout.GapStart) < 2f;
+                    bool landing = Mathf.Abs(d - layout.GapEnd) < 2f;
+                    float y = world.y - layout.Height(d);
+                    if (!(finish || lip || landing) || y < -StarRingTrack.SkinDepth - 0.1f || y > 0.1f) continue;
+                    Assert.LessOrEqual(Mathf.Abs(path.Spline.LateralOffset(world, d)), StarRingTrack.NarrowHalfWidth + 0.1f,
+                        $"{filter.name}: surface decoration must not hang over removed shoulders at {d:F1}");
+                }
             }
             finally
             {

@@ -217,9 +217,16 @@ namespace RacingGame.Tests
                     rivalProgress.SimulationStep(lap * steps + i);
                 }
                 Assert.AreEqual(lap + 1, map.Stage);
+                var hud = Object.FindAnyObjectByType<HudScreen>();
+                Assert.AreEqual(Loc.Get(lap == 1 ? "hud.wasteland.rails_off" : "hud.wasteland.narrowing"), hud.LastHint,
+                    "a rival triggers a visible warning even before the player's next lap");
+                Assert.IsTrue(map.transform.Find("Shoulders").gameObject.activeSelf, "warning precedes detachment");
+                float wait = lap == 1 ? StarRingTrack.RailSinkSeconds : StarRingTrack.CollapseDelay + StarRingTrack.CollapseSeconds;
+                float end = Time.time + wait + 0.1f;
+                while (Time.time < end) yield return null;
                 Assert.IsFalse(map.transform.Find("Rails").gameObject.activeSelf);
                 Assert.AreEqual(lap == 1, map.transform.Find("Shoulders").gameObject.activeSelf);
-                Assert.AreEqual(lap == 1, map.transform.Find("Warnings").gameObject.activeSelf);
+                Assert.AreEqual(lap == 1, map.transform.Find("Shoulders/Warnings").gameObject.activeSelf);
             }
             Assert.AreEqual(StarRingTrack.NarrowHalfWidth, path.halfWidth);
             Physics.SyncTransforms();
@@ -238,6 +245,107 @@ namespace RacingGame.Tests
             Assert.AreEqual(1f, CarController.RamPushScale);
             yield return null;
             Assert.AreEqual(0, GravitySurface.ActiveCount);
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator CollapseWarningPausesAndFallenCarRecoversOnTheNarrowDeck()
+        {
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float deadline = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null; yield return null;
+            var flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = Object.FindAnyObjectByType<RaceManager>();
+            try
+            {
+                flow.StartRace(Resources.Load<RaceEventDefinition>("Events/Event_e19"), null);
+                var map = Object.FindAnyObjectByType<StarRingTrack>();
+                path = TrackPath.Instance;
+                layout = map.Layout;
+                while (race.State == RaceState.Countdown) yield return null;
+                foreach (var turret in map.Turrets) turret.enabled = false;
+                foreach (var participant in race.Participants)
+                {
+                    participant.Car.SetInputSource(participant.gameObject.AddComponent<ScriptedDriverInput>());
+                    Place(participant.Car, layout.StartLine - 40f - participant.Car.CarId * 8f, 0f, 0.5f, Vector3.up, 0f);
+                }
+                var car = race.Player.Car;
+                float d = layout.StartLine + 25f;
+                Place(car, d, 7.5f, 0.5f, Vector3.up, 0f);
+                yield return Ticks(20);
+                Capture("1-rails", car);
+                map.SetStage(2, true);
+                yield return new WaitForSeconds(StarRingTrack.RailSinkSeconds + 0.1f);
+                Capture("2-open", car);
+                map.SetStage(3, true);
+                yield return new WaitForSeconds(0.4f);
+                Capture("3-warning", car);
+                PauseController.Set(RacingGame.Core.Platform.PauseReason.User, true);
+                yield return new WaitForSecondsRealtime(StarRingTrack.CollapseDelay + 0.2f);
+                Assert.IsFalse(map.EdgesGone, "a pause cannot consume the player's escape window");
+                Assert.Greater(car.transform.position.y, layout.Height(d) - 0.2f);
+                PauseController.Set(RacingGame.Core.Platform.PauseReason.User, false);
+                float end = Time.time + StarRingTrack.CollapseDelay - 0.8f;
+                while (Time.time < end) yield return null;
+                Assert.IsFalse(map.EdgesGone, "the remaining warning resumes after unpause");
+                end = Time.time + 2f;
+                bool fell = false;
+                while (Time.time < end)
+                {
+                    fell |= car.transform.position.y < layout.Height(d) - 2f;
+                    yield return null;
+                }
+                Assert.IsTrue(map.EdgesGone);
+                Assert.IsTrue(fell, "a stationary car left on the detached panel falls");
+                end = Time.time + 8f;
+                while (!car.IsGrounded && Time.time < end) yield return null;
+                Assert.IsTrue(car.IsGrounded, "fall recovery returns to the surviving road");
+                Assert.LessOrEqual(Mathf.Abs(path.Spline.LateralOffset(car.transform.position, race.Player.Progress.Distance)),
+                    StarRingTrack.NarrowHalfWidth - 1f, "recovery leaves room at the new edge");
+                Capture("4-narrow", car);
+                flow.RetryRace();
+                map = Object.FindAnyObjectByType<StarRingTrack>();
+                Assert.AreEqual(1, map.Stage);
+                Assert.IsFalse(map.EdgesGone);
+                Assert.AreEqual(StarRingLayout.HalfWidth, path.halfWidth);
+                Assert.IsTrue(map.transform.Find("Rails").gameObject.activeSelf);
+                Assert.IsTrue(map.transform.Find("Shoulders").gameObject.activeSelf);
+            }
+            finally { PauseController.ResetAll(); flow.EnterMenu(); }
+        }
+
+        // Optional artifacts from the real GPU test; no screenshots are taken in ordinary test runs.
+        private void Capture(string name, CarController car)
+        {
+            string directory = System.Environment.GetEnvironmentVariable("CG_STAR_SHOTS");
+            if (string.IsNullOrEmpty(directory)) return;
+            System.IO.Directory.CreateDirectory(directory);
+            var camera = Camera.main;
+            Vector3 position = camera.transform.position;
+            Quaternion rotation = camera.transform.rotation;
+            var previous = RenderTexture.active;
+            var previousTarget = camera.targetTexture;
+            var target = new RenderTexture(960, 540, 24);
+            var image = new Texture2D(960, 540, TextureFormat.RGB24, false);
+            try
+            {
+                float d = layout.StartLine + 25f;
+                Vector3 centre = path.Position(d), forward = path.Tangent(d);
+                camera.transform.position = centre - forward * 12f + Vector3.up * 7f;
+                camera.transform.LookAt(centre + forward * 15f);
+                camera.targetTexture = target;
+                camera.Render(); RenderTexture.active = target;
+                image.ReadPixels(new Rect(0, 0, 960, 540), 0, 0); image.Apply();
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(directory, name + ".png"), image.EncodeToPNG());
+                System.IO.File.WriteAllText(System.IO.Path.Combine(directory, "renderer.txt"), SystemInfo.graphicsDeviceName);
+            }
+            finally
+            {
+                camera.targetTexture = previousTarget; RenderTexture.active = previous;
+                camera.transform.SetPositionAndRotation(position, rotation);
+                target.Release(); Object.Destroy(target); Object.Destroy(image);
+            }
         }
     }
 }
