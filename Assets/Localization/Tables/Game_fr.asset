@@ -2043,6 +2043,14 @@ MonoBehaviour:
     m_Localized: "BOMBE LARGU\xC9E \u2014 QUITTE LE CERCLE ROUGE"
     m_Metadata:
       m_Items: []
+  - m_Id: 28159633885835264
+    m_Localized: "Nouveaux mod\xE8les"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28159633902612480
+    m_Localized: "Mod\xE8les classiques"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

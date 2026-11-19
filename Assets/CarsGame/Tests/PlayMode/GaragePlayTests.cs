@@ -31,6 +31,84 @@ namespace RacingGame.Tests
         }
 
         [UnityTest, Timeout(180000)]
+        public IEnumerator CornerSwitchChangesPreviewAndLiveCarsWithoutRespawning()
+        {
+            yield return Boot();
+            var flow = Object.FindAnyObjectByType<GameFlow>();
+            var menu = Object.FindAnyObjectByType<MenuScreens>();
+            var race = Object.FindAnyObjectByType<RaceManager>();
+            bool original = PlatformGlue.ClassicCarModels;
+            try
+            {
+                if (PlatformGlue.ClassicCarModels) PlatformGlue.ToggleCarModels();
+                menu.PreviewBody("mammoth");
+                yield return null;
+                var preview = Object.FindAnyObjectByType<GaragePreview>();
+                Assert.NotNull(preview.Model.transform.Find("Tripo_Tank"));
+                var progress = JsonUtility.ToJson(PlatformGlue.Save.Data.progress);
+                GameObject.Find("ModelStyle").GetComponent<Button>().onClick.Invoke();
+                yield return null;
+                preview = Object.FindAnyObjectByType<GaragePreview>();
+                Assert.NotNull(preview.Model.transform.Find("ClassicHull"));
+                Assert.IsNull(preview.Model.transform.Find("Tripo_Tank"));
+                Assert.AreEqual(progress, JsonUtility.ToJson(PlatformGlue.Save.Data.progress));
+
+                Assert.IsTrue(flow.StartTestDrive("classic"));
+                yield return null;
+                var player = race.Player;
+                var rb = player.GetComponent<Rigidbody>();
+                var position = rb.position;
+                var velocity = rb.linearVelocity;
+                float health = player.Health.Health, mass = rb.mass;
+                var livery = player.GetComponent<CarLivery>() ?? player.gameObject.AddComponent<CarLivery>();
+                livery.Apply(LiveryPattern.CenterStripe, Color.white);
+                var record = new RacingGame.Core.Ghost.GhostRecord { BodyId = "classic" };
+                record.AddPose(Vector3.zero, Quaternion.identity, 0d, 0f, 0);
+                var ghost = GhostCar.Spawn(race.spawner.raceCarPrefab, record, Color.cyan);
+                try
+                {
+                    var ghostFilter = ghost.GetComponent<MeshFilter>();
+                    var oldMesh = ghostFilter.sharedMesh;
+                    var button = GameObject.Find("RaceModelStyle").GetComponent<Button>();
+                    button.onClick.Invoke();
+                    foreach (var participant in race.Participants)
+                    {
+                        var body = participant.GetComponent<CarBody>();
+                        Assert.IsTrue(body.transform.Find("Tripo_" + body.Class).gameObject.activeSelf);
+                    }
+                    var newParts = player.transform.Find("Tripo_Sport").GetComponentsInChildren<MeshRenderer>();
+                    Assert.IsTrue(System.Array.Exists(newParts, r => r.name == "Livery" && r.enabled));
+                    Assert.Greater(livery.TriangleCount, 0);
+                    Assert.AreNotSame(oldMesh, ghostFilter.sharedMesh);
+                    button.onClick.Invoke();
+                    Assert.AreSame(oldMesh, ghostFilter.sharedMesh);
+                    Assert.IsTrue(player.transform.Find("Car_Visuals").gameObject.activeSelf);
+                    Assert.AreSame(player, race.Player);
+                    Assert.AreEqual(position, rb.position);
+                    Assert.AreEqual(velocity, rb.linearVelocity);
+                    Assert.AreEqual(mass, rb.mass);
+                    Assert.AreEqual(health, player.Health.Health);
+
+                    button.onClick.Invoke();
+                    var trim = System.Array.Find(newParts, r => r.name == "Trim");
+                    Assert.NotNull(trim);
+                    player.Health.Detonate(null);
+                    Assert.IsTrue(trim.HasPropertyBlock());
+                    button.onClick.Invoke();
+                    player.Health.ReviveNow();
+                    button.onClick.Invoke();
+                    Assert.IsFalse(trim.HasPropertyBlock(), "Respawning must clear the wreck tint on both sets");
+                }
+                finally { Object.Destroy(ghost.gameObject); }
+            }
+            finally
+            {
+                if (PlatformGlue.ClassicCarModels != original) PlatformGlue.ToggleCarModels();
+                flow.EnterMenu();
+            }
+        }
+
+        [UnityTest, Timeout(180000)]
         public IEnumerator PreviewEveryBodyWithoutSpawningCarsAndReleaseResources()
         {
             yield return Boot();

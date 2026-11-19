@@ -80,13 +80,13 @@ try {
         assert.equal(fire.x < left.x, prefs.left, 'Action and steering groups must swap sides');
         if (!prefs.large) normalWidth = left.width;
         else assert(left.width >= normalWidth * 1.24, 'Large buttons must be visibly larger');
-        for (const name of ['Left','Right','Fire','Brake','Reset','SwapWeapon','PauseButton']) {
+        for (const name of ['Left','Right','Fire','Brake','Reset','SwapWeapon','PauseButton','RaceModelStyle']) {
           const b = get(name);
           assert(b.width >= 43.5 && b.height >= 43.5, `${name} touch size ${b.width}x${b.height}`);
           assert(b.x*width-b.width/2 >= 0 && b.x*width+b.width/2 <= width && b.y*height-b.height/2 >= 0 && b.y*height+b.height/2 <= height, `${name} stays on screen`);
         }
         const overlap = (a,b) => Math.abs(a.x-b.x)*width < (a.width+b.width)/2-1 && Math.abs(a.y-b.y)*height < (a.height+b.height)/2-1;
-        const controls = ui.buttons.filter(b => ['Left','Right','Fire','Brake','Secondary','SwapWeapon','Reset','PauseButton'].includes(b.name));
+        const controls = ui.buttons.filter(b => ['Left','Right','Fire','Brake','Secondary','SwapWeapon','Reset','PauseButton','RaceModelStyle'].includes(b.name));
         for (let a=0;a<controls.length;a++) for (let b=a+1;b<controls.length;b++) assert(!overlap(controls[a],controls[b]), `${controls[a].name} overlaps ${controls[b].name}`);
         const speed = ui.labels.find(l => l.name === 'Speed');
         assert(speed, 'Speed display');

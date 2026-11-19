@@ -63,6 +63,13 @@ namespace RacingGame
             stripe.enabled = pattern != LiveryPattern.None && (health == null || !health.IsDead);
         }
 
+        internal void RefreshBody()
+        {
+            if (pattern == LiveryPattern.None) return;
+            Rebuild(pattern);
+            Apply(pattern, stripeColor);
+        }
+
         private void Rebuild(LiveryPattern newPattern)
         {
             pattern = newPattern;
@@ -98,6 +105,7 @@ namespace RacingGame
                 }
                 stripe.sharedMaterial = liveryMaterial;
             }
+            stripe.transform.SetParent(body.transform, false);
             if (mesh == null) { mesh = new Mesh { name = "LiveryMesh" }; stripe.GetComponent<MeshFilter>().sharedMesh = mesh; }
             mesh.Clear();
             mesh.SetVertices(outV); mesh.SetNormals(outN); mesh.SetTriangles(outT, 0);

@@ -8,12 +8,12 @@ namespace RacingGame
     /// <summary>One shared visual mesh per prefab/body; a ghost needs one transparent draw, not one per original material slot.</summary>
     internal static class GhostVisualMesh
     {
-        private static readonly Dictionary<(GameObject prefab, string body), Mesh> cache = new Dictionary<(GameObject, string), Mesh>();
+        private static readonly Dictionary<(GameObject prefab, string body, bool classic), Mesh> cache = new();
 
         internal static Mesh Get(GameObject prefab, string bodyId)
         {
             var body = CarBodies.Get(bodyId); // Canonical catalogue ID also bounds the cache for unknown remote IDs.
-            var key = (prefab, body.Id);
+            var key = (prefab, body.Id, PlatformGlue.ClassicCarModels);
             if (cache.TryGetValue(key, out var cached) && cached != null) return cached;
             // Never activate the template: its gameplay components must not register with the live race.
             var root = new GameObject("GhostTemplate");

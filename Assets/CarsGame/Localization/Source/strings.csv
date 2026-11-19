@@ -1,4 +1,6 @@
 key,context,max_chars,en,ru,tr,zh,de,es,fr,pt,uk
+models.new,car model switch,24,New models,Новые модели,Yeni modeller,新款车身,Neue Modelle,Modelos nuevos,Nouveaux modèles,Modelos novos,Нові моделі
+models.classic,car model switch,24,Classic models,Классические модели,Klasik modeller,经典车身,Klassische Modelle,Modelos clásicos,Modèles classiques,Modelos clássicos,Класичні моделі
 common.ok,button,12,OK,ОК,Tamam,确定,OK,OK,OK,OK,ОК
 common.back,button,12,Back,Назад,Geri,返回,Zurück,Atrás,Retour,Voltar,Назад
 common.continue,button,14,Continue,Продолжить,Devam,继续,Weiter,Continuar,Continuer,Continuar,Продовжити

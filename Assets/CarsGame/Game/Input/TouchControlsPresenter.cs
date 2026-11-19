@@ -169,7 +169,7 @@ namespace RacingGame
             Action((RectTransform)swapButton.transform, 40f, 260f, 280f, 370f);
             float edge = 44f / scale;
             float reset = Mathf.Max(100f, edge);
-            float resetTop = (HudScreen.PauseButtonBottomPixels(scale) + 8f) / scale;
+            float resetTop = (HudScreen.ModelButtonBottomPixels(scale) + 8f) / scale;
             Place(resetButton, Vector2.one, new Vector2(-40f - reset, -resetTop - reset), new Vector2(-40f, -resetTop));
             void MinimumHeight(RectTransform control)
             {

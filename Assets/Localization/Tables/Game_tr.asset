@@ -2063,6 +2063,14 @@ MonoBehaviour:
     m_Localized: "BOMBA BIRAKILDI \u2014 KIRMIZI \xC7EMBERDEN \xC7IK"
     m_Metadata:
       m_Items: []
+  - m_Id: 28159633885835264
+    m_Localized: Yeni modeller
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28159633902612480
+    m_Localized: Klasik modeller
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

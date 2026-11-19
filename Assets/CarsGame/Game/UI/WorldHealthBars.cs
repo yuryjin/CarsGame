@@ -35,7 +35,7 @@ namespace RacingGame
         {
             "RaceStatus", "LiveGoals", "TimerPanel", "Health", "AmmoPanel", "SecondaryPanel", "StatusPanel",
             "PauseButton", "HotBomb", "BossPanel", "Speedometer", "HintsPanel", "EventPanel",
-            "Left", "Right", "Fire", "Brake", "SwapWeapon", "Secondary", "Reset", "FinishCard", "ReturnToGarage"
+            "Left", "Right", "Fire", "Brake", "SwapWeapon", "Secondary", "Reset", "FinishCard", "ReturnToGarage", "RaceModelStyle"
         };
         private static readonly System.Comparison<Entry> PriorityComparer = ComparePriority;
         private Canvas canvas;

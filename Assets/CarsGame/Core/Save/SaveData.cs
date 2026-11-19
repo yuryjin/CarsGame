@@ -20,6 +20,7 @@ namespace RacingGame.Core.Save
         public bool autoThrottle = false;
         public bool cameraShake = true;
         public bool dynamicCamera = true;
+        public bool classicCarModels;
         /// <summary>Turret tracks rivals by itself; off = the mouse aims (desktop only, touch always auto).</summary>
         public bool autoAim = true;
         public bool touchLargeButtons;

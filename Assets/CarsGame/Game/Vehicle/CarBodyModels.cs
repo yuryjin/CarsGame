@@ -13,6 +13,8 @@ namespace RacingGame
         public Vector3 VisualScale = Vector3.one;
         public Mesh Paint, Trim;
         public Slot[] TrimSlots;
+        public Mesh KitPaint, KitTrim;
+        public Slot[] KitTrimSlots;
         /// <summary>Tank turret shell, parented to the cannon's yaw pivot so it turns with it.</summary>
         public Mesh TurretPaint, TurretTrim;
         public Slot[] TurretTrimSlots;
@@ -36,7 +38,8 @@ namespace RacingGame
 
         public static BodyModel Get(in BodyDef def)
         {
-            if (cache.TryGetValue(def.Id, out var model) && model.Paint != null) return model;
+            if (cache.TryGetValue(def.Id, out var model) &&
+                (def.IsStandard || model.Paint != null || model.KitPaint != null || model.KitTrim != null)) return model;
             model = Build(def);
             cache[def.Id] = model;
             return model;
@@ -45,16 +48,19 @@ namespace RacingGame
         private static BodyModel Build(in BodyDef def)
         {
             var m = new BodyMesh();
+            var kit = new BodyMesh();
             var model = new BodyModel();
             switch (def.Class)
             {
-                case BodyClass.Buggy: Buggy(def, m, model); break;
-                case BodyClass.Armored: Armored(def, m, model); break;
-                case BodyClass.Tank: Tank(def, m, model); break;
-                default: Sport(def, m, model); break;
+                case BodyClass.Buggy: Buggy(def, m, kit, model); break;
+                case BodyClass.Armored: Armored(def, m, kit, model); break;
+                case BodyClass.Tank: Tank(def, m, kit, model); break;
+                default: Sport(def, kit, model); break;
             }
             model.Paint = m.Build("Body_" + def.Id + "_Paint", BodyMesh.PaintSlots, out _);
             model.Trim = m.Build("Body_" + def.Id + "_Trim", BodyMesh.TrimSlots, out model.TrimSlots);
+            model.KitPaint = kit.Build("Kit_" + def.Id + "_Paint", BodyMesh.PaintSlots, out _);
+            model.KitTrim = kit.Build("Kit_" + def.Id + "_Trim", BodyMesh.TrimSlots, out model.KitTrimSlots);
             return model;
         }
 
@@ -62,7 +68,7 @@ namespace RacingGame
 
         // ------------------------------------------------------------------ buggy
         // An open tub on long suspension arms, a tube roll cage with the cannon on its roof plate, big bare wheels.
-        private static void Buggy(in BodyDef d, BodyMesh m, BodyModel model)
+        private static void Buggy(in BodyDef d, BodyMesh m, BodyMesh kit, BodyModel model)
         {
             var s = d.Shape;
             float zF = s.Length * 0.5f, zR = -s.Length * 0.5f, c = s.Clearance, r = s.WheelRadius, hb = s.HalfBase, ht = s.HalfTrack;
@@ -81,8 +87,8 @@ namespace RacingGame
                 m.BoxPair(Slot.Paint, new Vector3(ht, 2f * r - 0.05f, z + Mathf.Sign(z) * r * 1.05f), new Vector3(0.36f, 0.25f, 0.05f), Quaternion.Euler(Mathf.Sign(z) * 25f, 0f, 0f));
                 m.TubePair(Slot.Dark, new Vector3(tub - 0.02f, y1 - 0.05f, z), new Vector3(ht - 0.16f, 2f * r + 0.05f, z), 0.03f);
                 // Suspension arms to the hub.
-                m.TubePair(Slot.Dark, new Vector3(0.48f, y0 + 0.12f, z + 0.18f), new Vector3(ht - 0.12f, r, z), 0.035f);
-                m.TubePair(Slot.Dark, new Vector3(0.48f, y0 + 0.12f, z - 0.18f), new Vector3(ht - 0.12f, r, z), 0.035f);
+                kit.TubePair(Slot.Dark, new Vector3(0.48f, y0 + 0.12f, z + 0.18f), new Vector3(ht - 0.12f, r, z), 0.035f);
+                kit.TubePair(Slot.Dark, new Vector3(0.48f, y0 + 0.12f, z - 0.18f), new Vector3(ht - 0.12f, r, z), 0.035f);
             }
 
             // Seats.
@@ -119,6 +125,7 @@ namespace RacingGame
             m.BoxPair(Slot.Head, new Vector3(0.22f, c + 0.24f, zF + 0.01f), new Vector3(0.14f, 0.08f, 0.04f));
             m.BoxPair(Slot.Tail, new Vector3(0.36f, y1 - 0.02f, zR + 0.01f), new Vector3(0.12f, 0.08f, 0.04f));
 
+            m = kit;
             if (Has(d, BodyKit.LightBar))
             {
                 m.Box(Slot.Dark, new Vector3(0f, yt + 0.07f, zRf + 0.03f), new Vector3(1.0f, 0.07f, 0.08f));
@@ -202,7 +209,7 @@ namespace RacingGame
 
         // ------------------------------------------------------------------ armored
         // Narrow lower hull between the wheels, a full-width deck over them, a sloped cabin with slit windows.
-        private static void Armored(in BodyDef d, BodyMesh m, BodyModel model)
+        private static void Armored(in BodyDef d, BodyMesh m, BodyMesh kit, BodyModel model)
         {
             var s = d.Shape;
             float zF = s.Length * 0.5f, zR = -s.Length * 0.5f, c = s.Clearance, r = s.WheelRadius, hb = s.HalfBase, ht = s.HalfTrack;
@@ -237,6 +244,7 @@ namespace RacingGame
             m.Panel(Slot.Tail, tBL, tBR, tTR, tTL, 0.83f, 0.95f, 0.25f, 0.75f, 0.02f, deckInside);
 
             // Mud flaps behind the wheels.
+            m = kit;
             foreach (float z in Axles(hb, Has(d, BodyKit.SixWheels)))
                 m.BoxPair(Slot.Dark, new Vector3(ht, yW - 0.17f, z - r - 0.1f), new Vector3(0.3f, 0.3f, 0.03f));
 
@@ -298,7 +306,7 @@ namespace RacingGame
 
         // ------------------------------------------------------------------ tank
         // Two tracks with road wheels, a hull with a sloped glacis, and a turret shell that rides on the cannon's yaw pivot.
-        private static void Tank(in BodyDef d, BodyMesh m, BodyModel model)
+        private static void Tank(in BodyDef d, BodyMesh hull, BodyMesh kit, BodyModel model)
         {
             var s = d.Shape;
             float zF = s.Length * 0.5f, zR = -s.Length * 0.5f, hb = s.HalfBase, ht = s.HalfTrack;
@@ -307,6 +315,7 @@ namespace RacingGame
             model.HideWheels = true;
 
             // Tracks: a side profile extruded across the track width, grousers on the top run.
+            var m = kit;
             var profile = new[]
             {
                 new Vector2(-hb - 0.05f, 0.02f), new Vector2(hb + 0.05f, 0.02f), new Vector2(hb + 0.45f, 0.3f),
@@ -326,6 +335,7 @@ namespace RacingGame
             m.CylinderPair(Slot.Metal, new Vector3(xout - 0.02f, 0.36f, -hb - 0.3f), new Vector3(xout + 0.05f, 0.36f, -hb - 0.3f), 0.18f, 8);
 
             // Hull: lower tub between the tracks, upper hull over them with a sloped glacis.
+            m = hull;
             m.Section(Slot.Paint, -hb - 0.2f, hb + 0.1f, 0.18f, 0.18f, yT, yT, xin - 0.02f, xin - 0.02f, xin, xin, zR + 0.15f, zF - 0.25f);
             float deckFront = zF - 0.85f, deckBack = zR + 0.2f, deckHalf = hw - 0.06f;
             m.Section(Slot.Paint, zR + 0.05f, zF - 0.05f, yT, yT, yD, yD, hw, hw, deckHalf, deckHalf, deckBack, deckFront);
@@ -341,6 +351,7 @@ namespace RacingGame
             m.Panel(Slot.Tail, bBL, bBR, bTR, bTL, 0.05f, 0.15f, 0.55f, 0.8f, 0.02f, inside);
             m.Panel(Slot.Tail, bBL, bBR, bTR, bTL, 0.85f, 0.95f, 0.55f, 0.8f, 0.02f, inside);
 
+            m = kit;
             if (Has(d, BodyKit.Skirts))
             {
                 m.Hull(Slot.Paint,

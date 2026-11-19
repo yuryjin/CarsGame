@@ -215,7 +215,7 @@ namespace RacingGame
             var buttons = panel.GetComponentsInChildren<Button>();
             Button focus = Array.Find(buttons, b => b.interactable && b.name == selected)
                 ?? (name == "results" ? Array.Find(buttons, b => b.interactable && b.name == "ResultAction0") : null)
-                ?? Array.Find(buttons, b => b.interactable && b.name != "Back");
+                ?? Array.Find(buttons, b => b.interactable && b.name != "Back" && b.name != "ModelStyle");
             if (focus != null) EventSystem.current?.SetSelectedGameObject(focus.gameObject);
             // OnSelect reveals keyboard focus. During a refresh the player may
             // have scrolled away from that control, so restore their view last.
@@ -233,13 +233,21 @@ namespace RacingGame
             return text;
         }
 
-        private RectTransform Header(RectTransform root, string key, bool back = true, bool showWallet = true)
+        private RectTransform Header(RectTransform root, string key, bool back = true, bool showWallet = true, bool modelSwitch = false)
         {
+            float right = 0f;
+            if (modelSwitch && PlatformGlue.IsReady)
+            {
+                right = Compact ? 196f : 248f;
+                UiFactory.Button(root, "ModelStyle", Loc.Get(PlatformGlue.ClassicCarModels ? "models.classic" : "models.new"),
+                    () => { PlatformGlue.ToggleCarModels(); Show(current); }, Vector2.one, Vector2.one,
+                    new Vector2(12f - right, Compact ? -68f : -74f), new Vector2(0f, Compact ? 0f : -6f), 25f, UiFactory.Raised);
+            }
             if (Compact)
             {
                 if (back) UiFactory.Button(root, "Back", "‹  " + Loc.Get("common.back"), Back, Top, Top, new Vector2(0f, -68f), new Vector2(150f, 0f), 26f, UiFactory.Raised);
-                Label(root, "Title", Loc.Get(key), 40f, Top, Vector2.one, new Vector2(back ? 170f : 12f, -68f), new Vector2(showWallet ? -218f : -12f, 0f)).fontStyle = FontStyles.Bold;
-                if (showWallet) Label(root, "Coins", Coins(), 24f, Vector2.one, Vector2.one, new Vector2(-206f, -68f), Vector2.zero, UiFactory.Accent, TextAlignmentOptions.MidlineRight);
+                Label(root, "Title", Loc.Get(key), 40f, Top, Vector2.one, new Vector2(back ? 170f : 12f, -68f), new Vector2((showWallet ? -218f : -12f) - right, 0f)).fontStyle = FontStyles.Bold;
+                if (showWallet) Label(root, "Coins", Coins(), 24f, Vector2.one, Vector2.one, new Vector2(-206f - right, -68f), new Vector2(-right, 0f), UiFactory.Accent, TextAlignmentOptions.MidlineRight);
                 return UiFactory.Panel(root, "Body", Vector2.zero, Vector2.one, Vector2.zero, new Vector2(0f, -86f));
             }
             if (back) UiFactory.Button(root, "Back", "‹  " + Loc.Get("common.back"), Back, Top, Top, new Vector2(0f, -74f), new Vector2(164f, -6f), 26f, UiFactory.Raised);
@@ -249,11 +257,11 @@ namespace RacingGame
                     var stripe = UiFactory.Panel(root, "Mark" + i, Top, Top, new Vector2(6f + i * 22f, -66f), new Vector2(18f + i * 22f, -12f), UiFactory.Accent, false);
                     stripe.localRotation = Quaternion.Euler(0f, 0f, -15f);
                 }
-            var title = Label(root, "Title", Loc.Get(key), back ? 46f : 60f, Top, Vector2.one, new Vector2(back ? 190f : 94f, -82f), new Vector2(showWallet ? -300f : 0f, 0f));
+            var title = Label(root, "Title", Loc.Get(key), back ? 46f : 60f, Top, Vector2.one, new Vector2(back ? 190f : 94f, -82f), new Vector2((showWallet ? -300f : 0f) - right, 0f));
             title.fontStyle = FontStyles.Bold;
             if (showWallet)
             {
-                var wallet = UiFactory.Card(root, "Wallet", Vector2.one, Vector2.one, new Vector2(-276f, -74f), new Vector2(0f, -6f));
+                var wallet = UiFactory.Card(root, "Wallet", Vector2.one, Vector2.one, new Vector2(-276f - right, -74f), new Vector2(-right, -6f));
                 Label(wallet, "Coins", Coins(), 26f, Vector2.zero, Vector2.one, new Vector2(22f, 8f), new Vector2(-22f, -8f), UiFactory.Accent, TextAlignmentOptions.Center);
             }
             UiFactory.Panel(root, "Rule", Top, Vector2.one, new Vector2(0f, -111f), new Vector2(0f, -110f), new Color(0.4f, 0.5f, 0.65f, 0.3f), false);
@@ -279,7 +287,7 @@ namespace RacingGame
 
         private void BuildMain(RectTransform root)
         {
-            var body = Header(root, "menu.title", false);
+            var body = Header(root, "menu.title", false, modelSwitch: true);
             if (!PlatformGlue.IsReady)
             {
                 Label(body, "Loading", Loc.Ready ? Loc.Get("common.loading") : "…", 36f, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, UiFactory.Muted, TextAlignmentOptions.Center); return;
@@ -449,7 +457,7 @@ namespace RacingGame
 
         private void BuildGarage(RectTransform root)
         {
-            var body = Header(root, "garage.title");
+            var body = Header(root, "garage.title", modelSwitch: true);
             RectTransform content;
             if (Compact)
             {

@@ -59,6 +59,8 @@ namespace RacingGame
         private bool lastOverheated;
         private int lastHeatPct = -1;
         private Button resumeButton, restartButton, menuButton, settingsButton;
+        private RectTransform modelButton;
+        private TextMeshProUGUI modelLabel;
         private RectTransform helpPanel;
         private ScrollRect helpScroll;
         private int layoutScreenWidth, layoutScreenHeight;
@@ -378,6 +380,15 @@ namespace RacingGame
         {
             pauseButton = (RectTransform)UiFactory.Button(root, "PauseButton", "", () => PauseController.Set(PauseReason.User, true), Vector2.one, Vector2.one, new Vector2(-106f, -100f), new Vector2(-30f, -24f), 28f, UiFactory.Surface).transform;
             for (int i = 0; i < 2; i++) UiFactory.Panel(pauseButton, "Bar" + i, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-14f + 19f * i, -16f), new Vector2(-5f + 19f * i, 16f), UiFactory.Accent, false);
+            modelButton = (RectTransform)UiFactory.Button(root, "RaceModelStyle", "", () =>
+            {
+                PlatformGlue.ToggleCarModels();
+                RefreshModelLabel();
+                ShowEvent(Loc.Get(PlatformGlue.ClassicCarModels ? "models.classic" : "models.new"), UiFactory.Accent);
+            }, Vector2.one, Vector2.one, Vector2.zero, Vector2.zero, 28f, UiFactory.Surface).transform;
+            modelLabel = modelButton.GetComponentInChildren<TextMeshProUGUI>();
+            modelLabel.rectTransform.offsetMin = new Vector2(4f, 2f);
+            modelLabel.rectTransform.offsetMax = new Vector2(-4f, -2f);
             pausePanel = UiFactory.Panel(root, "Pause", Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.01f, 0.02f, 0.04f, 0.8f), false);
             pausePanel.GetComponent<Image>().raycastTarget = true;
             // Above the touch-control canvas, including its raycaster.
@@ -576,6 +587,7 @@ namespace RacingGame
         private void ApplyStaticTexts()
         {
             ApplyLayout(touchLayout);
+            RefreshModelLabel();
             pauseText.text = Loc.Get("pause.title"); pauseHint.text = Loc.Get("experience.help");
             resumeButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.resume");
             restartButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.restart");
@@ -600,6 +612,8 @@ namespace RacingGame
             EnsureKillFeedNames();
             UpdateKillFeedDisplay();
         }
+
+        private void RefreshModelLabel() => modelLabel.text = PlatformGlue.ClassicCarModels ? "3D\n1/2" : "3D\n2/2";
 
         // Four corner brackets around the aim point; ammo pips underneath. Plain images, no glyphs.
         private void BuildReticle(Transform root)
@@ -736,8 +750,8 @@ namespace RacingGame
             rt.offsetMin = offsetMin; rt.offsetMax = offsetMax;
         }
 
-        internal static float PauseButtonBottomPixels(float canvasScale) =>
-            Mathf.Max(24f * canvasScale, 8f) + Mathf.Max(76f * canvasScale, 44f);
+        internal static float ModelButtonBottomPixels(float canvasScale) =>
+            Mathf.Max(24f * canvasScale, 8f) + 2f * Mathf.Max(76f * canvasScale, 44f) + 8f;
 
         /// <summary>
         /// Keyboard/gamepad: speed bottom-left, HP and ammo bottom-right. Touch: the on-screen buttons own
@@ -762,6 +776,9 @@ namespace RacingGame
             float pauseTop = Mathf.Max(24f, 8f / scale);
             Place(pauseButton, Vector2.one, new Vector2(-pauseRight - pauseEdge, -pauseTop - pauseEdge),
                 new Vector2(-pauseRight, -pauseTop));
+            float modelBottom = -ModelButtonBottomPixels(scale) / scale;
+            Place(modelButton, Vector2.one, new Vector2(-pauseRight - pauseEdge, modelBottom),
+                new Vector2(-pauseRight, modelBottom + pauseEdge));
             // Portrait phones give the canvas ~1000 reference units of width: the timer (±200 around the
             // centre) would collide with a top-right HP bar, so HP/ammo drop to a row below it.
             bool narrow = layoutWidth < 1400f;
@@ -790,7 +807,7 @@ namespace RacingGame
                 Place(secondaryPanel, new Vector2(1f, 0f), new Vector2(-354f, 242f), new Vector2(-30f, 290f));
                 Place(statusPanel, new Vector2(1f, 0f), new Vector2(-354f, 298f), new Vector2(-30f, 346f));
                 Place(hintPanel, Vector2.zero, new Vector2(30f, 272f), new Vector2(680f, 422f));
-                if (killFeedPanel != null) Place(killFeedPanel, Vector2.one, new Vector2(-360f, -230f), new Vector2(-30f, -110f));
+                if (killFeedPanel != null) Place(killFeedPanel, Vector2.one, new Vector2(-360f, modelBottom - 128f), new Vector2(-30f, modelBottom - 8f));
                 for (int i = 0; i < killFeedTexts.Length; i++) if (killFeedTexts[i] != null) killFeedTexts[i].alignment = TextAlignmentOptions.MidlineRight;
                 hintText.alignment = TextAlignmentOptions.MidlineLeft;
             }
@@ -1598,6 +1615,7 @@ namespace RacingGame
             finishPanel.gameObject.SetActive(false);
             if (visible)
             {
+                RefreshModelLabel();
                 bool practice = gameFlow != null && gameFlow.IsPractice;
                 racePanel.gameObject.SetActive(!practice);
                 timerPanel.gameObject.SetActive(!practice);

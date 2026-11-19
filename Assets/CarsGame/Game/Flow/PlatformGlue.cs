@@ -17,6 +17,18 @@ namespace RacingGame
     public sealed class PlatformGlue : MonoBehaviour
     {
         public static SaveService Save { get; private set; }
+        public static bool ClassicCarModels => Save?.Data.settings.classicCarModels == true;
+
+        public static void ToggleCarModels()
+        {
+            if (Save == null || !Save.Loaded || Save.LocalVersionTooNew) return;
+            bool classic = !ClassicCarModels;
+            Save.Data.settings.classicCarModels = classic;
+            Save.MarkDirty();
+            foreach (var body in FindObjectsByType<CarBody>(FindObjectsSortMode.None)) body.SetModelStyle(classic);
+            foreach (var ghost in FindObjectsByType<GhostCar>(FindObjectsSortMode.None)) ghost.RefreshModel();
+        }
+
         public static AdPacer Pacer { get; private set; }
         public static IPlatformServices Platform => PlatformRuntime.Current;
 

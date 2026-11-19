@@ -340,11 +340,17 @@ namespace RacingGame
             if (weapons != null) weapons.enabled = enabled;
         }
 
+        internal void RefreshBodyRenderers()
+        {
+            renderers = null;
+            if (IsDead) TintWreck(true);
+        }
+
         private void TintWreck(bool wrecked)
         {
             if (renderers == null)
             {
-                renderers = GetComponentsInChildren<Renderer>();
+                renderers = GetComponentsInChildren<Renderer>(true);
             }
 
             for (int i = 0; i < renderers.Length; i++)

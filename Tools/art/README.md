@@ -25,6 +25,14 @@ Never pass `--cpu_fallback` casually: the DiT in CPU fp32 grew to 51 GB RSS once
 The GPU path needs `torch.set_grad_enabled(False)` (set in `hunyuan_shape.py`); without it autograd keeps
 every denoising step and the DiT stage runs out of 12 GB.
 
+## TripoSR car bodies (19 November 2026)
+
+Four locally generated vehicle shells cover the existing Sport, Buggy, Armored and Tank classes. The [reference sheet](tripo-car-inputs.webp) contains the four original ImageGen inputs in that order, left to right by row. Each tile is a lossless 512 × 512 RGB image ready for TripoSR with background removal disabled.
+
+The generation used TripoSR revision `107cefdc244c39106fa830359024f6a2f1c78871` and the official `model.ckpt` (SHA-256 `429e2c6b22a0923967459de24d67f05962b235f79cde6b032aa7ed2ffcd970ee`). The code and weights are released under MIT for commercial use. The game ships the finished geometry. [TripoSR license](https://github.com/VAST-AI-Research/TripoSR/blob/107cefdc244c39106fa830359024f6a2f1c78871/LICENSE) · [Model weights](https://huggingface.co/stabilityai/TripoSR) · [Publisher's commercial-use statement](https://stability.ai/news-updates/triposr-3d-generation)
+
+The meshes were extracted at marching-cubes resolution 176 and threshold 25. Blender cleanup aligned and mirrored the visible half, opened the wheel wells and separated paint from vertex-coloured trim. Each FBX uses two renderers and fits a 2 × 1 × 4 metre envelope in Unity, with the nose on +Z. `CarBody` fits it to each catalogue entry and retains its wheels, tracks and equipment. Mesh read access supports liveries and the combined ghost mesh. [Unity meshes](../../Assets/CarsGame/Resources/Art/TripoCars)
+
 # Props: pickups and weapon heads (Z-Image reference → Hunyuan3D-2 → Blender → Unity)
 
 Contract: `props_spec.json` (bounds in the slot of the primitive the model replaces, triangle target, palette zones).

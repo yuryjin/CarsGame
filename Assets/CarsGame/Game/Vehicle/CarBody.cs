@@ -8,9 +8,9 @@ namespace RacingGame
 {
     /// <summary>
     /// Turns a freshly spawned RaceCar into one of the <see cref="CarBodies"/>: mass, handling and hit points,
-    /// the hull collider and the rolling spheres, and the procedural model (<see cref="CarBodyModels"/>).
+    /// the hull collider, rolling spheres and visuals. The selected model style only changes the visuals.
     /// Apply right after Instantiate and before the drivers, upgrades and paint: upgrades multiply on top.
-    /// The standard body changes nothing, so the stock car behaves exactly as before.
+    /// The standard body keeps the stock driving characteristics.
     /// </summary>
     public sealed class CarBody : MonoBehaviour
     {
@@ -24,20 +24,29 @@ namespace RacingGame
 
         private readonly List<Transform> extraSpinners = new List<Transform>();
         private CarController car;
+        private Transform classicHull, newHull;
+        private bool initialized;
 
         public static CarBody Apply(GameObject go, in BodyDef def)
         {
             var body = go.GetComponent<CarBody>() ?? go.AddComponent<CarBody>();
-            if (body.BodyId == def.Id) return body;
+            if (body.initialized && body.BodyId == def.Id) return body;
+            if (body.newHull != null)
+            {
+                body.newHull.gameObject.SetActive(false);
+                Destroy(body.newHull.gameObject);
+                body.newHull = null;
+            }
+            body.initialized = true;
             body.BodyId = def.Id;
             body.Class = def.Class;
             body.AiBrakePlan = 1f / Mathf.Sqrt(Mathf.Max(1f, def.Stats.Mass));
-            if (def.IsStandard) return body;   // a body is applied once per spawn; the prefab already is the standard car
-
             body.car = go.GetComponent<CarController>();
-            ApplyPhysics(go, def);
+            if (!def.IsStandard) ApplyPhysics(go, def);
             var model = CarBodyModels.Get(def);
             body.ApplyVisuals(model, def);
+            body.SetModelStyle(PlatformGlue.ClassicCarModels);
+            if (def.IsStandard) return body;
 
             var health = go.GetComponent<CarHealth>();
             if (health != null) health.SetMaxHealth(health.maxHealth * def.Stats.Health, true);
@@ -46,8 +55,6 @@ namespace RacingGame
             // Grass is a legal line for tracks and long-travel buggies: the lost-car reset waits longer for them.
             var participant = go.GetComponent<RaceParticipant>();
             if (participant != null) participant.offTrackResetSeconds *= Mathf.Max(1f, def.Stats.Offroad);
-            var paint = go.GetComponent<CarPaint>();
-            if (paint != null) paint.Refresh();
             return body;
         }
 
@@ -123,21 +130,25 @@ namespace RacingGame
             var visuals = transform.Find("Car_Visuals");
             int layer = gameObject.layer;
 
-            Transform kitParent = transform;
-            if (model.KeepStockVisuals && visuals != null)
+            if (model.KeepStockVisuals)
             {
-                visuals.localScale = model.VisualScale;
-                kitParent = visuals;
+                classicHull = visuals;
+                if (classicHull != null) classicHull.localScale = model.VisualScale;
             }
-
-            var paint = Part(kitParent, "Kit_Paint", model.Paint, new[] { mats.Paint }, true, layer);
-            Part(kitParent, "Kit_Trim", model.Trim, mats.For(model.TrimSlots), false, layer);
-            if (!model.KeepStockVisuals)
+            else
             {
                 if (visuals != null) visuals.gameObject.SetActive(false);
-                // The livery and the paint look for the first paint renderer: the new hull goes first.
-                if (paint != null) paint.transform.SetSiblingIndex(0);
+                classicHull = new GameObject("ClassicHull").transform;
+                classicHull.SetParent(transform, false);
+                Part(classicHull, "Body_Paint", model.Paint, new[] { mats.Paint }, true, layer);
+                Part(classicHull, "Body_Trim", model.Trim, mats.For(model.TrimSlots), false, layer);
             }
+
+            var kitPaint = Part(transform, "Kit_Paint", model.KitPaint, new[] { mats.Paint }, true, layer);
+            var kitTrim = Part(transform, "Kit_Trim", model.KitTrim, mats.For(model.KitTrimSlots), false, layer);
+            if (kitPaint != null) kitPaint.transform.localScale = model.VisualScale;
+            if (kitTrim != null) kitTrim.transform.localScale = model.VisualScale;
+            if (def.IsStandard) return; // Its turret, wheels and colliders already come from the prefab.
 
             if (model.HideWheels && car != null)
                 foreach (var w in new[] { car.frontLeftWheel, car.frontRightWheel, car.rearLeftWheel, car.rearRightWheel })
@@ -167,6 +178,43 @@ namespace RacingGame
                     Part(cannon.barrel, "Barrel_Twin", model.Barrel, mats.For(model.BarrelSlots), false, layer);
                 }
             }
+        }
+
+        internal void SetModelStyle(bool classic)
+        {
+            if (classicHull == null) return;
+            if (!classic && newHull == null)
+            {
+                var prefab = Resources.Load<GameObject>("Art/TripoCars/" + Class);
+                if (prefab != null)
+                {
+                    var def = CarBodies.Get(BodyId);
+                    var s = def.Shape;
+                    newHull = Instantiate(prefab, transform, false).transform;
+                    newHull.name = "Tripo_" + Class;
+                    // FBX hulls occupy 2 × 1 × 4 metres, centred over their base.
+                    float bottom = Class == BodyClass.Tank ? 0.42f : s.Clearance;
+                    float roof = CarBodyModels.Get(def).TurretPosition.y - 0.05f;
+                    float width = Class == BodyClass.Buggy ? s.Width * 0.88f : s.Width;
+                    newHull.localScale = new Vector3(width / 2f, roof - bottom, s.Length / 4f);
+                    newHull.localPosition = Vector3.up * bottom;
+                    foreach (var r in newHull.GetComponentsInChildren<MeshRenderer>(true))
+                    {
+                        r.gameObject.layer = gameObject.layer;
+                        r.shadowCastingMode = r.sharedMaterial != null && r.sharedMaterial.name.Contains("CarPaint")
+                            ? ShadowCastingMode.On : ShadowCastingMode.Off;
+                        r.lightProbeUsage = LightProbeUsage.Off;
+                        r.reflectionProbeUsage = ReflectionProbeUsage.Off;
+                    }
+                }
+            }
+            bool showClassic = classic || newHull == null;
+            classicHull.gameObject.SetActive(showClassic);
+            if (newHull != null) newHull.gameObject.SetActive(!showClassic);
+            (showClassic ? classicHull : newHull).SetAsFirstSibling();
+            GetComponent<CarPaint>()?.Refresh();
+            GetComponent<CarLivery>()?.RefreshBody();
+            GetComponent<CarHealth>()?.RefreshBodyRenderers();
         }
 
         private static MeshRenderer Part(Transform parent, string name, Mesh mesh, Material[] materials, bool castShadows, int layer)
