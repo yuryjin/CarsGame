@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 using RacingGame.Core.Track;
 using RacingGame.World;
@@ -13,6 +14,52 @@ namespace RacingGame.Tests
             var pts = new Vector3[n];
             for (int i = 0; i < n; i++) { float a = i * Mathf.PI * 2f / n; pts[i] = new Vector3(Mathf.Cos(a) * radius, 0f, Mathf.Sin(a) * radius); }
             return new TrackSpline(pts);
+        }
+
+        [Test]
+        public void CircuitAsphaltClosesWithoutStretchingEitherTexture()
+        {
+            var road = AssetDatabase.LoadAssetAtPath<Mesh>("Assets/Generated/Env/CircuitAsphalt.asset");
+            var material = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/M_Asphalt.mat");
+            var grain = (Texture2D)material.GetTexture("_BaseMap");
+            Assert.That(grain.width, Is.EqualTo(512));
+            Assert.Greater(grain.mipmapCount, 1);
+            Assert.That(grain.wrapMode, Is.EqualTo(TextureWrapMode.Repeat));
+            Assert.NotNull(material.GetTexture("_DetailAlbedoMap"));
+            Assert.IsTrue(material.IsKeywordEnabled("_DETAIL_MULX2"));
+            var grainTiles = material.GetTextureScale("_BaseMap");
+            var wearTiles = Vector2.Scale(grainTiles, material.GetTextureScale("_DetailAlbedoMap"));
+            Assert.Less(Vector2.Distance(Vector2.one, wearTiles), 0.0001f);
+            Assert.AreEqual(Mathf.Round(grainTiles.y), grainTiles.y);
+
+            var uv = road.uv;
+            var vertices = road.vertices;
+            Assert.AreEqual(vertices[0], vertices[vertices.Length - 2]);
+            Assert.AreEqual(vertices[1], vertices[vertices.Length - 1]);
+            Assert.That(uv[0].y, Is.EqualTo(0f).Within(0.00001f));
+            Assert.AreEqual(1f, uv[uv.Length - 1].y);
+            var indices = road.triangles;
+            for (int i = 0; i < indices.Length; i += 3)
+            {
+                float a = uv[indices[i]].y, b = uv[indices[i + 1]].y, c = uv[indices[i + 2]].y;
+                Assert.Less(Mathf.Max(a, Mathf.Max(b, c)) - Mathf.Min(a, Mathf.Min(b, c)), 0.02f);
+            }
+        }
+
+        [TestCase("LeftKerb")]
+        [TestCase("RightKerb")]
+        public void EachKerbFaceHasOnePaintColour(string side)
+        {
+            var mesh = AssetDatabase.LoadAssetAtPath<Mesh>("Assets/Generated/Env/Kerb_" + side + ".asset");
+            var colors = mesh.colors32;
+            var indices = mesh.triangles;
+            Assert.Greater(indices.Length, 0);
+            for (int i = 0; i < indices.Length; i += 3)
+            {
+                Assert.AreEqual(colors[indices[i]], colors[indices[i + 1]]);
+                Assert.AreEqual(colors[indices[i]], colors[indices[i + 2]]);
+            }
+            Assert.AreNotEqual(colors[indices[0]], colors[indices[6]]);
         }
 
         [Test]

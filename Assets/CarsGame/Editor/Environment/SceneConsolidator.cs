@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -10,7 +9,7 @@ namespace RacingGame.EditorTools
     /// Collapses the repeated authored geometry into single vertex-coloured meshes: barriers (colliders kept
     /// on renderer-less children), track dashes (transforms kept — they ARE the spline), start gantry,
     /// red/white kerbs; removes the old tree/grandstand objects (rebuilt by PropBaker) and converts the car
-    /// light materials to the emissive shader. Re-runnable (skips already converted groups).
+    /// light materials to the emissive shader. Road art can be rebaked from the authored collision strips and markers.
     /// </summary>
     public static class SceneConsolidator
     {
@@ -20,8 +19,6 @@ namespace RacingGame.EditorTools
         private static readonly Color32 BarrierWhite = MeshChunkWriter.Srgb(0.90f, 0.91f, 0.93f);
         private static readonly Color32 BarrierRed = MeshChunkWriter.Srgb(0.86f, 0.14f, 0.14f);
         private static readonly Color32 DashWhite = MeshChunkWriter.Srgb(0.96f, 0.96f, 0.96f);
-        private static readonly Color32 KerbRed = MeshChunkWriter.Srgb(0.88f, 0.12f, 0.14f);
-        private static readonly Color32 KerbWhite = MeshChunkWriter.Srgb(0.94f, 0.94f, 0.94f);
 
         public static string Consolidate()
         {
@@ -29,7 +26,6 @@ namespace RacingGame.EditorTools
             var rt = GameObject.Find("RaceTrack");
             if (rt == null) return "ERROR: RaceTrack missing";
             var track = Object.FindFirstObjectByType<RacingGame.TrackPath>();
-            var spline = track.Spline;
             var litMat = EnvironmentBaker.EnvMaterial("M_Env_Lit", m => { m.SetFloat("_Flat", 0f); m.SetFloat("_Wrap", 0.35f); m.SetFloat("_ShadowFloor", 0.4f); m.SetFloat("_EmissionBoost", GrandstandGeometry.IndirectFill); m.SetFloat("_FogOverride", 0f); m.SetFloat("_EmissionByLamps", 0f); });
 
             // Remember authored tree positions before anything is deleted.
@@ -64,21 +60,40 @@ namespace RacingGame.EditorTools
             // --- Dashes: renderers removed from the spline children, mesh lives in a sibling.
             var markings = rt.transform.Find("Track_Markings");
             var decor = rt.transform.Find("Track_Decor");
-            if (markings != null && decor == null)
+            if (markings != null)
             {
                 var w = new MeshChunkWriter("Dashes");
                 int n = 0;
                 foreach (Transform ch in markings)
                 {
                     var mf = ch.GetComponent<MeshFilter>(); var mr = ch.GetComponent<MeshRenderer>();
-                    if (mf == null) continue;
                     LowPoly.Box(w, ch.localToWorldMatrix, Vector3.zero, Vector3.one, DashWhite);
-                    Undo.DestroyObjectImmediate(mr); Undo.DestroyObjectImmediate(mf); n++;
+                    if (mr != null) Undo.DestroyObjectImmediate(mr);
+                    if (mf != null) Undo.DestroyObjectImmediate(mf);
+                    n++;
                 }
-                var decorGo = new GameObject("Track_Decor"); Undo.RegisterCreatedObjectUndo(decorGo, "decor"); decorGo.transform.SetParent(rt.transform, false);
-                foreach (var mesh in w.Finish()) EnvironmentBaker.Place(decorGo.transform, EnvironmentBaker.SaveMesh(mesh, "Dashes"), litMat, false, true);
+                var grid = Object.FindAnyObjectByType<StartGrid>();
+                var checkers = rt.transform.Find("StartFinish_Gantry/StartLine_Checkers");
+                if (grid != null && checkers != null) CircuitSurfaceBaker.AddGridPaint(w, track, grid, checkers);
+                if (decor == null)
+                {
+                    decor = new GameObject("Track_Decor").transform;
+                    Undo.RegisterCreatedObjectUndo(decor.gameObject, "decor"); decor.SetParent(rt.transform, false);
+                }
+                var meshes = w.Finish();
+                for (int i = 0; i < meshes.Count; i++)
+                {
+                    string name = i == 0 ? "Dashes" : "Dashes_" + i;
+                    var saved = EnvironmentBaker.SaveMesh(meshes[i], name);
+                    var child = decor.Find(name);
+                    if (child == null) EnvironmentBaker.Place(decor, saved, litMat, false, true);
+                    else child.GetComponent<MeshFilter>().sharedMesh = saved;
+                }
                 log.AppendLine($"dashes: {n} -> 1 mesh (spline transforms kept: {markings.childCount})");
             }
+
+            var road = rt.transform.Find("Track_Road")?.GetComponent<MeshFilter>();
+            if (road != null) CircuitSurfaceBaker.BakeAsphalt(track, road);
 
             // --- Start gantry: everything into one mesh, colliders kept.
             var gantry = rt.transform.Find("StartFinish_Gantry");
@@ -102,28 +117,20 @@ namespace RacingGame.EditorTools
                 log.AppendLine($"gantry: {n} parts -> 1 mesh, activated");
             }
 
-            // --- Kerbs: red/white by distance along the spline, on the stylized shader (collider keeps the original mesh).
+            // --- Kerbs: each painted section has independent vertices.
             foreach (var kerbName in new[] { "Track_LeftKerb", "Track_RightKerb" })
             {
                 var kerb = rt.transform.Find(kerbName);
                 if (kerb == null) continue;
                 var mf = kerb.GetComponent<MeshFilter>(); var mr = kerb.GetComponent<MeshRenderer>();
-                if (mf == null || mf.sharedMesh == null || mf.sharedMesh.name.StartsWith("Kerb_")) continue;
-                var src = mf.sharedMesh;
-                var mesh = Object.Instantiate(src);
-                var verts = mesh.vertices; var colors = new Color32[verts.Length];
-                int hint = -1;
-                for (int i = 0; i < verts.Length; i++)
-                {
-                    Vector3 wp = kerb.TransformPoint(verts[i]);
-                    float d = spline.Project(wp, ref hint, 0);
-                    colors[i] = (Mathf.FloorToInt(d / 3.5f) % 2 == 0) ? KerbRed : KerbWhite;
-                }
-                mesh.colors32 = colors;
-                var saved = EnvironmentBaker.SaveMesh(mesh, kerbName.Replace("Track_", "Kerb_"));
+                var source = kerb.GetComponent<MeshCollider>()?.sharedMesh;
+                if (mf == null || mr == null || source == null) continue;
+                var saved = EnvironmentBaker.SaveMesh(CircuitSurfaceBaker.Kerb(source), kerbName.Replace("Track_", "Kerb_"));
                 Undo.RecordObject(mf, "kerb"); mf.sharedMesh = saved;
-                Undo.RecordObject(mr, "kerb"); mr.sharedMaterial = litMat; mr.shadowCastingMode = ShadowCastingMode.Off; mr.receiveShadows = true;
-                log.AppendLine(kerbName + ": recoloured (" + verts.Length + " verts)");
+                Undo.RecordObject(mr, "kerb");
+                mr.sharedMaterials = new[] { litMat };
+                mr.shadowCastingMode = ShadowCastingMode.Off; mr.receiveShadows = true;
+                log.AppendLine(kerbName + ": painted (" + saved.vertexCount + " verts)");
             }
 
             // --- Old props: trees + grandstand are regenerated by PropBaker.

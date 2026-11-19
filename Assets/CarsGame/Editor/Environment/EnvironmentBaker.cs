@@ -50,14 +50,21 @@ namespace RacingGame.EditorTools
             return go.transform;
         }
 
-        public static Mesh SaveMesh(Mesh mesh, string name)
+        public static Mesh SaveMesh(Mesh mesh, string name, ModelImporterMeshCompression compression = ModelImporterMeshCompression.Medium)
         {
             Ensure("Assets/Generated"); Ensure(MeshDir);
             string path = $"{MeshDir}/{name}.asset";
-            if (AssetDatabase.LoadAssetAtPath<Mesh>(path) != null) AssetDatabase.DeleteAsset(path);
             mesh.name = name;
-            MeshUtility.SetMeshCompression(mesh, ModelImporterMeshCompression.Medium);
+            MeshUtility.SetMeshCompression(mesh, compression);
             mesh.UploadMeshData(false);
+            var existing = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+            if (existing != null)
+            {
+                EditorUtility.CopySerialized(mesh, existing);
+                EditorUtility.SetDirty(existing);
+                Object.DestroyImmediate(mesh);
+                return existing;
+            }
             AssetDatabase.CreateAsset(mesh, path);
             return AssetDatabase.LoadAssetAtPath<Mesh>(path);
         }

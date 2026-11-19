@@ -78,6 +78,8 @@ namespace RacingGame.Tests
             {
                 var kerb = GameObject.Find("RaceTrack/" + name);
                 var filter = kerb.GetComponent<MeshFilter>();
+                Assert.AreEqual(filter.sharedMesh.subMeshCount, kerb.GetComponent<MeshRenderer>().sharedMaterials.Length,
+                    "An extra white material would overpaint the baked kerb stripes.");
                 var collider = kerb.GetComponent<MeshCollider>();
                 originalMeshes.Add(filter, filter.sharedMesh);
                 originalKerbs.Add(collider, collider.sharedMesh);
