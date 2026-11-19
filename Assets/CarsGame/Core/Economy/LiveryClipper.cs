@@ -5,7 +5,7 @@ namespace RacingGame.Core.Economy
 {
     /// <summary>
     /// Builds livery stripes as geometry: every body triangle is clipped against axis-aligned boxes (plus a
-    /// face-normal filter) and the surviving polygons are pushed out a few millimetres along the face normal.
+    /// face-normal filter) and the surviving polygons follow the paint surface a few millimetres above it.
     /// Needs no UVs, textures or decal passes, so it works on the procedural body and on imported meshes alike.
     /// Runs once per car at spawn; not for per-frame use.
     /// </summary>
@@ -64,17 +64,21 @@ namespace RacingGame.Core.Economy
 
         /// <summary>
         /// Clip triangles (<paramref name="tris"/> indexes <paramref name="verts"/>) against the regions and append
-        /// flat-shaded output. Returns the number of output triangles.
+        /// the stripe mesh. Supply the paint normals to match the surface shading across clipped edges.
         /// </summary>
         public static int Build(IList<Vector3> verts, IList<int> tris, IList<Region> regions, float offset,
-                                List<Vector3> outVerts, List<Vector3> outNormals, List<int> outTris)
+                                List<Vector3> outVerts, List<Vector3> outNormals, List<int> outTris,
+                                IList<Vector3> paintNormals = null)
         {
             var poly = new List<Vector3>(12);
             var tmp = new List<Vector3>(12);
+            Vector3[] lift = paintNormals != null && paintNormals.Count == verts.Count
+                ? SharedLiftDirections(verts, paintNormals) : null;
             int count = 0;
             for (int t = 0; t + 2 < tris.Count; t += 3)
             {
-                Vector3 a = verts[tris[t]], b = verts[tris[t + 1]], c = verts[tris[t + 2]];
+                int ia = tris[t], ib = tris[t + 1], ic = tris[t + 2];
+                Vector3 a = verts[ia], b = verts[ib], c = verts[ic];
                 Vector3 n = Vector3.Cross(b - a, c - a);
                 float len = n.magnitude;
                 if (len < 1e-10f) continue;
@@ -91,12 +95,38 @@ namespace RacingGame.Core.Economy
                     }
                     if (poly.Count < 3) continue;
                     int start = outVerts.Count;
-                    Vector3 push = n * offset;
-                    for (int i = 0; i < poly.Count; i++) { outVerts.Add(poly[i] + push); outNormals.Add(n); }
+                    Vector3 axisB = Vector3.Cross(c - a, n) / len, axisC = Vector3.Cross(n, b - a) / len;
+                    foreach (Vector3 point in poly)
+                    {
+                        Vector3 direction = n, shading = n;
+                        if (lift != null)
+                        {
+                            float u = Vector3.Dot(point - a, axisB), v = Vector3.Dot(point - a, axisC);
+                            float w = 1f - u - v;
+                            direction = w * lift[ia] + u * lift[ib] + v * lift[ic];
+                            shading = (w * paintNormals[ia] + u * paintNormals[ib] + v * paintNormals[ic]).normalized;
+                        }
+                        outVerts.Add(point + offset * direction);
+                        outNormals.Add(shading);
+                    }
                     for (int i = 1; i + 1 < poly.Count; i++) { outTris.Add(start); outTris.Add(start + i); outTris.Add(start + i + 1); count++; }
                 }
             }
             return count;
+        }
+
+        // FBX splits vertices at hard edges. Both sides must use the same offset to keep the stripe joined.
+        private static Vector3[] SharedLiftDirections(IList<Vector3> verts, IList<Vector3> normals)
+        {
+            var sums = new Dictionary<Vector3, Vector3>(verts.Count);
+            for (int i = 0; i < verts.Count; i++)
+            {
+                sums.TryGetValue(verts[i], out Vector3 sum);
+                sums[verts[i]] = sum + normals[i];
+            }
+            var directions = new Vector3[verts.Count];
+            for (int i = 0; i < verts.Count; i++) directions[i] = sums[verts[i]].normalized;
+            return directions;
         }
 
         // Sutherland–Hodgman against one axis-aligned plane: keep p[axis] >= limit (lower) or <= limit (upper).

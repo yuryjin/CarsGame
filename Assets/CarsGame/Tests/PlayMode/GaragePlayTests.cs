@@ -70,7 +70,14 @@ namespace RacingGame.Tests
                     var ghostFilter = ghost.GetComponent<MeshFilter>();
                     var oldMesh = ghostFilter.sharedMesh;
                     var button = GameObject.Find("RaceModelStyle").GetComponent<Button>();
+                    var styleLabel = button.GetComponentInChildren<TMPro.TMP_Text>();
+                    var spinner = player.Car.frontLeftWheel.GetChild(0);
+                    var stockWheel = spinner.GetChild(0).gameObject;
+                    Assert.AreEqual(Loc.Get("models.classic"), styleLabel.text);
                     button.onClick.Invoke();
+                    Assert.AreEqual(Loc.Get("models.new"), styleLabel.text);
+                    Assert.IsTrue(spinner.Find("AlloyWheel").gameObject.activeInHierarchy);
+                    Assert.IsFalse(stockWheel.activeSelf);
                     foreach (var participant in race.Participants)
                     {
                         var body = participant.GetComponent<CarBody>();
@@ -82,6 +89,8 @@ namespace RacingGame.Tests
                     Assert.AreNotSame(oldMesh, ghostFilter.sharedMesh);
                     button.onClick.Invoke();
                     Assert.AreSame(oldMesh, ghostFilter.sharedMesh);
+                    Assert.IsTrue(stockWheel.activeInHierarchy);
+                    Assert.IsFalse(spinner.Find("AlloyWheel").gameObject.activeSelf);
                     Assert.IsTrue(player.transform.Find("Car_Visuals").gameObject.activeSelf);
                     Assert.AreSame(player, race.Player);
                     Assert.AreEqual(position, rb.position);

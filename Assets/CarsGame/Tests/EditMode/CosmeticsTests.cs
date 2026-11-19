@@ -89,6 +89,30 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void StripeStaysJoinedAcrossAClippedHardEdge()
+        {
+            var a = new Vector3(-1, 0, 0);
+            var b = new Vector3(1, 0, 0);
+            var slope = new Vector3(0, 1, -0.7f).normalized;
+            var verts = new[] { a, b, Vector3.back, b, a, new Vector3(0, 0.7f, 1) };
+            var normals = new[] { Vector3.up, Vector3.up, Vector3.up, slope, slope, slope };
+            var region = new LiveryClipper.Region(new Vector3(-0.5f, -2, -2), new Vector3(0.5f, 2, 2));
+            var output = new List<Vector3>();
+            var shading = new List<Vector3>();
+            LiveryClipper.Build(verts, new[] { 0, 1, 2, 3, 4, 5 }, new[] { region }, 0.01f,
+                                output, shading, new List<int>(), normals);
+            foreach (float x in new[] { -0.5f, 0.5f })
+            {
+                Vector3 seam = new Vector3(x, 0, 0) + 0.01f * (Vector3.up + slope).normalized;
+                var adjacent = new List<Vector3>();
+                for (int i = 0; i < output.Count; i++)
+                    if (Vector3.Distance(output[i], seam) < 1e-5f) adjacent.Add(shading[i]);
+                Assert.AreEqual(2, adjacent.Count, "Both clipped triangles must meet at the same point");
+                Assert.Less(Vector3.Dot(adjacent[0], adjacent[1]), 0.9f, "Keep the paint's hard shading edge");
+            }
+        }
+
+        [Test]
         public void SideBandOnlyOnFlanksAndTwinStripesAreTwo()
         {
             BoxMesh(out var v, out var t);

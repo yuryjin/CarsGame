@@ -613,7 +613,7 @@ namespace RacingGame
             UpdateKillFeedDisplay();
         }
 
-        private void RefreshModelLabel() => modelLabel.text = PlatformGlue.ClassicCarModels ? "3D\n1/2" : "3D\n2/2";
+        private void RefreshModelLabel() => modelLabel.text = Loc.Get(PlatformGlue.ClassicCarModels ? "models.classic" : "models.new");
 
         // Four corner brackets around the aim point; ammo pips underneath. Plain images, no glyphs.
         private void BuildReticle(Transform root)
@@ -777,15 +777,17 @@ namespace RacingGame
             Place(pauseButton, Vector2.one, new Vector2(-pauseRight - pauseEdge, -pauseTop - pauseEdge),
                 new Vector2(-pauseRight, -pauseTop));
             float modelBottom = -ModelButtonBottomPixels(scale) / scale;
-            Place(modelButton, Vector2.one, new Vector2(-pauseRight - pauseEdge, modelBottom),
+            float modelWidth = Mathf.Max(154f, 88f / scale);
+            modelLabel.fontSizeMin = 12f / scale;
+            modelLabel.fontSizeMax = Mathf.Max(24f, 14f / scale);
+            Place(modelButton, Vector2.one, new Vector2(-pauseRight - modelWidth, modelBottom),
                 new Vector2(-pauseRight, modelBottom + pauseEdge));
             // Portrait phones give the canvas ~1000 reference units of width: the timer (±200 around the
             // centre) would collide with a top-right HP bar, so HP/ammo drop to a row below it.
             bool narrow = layoutWidth < 1400f;
             if (touch)
             {
-                float edge = Mathf.Max(100f, 44f / Mathf.Max(0.1f, hudRoot.lossyScale.x));
-                float statusRight = Mathf.Min(-170f, -64f - edge);
+                float statusRight = Mathf.Min(-170f, -pauseRight - modelWidth - 8f / scale);
                 float speedBottom = 224f + (layoutTouchLarge ? 40f : 0f);
                 Place(speedPanel, layoutTouchLeft ? new Vector2(1f, 0f) : Vector2.zero,
                     new Vector2(layoutTouchLeft ? -284f : 40f, speedBottom), new Vector2(layoutTouchLeft ? -40f : 284f, speedBottom + 224f));

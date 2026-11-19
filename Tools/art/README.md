@@ -31,7 +31,13 @@ Four locally generated vehicle shells cover the existing Sport, Buggy, Armored a
 
 The generation used TripoSR revision `107cefdc244c39106fa830359024f6a2f1c78871` and the official `model.ckpt` (SHA-256 `429e2c6b22a0923967459de24d67f05962b235f79cde6b032aa7ed2ffcd970ee`). The code and weights are released under MIT for commercial use. The game ships the finished geometry. [TripoSR license](https://github.com/VAST-AI-Research/TripoSR/blob/107cefdc244c39106fa830359024f6a2f1c78871/LICENSE) · [Model weights](https://huggingface.co/stabilityai/TripoSR) · [Publisher's commercial-use statement](https://stability.ai/news-updates/triposr-3d-generation)
 
-The meshes were extracted at marching-cubes resolution 176 and threshold 25. Blender cleanup aligned and mirrored the visible half, opened the wheel wells and separated paint from vertex-coloured trim. Each FBX uses two renderers and fits a 2 × 1 × 4 metre envelope in Unity, with the nose on +Z. `CarBody` fits it to each catalogue entry and retains its wheels, tracks and equipment. Mesh read access supports liveries and the combined ghost mesh. [Unity meshes](../../Assets/CarsGame/Resources/Art/TripoCars)
+The original surfaces were extracted at marching-cubes resolution 176 and threshold 25. The Blender source below records thirteen width measurements along each aligned TripoSR shell. It rebuilds the body panels, wheel arches, glazing, lamps and vents around those profiles and the reference sheet. This gives the paint and stripes clean surfaces at chase-camera distance. [Blender source](retopo_tripo_cars.py)
+
+```bash
+blender -b -t 2 --factory-startup --python-exit-code 1 --python Tools/art/retopo_tripo_cars.py -- /tmp/tripo-cars
+```
+
+The four body FBXs each contain a painted hull and vertex-coloured trim. They fit a 2 × 1 × 4 metre envelope in Unity, with the nose on +Z. `CarBody` fits each shell to its catalogue entry. The fifth FBX supplies a shared five-spoke wheel for each driven and decorative axle. Tanks use their existing tracks. Mesh read access supports liveries and replay ghosts. [Unity meshes](../../Assets/CarsGame/Resources/Art/TripoCars)
 
 # Props: pickups and weapon heads (Z-Image reference → Hunyuan3D-2 → Blender → Unity)
 

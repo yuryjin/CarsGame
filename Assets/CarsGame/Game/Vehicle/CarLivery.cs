@@ -12,10 +12,10 @@ namespace RacingGame
     /// </summary>
     public sealed class CarLivery : MonoBehaviour
     {
-        [Tooltip("Push-out along the face normal (m); large enough to avoid z-fighting on 24-bit depth.")]
+        [Tooltip("Distance above the painted surface in metres.")]
         public float offset = 0.008f;
 
-        private static Material liveryMaterial;
+        private static readonly Dictionary<Material, Material> LiveryMaterials = new Dictionary<Material, Material>();
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int ColorId = Shader.PropertyToID("_Color");
         private MeshRenderer stripe;
@@ -79,6 +79,7 @@ namespace RacingGame
             if (body == null) return;
             var source = body.GetComponent<MeshFilter>().sharedMesh;
             var verts = new List<Vector3>(source.vertexCount); source.GetVertices(verts);
+            var normals = new List<Vector3>(source.vertexCount); source.GetNormals(normals);
             var tris = new List<int>();
             var mats = body.sharedMaterials;
             for (int sub = 0; sub < source.subMeshCount; sub++)
@@ -87,24 +88,21 @@ namespace RacingGame
                 if (m != null && m.name.Contains("CarPaint")) tris.AddRange(source.GetTriangles(sub));
             }
             var outV = new List<Vector3>(256); var outN = new List<Vector3>(256); var outT = new List<int>(384);
-            TriangleCount = LiveryClipper.Build(verts, tris, LiveryClipper.RegionsFor(pattern, source.bounds), offset, outV, outN, outT);
+            TriangleCount = LiveryClipper.Build(verts, tris, LiveryClipper.RegionsFor(pattern, source.bounds), offset, outV, outN, outT, normals);
             if (stripe == null)
             {
                 var go = new GameObject("Livery");
                 go.layer = body.gameObject.layer;
-                go.transform.SetParent(body.transform, false);
                 go.AddComponent<MeshFilter>();
                 stripe = go.AddComponent<MeshRenderer>();
                 stripe.shadowCastingMode = ShadowCastingMode.Off;
                 stripe.lightProbeUsage = LightProbeUsage.Off;
                 stripe.reflectionProbeUsage = ReflectionProbeUsage.Off;
-                if (liveryMaterial == null)
-                {
-                    // Same shader as the paint so it lights identically; the name keeps CarPaint from adopting it.
-                    liveryMaterial = new Material(body.sharedMaterial) { name = "Livery (runtime)" };
-                }
-                stripe.sharedMaterial = liveryMaterial;
             }
+            // Match the current body finish. The distinct name keeps CarPaint from recolouring the stripe.
+            if (!LiveryMaterials.TryGetValue(body.sharedMaterial, out var finish))
+                LiveryMaterials[body.sharedMaterial] = finish = new Material(body.sharedMaterial) { name = "Livery (runtime)" };
+            stripe.sharedMaterial = finish;
             stripe.transform.SetParent(body.transform, false);
             if (mesh == null) { mesh = new Mesh { name = "LiveryMesh" }; stripe.GetComponent<MeshFilter>().sharedMesh = mesh; }
             mesh.Clear();

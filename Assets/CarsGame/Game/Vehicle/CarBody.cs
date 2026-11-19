@@ -23,6 +23,7 @@ namespace RacingGame
         public float AiBrakePlan { get; private set; } = 1f;
 
         private readonly List<Transform> extraSpinners = new List<Transform>();
+        private readonly List<Transform> alloyWheels = new List<Transform>();
         private CarController car;
         private Transform classicHull, newHull;
         private bool initialized;
@@ -212,9 +213,41 @@ namespace RacingGame
             classicHull.gameObject.SetActive(showClassic);
             if (newHull != null) newHull.gameObject.SetActive(!showClassic);
             (showClassic ? classicHull : newHull).SetAsFirstSibling();
+            SetWheelStyle(showClassic);
             GetComponent<CarPaint>()?.Refresh();
             GetComponent<CarLivery>()?.RefreshBody();
             GetComponent<CarHealth>()?.RefreshBodyRenderers();
+        }
+
+        private void SetWheelStyle(bool classic)
+        {
+            if (Class == BodyClass.Tank || car == null) return;
+            if (!classic && alloyWheels.Count == 0)
+            {
+                var prefab = Resources.Load<GameObject>("Art/TripoCars/Wheel");
+                if (prefab == null) return;
+                foreach (var pivot in new[] { car.frontLeftWheel, car.frontRightWheel, car.rearLeftWheel, car.rearRightWheel })
+                    if (pivot != null && pivot.childCount > 0) AddWheel(pivot.GetChild(0), prefab);
+                foreach (var spinner in extraSpinners) AddWheel(spinner, prefab);
+            }
+            foreach (var wheel in alloyWheels)
+                foreach (Transform visual in wheel.parent)
+                    visual.gameObject.SetActive(visual == wheel ? !classic : classic);
+        }
+
+        private void AddWheel(Transform spinner, GameObject prefab)
+        {
+            var wheel = Instantiate(prefab, spinner, false).transform;
+            wheel.name = "AlloyWheel";
+            if (spinner.parent.localPosition.x < 0f) wheel.Rotate(Vector3.up, 180f, Space.Self);
+            foreach (var renderer in wheel.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                renderer.gameObject.layer = gameObject.layer;
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.lightProbeUsage = LightProbeUsage.Off;
+                renderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+            }
+            alloyWheels.Add(wheel);
         }
 
         private static MeshRenderer Part(Transform parent, string name, Mesh mesh, Material[] materials, bool castShadows, int layer)

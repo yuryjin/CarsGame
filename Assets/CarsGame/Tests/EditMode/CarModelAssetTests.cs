@@ -6,6 +6,26 @@ namespace RacingGame.Tests
 {
     public class CarModelAssetTests
     {
+        [Test]
+        public void AlloyWheelFitsTheStockAxleAndCanBeCopiedIntoReplayGhosts()
+        {
+            var wheel = Resources.Load<GameObject>("Art/TripoCars/Wheel");
+            Assert.NotNull(wheel);
+            Assert.IsEmpty(wheel.GetComponentsInChildren<Collider>());
+            var parts = wheel.GetComponentsInChildren<MeshFilter>();
+            Assert.AreEqual(1, parts.Length);
+            var mesh = parts[0].sharedMesh;
+            Assert.IsTrue(mesh.isReadable);
+            Assert.AreEqual(mesh.vertexCount, mesh.colors32.Length);
+            Assert.AreEqual("M_Props", parts[0].GetComponent<MeshRenderer>().sharedMaterial.name);
+            var bounds = new Bounds(Vector3.zero, Vector3.zero);
+            foreach (var v in mesh.vertices)
+                bounds.Encapsulate(wheel.transform.InverseTransformPoint(parts[0].transform.TransformPoint(v)));
+            Assert.That(bounds.size.x, Is.EqualTo(0.34f).Within(0.02f));
+            Assert.That(bounds.size.y, Is.EqualTo(0.68f).Within(0.02f));
+            Assert.That(bounds.size.z, Is.EqualTo(0.68f).Within(0.02f));
+        }
+
         [TestCase(BodyClass.Sport)]
         [TestCase(BodyClass.Buggy)]
         [TestCase(BodyClass.Armored)]
