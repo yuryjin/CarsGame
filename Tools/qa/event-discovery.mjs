@@ -25,15 +25,27 @@ try {
       const renderer = await page.evaluate(() => { const gl = document.querySelector('canvas').getContext('webgl2'), e = gl.getExtension('WEBGL_debug_renderer_info'); return gl.getParameter(e ? e.UNMASKED_RENDERER_WEBGL : gl.RENDERER); });
       assert.match(renderer, /NVIDIA/i);
       const initial = await cmd('state');
-      await cmd('goto', 'events'); await page.waitForTimeout(500);
+      const home = await cmd('ui');
+      const box = await page.locator('canvas').boundingBox();
+      for (const name of ['Play', 'ChooseRace']) {
+        const action = home.buttons.find(b => b.name === name);
+        const label = home.labels.find(l => l.parent === name && l.name === 'Label');
+        assert(action?.interactable && action.height >= 44 && action.width >= 44, lang + ' ' + name);
+        assert(label && !label.truncated && label.fontPixels >= 15, lang + ' ' + name + ' label');
+      }
+      const chooser = home.buttons.find(b => b.name === 'ChooseRace');
+      await page.mouse.click(box.x + chooser.x * box.width, box.y + chooser.y * box.height);
+      await page.waitForTimeout(500);
       const state = await cmd('ui');
-      evidence.push({ lang, renderer, initial, menu: state });
+      assert.equal(state.screen, 'events');
+      evidence.push({ lang, renderer, initial, home, menu: state });
       await fs.writeFile(`${out}/evidence.json`, JSON.stringify({ evidence, errors }, null, 2));
       if (['ru', 'zh'].includes(lang)) await page.screenshot({ path: `${out}/${lang}-events.png` });
       const cards = state.buttons.filter(b => b.name.startsWith('Start_'));
-      assert.equal(cards.length, 21, 'Every race and mission remains available in the list');
+      assert.equal(cards.length, 22, 'Every race, mission and arena remains available in the list');
       const available = cards.filter(b => b.interactable), locked = cards.filter(b => !b.interactable);
-      assert.equal(available.length, 7, 'Fresh players retain the original seven available modes');
+      assert.equal(available.length, 8, 'Fresh players can choose all eight unlocked modes');
+      assert(available.some(b => b.name === 'Start_a1'), 'The arena is available from the first launch');
       assert(Math.max(...available.map(b => b.y)) < Math.min(...locked.map(b => b.y)), 'Playable modes precede locked career races');
       for (const parent of ['AvailableEventsTitle', 'LockedEventsTitle']) {
         const label = state.labels.find(l => l.parent === parent && l.name === 'Title');
@@ -56,7 +68,6 @@ try {
         await page.mouse.move(420, 230); await page.mouse.wheel(0, target.y > .5 ? 180 : -180); await page.waitForTimeout(220);
       }
       assert(target.y > .35 && target.y < .9, 'Space race is reachable by ordinary scrolling');
-      const box = await page.locator('canvas').boundingBox();
       await page.mouse.click(box.x + target.x * box.width, box.y + target.y * box.height);
       await page.waitForTimeout(450);
       const started = await cmd('state');

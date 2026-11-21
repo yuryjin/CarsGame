@@ -2108,6 +2108,19 @@ MonoBehaviour:
     m_Localized: '{t} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 28923211244974080
+    m_Localized: "Progresso restaurado da c\xF3pia de seguran\xE7a local."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362688
+    m_Localized: Salvamento local danificado. Progresso restaurado da nuvem.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362689
+    m_Localized: "N\xE3o h\xE1 c\xF3pia local utiliz\xE1vel. O salvamento danificado
+      foi guardado separadamente."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -70,7 +70,9 @@ namespace RacingGame.Tests
             progress.unlockedEvents.Clear();
             progress.bests.Clear();
             string initial = JsonUtility.ToJson(progress);
-            menu.Show("events"); yield return null; yield return null;
+            menu.Show("main");
+            GameObject.Find("ChooseRace").GetComponent<Button>().onClick.Invoke();
+            yield return null; yield return null;
             AssertAvailableFirst(flow);
             Assert.AreEqual(initial, JsonUtility.ToJson(progress), "Browsing cannot unlock or award anything");
             Assert.IsFalse(StartButton("e2").interactable);
@@ -85,6 +87,43 @@ namespace RacingGame.Tests
             Assert.AreEqual("e17", RaceSetup.Event.eventId);
             Assert.AreEqual(RaceState.Countdown, Object.FindAnyObjectByType<RaceManager>().State,
                 "The surfaced mode must start through its actual UI action");
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator MainPlayStartsTheDisplayedEventOnTheChosenTier()
+        {
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float until = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < until) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null; yield return null;
+            var save = PlatformGlue.Save;
+            profile = JsonUtility.ToJson(save.Data);
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var menu = Object.FindAnyObjectByType<MenuScreens>();
+            save.Data.progress.bests.Clear();
+            save.Data.progress.unlockedEvents.Clear();
+            save.Data.progress.ledger.Clear();
+            menu.Show("main");
+            GameObject.Find("Play").GetComponent<Button>().onClick.Invoke();
+            Assert.AreEqual(FlowState.Racing, flow.State);
+            Assert.AreEqual("e1", flow.CurrentEvent.eventId);
+            flow.EnterMenu();
+
+            save.Local.races = 1;
+            save.Data.progress.bests.Add(new Core.Save.EventBest { eventId = "e1", bestTimeMs = 60000 });
+            save.Data.progress.unlockedEvents.Add("e2");
+            GameObject.Find("ChooseRace").GetComponent<Button>().onClick.Invoke();
+            GameObject.Find("Tier2").GetComponent<Button>().onClick.Invoke();
+            string selectedTier = save.Data.settings.tier;
+            GameObject.Find("Back").GetComponent<Button>().onClick.Invoke();
+            var next = flow.events.Single(e => e.eventId == "e2");
+            Assert.AreEqual(Loc.Get(next.nameKey), GameObject.Find("EventName").GetComponent<TMP_Text>().text);
+            GameObject.Find("Play").GetComponent<Button>().onClick.Invoke();
+            Assert.AreEqual(FlowState.Racing, flow.State);
+            Assert.AreSame(next, flow.CurrentEvent);
+            Assert.AreEqual(selectedTier, RaceSetup.TierId);
+            Assert.AreEqual(1, save.Data.Races, "Starting a race cannot grant a finish");
         }
     }
 }

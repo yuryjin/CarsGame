@@ -13,6 +13,7 @@ namespace RacingGame
         private RectTransform saveRecoveryPanel;
         private GameObject savePreviousSelection;
         private string saveRecoveryLanguage;
+        private string reportedRecovery;
         private int saveRecoveryWidth, saveRecoveryHeight;
         private bool saveRecoveryReadFailed;
 
@@ -24,6 +25,7 @@ namespace RacingGame
                 HideSaveRecovery();
                 observedSave = save;
                 saveWarningAcknowledged = saveFailureObserved = false;
+                reportedRecovery = null;
             }
             if (save != null && save.LocalVersionTooNew)
             {
@@ -46,6 +48,18 @@ namespace RacingGame
                 }
                 saveFailureObserved = saveWarningAcknowledged = false;
                 HideSaveRecovery();
+                if (save != null && Loc.Ready && (flow.State != FlowState.Racing || PauseController.IsPaused))
+                {
+                    string notice = null;
+                    if (save.RestoredLocalBackup) notice = "save.local.from_backup";
+                    else if (save.LastLocalStatus == SaveParseStatus.Corrupt)
+                        notice = save.LastCloudStatus == SaveParseStatus.Ok ? "save.local.from_cloud" : "save.local.no_copy";
+                    if (notice != null && notice != reportedRecovery)
+                    {
+                        Toast(Loc.Get(notice));
+                        reportedRecovery = notice;
+                    }
+                }
                 return;
             }
             bool canShow = flow.State != FlowState.Racing || PauseController.IsPaused;

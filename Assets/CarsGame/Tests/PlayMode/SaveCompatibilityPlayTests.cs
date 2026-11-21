@@ -15,8 +15,8 @@ namespace RacingGame.Tests
         {
             public string Json = "{\"version\":999,\"futureProgress\":\"preserve\"}";
             public int Writes;
-            public string Read() => Json;
-            public void Write(string json) { Json = json; Writes++; }
+            public string Read(LocalSaveSlot slot = LocalSaveSlot.Profile) => slot == LocalSaveSlot.Profile ? Json : null;
+            public void Write(string json, LocalSaveSlot slot = LocalSaveSlot.Profile) { Json = json; Writes++; }
         }
         private static void SetSave(SaveService save) => typeof(PlatformGlue).GetProperty("Save").SetValue(null, save);
 

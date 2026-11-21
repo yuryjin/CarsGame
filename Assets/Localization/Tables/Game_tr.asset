@@ -2128,6 +2128,19 @@ MonoBehaviour:
     m_Localized: '{t} sn'
     m_Metadata:
       m_Items: []
+  - m_Id: 28923211244974080
+    m_Localized: "\u0130lerleme yerel yedekten geri y\xFCklendi."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362688
+    m_Localized: "Yerel kay\u0131t hasarl\u0131. \u0130lerleme buluttan geri y\xFCklendi."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362689
+    m_Localized: "Kullan\u0131labilir yerel yedek yok. Hasarl\u0131 kay\u0131t ayr\u0131
+      tutuldu."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

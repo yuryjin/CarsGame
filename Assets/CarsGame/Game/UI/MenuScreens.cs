@@ -298,7 +298,7 @@ namespace RacingGame
             var list = Events();
             var ev = FeaturedEvent(list);
             float inset = Narrow ? 26f : 36f;
-            float textRight = Narrow ? -258f : -inset;
+            float textRight = Narrow ? -306f : -inset;
             Label(hero, "Eyebrow", Loc.Get("menu.next_race"), 26f, Top, Vector2.one,
                 new Vector2(inset, Narrow ? -50f : -78f), new Vector2(textRight, Narrow ? -12f : -24f), UiFactory.Accent);
             var title = Label(hero, "EventName", ev != null ? Loc.Get(ev.nameKey) : Loc.Get("menu.play"), Narrow ? 46f : 64f, Top, Vector2.one,
@@ -321,11 +321,16 @@ namespace RacingGame
                 Label(hero, "Progress", progress + "     " + stars, 26f, Top, Vector2.one,
                     new Vector2(inset, -352f), new Vector2(-inset, -274f), UiFactory.Muted);
             }
-            string playKey = PlatformGlue.Save != null && PlatformGlue.Save.Data.Races == 0 ? "menu.play" : "events.title";
             var rightCenter = new Vector2(1f, 0.5f);
-            UiFactory.Button(hero, "Play", Loc.Get(playKey), PlayFromMain, Narrow ? rightCenter : Vector2.zero,
-                Narrow ? rightCenter : new Vector2(1f, 0f), Narrow ? new Vector2(-238f, -45f) : new Vector2(inset, 32f),
-                Narrow ? new Vector2(-inset, 45f) : new Vector2(-inset, 124f), Narrow ? 30f : 34f);
+            var actions = UiFactory.Panel(hero, "RaceActions", Narrow ? rightCenter : Vector2.zero,
+                Narrow ? rightCenter : new Vector2(1f, 0f), Narrow ? new Vector2(-286f, -86f) : new Vector2(inset, 32f),
+                Narrow ? new Vector2(-inset, 86f) : new Vector2(-inset, 124f));
+            UiFactory.Button(actions, "Play", Loc.Get("menu.play"), ev != null ? () => flow.StartRace(ev, SelectedTier()) : (Action)null,
+                Narrow ? new Vector2(0f, .5f) : Vector2.zero, Narrow ? Vector2.one : new Vector2(.5f, 1f),
+                Narrow ? new Vector2(0f, 5f) : Vector2.zero, Narrow ? Vector2.zero : new Vector2(-7f, 0f), 32f);
+            UiFactory.Button(actions, "ChooseRace", Loc.Get("events.title"), () => Show("events"),
+                Narrow ? Vector2.zero : new Vector2(.5f, 0f), Narrow ? new Vector2(1f, .5f) : Vector2.one,
+                Narrow ? Vector2.zero : new Vector2(7f, 0f), Narrow ? new Vector2(0f, -5f) : Vector2.zero, 28f, UiFactory.Raised);
 
             var links = Narrow ? Item(content, "Links", 180f, false)
                 : UiFactory.Panel(row, "Links", new Vector2(0.58f, 0f), Vector2.one, new Vector2(12f, 0f), Vector2.zero);
@@ -391,18 +396,6 @@ namespace RacingGame
             var save = PlatformGlue.Save;
             if (save != null && save.Data.settings.tier != tiers[index].tierId) { save.Data.settings.tier = tiers[index].tierId; save.MarkDirty(); }
             Show("events");
-        }
-
-        // A brand-new player goes straight into the first race on the resolved (easy) tier; later the
-        // big button opens the event list.
-        private void PlayFromMain()
-        {
-            var save = PlatformGlue.Save;
-            var list = Events();
-            var tiers = Tiers();
-            if (save != null && save.Data.Races == 0 && list.Count > 0)
-                flow.StartRace(list[0], tiers.Length > 0 ? tiers[ResolveTierIndex(tiers)] : null);
-            else Show("events");
         }
 
         private void BuildEvents(RectTransform root)

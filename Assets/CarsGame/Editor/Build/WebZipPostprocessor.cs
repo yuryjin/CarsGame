@@ -36,6 +36,9 @@ namespace RacingGame.EditorTools
 
             MoveOutDoNotShip(dir);
             if (!File.Exists(Path.Combine(dir, "index.html"))) problems.AppendLine("index.html missing at build root");
+            string bundles = Path.Combine(dir, "StreamingAssets", "aa", "WebGL");
+            if (!Directory.Exists(bundles) || !Directory.EnumerateFiles(bundles, "*.bundle").Any())
+                problems.AppendLine("WebGL Addressables bundles are missing. The game cannot load its localized menus.");
             var files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
             long total = 0;
             var bad = new Regex(@"[\sЀ-ӿ]");

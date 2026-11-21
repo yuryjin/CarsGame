@@ -7,12 +7,17 @@ const out=process.env.OUT||'/tmp/cars-save-recovery';await fs.mkdir(out,{recursi
 const browser=await chromium.launch({channel:'chrome',args:[...process.env.WEBTEST_CHROME_ARGS.split(' '),'--no-proxy-server']});
 const evidence=[],errors=[];
 try{
- for(const [width,height,mode] of [[640,360,'write'],[812,375,'write'],[1280,720,'write'],[640,360,'read']]){
+ for(const [width,height,mode] of [[640,360,'corrupt'],[640,360,'write'],[812,375,'write'],[1280,720,'write'],[640,360,'read']]){
   const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage();
   await context.addInitScript(mode=>{
    const key='cars.local.cars.save.v1',get=Storage.prototype.getItem,set=Storage.prototype.setItem;
    const saved={version:6,updatedAtUnixMs:Date.now(),settings:{lang:'ru',hintsSeen:65535,sfx:mode==='read'?0:1},progress:{ledger:[{deviceId:'qa-browser-storage',coinsEarned:123}]}};
-   if(mode==='read')set.call(localStorage,key,JSON.stringify(saved));
+   if(mode==='corrupt'){
+    saved.progress.ledger[0].races=1;
+    saved.progress.bests=[{eventId:'e1',bestTimeMs:60000,stars:1}];
+    saved.progress.unlockedEvents=['e2'];
+    if(!get.call(localStorage,key))set.call(localStorage,key,JSON.stringify(saved));
+   }else if(mode==='read')set.call(localStorage,key,JSON.stringify(saved));
    else if(!get.call(localStorage,key)&&!get.call(localStorage,'cars.mock.playerdata'))set.call(localStorage,'cars.mock.playerdata',JSON.stringify({save:JSON.stringify(saved)}));
    window.__denyLocalRead=mode==='read';window.__denyLocalWrite=false;window.__storageFaults=0;
    Storage.prototype.getItem=function(k){if(this===localStorage&&k===key&&window.__denyLocalRead){window.__storageFaults++;throw new DOMException('QA denied read','SecurityError');}return get.call(this,k);};
@@ -26,7 +31,26 @@ try{
   try{
    await page.goto(process.env.URL||'http://127.0.0.1:8848/?sdk=mock&lang=ru');await ready();
    const renderer=await page.evaluate(()=>{const g=document.querySelector('canvas').getContext('webgl2'),e=g.getExtension('WEBGL_debug_renderer_info');return g.getParameter(e?e.UNMASKED_RENDERER_WEBGL:g.RENDERER);});assert.match(renderer,/NVIDIA/i);
-   if(mode==='write'){
+   if(mode==='corrupt'){
+    const key='cars.local.cars.save.v1', damaged='{"version":6,"progress":';
+    await click('ModelStyle');
+    const backup=await page.evaluate(key=>JSON.parse(localStorage.getItem(key+'.backup')),key);
+    assert.equal(backup.progress.ledger.find(row=>row.deviceId==='qa-browser-storage')?.coinsEarned,123);
+    await page.evaluate(([key,damaged])=>{
+     localStorage.removeItem('cars.mock.playerdata');
+     localStorage.removeItem('cars.save.mirror');
+     localStorage.setItem(key,damaged);
+    },[key,damaged]);
+    await page.reload();await ready();
+    const restored=await cmd('ui');
+    assert.equal(restored.coins,123);assert.equal(restored.races,1);
+    assert.equal(await page.evaluate(key=>localStorage.getItem(key+'.damaged'),key),damaged);
+    assert(restored.labels.some(l=>l.name==='Message'&&l.text.includes('резервной копии')&&!l.truncated));
+    await click('ChooseRace');assert.equal((await cmd('ui')).screen,'events');
+    await click('Back');await click('Play');
+    const started=await cmd('state');assert.equal(started.evt,'e2');assert.equal(started.races,1);
+    evidence.push({width,mode,restored,started});console.log('PASS backup recovery and featured race');
+   }else if(mode==='write'){
     assert.equal((await cmd('state')).coins,123);
     await cmd('goto','settings');await page.evaluate(()=>window.__denyLocalWrite=true);
     const slider=(await cmd('ui')).sliders.find(s=>s.name==='SoundVolume');assert(slider);

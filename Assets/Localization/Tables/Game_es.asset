@@ -2111,6 +2111,19 @@ MonoBehaviour:
     m_Localized: '{t} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 28923211244974080
+    m_Localized: Progreso recuperado de la copia de seguridad local.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362688
+    m_Localized: "Partida local da\xF1ada. Progreso recuperado de la nube."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362689
+    m_Localized: "No hay copia local utilizable. La partida da\xF1ada se conserv\xF3
+      por separado."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -54,7 +54,7 @@ try {
     return b;
   };
   const checkMain = (s, width, height) => {
-    for (const name of ['Play','garage','Practice','leaders','settings']) {
+    for (const name of ['Play','ChooseRace','garage','Practice','leaders','settings']) {
       const b = target(s, name, 44);
       assert(b.interactable && b.x * width >= b.width / 2 && b.x * width + b.width / 2 <= width &&
         b.y * height >= b.height / 2 && b.y * height + b.height / 2 <= height, `${name} must be fully visible on entry`);

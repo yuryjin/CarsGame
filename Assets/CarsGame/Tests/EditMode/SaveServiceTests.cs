@@ -11,19 +11,102 @@ namespace RacingGame.Tests
         private sealed class MockLocalStore : ILocalSaveStore
         {
             public string StoredJson;
+            public string BackupJson, DamagedJson;
             public int WriteCount;
             public bool FailWrite;
-            public bool FailRead;
+            public bool FailRead, FailArchive, FailBackup;
             public int WriteAttempts;
 
-            public string Read() => FailRead ? throw new System.IO.IOException("QA read blocked") : StoredJson;
-            public void Write(string json)
+            public string Read(LocalSaveSlot slot = LocalSaveSlot.Profile) => FailRead ? throw new System.IO.IOException("QA read blocked")
+                : slot == LocalSaveSlot.Profile ? StoredJson : slot == LocalSaveSlot.Backup ? BackupJson : DamagedJson;
+            public void Write(string json, LocalSaveSlot slot = LocalSaveSlot.Profile)
             {
                 WriteAttempts++;
                 if (FailWrite) throw new System.IO.IOException("QA disk full");
+                if (slot == LocalSaveSlot.Damaged)
+                {
+                    if (FailArchive) throw new System.IO.IOException("QA archive full");
+                    DamagedJson = json;
+                    return;
+                }
+                if (slot == LocalSaveSlot.Backup)
+                {
+                    if (FailBackup) throw new System.IO.IOException("QA backup full");
+                    BackupJson = json;
+                    return;
+                }
                 StoredJson = json;
                 WriteCount++;
             }
+        }
+
+        [Test]
+        public async Task DamagedLegacyProfileWithoutBackupKeepsItsOriginalWhenStartingAgain()
+        {
+            const string damaged = "{broken";
+            var local = new MockLocalStore { StoredJson = damaged };
+            var service = new SaveService(local, () => null, () => 0d, "here");
+            await service.LoadAsync();
+            Assert.AreEqual(SaveParseStatus.Corrupt, service.LastLocalStatus);
+            Assert.IsFalse(service.RestoredLocalBackup);
+            Assert.AreEqual(damaged, local.StoredJson, "Loading alone must not save a blank profile");
+            service.Local.coinsEarned = 45;
+            service.MarkDirty();
+            Assert.IsTrue((await service.FlushAsync()).Ok);
+            Assert.AreEqual(damaged, local.DamagedJson);
+            Assert.AreEqual(45, SaveMigrator.FromJson(local.StoredJson).Coins);
+        }
+
+        [Test]
+        public async Task CloudRecoveryWaitsForTheDamagedOriginalToBeArchived()
+        {
+            const string damaged = "[unreadable";
+            var local = new MockLocalStore { StoredJson = damaged, FailArchive = true };
+            var cloud = new MockCloudSave { StoredJson = CoinsOnDevice("remote", 250) };
+            var service = new SaveService(local, () => cloud, () => 0d, "here");
+            await service.LoadAsync();
+            Assert.AreEqual(250, service.Data.Coins);
+            service.Local.coinsEarned = 20;
+            service.MarkDirty();
+            Assert.IsFalse((await service.FlushAsync()).Ok);
+            Assert.AreEqual(damaged, local.StoredJson);
+            Assert.AreEqual(0, cloud.QueueCalls);
+
+            local.FailArchive = false;
+            Assert.IsTrue((await service.FlushAsync()).Ok);
+            Assert.AreEqual(damaged, local.DamagedJson);
+            Assert.AreEqual(270, SaveMigrator.FromJson(cloud.StoredJson).Coins);
+            var offline = new SaveService(local, () => null, () => 0d, "here");
+            await offline.LoadAsync();
+            Assert.AreEqual(270, offline.Data.Coins);
+        }
+
+        [Test]
+        public async Task AFutureBackupCannotBeReplacedByAnOlderBuild()
+        {
+            const string future = "{\"version\":999}";
+            var local = new MockLocalStore { StoredJson = "{bad", BackupJson = future };
+            var cloud = new MockCloudSave();
+            var service = new SaveService(local, () => cloud, () => 0d, "here");
+            await service.LoadAsync();
+            service.MarkDirty(); service.Tick();
+            Assert.IsTrue(service.LocalVersionTooNew);
+            Assert.IsFalse((await service.FlushAsync()).Ok);
+            Assert.AreEqual(future, local.BackupJson);
+            Assert.AreEqual("{bad", local.StoredJson);
+            Assert.AreEqual(0, cloud.QueueCalls);
+        }
+
+        [Test]
+        public async Task FullBackupStorageStillAllowsSavingTheLatestRace()
+        {
+            var local = new MockLocalStore { StoredJson = CoinsOnDevice("here", 100), FailBackup = true };
+            var service = new SaveService(local, () => null, () => 0d, "here");
+            await service.LoadAsync();
+            service.Local.coinsEarned += 30;
+            service.MarkDirty();
+            Assert.IsTrue((await service.FlushAsync()).Ok);
+            Assert.AreEqual(130, SaveMigrator.FromJson(local.StoredJson).Coins);
         }
 
         private sealed class MockCloudSave : ICloudSave

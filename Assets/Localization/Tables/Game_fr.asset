@@ -2107,6 +2107,20 @@ MonoBehaviour:
     m_Localized: '{t} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 28923211244974080
+    m_Localized: "Progression restaur\xE9e depuis la sauvegarde de secours locale."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362688
+    m_Localized: "Sauvegarde locale endommag\xE9e. Progression restaur\xE9e depuis
+      le cloud."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362689
+    m_Localized: "Aucune copie locale utilisable. La sauvegarde endommag\xE9e a \xE9t\xE9
+      conserv\xE9e \xE0 part."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

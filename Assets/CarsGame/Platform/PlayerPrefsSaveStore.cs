@@ -19,24 +19,34 @@ namespace RacingGame.Platform
             setString = writeValue ?? PlayerPrefs.SetString;
             persist = save ?? PlayerPrefs.Save;
         }
-        public string Read()
+        private string KeyFor(LocalSaveSlot slot) => slot switch
         {
+            LocalSaveSlot.Profile => key,
+            LocalSaveSlot.Backup => key + ".backup",
+            LocalSaveSlot.Damaged => key + ".damaged",
+            _ => throw new ArgumentOutOfRangeException(nameof(slot))
+        };
+
+        public string Read(LocalSaveSlot slot = LocalSaveSlot.Profile)
+        {
+            string storageKey = KeyFor(slot);
 #if UNITY_WEBGL && !UNITY_EDITOR
-            string reply = Yandex.YandexNative.TakeString(Yandex.YandexNative.CarsLocal_Read(key));
+            string reply = Yandex.YandexNative.TakeString(Yandex.YandexNative.CarsLocal_Read(storageKey));
             var result = JsonUtility.FromJson<ReadResult>(reply);
             if (result == null || !result.ok) throw new InvalidOperationException("local storage read failed");
             if (result.found) return result.value;
 #endif
-            return PlayerPrefs.GetString(key, "");
+            return PlayerPrefs.GetString(storageKey, "");
         }
 
-        public void Write(string json)
+        public void Write(string json, LocalSaveSlot slot = LocalSaveSlot.Profile)
         {
+            string storageKey = KeyFor(slot);
 #if UNITY_WEBGL && !UNITY_EDITOR
-            if (Yandex.YandexNative.CarsLocal_Write(key, json) == 0)
+            if (Yandex.YandexNative.CarsLocal_Write(storageKey, json) == 0)
                 throw new InvalidOperationException("local storage write failed");
 #else
-            setString(key, json); persist();
+            setString(storageKey, json); persist();
 #endif
         }
 

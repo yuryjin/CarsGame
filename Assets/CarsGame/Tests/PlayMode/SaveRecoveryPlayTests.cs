@@ -14,12 +14,14 @@ namespace RacingGame.Tests
         private sealed class FailingStore : ILocalSaveStore
         {
             public bool Fail, FailRead;
-            public string Json;
-            public string Read() => FailRead ? throw new System.IO.IOException("QA read denied") : Json;
-            public void Write(string json)
+            public string Json, Backup;
+            public string Read(LocalSaveSlot slot = LocalSaveSlot.Profile) => FailRead ? throw new System.IO.IOException("QA read denied")
+                : slot == LocalSaveSlot.Profile ? Json : Backup;
+            public void Write(string json, LocalSaveSlot slot = LocalSaveSlot.Profile)
             {
                 if (Fail) throw new System.IO.IOException("QA quota full");
-                Json = json;
+                if (slot == LocalSaveSlot.Profile) Json = json;
+                if (slot == LocalSaveSlot.Backup) Backup = json;
             }
         }
         private SaveService original;

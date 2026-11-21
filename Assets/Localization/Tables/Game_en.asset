@@ -2103,6 +2103,18 @@ MonoBehaviour:
     m_Localized: '{t} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 28923211244974080
+    m_Localized: Progress restored from the local backup.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362688
+    m_Localized: Local save damaged. Progress restored from the cloud.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362689
+    m_Localized: No usable local backup. The damaged save was kept separately.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

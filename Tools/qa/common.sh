@@ -15,7 +15,7 @@ export PYTHONPATH=${PYTHONPATH:-$HOME/.local/lib/python3.10/site-packages}
 # Never run batch Unity on $PROJECT itself while the Editor has it open: it overwrites Logs/Editor.log
 # and deletes the Pipeline bridge descriptor (Library/Pipeline/.unity-pipeline-port).
 ensure_sim() {
-  if [ ! -d "$SIM/Library" ]; then
+  if [ ! -d "$SIM/Library" ] && [ -d "$PROJECT/Library" ]; then
     rsync -a --exclude Temp --exclude Logs --exclude Builds --exclude 'Library/Search' --exclude 'Library/Pipeline' \
       "$PROJECT/Assets" "$PROJECT/Packages" "$PROJECT/ProjectSettings" "$PROJECT/Library" "$SIM/"
     # A Library copied from an open Editor can map scene scripts to nothing ("referenced script is missing"):

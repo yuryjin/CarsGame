@@ -32,6 +32,10 @@ namespace RacingGame.EditorTools
             var target = BuildTarget.WebGL;
             if (!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.WebGL, target))
                 throw new InvalidOperationException("WebGL module is not installed: unity install-modules -e 6000.5.9f1 -m webgl");
+            // The Addressables profile resolves bundle paths from the active Editor target.
+            if (EditorUserBuildSettings.activeBuildTarget != target &&
+                (Application.isBatchMode || !EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.WebGL, target)))
+                throw new BuildFailedException("Select WebGL as the active target. In batch mode pass -buildTarget WebGL.");
 
             PlayerSettings.WebGL.template = template;
             PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;

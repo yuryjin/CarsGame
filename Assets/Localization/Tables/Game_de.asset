@@ -2103,6 +2103,19 @@ MonoBehaviour:
     m_Localized: '{t} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 28923211244974080
+    m_Localized: Fortschritt aus der lokalen Sicherung wiederhergestellt.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362688
+    m_Localized: "Lokaler Spielstand besch\xE4digt. Fortschritt aus der Cloud wiederhergestellt."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28923211253362689
+    m_Localized: "Keine nutzbare lokale Sicherung. Der besch\xE4digte Spielstand
+      wurde separat gesichert."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

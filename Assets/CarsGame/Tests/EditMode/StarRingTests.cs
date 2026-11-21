@@ -199,7 +199,9 @@ namespace RacingGame.Tests
                     bool landing = Mathf.Abs(d - layout.GapEnd) < 2f;
                     float y = world.y - layout.Height(d);
                     if (!(finish || lip || landing) || y < -StarRingTrack.SkinDepth - 0.1f || y > 0.1f) continue;
-                    Assert.LessOrEqual(Mathf.Abs(path.Spline.LateralOffset(world, d)), StarRingTrack.NarrowHalfWidth + 0.1f,
+                    float offset = Mathf.Abs(path.Spline.LateralOffset(world, d));
+                    if (offset > StarRingLayout.HalfWidth + 0.1f) continue; // The freestanding arch posts are outside the original deck.
+                    Assert.LessOrEqual(offset, StarRingTrack.NarrowHalfWidth + 0.1f,
                         $"{filter.name}: surface decoration must not hang over removed shoulders at {d:F1}");
                 }
             }

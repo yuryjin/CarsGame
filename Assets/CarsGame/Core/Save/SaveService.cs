@@ -4,8 +4,14 @@ using RacingGame.Core.Platform;
 
 namespace RacingGame.Core.Save
 {
+    public enum LocalSaveSlot { Profile, Backup, Damaged }
+
     /// <summary>Write must throw when persistence fails; callers must not silently acknowledge it.</summary>
-    public interface ILocalSaveStore { string Read(); void Write(string json); }
+    public interface ILocalSaveStore
+    {
+        string Read(LocalSaveSlot slot = LocalSaveSlot.Profile);
+        void Write(string json, LocalSaveSlot slot = LocalSaveSlot.Profile);
+    }
 
     /// <summary>
     /// Owns the in-memory <see cref="SaveData"/>. Local writes are immediate; cloud writes are
@@ -26,6 +32,9 @@ namespace RacingGame.Core.Save
         public int CloudFailures { get; private set; }
         public bool LocalWriteFailed { get; private set; }
         public bool LocalReadFailed { get; private set; }
+        public bool RestoredLocalBackup { get; private set; }
+        private string lastGoodLocalJson;
+        private bool backupWriteFailed;
         private bool localDirty;
         private double nextLocalRetryAt = double.NegativeInfinity;
         private const double LocalRetrySeconds = 5d;
@@ -67,8 +76,7 @@ namespace RacingGame.Core.Save
             SaveData localData = null;
             try
             {
-                localData = SaveMigrator.Parse(local?.Read(), out var localStatus);
-                LastLocalStatus = localStatus;
+                localData = ReadLocal();
             }
             catch (Exception)
             {
@@ -76,10 +84,37 @@ namespace RacingGame.Core.Save
                 nextLocalRetryAt = clock() + LocalRetrySeconds;
             }
             if (!Loaded) { Data = SaveMerge.Merge(Data, localData) ?? Data; Data.deviceId = DeviceId; Loaded = true; Changed?.Invoke(Data); }
+            if (RestoredLocalBackup && localDirty && !LocalReadFailed) RetryLocalWrite();
 
             var c = cloud?.Invoke();
             if (c == null) { CloudSynced = true; return; }
             await FetchAndMergeCloudAsync(c);
+        }
+
+        private SaveData ReadLocal()
+        {
+            string json = local?.Read();
+            var data = SaveMigrator.Parse(json, out var status);
+            LastLocalStatus = status;
+            if (data != null) { lastGoodLocalJson = json; return data; }
+            if (local == null || LocalVersionTooNew) return null;
+
+            // Keep the original text before a new profile or a cloud merge can replace it.
+            if (status == SaveParseStatus.Corrupt) local.Write(json, LocalSaveSlot.Damaged);
+            string backup = local.Read(LocalSaveSlot.Backup);
+            data = SaveMigrator.Parse(backup, out var backupStatus);
+            if (backupStatus == SaveParseStatus.NewerVersion) LastLocalStatus = backupStatus;
+            if (status == SaveParseStatus.Empty && backupStatus == SaveParseStatus.Corrupt)
+            {
+                local.Write(backup, LocalSaveSlot.Damaged);
+                LastLocalStatus = backupStatus;
+            }
+            if (data != null)
+            {
+                lastGoodLocalJson = backup;
+                RestoredLocalBackup = localDirty = true;
+            }
+            return data;
         }
 
         // Cloud is only "known" after an explicitly empty or valid, migratable payload. Corrupt or
@@ -156,17 +191,20 @@ namespace RacingGame.Core.Save
             try
             {
                 if (local == null) throw new InvalidOperationException("local save store unavailable");
-                if (LocalReadFailed)
+                if (LocalReadFailed || !Loaded)
                 {
-                    var recovered = SaveMigrator.Parse(local.Read(), out var status);
-                    LastLocalStatus = status;
+                    LocalReadFailed = true;
+                    var recovered = ReadLocal();
                     LocalReadFailed = false;
                     if (LocalVersionTooNew) return false;
                     Data = SaveMerge.Merge(Data, recovered) ?? Data;
                     Data.deviceId = DeviceId;
                     Changed?.Invoke(Data);
                 }
-                local.Write(SaveMigrator.ToJson(Data));
+                string json = SaveMigrator.ToJson(Data);
+                local.Write(json);
+                RefreshBackup(lastGoodLocalJson ?? json);
+                lastGoodLocalJson = json;
                 localDirty = false;
                 LocalWriteFailed = false;
                 return true;
@@ -176,6 +214,21 @@ namespace RacingGame.Core.Save
                 LocalWriteFailed = true;
                 nextLocalRetryAt = clock() + LocalRetrySeconds;
                 return false;
+            }
+        }
+
+        private void RefreshBackup(string json)
+        {
+            try
+            {
+                local.Write(json, LocalSaveSlot.Backup);
+                backupWriteFailed = false;
+            }
+            catch (Exception)
+            {
+                // The primary write already succeeded, even if storage cannot fit a second copy.
+                if (!backupWriteFailed) UnityEngine.Debug.LogWarning("[SaveService] local backup could not be refreshed.");
+                backupWriteFailed = true;
             }
         }
 

@@ -8,6 +8,19 @@ import unittest
 COMMON = Path(__file__).with_name('common.sh').resolve()
 
 class SimSyncTests(unittest.TestCase):
+    def test_fresh_checkout_without_library_can_create_an_isolated_project(self):
+        with tempfile.TemporaryDirectory(prefix='cars-cold-sync-') as folder:
+            root = Path(folder)
+            project, sim = root / 'project', root / 'sim'
+            for name in ('Assets', 'Packages', 'ProjectSettings'):
+                (project / name).mkdir(parents=True)
+                (project / name / 'input.txt').write_text(name)
+            env = dict(os.environ, PROJECT=str(project), SIM=str(sim), CG_WORK=str(root / 'work'))
+            subprocess.run(['bash', '-ec', 'source "$1"; ensure_sim', 'cold-sync', str(COMMON)],
+                           env=env, check=True, capture_output=True, text=True)
+            for name in ('Assets', 'Packages', 'ProjectSettings'):
+                self.assertEqual(name, (sim / name / 'input.txt').read_text())
+
     def test_reuse_updates_and_removes_inputs_without_touching_library(self):
         with tempfile.TemporaryDirectory(prefix='cars-sim-sync-') as folder:
             root = Path(folder)
