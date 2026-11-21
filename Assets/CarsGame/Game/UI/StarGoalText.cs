@@ -5,6 +5,7 @@ namespace RacingGame
         public static string Description(RaceEventDefinition ev, int star)
         {
             if (ev == null) return "";
+            if (ev.eventId == TrainMission.EventId && star < 2) return Loc.Get(star == 0 ? "train.star1" : "train.star2");
             if (ev.mode == EventMode.Mission && star < 2) return star == 0 ? Loc.Get("mission.star1") : Loc.Format("mission.star2", "n", ev.star2TargetKills > 0 ? ev.star2TargetKills : 2);
             if (star == 0) return Loc.Format("goals.place", "n", ev.star1TargetPosition > 0 ? ev.star1TargetPosition : 3);
             if (star == 1) return Loc.Format(ev.skillGoal == SkillGoal.Kills ? "goals.kills" : "goals.skill." + ev.skillGoal.ToString().ToLowerInvariant(),

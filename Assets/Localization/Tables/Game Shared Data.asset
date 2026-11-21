@@ -2067,6 +2067,70 @@ MonoBehaviour:
     m_Key: save.local.no_copy
     m_Metadata:
       m_Items: []
+  - m_Id: 28966960855592960
+    m_Key: events.m2.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175872
+    m_Key: train.detail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175873
+    m_Key: train.star1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175874
+    m_Key: train.star2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175875
+    m_Key: train.guard.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175876
+    m_Key: train.fork
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175877
+    m_Key: train.blocked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175878
+    m_Key: train.pursue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175879
+    m_Key: train.hold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175880
+    m_Key: train.siding
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175881
+    m_Key: train.station
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175882
+    m_Key: train.whistle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175883
+    m_Key: train.win.moving
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175884
+    m_Key: train.win.station
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175885
+    m_Key: train.loss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175886
+    m_Key: train.lesson
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

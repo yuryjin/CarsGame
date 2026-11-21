@@ -11,7 +11,7 @@ namespace RacingGame
     public static class SfxSynth
     {
         private const int Rate = 22050;
-        private static AudioClip engine, shot, hit, lapDing, beep, go, finish, wreck;
+        private static AudioClip engine, shot, hit, lapDing, beep, go, finish, wreck, trainWhistle;
 
         public static AudioClip Engine => engine ??= Loop("sfx_engine", 1f, t =>
         {
@@ -45,6 +45,13 @@ namespace RacingGame
         public static AudioClip LapDing => lapDing ??= OneShot("sfx_lap", 0.25f, t => Mathf.Sin(2f * Mathf.PI * 1320f * t) * Mathf.Exp(-t * 12f) * 0.6f);
         public static AudioClip Beep => beep ??= OneShot("sfx_beep", 0.12f, t => Mathf.Sin(2f * Mathf.PI * 660f * t) * Mathf.Exp(-t * 20f) * 0.7f);
         public static AudioClip Go => go ??= OneShot("sfx_go", 0.45f, t => Mathf.Sin(2f * Mathf.PI * 880f * t) * Mathf.Exp(-t * 6f) * 0.8f);
+
+        public static AudioClip TrainWhistle => trainWhistle ??= OneShot("sfx_train_whistle", 1.4f, t =>
+        {
+            float phase = 2f * Mathf.PI * (t + 0.005f * Mathf.Exp(-t * 9f));
+            float pressure = Mathf.Clamp01(t / 0.12f) * Mathf.Clamp01((1.4f - t) / 0.30f);
+            return pressure * (Mathf.Sin(330f * phase) * 0.42f + Mathf.Sin(414f * phase) * 0.31f + Mathf.Sin(493f * phase) * 0.22f);
+        });
 
         public static AudioClip Finish => finish ??= OneShot("sfx_finish", 0.9f, t =>
         {

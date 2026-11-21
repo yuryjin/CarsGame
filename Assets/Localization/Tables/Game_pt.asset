@@ -2121,6 +2121,73 @@ MonoBehaviour:
       foi guardado separadamente."
     m_Metadata:
       m_Items: []
+  - m_Id: 28966960855592960
+    m_Localized: "A \xFAltima viagem"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175872
+    m_Localized: "Recupere a ta\xE7a roubada"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175873
+    m_Localized: "Recupere a ta\xE7a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175874
+    m_Localized: Destrua o buggy da escolta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175875
+    m_Localized: Escolta do trem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175876
+    m_Localized: "A ta\xE7a est\xE1 no \xFAltimo vag\xE3o. \xC0 esquerda, siga o
+      trem. \xC0 direita, corte at\xE9 o desvio."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175877
+    m_Localized: Passe pelo buggy ou tire-o do caminho.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175878
+    m_Localized: "Alcance o \xFAltimo vag\xE3o e acompanhe sua velocidade."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175879
+    m_Localized: "Siga junto ao vag\xE3o \xB7 {n}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175880
+    m_Localized: "Desvio ativado. Siga o trem at\xE9 a esta\xE7\xE3o."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175881
+    m_Localized: "Aproxime-se do \xFAltimo vag\xE3o para pegar a ta\xE7a."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175882
+    m_Localized: "Apito do trem atr\xE1s das rochas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175883
+    m_Localized: "Ta\xE7a recuperada do trem em movimento"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175884
+    m_Localized: "Ta\xE7a recuperada na esta\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175885
+    m_Localized: "O trem cruzou a fronteira com a ta\xE7a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175886
+    m_Localized: "Passe pela escolta e fique ao lado do \xFAltimo vag\xE3o por {s}
+      segundos. Ou corte pelo leito seco, chegue ao desvio antes do trem e pegue
+      a ta\xE7a na esta\xE7\xE3o."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

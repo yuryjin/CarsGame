@@ -5,7 +5,7 @@ namespace RacingGame
     public enum FinishGoal { NoDeaths, WinWithoutRepair, BeatTime, CleanRun }
     public enum SkillGoal { Kills, DriftBoosts, Shortcuts, CeilingBoost, CleanFinalLap, BombPasses }
 
-    /// <summary>Mission = co-op boss fight on its own map (<see cref="MissionDirector"/>).</summary>
+    /// <summary>Mission events supply their own map and finish conditions.</summary>
     public enum EventMode { Race, Arena, Mission }
 
     /// <summary>One entry of the race-select screen. Rules vary per event so the single track stays fresh.</summary>

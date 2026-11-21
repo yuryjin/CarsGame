@@ -2141,6 +2141,72 @@ MonoBehaviour:
       tutuldu."
     m_Metadata:
       m_Items: []
+  - m_Id: 28966960855592960
+    m_Localized: Son Sefer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175872
+    m_Localized: "\xC7al\u0131nan kupay\u0131 geri al"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175873
+    m_Localized: "Kupay\u0131 geri al"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175874
+    m_Localized: "Muhaf\u0131z arac\u0131n\u0131 saf d\u0131\u015F\u0131 b\u0131rak"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175875
+    m_Localized: "Tren muhaf\u0131z\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175876
+    m_Localized: "Kupa son vagonda. Sol yol treni izler, sa\u011F yol makasa kestirmedir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175877
+    m_Localized: "Muhaf\u0131z arac\u0131n\u0131 ge\xE7 ya da yoldan it."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175878
+    m_Localized: "Son vagona yeti\u015F ve h\u0131z\u0131n\u0131 ona uydur."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175879
+    m_Localized: "Vagonun yan\u0131nda kal \xB7 %{n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175880
+    m_Localized: "Makas \xE7evrildi. Treni istasyona kadar izle."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175881
+    m_Localized: "Kupay\u0131 almak i\xE7in son vagonun yan\u0131na s\xFCr."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175882
+    m_Localized: "Kayalar\u0131n ard\u0131ndan tren d\xFCd\xFC\u011F\xFC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175883
+    m_Localized: "Kupa hareket h\xE2lindeki trenden al\u0131nd\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175884
+    m_Localized: "Kupa istasyonda al\u0131nd\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175885
+    m_Localized: "Tren kupayla s\u0131n\u0131r\u0131 ge\xE7ti"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175886
+    m_Localized: "Muhaf\u0131z\u0131 ge\xE7 ve {s} saniye son vagonun yan\u0131nda
+      kal. Ya da kuru dere yata\u011F\u0131ndan kestir, makasa trenden \xF6nce var
+      ve kupay\u0131 istasyonda al."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -2121,6 +2121,73 @@ MonoBehaviour:
       conserv\xE9e \xE0 part."
     m_Metadata:
       m_Items: []
+  - m_Id: 28966960855592960
+    m_Localized: Le dernier convoi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175872
+    m_Localized: "R\xE9cup\xE8re la coupe vol\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175873
+    m_Localized: "R\xE9cup\xE8re la coupe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175874
+    m_Localized: "D\xE9truis le buggy d\u2019escorte"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175875
+    m_Localized: Escorte du train
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175876
+    m_Localized: "La coupe est en queue. \xC0 gauche, longe le train. \xC0 droite,
+      coupe vers l\u2019aiguillage."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175877
+    m_Localized: "D\xE9passe le buggy ou \xE9carte-le d\u2019un coup."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175878
+    m_Localized: "Rattrape le dernier wagon et roule \xE0 sa hauteur."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175879
+    m_Localized: "Reste \xE0 sa hauteur \xB7 {n}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175880
+    m_Localized: "Aiguillage activ\xE9. Suis le train jusqu\u2019\xE0 la gare."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175881
+    m_Localized: Approche du dernier wagon pour prendre la coupe.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175882
+    m_Localized: "Sifflet du train derri\xE8re les rochers"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175883
+    m_Localized: Coupe reprise sur le train en marche
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175884
+    m_Localized: "Coupe r\xE9cup\xE9r\xE9e \xE0 la gare"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175885
+    m_Localized: "Le train a franchi la fronti\xE8re avec la coupe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175886
+    m_Localized: "D\xE9passe l\u2019escorte et reste \xE0 hauteur du dernier wagon
+      pendant {s} secondes. Tu peux aussi couper par le lit ass\xE9ch\xE9, atteindre
+      l\u2019aiguillage avant le train et r\xE9cup\xE9rer la coupe \xE0 la gare."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

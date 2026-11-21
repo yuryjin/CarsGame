@@ -2124,6 +2124,73 @@ MonoBehaviour:
       por separado."
     m_Metadata:
       m_Items: []
+  - m_Id: 28966960855592960
+    m_Localized: "El \xFAltimo tramo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175872
+    m_Localized: Recupera la copa robada
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175873
+    m_Localized: Recupera la copa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175874
+    m_Localized: Destruye el buggy escolta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175875
+    m_Localized: Escolta del tren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175876
+    m_Localized: "La copa va en el \xFAltimo vag\xF3n. Izquierda junto al tren, derecha
+      al desv\xEDo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175877
+    m_Localized: "Adelanta al buggy o s\xE1calo de en medio."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175878
+    m_Localized: "Alcanza el \xFAltimo vag\xF3n e iguala su velocidad."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175879
+    m_Localized: "Sigue junto al vag\xF3n \xB7 {n}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175880
+    m_Localized: "Desv\xEDo activado. Sigue al tren hasta la estaci\xF3n."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175881
+    m_Localized: "Ac\xE9rcate al \xFAltimo vag\xF3n para recoger la copa."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175882
+    m_Localized: Silbato del tren tras las rocas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175883
+    m_Localized: Copa recuperada del tren en marcha
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175884
+    m_Localized: "Copa recuperada en la estaci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175885
+    m_Localized: "El tren cruz\xF3 la frontera con la copa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175886
+    m_Localized: "Adelanta a la escolta y mantente junto al \xFAltimo vag\xF3n {s}
+      segundos. O toma el cauce seco, llega al desv\xEDo antes que el tren y recoge
+      la copa en la estaci\xF3n."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

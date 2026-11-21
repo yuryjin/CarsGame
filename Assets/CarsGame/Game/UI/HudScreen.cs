@@ -66,6 +66,7 @@ namespace RacingGame
         private int layoutScreenWidth, layoutScreenHeight;
         private bool layoutTouchLarge, layoutTouchLeft;
         private TextMeshProUGUI helpText;
+        private TrainHud trainHud;
         private CanvasGroup pauseControls;
         private string shownCenter;
         private SpeedometerGraphic speedDial;
@@ -1183,6 +1184,7 @@ namespace RacingGame
         public static string ControlsHint(bool touch)
         {
             var ev = RaceSetup.Event;
+            if (ev != null && ev.eventId == TrainMission.EventId) return Loc.Format("train.lesson", "s", TrainMission.HoldSeconds);
             if (ev != null && ev.mode == EventMode.Arena) return Loc.Get("arena.lesson");
             if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.HotBomb) return Loc.Get("lesson.bomb");
             if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.MinesOnly) return Loc.Get(touch ? "lesson.mines.touch" : "lesson.mines.keys");
@@ -1611,6 +1613,7 @@ namespace RacingGame
         /// <summary>Menu screens hide the HUD; the race shows it.</summary>
         public void SetVisible(bool visible)
         {
+            if (trainHud != null) { trainHud.gameObject.SetActive(false); Destroy(trainHud.gameObject); trainHud = null; }
             foreach (var c in GetComponentsInChildren<Canvas>(true)) if (c.name == "HUD") c.gameObject.SetActive(visible);
             pausePanel.gameObject.SetActive(visible && PauseController.IsPaused);
             helpPanel.gameObject.SetActive(false);
@@ -1619,13 +1622,16 @@ namespace RacingGame
             {
                 RefreshModelLabel();
                 bool practice = gameFlow != null && gameFlow.IsPractice;
-                racePanel.gameObject.SetActive(!practice);
-                timerPanel.gameObject.SetActive(!practice);
+                var train = TrainMission.Current;
+                if (train != null) trainHud = TrainHud.Create(train, this, hudRoot);
+                racePanel.gameObject.SetActive(!practice && !race.IsMissionMode);
+                timerPanel.gameObject.SetActive(!practice && train == null);
                 SetTimer(0d);
                 goalsExpanded = false;
                 hintText.text = ControlsHint(touchLayout);
                 LayoutHint();
-                hintUntil = Time.unscaledTime + ControlsHintSeconds; hintPanel.gameObject.SetActive(true); playerCar = null;
+                hintUntil = train == null ? Time.unscaledTime + ControlsHintSeconds : -1f;
+                hintPanel.gameObject.SetActive(train == null); playerCar = null;
             }
             if (eventPanel != null) eventPanel.gameObject.SetActive(false);
             incomingUntil = hitMarkerUntil = nextGoalRefresh = 0f;

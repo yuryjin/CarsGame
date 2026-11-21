@@ -44,6 +44,28 @@ namespace RacingGame
             public ResourceCounts resources;
             public InputSnapshot input;
             public ReplaySnapshot replay;
+            public TrainSnapshot train;
+        }
+
+        [Serializable] public sealed class TrainSnapshot
+        {
+            public Vector3 player, forward, tail, tailForward, start, switchPoint, station;
+            public float yawRate, trainSpeed, capture;
+            public bool diverted, passedSwitch, atStation, approachClear;
+        }
+
+        private static TrainSnapshot ReadTrain(CarController car)
+        {
+            var mission = TrainMission.Current;
+            if (car == null || mission == null || mission.Route.Tail == null) return null;
+            var route = mission.Route;
+            return new TrainSnapshot {
+                player = car.transform.position, forward = car.transform.forward, yawRate = car.Body.angularVelocity.y,
+                tail = route.Tail.position, tailForward = route.Tail.forward, trainSpeed = route.Velocity.magnitude,
+                start = route.StartPose.position, switchPoint = route.SwitchPoint, station = route.StationPoint,
+                capture = mission.CaptureProgress, diverted = mission.Diverted, passedSwitch = route.PassedSwitch,
+                atStation = route.AtStation, approachClear = mission.Escort.ApproachClear
+            };
         }
 
         [Serializable] public class ReplaySnapshot
@@ -233,6 +255,7 @@ namespace RacingGame
                     case "state": break;
                     case "ui": break;
                     case "ghosts": break;
+                    case "train": break;
                     case "resources":
                         lastResources = new ResourceCounts {
                             materials = Resources.FindObjectsOfTypeAll<Material>().Length,
@@ -383,6 +406,7 @@ namespace RacingGame
                 throttle = car != null ? car.LastCommand.Throttle : 0f, steer = car != null ? car.LastCommand.Steer : 0f,
                 input = ReadInput(),
                 replay = lastCommand == "ghosts" ? ReadReplay() : null,
+                train = lastCommand == "train" ? ReadTrain(car) : null,
                 braking = car != null && car.LastCommand.Brake, deaths = p?.Deaths ?? 0,
                 aiResets = ai != null ? ai.ResetCount : 0,
                 raceSeed = director != null ? director.raceSeed : 0,

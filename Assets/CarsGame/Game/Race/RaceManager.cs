@@ -31,7 +31,7 @@ namespace RacingGame
         public float MatchDuration => (RaceSetup.Event != null && RaceSetup.Event.mode == EventMode.Arena && RaceSetup.Event.matchDuration > 0f)
             ? RaceSetup.Event.matchDuration
             : arenaDurationSeconds;
-        /// <summary>Co-op boss mission: the <see cref="MissionDirector"/> decides when it ends (<see cref="EndMission"/>).</summary>
+        /// <summary>Each mission decides when to call <see cref="EndMission"/>.</summary>
         public bool IsMissionMode => RaceSetup.Event != null && RaceSetup.Event.mode == EventMode.Mission;
         public double RemainingTime => IsArenaMode ? Math.Max(0d, MatchDuration - RaceTime) : 0d;
 
@@ -119,9 +119,10 @@ namespace RacingGame
         public void StartRace()
         {
             if (spawner == null) { Debug.LogError("[RaceManager] no RaceSpawner.", this); return; }
+            if (aiCountOverride >= 0) spawner.aiCount = aiCountOverride;
+            else if (tier != null) spawner.aiCount = tier.aiCount;
             if (tier != null)
             {
-                spawner.aiCount = aiCountOverride >= 0 ? aiCountOverride : tier.aiCount;
                 spawner.aiFireCooldown = tier.aiFireCooldown;
                 if (tier.profiles != null && tier.profiles.Length > 0) spawner.profiles = tier.profiles;
             }

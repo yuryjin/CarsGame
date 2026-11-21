@@ -76,6 +76,19 @@ namespace RacingGame.Tests
             AssertAvailableFirst(flow);
             Assert.AreEqual(initial, JsonUtility.ToJson(progress), "Browsing cannot unlock or award anything");
             Assert.IsFalse(StartButton("e2").interactable);
+            var train = StartButton(TrainMission.EventId);
+            Assert.IsTrue(train.interactable);
+            var trainCard = train.transform.parent;
+            Assert.AreEqual(Loc.Get("events.m2.name"), trainCard.Find("Name").GetComponent<TMP_Text>().text);
+            Assert.AreEqual(Loc.Get("train.detail"), trainCard.Find("Stats").GetComponent<TMP_Text>().text);
+            StringAssert.Contains(Loc.Get("train.star1"), trainCard.Find("Stars").GetComponent<TMP_Text>().text);
+            StringAssert.Contains(Loc.Get("train.star2"), trainCard.Find("Stars").GetComponent<TMP_Text>().text);
+            train.onClick.Invoke();
+            yield return null;
+            Assert.AreEqual(Loc.Get("train.fork"), GameObject.Find("TrainGoal").GetComponent<TMP_Text>().text);
+            Assert.IsNull(GameObject.Find("RaceStatus"), "The cup chase has no laps or rival ranking");
+            flow.EnterMenu(); yield return null;
+            Assert.IsNull(GameObject.Find("TrainObjective"));
             // A controlled saved-unlock fixture verifies that rebuilding promotes the newly available row.
             progress.unlockedEvents.Add("e2");
             menu.Show("events"); yield return null; yield return null;

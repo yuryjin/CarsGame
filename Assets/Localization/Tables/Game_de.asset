@@ -2116,6 +2116,73 @@ MonoBehaviour:
       wurde separat gesichert."
     m_Metadata:
       m_Items: []
+  - m_Id: 28966960855592960
+    m_Localized: Die letzte Fahrt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175872
+    m_Localized: "Hol den gestohlenen Pokal zur\xFCck"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175873
+    m_Localized: "Hol den Pokal zur\xFCck"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175874
+    m_Localized: Schalte den Wachbuggy aus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175875
+    m_Localized: Zugwache
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175876
+    m_Localized: "Pokal im letzten Wagen. Links am Zug entlang, rechts zur Weiche
+      abk\xFCrzen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175877
+    m_Localized: "\xDCberhole den Buggy oder dr\xE4ng ihn ab."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175878
+    m_Localized: Hol den letzten Wagen ein und fahr neben ihm her.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175879
+    m_Localized: "Bleib neben dem Wagen \xB7 {n}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175880
+    m_Localized: Weiche gestellt. Folge dem Zug zum Bahnhof.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175881
+    m_Localized: Fahr zum letzten Wagen und hol den Pokal.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175882
+    m_Localized: Zugpfeife hinter den Felsen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175883
+    m_Localized: Pokal vom fahrenden Zug geholt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175884
+    m_Localized: Pokal am Bahnhof geholt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175885
+    m_Localized: "Der Zug ist mit dem Pokal \xFCber die Grenze"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175886
+    m_Localized: Fahr an der Wache vorbei und bleib {s} Sekunden neben dem letzten
+      Wagen. Oder nimm das trockene Flussbett, erreiche die Weiche vor dem Zug und
+      hol den Pokal am Bahnhof.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

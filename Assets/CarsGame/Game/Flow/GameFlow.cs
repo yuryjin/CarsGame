@@ -62,6 +62,7 @@ namespace RacingGame
         private StarRingTrack starRing;
         private WastelandTrack wasteland;
         private MissionDirector mission;
+        private TrainMission trainMission;
         private TrackFork trackFork;
         private HotBombRace hotBomb;
         private PickupSpawner pickups;
@@ -145,6 +146,7 @@ namespace RacingGame
             // must keep the next countdown/audio paused until their own resume callback.
             PauseController.Set(PauseReason.User | PauseReason.Menu, false);
             if (mission != null) { mission.Dispose(); Destroy(mission.gameObject); mission = null; }
+            if (trainMission != null) { trainMission.Dispose(); Destroy(trainMission.gameObject); trainMission = null; }
             if (pickups != null) pickups.Clear();
             if (trackFork != null) { trackFork.Restore(); Destroy(trackFork.gameObject); trackFork = null; }
             if (spaceTrack != null) { spaceTrack.Restore(); Destroy(spaceTrack.gameObject); spaceTrack = null; }
@@ -222,8 +224,13 @@ namespace RacingGame
                 abyssTrack = AbyssTrack.Create(track);
                 if (ev.spaceTrack) spaceTrack = SpaceTrack.Create(track, abyssTrack);
             }
-            if (ev != null && ev.mode == EventMode.Mission) mission = MissionDirector.Create(race);   // its own desert; the circuit hides
-            if (track != null && abyssTrack == null && starRing == null && wasteland == null && mission == null && (ev == null || ev.mode != EventMode.Arena))
+            if (ev != null && ev.mode == EventMode.Mission)
+            {
+                if (ev.eventId == TrainMission.EventId) trainMission = TrainMission.Create(race);
+                else mission = MissionDirector.Create(race);
+            }
+            bool onCircuit = ev == null || ev.mode == EventMode.Race;
+            if (onCircuit && track != null && abyssTrack == null && starRing == null && wasteland == null)
                 trackFork = TrackFork.Create(track, pickups != null && (ev == null || ev.pickupCount > 0));
             CarHealth.GlobalDamageMultiplier = ev != null ? ev.damageMultiplier : 1f;
             CarController.RamPushScale = ev != null ? ev.ramPush : 1f;
@@ -242,13 +249,13 @@ namespace RacingGame
             if (race.State == RaceState.Idle) { EnterMenu(); return; }
             if (abyssTrack != null && spaceTrack == null && race.Player != null) abyssTrack.Follow(race.Player.Progress);
             if (starRing != null) starRing.Follow(race);
-            if (pickups != null && mission == null && (ev == null || ev.mode != EventMode.Arena)) pickups.Spawn(ev != null ? ev.pickupCount : 9);
+            if (onCircuit && pickups != null) pickups.Spawn(ev != null ? ev.pickupCount : 9);
             LayMineField(ev);
             if (hud != null) hud.SetVisible(true);
             if (speedFx != null) speedFx.SetVisible(true);
             if (overlays != null) overlays.SetVisible(true);
             SetState(FlowState.Racing);
-            if (!IsTestDrive && mission == null && (ev == null || ev.mode != EventMode.Arena)) SpawnGhosts(ev, generation);
+            if (onCircuit && !IsTestDrive) SpawnGhosts(ev, generation);
         }
 
         // Arena: the fight zone; a race: slalom gates on the straights. Seeded from the race, so the daily race matches for everyone.
@@ -525,7 +532,7 @@ namespace RacingGame
         {
             if (playerEngine != null) playerEngine.SetRunning(true);
             foreach (var g in ghosts) if (g != null) g.Begin(race.RaceStartTime);
-            if (!IsTestDrive && race.Player != null) recorder.Begin(race.Player, TrackHash(RaceSetup.Event), UiFactory.Escape(PlatformGlue.Platform != null ? PlatformGlue.Platform.Player.Name : "You"));
+            if (!IsTestDrive && trainMission == null && race.Player != null) recorder.Begin(race.Player, TrackHash(RaceSetup.Event), UiFactory.Escape(PlatformGlue.Platform != null ? PlatformGlue.Platform.Player.Name : "You"));
         }
         private void OnParticipantFinished(RaceParticipant p)
         {

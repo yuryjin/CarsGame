@@ -2115,6 +2115,71 @@ MonoBehaviour:
     m_Localized: No usable local backup. The damaged save was kept separately.
     m_Metadata:
       m_Items: []
+  - m_Id: 28966960855592960
+    m_Localized: The Last Run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175872
+    m_Localized: Recover the stolen cup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175873
+    m_Localized: Recover the cup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175874
+    m_Localized: Wreck the guard buggy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175875
+    m_Localized: Train guard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175876
+    m_Localized: Cup on the rear car. Left follows the train. Right cuts to the switch.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175877
+    m_Localized: Get past the buggy or knock it out of the way.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175878
+    m_Localized: Catch the rear car and match its speed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175879
+    m_Localized: "Stay alongside \xB7 {n}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175880
+    m_Localized: Switch set. Follow the train to the station.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175881
+    m_Localized: Drive up to the rear car to collect the cup.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175882
+    m_Localized: Train whistle beyond the rocks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175883
+    m_Localized: Cup recovered from the moving train
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175884
+    m_Localized: Cup collected at the station
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175885
+    m_Localized: The train crossed the border with the cup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28966960868175886
+    m_Localized: Pass the guard and stay beside the rear car for {s} seconds. Or
+      take the dry wash, reach the switch first and collect the cup at the station.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
