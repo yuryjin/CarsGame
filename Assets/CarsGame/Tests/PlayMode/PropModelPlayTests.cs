@@ -57,7 +57,8 @@ namespace RacingGame.Tests
             {
                 var p = Pickup.Create(kinds[i], new Vector3((i - 1.5f) * 3f, 0f, -5f), stage.transform);
                 Assert.IsNotNull(p.transform.Find("Model"), kinds[i].ToString());
-                Assert.AreEqual(2, Renderers(p.transform), kinds[i] + ": model + beacon");
+                Assert.AreEqual(2, Renderers(p.transform), kinds[i] + ": model + arrow");
+                Assert.IsNotNull(p.transform.Find("Arrow"), kinds[i] + ": arrow above the pickup");
             }
 
             if (SystemInfo.graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.Null)

@@ -23,9 +23,12 @@ namespace RacingGame
         public static event System.Action<Pickup, CarController> PickedUp;
         public int TakenTick { get; private set; }
 
+        private const float ArrowHeight = 2.2f; // tip height above the road; the model tops out around 1.6 m
         private Transform visual;
+        private Transform arrow;
         private float bobPhase;
         private static Material[] materials;
+        private static Mesh arrowMesh;
 
         public static Pickup Create(PickupKind kind, Vector3 position, Transform parent)
         {
@@ -66,17 +69,55 @@ namespace RacingGame
                 vr.sharedMaterial = MaterialFor(kind);
                 visual = v.transform;
             }
-            // A thin glowing post above the pickup: readable from a distance and over other cars.
-            var beacon = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            Destroy(beacon.GetComponent<Collider>());
-            beacon.name = "Beacon";
-            beacon.transform.SetParent(transform, false);
-            beacon.transform.localPosition = Vector3.up * 2.9f;
-            beacon.transform.localScale = new Vector3(0.25f, 1.5f, 0.25f);
-            var br = beacon.GetComponent<Renderer>();
-            br.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            br.sharedMaterial = MaterialFor(kind);
+            // A glowing arrow pointing down at the pickup: readable from a distance and over other cars.
+            var arrowGo = new GameObject("Arrow", typeof(MeshFilter), typeof(MeshRenderer));
+            arrow = arrowGo.transform;
+            arrow.SetParent(transform, false);
+            arrow.localPosition = Vector3.up * ArrowHeight;
+            arrowGo.GetComponent<MeshFilter>().sharedMesh = ArrowMesh();
+            var ar = arrowGo.GetComponent<MeshRenderer>();
+            ar.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            ar.sharedMaterial = MaterialFor(kind);
             bobPhase = (transform.position.x + transform.position.z) * 0.37f;
+        }
+
+        /// <summary>Flat-shaded octagonal arrow, tip at the origin pointing down: cone head + shaft. Shared by all pickups.</summary>
+        private static Mesh ArrowMesh()
+        {
+            if (arrowMesh != null) return arrowMesh;
+            const int sides = 8;
+            const float headRadius = 0.5f, headHeight = 0.6f, shaftRadius = 0.16f, shaftTop = 1.25f;
+            var verts = new System.Collections.Generic.List<Vector3>();
+            var tris = new System.Collections.Generic.List<int>();
+            void Tri(Vector3 a, Vector3 b, Vector3 c, Vector3 outward)
+            {
+                if (Vector3.Dot(Vector3.Cross(b - a, c - a), outward) < 0f) { var t = b; b = c; c = t; }
+                tris.Add(verts.Count); verts.Add(a);
+                tris.Add(verts.Count); verts.Add(b);
+                tris.Add(verts.Count); verts.Add(c);
+            }
+            Vector3 Ring(int i, float radius, float y)
+            {
+                float angle = (i % sides) * Mathf.PI * 2f / sides;
+                return new Vector3(Mathf.Cos(angle) * radius, y, Mathf.Sin(angle) * radius);
+            }
+            for (int i = 0; i < sides; i++)
+            {
+                Vector3 h0 = Ring(i, headRadius, headHeight), h1 = Ring(i + 1, headRadius, headHeight);
+                Vector3 radial = (h0 + h1) * 0.5f; radial.y = 0f;
+                Tri(Vector3.zero, h0, h1, radial);                          // head side
+                Tri(Vector3.up * headHeight, h0, h1, Vector3.up);           // head top (under the shaft)
+                Vector3 s0 = Ring(i, shaftRadius, headHeight), s1 = Ring(i + 1, shaftRadius, headHeight);
+                Vector3 t0 = Ring(i, shaftRadius, shaftTop), t1 = Ring(i + 1, shaftRadius, shaftTop);
+                Tri(s0, s1, t1, radial); Tri(s0, t1, t0, radial);            // shaft side
+                Tri(Vector3.up * shaftTop, t0, t1, Vector3.up);             // shaft cap
+            }
+            arrowMesh = new Mesh { name = "PickupArrow" };
+            arrowMesh.SetVertices(verts);
+            arrowMesh.SetTriangles(tris, 0);
+            arrowMesh.RecalculateNormals();
+            arrowMesh.RecalculateBounds();
+            return arrowMesh;
         }
 
         private static Material MaterialFor(PickupKind kind)
@@ -108,6 +149,7 @@ namespace RacingGame
             if (visual == null) return;
             visual.Rotate(Vector3.up, 120f * Time.deltaTime, Space.World);
             visual.localPosition = new Vector3(0f, 0.9f + 0.15f * Mathf.Sin(Time.time * 2.5f + bobPhase), 0f);
+            if (arrow != null) arrow.localPosition = new Vector3(0f, ArrowHeight + 0.25f * Mathf.Abs(Mathf.Sin(Time.time * 3f + bobPhase)), 0f);
         }
 
         public void OnTriggerEnter(Collider other)
