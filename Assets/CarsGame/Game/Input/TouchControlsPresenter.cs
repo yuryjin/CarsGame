@@ -127,7 +127,7 @@ namespace RacingGame
             secondaryKey = "touch.secondary";
             secondaryLabel.transform.parent.gameObject.SetActive(false);
             brakeButton = (RectTransform)Button(root, "Brake", Loc.Get("touch.brake"), "<Gamepad>/buttonSouth", new Vector2(1f, 0f), new Vector2(-480f, 40f), new Vector2(-280f, 160f)).transform.parent;
-            resetButton = (RectTransform)Button(root, "Reset", "R", "<Gamepad>/buttonNorth", new Vector2(1f, 1f), new Vector2(-140f, -140f), new Vector2(-40f, -40f)).transform.parent;
+            resetButton = (RectTransform)Button(root, "Reset", Loc.Get("touch.reset"), "<Gamepad>/buttonNorth", new Vector2(1f, 1f), new Vector2(-140f, -140f), new Vector2(-40f, -40f)).transform.parent;
             launchLabel = Button(root, "Launch", Loc.Get("touch.launch"), "<Gamepad>/rightTrigger",
                 new Vector2(0.5f, 0f), new Vector2(-200f, 40f), new Vector2(200f, 190f));
             targetScale = -1f;
@@ -170,7 +170,11 @@ namespace RacingGame
             float edge = 44f / scale;
             float reset = Mathf.Max(100f, edge);
             float resetTop = (HudScreen.ModelButtonBottomPixels(scale) + 8f) / scale;
-            Place(resetButton, Vector2.one, new Vector2(-40f - reset, -resetTop - reset), new Vector2(-40f, -resetTop));
+            float resetWidth = Mathf.Max(reset, 84f / scale);
+            Place(resetButton, Vector2.one, new Vector2(-40f - resetWidth, -resetTop - reset), new Vector2(-40f, -resetTop));
+            var resetLabel = resetButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            resetLabel.fontSizeMin = 12f / scale;
+            resetLabel.fontSizeMax = Mathf.Max(26f, 14f / scale);
             void MinimumHeight(RectTransform control)
             {
                 var hi = control.offsetMax;

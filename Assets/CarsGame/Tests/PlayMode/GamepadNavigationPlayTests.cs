@@ -78,6 +78,9 @@ namespace RacingGame.Tests
             Assert.NotNull(target, $"{name} must be reachable from {start.name}");
             foreach (var direction in routes[target]) yield return Press(direction);
             Assert.AreEqual(name, EventSystem.current.currentSelectedGameObject?.name, "Real device input follows navigation");
+            Assert.IsTrue(target.targetGraphic.GetComponent<Outline>()?.isActiveAndEnabled == true, "The focused control has a visible outline");
+            if (start != target)
+                Assert.IsFalse(start.targetGraphic.GetComponent<Outline>()?.isActiveAndEnabled == true, "Moving focus clears the previous outline");
             var scroll = target.GetComponentInParent<ScrollRect>();
             if (scroll != null)
             {

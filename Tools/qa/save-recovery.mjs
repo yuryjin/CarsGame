@@ -29,7 +29,6 @@ try{
    if(mode==='write'){
     assert.equal((await cmd('state')).coins,123);
     await cmd('goto','settings');await page.evaluate(()=>window.__denyLocalWrite=true);
-    // Sound is visible at the top on every viewport; Music is below the clip at 640x360.
     const slider=(await cmd('ui')).sliders.find(s=>s.name==='SoundVolume');assert(slider);
     assert(slider.y*height-slider.height/2>=72&&slider.y*height+slider.height/2<=height-40,'Trigger is visible');
     await page.mouse.click(slider.x*width,slider.y*height,{delay:80});await page.waitForTimeout(400);

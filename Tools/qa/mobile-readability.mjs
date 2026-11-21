@@ -51,6 +51,16 @@ try {
   const target = (s, name, min = 42) => {
     const b = s.buttons.find(b => b.name === name);
     assert(b, `Missing ${name}`); assert(b.width >= min && b.height >= min, `${name} target ${b.width} × ${b.height}`);
+    return b;
+  };
+  const checkMain = (s, width, height) => {
+    for (const name of ['Play','garage','Practice','leaders','settings']) {
+      const b = target(s, name, 44);
+      assert(b.interactable && b.x * width >= b.width / 2 && b.x * width + b.width / 2 <= width &&
+        b.y * height >= b.height / 2 && b.y * height + b.height / 2 <= height, `${name} must be fully visible on entry`);
+      const text = label(s, 'Label', name);
+      assert(text.fontPixels >= 15 && !text.truncated, `Unreadable destination: ${text.text}`);
+    }
   };
   const renderer = await page.evaluate(() => {
     const gl = document.querySelector('canvas').getContext('webgl2'), ext = gl.getExtension('WEBGL_debug_renderer_info');
@@ -62,8 +72,7 @@ try {
     await page.setViewportSize({ width, height }); await page.waitForTimeout(500);
     await cmd('goto', 'main');
     let s = await ui();
-    target(s, 'Play');
-    assert(s.buttons.find(b => b.name === 'Play').y < .92, 'Play must be visible without scrolling');
+    checkMain(s, width, height);
     assert(label(s, 'Details').fontPixels >= 13, 'Main details must be readable');
     await record(`${width}-main`);
     await cmd('goto', 'garage');
@@ -81,6 +90,10 @@ try {
     assert.equal((await ui()).screen, 'garage', 'Escape must follow the arsenal Back route');
     await cmd('goto', 'settings');
     s = await ui(); assert(label(s, 'LanguageName').fontPixels >= 13);
+    for (const name of ['SoundVolume', 'MusicVolume']) {
+      const slider = s.sliders.find(slider => slider.name === name);
+      assert(slider?.interactable && slider.y * height + slider.height / 2 <= height && slider.height >= 44, `${name} fits on entry`);
+    }
     await record(`${width}-settings`);
     await cmd('touch', 'on'); await cmd('startRace', 'e1', 'easy');
     for (let i = 0; i < 40 && (await cmd('state')).race !== 'Racing'; i++) await page.waitForTimeout(250);
@@ -140,6 +153,9 @@ try {
     for (const text of s.labels.filter(t => t.name === 'Name')) {
       assert(text.fontPixels >= 13 && !text.truncated, `${language}: unreadable setting ${text.text}`);
     }
+    await cmd('goto', 'main');
+    checkMain(await ui(), 640, 360);
+    await cmd('goto', 'settings');
     if (['ru','zh','de'].includes(language)) await record(`640-settings-${language}`);
     if (['zh','de'].includes(language)) {
       await cmd('goto', 'garage'); await click('ChooseSlot1'); await click('Filter_Control');

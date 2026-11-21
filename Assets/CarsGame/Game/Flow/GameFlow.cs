@@ -32,6 +32,8 @@ namespace RacingGame
         public long LastBestDeltaMs { get; private set; }
         public bool LastHadPreviousBest { get; private set; }
         public bool LastWasPersonalBest { get; private set; }
+        public int[] LastSectorDeltaMs { get; private set; }
+        private int[] personalGhostSectors;
         public bool LastBestComparable { get; private set; }
         public bool LastBestSetupKnown { get; private set; }
         private Core.Save.RecordSetup raceRecordSetup;
@@ -222,7 +224,7 @@ namespace RacingGame
             }
             if (ev != null && ev.mode == EventMode.Mission) mission = MissionDirector.Create(race);   // its own desert; the circuit hides
             if (track != null && abyssTrack == null && starRing == null && wasteland == null && mission == null && (ev == null || ev.mode != EventMode.Arena))
-                trackFork = TrackFork.Create(track);
+                trackFork = TrackFork.Create(track, pickups != null && (ev == null || ev.pickupCount > 0));
             CarHealth.GlobalDamageMultiplier = ev != null ? ev.damageMultiplier : 1f;
             CarController.RamPushScale = ev != null ? ev.ramPush : 1f;
             // Look before the field spawns so the first frame of the countdown is already correct.
@@ -283,6 +285,7 @@ namespace RacingGame
         {
             foreach (var g in ghosts) if (g != null) Destroy(g.gameObject);
             ghosts.Clear();
+            personalGhostSectors = LastSectorDeltaMs = null;
         }
 
         private async void SpawnGhosts(RaceEventDefinition ev, int generation)
@@ -292,7 +295,11 @@ namespace RacingGame
             int hash = TrackHash(ev);
             var save = PlatformGlue.Save;
             var own = save != null ? Core.Ghost.GhostRecord.FromBase64(save.Data.bestGhost) : null;
-            if (own != null && own.TrackHash == hash) AddGhost(GhostCar.Spawn(prefab, own, GhostTint));
+            if (own != null && own.TrackHash == hash)
+            {
+                AddGhost(GhostCar.Spawn(prefab, own, GhostTint));
+                personalGhostSectors = GhostSectorTimes.Measure(track, own, race.laps);
+            }
 
             var sessions = PlatformGlue.Platform?.Sessions;
             if (sessions == null) return;
@@ -527,6 +534,15 @@ namespace RacingGame
             SfxPlayer.Instance.PlayUi(SfxSynth.Finish);
             var rec = recorder.Stop();
             if (rec == null || rec.Samples.Count < 10) return;
+            if (personalGhostSectors != null)
+            {
+                var times = GhostSectorTimes.Measure(track, rec, race.laps);
+                if (times != null)
+                {
+                    for (int i = 0; i < times.Length; i++) times[i] -= personalGhostSectors[i];
+                    LastSectorDeltaMs = times;
+                }
+            }
             string encoded = rec.ToBase64();
             if (string.IsNullOrEmpty(encoded)) return; // An incomplete or oversized replay cannot replace a valid best.
             var save = PlatformGlue.Save;

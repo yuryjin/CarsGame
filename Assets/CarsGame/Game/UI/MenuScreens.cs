@@ -182,7 +182,7 @@ namespace RacingGame
             panel.GetComponent<Image>().raycastTarget = true;
             transition = panel.gameObject.AddComponent<CanvasGroup>(); transition.alpha = 0f;
             float margin = Compact ? 12f : 32f;
-            float width = Mathf.Min(1640f, layoutWidth - margin * 2f);
+            float width = Mathf.Min(name == "settings" ? 1320f : 1640f, layoutWidth - margin * 2f);
             var shell = UiFactory.Card(panel, "Shell", new Vector2(0.5f, 0f), new Vector2(0.5f, 1f), new Vector2(-width * 0.5f, margin), new Vector2(width * 0.5f, -margin));
             shell.GetComponent<Image>().color = new Color(0.035f, 0.05f, 0.08f, 0.96f);
             var frame = UiFactory.Panel(shell, "Frame", Vector2.zero, Vector2.one, new Vector2(Compact ? 16f : 32f, Compact ? 8f : 16f), new Vector2(Compact ? -16f : -32f, Compact ? -8f : -24f));
@@ -293,60 +293,61 @@ namespace RacingGame
                 Label(body, "Loading", Loc.Ready ? Loc.Get("common.loading") : "…", 36f, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, UiFactory.Muted, TextAlignmentOptions.Center); return;
             }
             var content = UiFactory.Scroll(body, "MainScroll", Vector2.zero, Vector2.zero);
-            var row = Item(content, "Home", Compact ? 300f : Narrow ? 430f : 580f, false);
+            var row = Item(content, "Home", Narrow ? 194f : 510f, false);
             var hero = UiFactory.Card(row, "RaceCard", Vector2.zero, new Vector2(Narrow ? 1f : 0.58f, 1f), Vector2.zero, new Vector2(Narrow ? 0f : -12f, 0f));
             var list = Events();
             var ev = FeaturedEvent(list);
-            Label(hero, "Eyebrow", Loc.Get("events.title"), 24f, Top, Vector2.one, new Vector2(36f, -76f), new Vector2(-36f, -28f), UiFactory.Accent);
-            var title = Label(hero, "EventName", ev != null ? Loc.Get(ev.nameKey) : Loc.Get("menu.play"), 64f, Top, Vector2.one, new Vector2(36f, -226f), new Vector2(-36f, -98f));
+            float inset = Narrow ? 26f : 36f;
+            float textRight = Narrow ? -258f : -inset;
+            Label(hero, "Eyebrow", Loc.Get("menu.next_race"), 26f, Top, Vector2.one,
+                new Vector2(inset, Narrow ? -50f : -78f), new Vector2(textRight, Narrow ? -12f : -24f), UiFactory.Accent);
+            var title = Label(hero, "EventName", ev != null ? Loc.Get(ev.nameKey) : Loc.Get("menu.play"), Narrow ? 46f : 64f, Top, Vector2.one,
+                new Vector2(inset, Narrow ? -123f : -206f), new Vector2(textRight, Narrow ? -50f : -80f));
             title.fontStyle = FontStyles.Bold;
             var tiers = Tiers();
             int rivals = ev != null && ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[ResolveTierIndex(tiers)].aiCount : 3;
             string detail = ev == null ? "" : ev.mode == EventMode.Mission ? Loc.Format("mission.detail", "n", rivals)
                 : ev.mode == EventMode.Arena ? Loc.Format("arena.detail", "n", rivals)
-                : Loc.Format("events.laps", "n", ev.laps) + "  /  " + Loc.Format("events.rivals", "n", rivals);
+                : Loc.Format("events.laps", "n", ev.laps) + "   ·   " + Loc.Format("events.rivals", "n", rivals);
             int maxStars = list.Count * 3;
             int earnedStars = PlatformGlue.Save != null ? PlatformGlue.Save.Data.TotalStars : 0;
             string stars = "<color=#FFCC40>" + Loc.Format("events.stars", "s", earnedStars, "max", maxStars) + "</color>";
-            // The narrow hero card has no room for a separate stars row above the Play button.
-            if (Narrow) detail += "  /  " + stars;
-            Label(hero, "Details", detail, 26f, Top, Vector2.one, new Vector2(38f, -282f), new Vector2(-36f, -230f), UiFactory.Muted);
-            if (!Narrow) Label(hero, "StarsCount", stars, 26f, Top, Vector2.one, new Vector2(38f, -326f), new Vector2(-36f, -282f), UiFactory.Accent);
+            if (Narrow) detail += "   ·   " + stars;
+            Label(hero, "Details", detail, 26f, Top, Vector2.one,
+                new Vector2(inset, Narrow ? -184f : -264f), new Vector2(textRight, Narrow ? -123f : -210f), UiFactory.Muted);
             if (!Narrow)
             {
-                Label(hero, "Progress", list.FindAll(e => flow.IsUnlocked(e)).Count.ToString("00") + " <color=#8B9AAD>/ " + list.Count.ToString("00") + "</color>", 64f, Vector2.zero, new Vector2(1f, 0f), new Vector2(38f, 162f), new Vector2(-38f, 248f));
-                for (int i = 0; i < list.Count; i++) UiFactory.Panel(hero, "EventProgress" + i, new Vector2(i / (float)list.Count, 0f), new Vector2((i + 1f) / list.Count, 0f), new Vector2(i == 0 ? 38f : 5f, 148f), new Vector2(i == list.Count - 1 ? -38f : -5f, 152f), flow.IsUnlocked(list[i]) ? UiFactory.Accent : UiFactory.Raised, false);
+                string progress = Loc.Format("menu.unlocked_races", "n", list.FindAll(e => flow.IsUnlocked(e)).Count, "max", list.Count);
+                Label(hero, "Progress", progress + "     " + stars, 26f, Top, Vector2.one,
+                    new Vector2(inset, -352f), new Vector2(-inset, -274f), UiFactory.Muted);
             }
-            UiFactory.Button(hero, "Play", Loc.Get(PlatformGlue.Save != null && PlatformGlue.Save.Data.Races == 0 ? "menu.play" : "events.title") + "   ›", PlayFromMain, Vector2.zero, new Vector2(1f, 0f), new Vector2(36f, 32f), new Vector2(-36f, 116f), 34f);
-            if (Compact)
+            string playKey = PlatformGlue.Save != null && PlatformGlue.Save.Data.Races == 0 ? "menu.play" : "events.title";
+            var rightCenter = new Vector2(1f, 0.5f);
+            UiFactory.Button(hero, "Play", Loc.Get(playKey), PlayFromMain, Narrow ? rightCenter : Vector2.zero,
+                Narrow ? rightCenter : new Vector2(1f, 0f), Narrow ? new Vector2(-238f, -45f) : new Vector2(inset, 32f),
+                Narrow ? new Vector2(-inset, 45f) : new Vector2(-inset, 124f), Narrow ? 30f : 34f);
+
+            var links = Narrow ? Item(content, "Links", 180f, false)
+                : UiFactory.Panel(row, "Links", new Vector2(0.58f, 0f), Vector2.one, new Vector2(12f, 0f), Vector2.zero);
+            var destinations = new[] { ("garage", "menu.garage"), ("practice", "practice.title"), ("leaders", "menu.leaderboard"), ("settings", "menu.settings") };
+            int columns = Narrow ? 2 : 1;
+            int rows = destinations.Length / columns;
+            for (int i = 0; i < destinations.Length; i++)
             {
-                var eyebrow = (RectTransform)hero.Find("Eyebrow");
-                eyebrow.offsetMin = new Vector2(28f, -58f); eyebrow.offsetMax = new Vector2(-28f, -18f);
-                title.fontSizeMax = 44f;
-                title.fontSizeMin = 30f;
-                title.rectTransform.offsetMin = new Vector2(28f, -136f); title.rectTransform.offsetMax = new Vector2(-28f, -62f);
-                var detailRect = (RectTransform)hero.Find("Details");
-                detailRect.offsetMin = new Vector2(28f, -184f); detailRect.offsetMax = new Vector2(-28f, -138f);
-                var play = (RectTransform)hero.Find("Play");
-                play.offsetMin = new Vector2(28f, 16f); play.offsetMax = new Vector2(-28f, 100f);
+                var (target, key) = destinations[i];
+                int col = i % columns, line = i / columns;
+                var min = new Vector2(col / (float)columns, 1f - (line + 1f) / rows);
+                var max = new Vector2((col + 1f) / columns, 1f - line / (float)rows);
+                var button = UiFactory.Button(links, target == "practice" ? "Practice" : target, Loc.Get(key), () => Show(target), min, max,
+                    new Vector2(col == 0 ? 0f : 8f, line == rows - 1 ? 0f : 8f),
+                    new Vector2(col == columns - 1 ? 0f : -8f, line == 0 ? 0f : -8f), 32f, UiFactory.Raised);
+                var label = button.GetComponentInChildren<TextMeshProUGUI>();
+                label.alignment = TextAlignmentOptions.MidlineLeft;
+                label.rectTransform.offsetMin = new Vector2(26f, 8f);
+                label.rectTransform.offsetMax = new Vector2(-62f, -8f);
+                Label(button.transform, "Arrow", "›", 34f, new Vector2(1f, 0f), Vector2.one,
+                    new Vector2(-50f, 0f), new Vector2(-20f, 0f), UiFactory.Muted, TextAlignmentOptions.Center);
             }
-            var links = Narrow ? content : UiFactory.Panel(row, "Links", new Vector2(0.58f, 0f), Vector2.one, new Vector2(12f, 0f), Vector2.zero);
-            var keys = new[] { "menu.garage", "menu.leaderboard", "menu.settings" };
-            var targets = new[] { "garage", "leaders", "settings" };
-            var captions = new[] { "garage.engine.desc", "lb.local", "settings.language" };
-            for (int i = 0; i < keys.Length; i++)
-            {
-                var slot = Narrow ? Item(links, targets[i] + "Slot", 136f, false) : UiFactory.Panel(links, targets[i] + "Slot", new Vector2(0f, 1f - (i + 1f) / 3f), new Vector2(1f, 1f - i / 3f), new Vector2(0f, i == 2 ? 0f : 10f), new Vector2(0f, i == 0 ? 0f : -10f));
-                string target = targets[i];
-                var button = UiFactory.Button(slot, target, "", () => Show(target), Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 32f, UiFactory.Surface);
-                Label(button.transform, "Index", (i + 1).ToString("00"), 24f, Vector2.zero, Vector2.one, new Vector2(28f, 20f), new Vector2(-20f, -20f), UiFactory.Accent, TextAlignmentOptions.TopLeft);
-                Label(button.transform, "Name", Loc.Get(keys[i]), 32f, Vector2.zero, Vector2.one, new Vector2(82f, 48f), new Vector2(-42f, -22f)).fontStyle = FontStyles.Bold;
-                Label(button.transform, "Detail", Loc.Get(captions[i]), 22f, Vector2.zero, Vector2.one, new Vector2(82f, 18f), new Vector2(-42f, -82f), UiFactory.Muted);
-                Label(button.transform, "Arrow", "›", 42f, new Vector2(1f, 0f), Vector2.one, new Vector2(-40f, 0f), new Vector2(-14f, 0f), UiFactory.Muted);
-            }
-            var practiceLink = Item(content, "PracticeLink", 86f, false);
-            UiFactory.Button(practiceLink, "Practice", Loc.Get("practice.title") + "   ›", () => Show("practice"),
-                Vector2.zero, Vector2.one, new Vector2(4f, 4f), new Vector2(-4f, -4f), 28f, UiFactory.Raised);
             BuildDailyCard(content);
         }
 
@@ -644,7 +645,7 @@ namespace RacingGame
 
         private void BuildSettings(RectTransform root)
         {
-            var content = UiFactory.Scroll(Header(root, "settings.title"), "SettingsScroll", Vector2.zero, Vector2.zero);
+            var content = UiFactory.Scroll(Header(root, "settings.title", showWallet: false), "SettingsScroll", Vector2.zero, Vector2.zero);
             var save = PlatformGlue.Save;
             string lang = save != null ? save.Data.settings.lang : "";
             int index = Array.IndexOf(LanguageCycle, lang);
@@ -652,11 +653,11 @@ namespace RacingGame
             if (save != null && save.LocalWriteFailed)
                 UiFactory.Button(Item(content, "LocalSaveRetry", 86f, false), "RetryLocalSave", Loc.Get("save.local.retry"),
                     () => { saveWarningAcknowledged = false; UpdateSaveRecovery(); }, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 28f);
-            var row = SettingRow(content, "Language", "settings.language");
-            var value = SettingValue(row);
-            UiFactory.Button(value, "LanguagePrevious", "‹", () => PlatformGlue.SetLanguageOverride(LanguageCycle[(Mathf.Max(0, index) + LanguageCycle.Length - 1) % LanguageCycle.Length]), Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(64f, 0f), 36f, UiFactory.Raised);
-            Label(value, "LanguageName", language, 25f, Vector2.zero, Vector2.one, new Vector2(74f, 4f), new Vector2(-74f, -4f), Color.white, TextAlignmentOptions.Center);
-            UiFactory.Button(value, "LanguageNext", "›", () => PlatformGlue.SetLanguageOverride(LanguageCycle[(Mathf.Max(0, index) + 1) % LanguageCycle.Length]), new Vector2(1f, 0f), Vector2.one, new Vector2(-64f, 0f), Vector2.zero, 36f, UiFactory.Raised);
+            Section(content, "LanguageAudioTitle", Loc.Get("settings.group.language_audio"));
+            var value = SettingValue(content, "Language", "settings.language");
+            UiFactory.Button(value, "LanguagePrevious", "‹", () => PlatformGlue.SetLanguageOverride(LanguageCycle[(Mathf.Max(0, index) + LanguageCycle.Length - 1) % LanguageCycle.Length]), Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(72f, 0f), 36f, UiFactory.Raised);
+            Label(value, "LanguageName", language, 26f, Vector2.zero, Vector2.one, new Vector2(82f, 4f), new Vector2(-82f, -4f), Color.white, TextAlignmentOptions.Center);
+            UiFactory.Button(value, "LanguageNext", "›", () => PlatformGlue.SetLanguageOverride(LanguageCycle[(Mathf.Max(0, index) + 1) % LanguageCycle.Length]), new Vector2(1f, 0f), Vector2.one, new Vector2(-72f, 0f), Vector2.zero, 36f, UiFactory.Raised);
             VolumeRow(content, "Sound", "settings.sound", save != null ? save.Data.settings.sfx : 1f, level =>
             {
                 if (save == null) return;
@@ -672,6 +673,7 @@ namespace RacingGame
             // MusicPlayer observes changes, including an explicitly chosen 80% value.
             VolumeRow(content, "Music", "settings.music", save != null ? MusicDirector.MusicLevel(save.Data.settings) : 0f, level =>
             { if (save == null) return; save.Data.settings.music = level; save.Data.settings.musicChosen = true; save.MarkDirty(); });
+            Section(content, "ControlsTitle", Loc.Get("settings.group.controls"));
             ToggleRow(content, "AutoThrottle", "settings.auto_throttle", save != null && save.Data.settings.autoThrottle, enabled =>
             {
                 if (save == null) return;
@@ -687,10 +689,19 @@ namespace RacingGame
             if (!PlatformGlue.IsMobileDevice)
                 ToggleRow(content, "AutoAim", "settings.auto_aim", save == null || save.Data.settings.autoAim, enabled =>
                 { if (save == null) return; save.Data.settings.autoAim = enabled; save.MarkDirty(); Show("settings"); });
+            var hints = SettingValue(content, "Hints", "settings.hints");
+            UiFactory.Button(hints, "ReplayHints", Loc.Get("settings.hints.replay"), () =>
+            {
+                if (save == null) return;
+                save.Data.settings.hintsSeen = 0;
+                save.MarkDirty();
+                Toast(Loc.Get("settings.hints.reset"));
+            }, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 26f, UiFactory.Raised);
+            Section(content, "DisplayTitle", Loc.Get("settings.group.display"));
             if (PlatformGlue.HasQualityChoice && save != null)
             {
                 var settings = save.Data.settings;
-                var options = SettingValue(SettingRow(content, "Graphics", "settings.graphics"));
+                var options = SettingValue(content, "Graphics", "settings.graphics");
                 var keys = new[] { "settings.graphics.auto", "settings.graphics.low", "settings.graphics.high" };
                 int selected = settings.qualityAuto ? 0 : settings.quality <= 0 ? 1 : 2;
                 for (int i = 0; i < keys.Length; i++)
@@ -703,25 +714,23 @@ namespace RacingGame
             { if (save == null) return; save.Data.settings.cameraShake = enabled; save.MarkDirty(); Show("settings"); });
             ToggleRow(content, "DynamicCamera", "settings.dynamic_camera", save == null || save.Data.settings.dynamicCamera, enabled =>
             { if (save == null) return; save.Data.settings.dynamicCamera = enabled; save.MarkDirty(); Show("settings"); });
-            var hints = SettingValue(SettingRow(content, "Hints", "settings.hints"));
-            UiFactory.Button(hints, "ReplayHints", Loc.Get("settings.hints.replay"), () =>
-            {
-                if (save == null) return;
-                save.Data.settings.hintsSeen = 0;
-                save.MarkDirty();
-                Toast(Loc.Get("settings.hints.reset"));
-            }, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 26f, UiFactory.Raised);
         }
-        private RectTransform SettingRow(Transform content, string name, string key)
+
+        private static RectTransform SettingValue(Transform content, string name, string key)
         {
-            var row = Item(content, name, Narrow ? 170f : 122f);
-            Label(row, "Name", Loc.Get(key), 30f, Narrow ? Top : Vector2.zero, Vector2.one, new Vector2(28f, Narrow ? -64f : 16f), new Vector2(Narrow ? -28f : -550f, -16f));
-            return row;
+            // The garage also uses this row inside a narrower catalog column.
+            bool stacked = ((RectTransform)content).rect.width < 740f;
+            var row = Item(content, name, stacked ? 152f : 96f, false);
+            const float split = 0.44f;
+            Label(row, "Name", Loc.Get(key), 30f, stacked ? Top : Vector2.zero, stacked ? Vector2.one : new Vector2(split, 1f),
+                new Vector2(16f, stacked ? -64f : 6f), new Vector2(-12f, -6f));
+            UiFactory.Panel(row, "Divider", Vector2.zero, new Vector2(1f, 0f), Vector2.zero, new Vector2(0f, 2f), UiFactory.Raised, false);
+            return UiFactory.Panel(row, "Value", stacked ? Vector2.zero : new Vector2(split, 0.5f), stacked ? new Vector2(1f, 0f) : new Vector2(1f, 0.5f),
+                new Vector2(12f, stacked ? 8f : -36f), new Vector2(-12f, stacked ? 80f : 36f));
         }
-        private RectTransform SettingValue(RectTransform row) => UiFactory.Panel(row, "Value", Narrow ? Vector2.zero : new Vector2(1f, 0.5f), Narrow ? new Vector2(1f, 0f) : new Vector2(1f, 0.5f), Narrow ? new Vector2(26f, 22f) : new Vector2(-528f, -34f), Narrow ? new Vector2(-26f, 90f) : new Vector2(-26f, 34f));
         private void ToggleRow(Transform content, string name, string key, bool enabled, Action<bool> change)
         {
-            var value = SettingValue(SettingRow(content, name, key));
+            var value = SettingValue(content, name, key);
             for (int i = 0; i < 2; i++)
             {
                 bool state = i == 1;
@@ -731,7 +740,7 @@ namespace RacingGame
 
         private void VolumeRow(Transform content, string name, string key, float level, Action<float> change)
         {
-            var value = SettingValue(SettingRow(content, name, key));
+            var value = SettingValue(content, name, key);
             int percent = Mathf.RoundToInt(Mathf.Clamp01(level) * 100f);
             var label = Label(value, "VolumeValue", percent + "%", 27f, new Vector2(1f, 0f), Vector2.one,
                 new Vector2(-92f, 0f), Vector2.zero, Color.white, TextAlignmentOptions.Center);
@@ -915,6 +924,8 @@ namespace RacingGame
             string record = RecordLine(me);
             if (record.Length > 0) Label(summary, "Record", record, 24f, Top, Vector2.one, new Vector2(234f, -170f), new Vector2(-28f, -128f), flow.LastWasPersonalBest ? UiFactory.Positive : UiFactory.Muted);
 
+            if (me != null && me.Finished && flow.LastSectorDeltaMs != null)
+                BuildSectorComparison(content, flow.LastSectorDeltaMs);
             BuildRewardDetails(content, me, missionEvent);
             BuildResultStars(content);
             var next = RecommendedNext();

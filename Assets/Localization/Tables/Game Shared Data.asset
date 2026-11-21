@@ -1999,6 +1999,62 @@ MonoBehaviour:
     m_Key: models.classic
     m_Metadata:
       m_Items: []
+  - m_Id: 28262365795790848
+    m_Key: menu.next_race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365808373760
+    m_Key: menu.unlocked_races
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568064
+    m_Key: settings.group.language_audio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568065
+    m_Key: settings.group.controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568066
+    m_Key: settings.group.display
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726132641792
+    m_Key: touch.reset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224704
+    m_Key: hint.stuck.touch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224705
+    m_Key: goals.compact.touch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224706
+    m_Key: results.sectors
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224707
+    m_Key: results.sector.bridge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224708
+    m_Key: results.sector.tower
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224709
+    m_Key: results.sector.pits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224710
+    m_Key: results.sector.number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224711
+    m_Key: results.sector.delta
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

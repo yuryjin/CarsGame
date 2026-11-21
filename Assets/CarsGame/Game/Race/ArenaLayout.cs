@@ -14,6 +14,7 @@ namespace RacingGame
         private MissionStrikes strikes;
         private RaceSpawner spawner;
         private RaceManager race;
+        private Transform bomberFormation;
         private bool ownsArt;
         public int SimulationOrder => 2100;
         public int LiveBombs => strikes != null ? strikes.Count : 0;
@@ -54,6 +55,7 @@ namespace RacingGame
             var rock = MissionArt.Rock;
             var deck = MissionArt.Iron;
             var edge = MissionArt.HazardGlow;
+            var ruinedBridgehead = Resources.Load<GameObject>("Art/Arena/RuinedBridgehead");
             AddBox("SandBasin", new Vector3(0f, -1f, 0f), new Vector3(244f, 2f, 244f), sand);
             // Broad approaches are climbable from the sand; all six face the central gap.
             float run = BridgeStart - BridgeEnd;
@@ -71,12 +73,7 @@ namespace RacingGame
                         new Vector3(0.3f, 0.08f, ramp.localScale.z), edge);
                     stripe.localRotation = ramp.localRotation;
                 }
-                // Buttresses sit outside the driving lanes; the basin remains accessible between arms.
-                var mesa = AddBox("SandstoneMesa" + arm, Quaternion.Euler(0f, arm * 60f + 30f, 0f) * new Vector3(0f, 6f, 78f),
-                    new Vector3(17f, 12f, 24f), rock);
-                mesa.localRotation = Quaternion.Euler(0f, arm * 60f + 15f, 0f);
-                mesa.GetComponent<MeshFilter>().sharedMesh = MissionArt.Cached("ArenaMesa", (w, g) =>
-                    LowPoly.Pyramid(w, Matrix4x4.identity, Vector3.down * 0.5f, Vector2.one, 1f, new Vector2(0.12f, -0.1f), MissionArt.Rock))[0];
+                AddButtress(arm, ruinedBridgehead);
             }
             // Distant dunes dress the boundary without adding runtime mesh colliders.
             var backdrop = new GameObject("Dunes").transform;
@@ -92,10 +89,50 @@ namespace RacingGame
                         new Vector2(i % 3 * 3f, -4f), i % 2 == 0 ? MissionArt.SandDark : MissionArt.Rock);
                 }
             }), LayerMask.NameToLayer("Track"));
+            BuildScenery();
             AddBox("NorthRim", new Vector3(0f, 3f, HalfSize), new Vector3(244f, 6f, 3f), rock);
             AddBox("SouthRim", new Vector3(0f, 3f, -HalfSize), new Vector3(244f, 6f, 3f), rock);
             AddBox("EastRim", new Vector3(HalfSize, 3f, 0f), new Vector3(3f, 6f, 238f), rock);
             AddBox("WestRim", new Vector3(-HalfSize, 3f, 0f), new Vector3(3f, 6f, 238f), rock);
+        }
+
+        private void AddButtress(int arm, GameObject ruinedBridgehead)
+        {
+            var position = Quaternion.Euler(0f, arm * 60f + 30f, 0f) * (Vector3.forward * 78f);
+            var rotation = Quaternion.Euler(0f, arm * 60f + 15f, 0f);
+            var size = new Vector3(17f, 12f, 24f);
+            var centre = Vector3.up * (size.y * 0.5f);
+            if (arm % 2 == 0 && ruinedBridgehead != null)
+            {
+                var ruin = Instantiate(ruinedBridgehead, transform, false);
+                ruin.transform.SetLocalPositionAndRotation(position, rotation);
+                ruin.layer = LayerMask.NameToLayer("Track");
+                var blocker = ruin.AddComponent<BoxCollider>();
+                blocker.center = centre;
+                blocker.size = size;
+                return;
+            }
+
+            var mesa = AddBox("SandstoneMesa" + arm, position + centre, size, MissionArt.Rock);
+            mesa.localRotation = rotation;
+            mesa.GetComponent<MeshFilter>().sharedMesh = MissionArt.Cached("ArenaMesa", (w, g) =>
+                LowPoly.Pyramid(w, Matrix4x4.identity, Vector3.down * 0.5f, Vector2.one, 1f, new Vector2(0.12f, -0.1f), MissionArt.Rock))[0];
+        }
+
+        private void BuildScenery()
+        {
+            var ruins = Resources.Load<GameObject>("Art/Arena/RuinedWorks");
+            if (ruins != null) Instantiate(ruins, transform, false).name = ruins.name;
+
+            var bomber = Resources.Load<GameObject>("Art/Arena/Bomber");
+            if (bomber == null) return;
+            bomberFormation = MissionArt.Pivot(transform, "BomberFormation", Vector3.zero);
+            foreach (var offset in new[] { new Vector3(74f, 33f, -40f), new Vector3(98f, 37f, -23f) })
+            {
+                var plane = Instantiate(bomber, bomberFormation, false).transform;
+                var heading = Quaternion.LookRotation(Vector3.Cross(Vector3.up, offset));
+                plane.SetLocalPositionAndRotation(offset, heading * Quaternion.Euler(0f, 0f, -13f));
+            }
         }
 
         public void Initialize(RaceSpawner field, RaceManager manager)
@@ -121,7 +158,9 @@ namespace RacingGame
 
         private void LateUpdate()
         {
-            if (Running && SimulationDriver.Current != null) strikes?.UpdateVisuals(SimulationDriver.Current.Tick, 0f);
+            if (!Running) return;
+            if (bomberFormation != null) bomberFormation.localRotation = Quaternion.Euler(0f, (float)race.RaceTime * 9f, 0f);
+            if (SimulationDriver.Current != null) strikes?.UpdateVisuals(SimulationDriver.Current.Tick, 0f);
         }
 
         public bool IsBombZone(Vector3 world)

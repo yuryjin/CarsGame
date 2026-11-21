@@ -158,8 +158,7 @@ namespace RacingGame
                 var options = new List<string> { "" };
                 foreach (var p in Cosmetics.Paints) if (Cosmetics.OwnsPaint(progress.cosmetics, p.Id)) options.Add(p.Id);
                 int at = Mathf.Max(0, options.IndexOf(progress.stripe ?? ""));
-                var row = SettingRow(content, "StripeColour", "garage.stripe_color");
-                var value = SettingValue(row);
+                var value = SettingValue(content, "StripeColour", "garage.stripe_color");
                 void Step(int dir)
                 {
                     var live = PlatformGlue.Save;   // a cloud merge may have replaced the data since the screen was built

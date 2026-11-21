@@ -75,6 +75,7 @@ namespace RacingGame.Tests
             Assert.IsTrue(race.Player.Weapons.CompactLoadout);
             Assert.NotNull(Button("Fire"));
             Assert.NotNull(Button("SwapWeapon"));
+            Assert.AreEqual(Loc.Get("touch.reset"), Button("Reset").GetComponentInChildren<TMPro.TMP_Text>().text);
             foreach (string name in new[] { "Brake", "Reset", "SwapWeapon", "PauseButton", "LiveGoals" })
             {
                 var target = (RectTransform)Button(name).transform;
@@ -99,6 +100,7 @@ namespace RacingGame.Tests
             Assert.AreEqual(RaceState.Racing, race.State);
             var goals = Button("LiveGoals");
             Assert.NotNull(goals);
+            StringAssert.IsMatch(@"^★ \d/3$", goals.GetComponentInChildren<TMPro.TMP_Text>().text);
             float compactHeight = ((RectTransform)goals.transform).rect.height;
             goals.onClick.Invoke(); yield return null;
             Assert.Greater(((RectTransform)goals.transform).rect.height, compactHeight);

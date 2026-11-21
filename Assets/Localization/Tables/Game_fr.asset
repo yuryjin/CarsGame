@@ -47,19 +47,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094595
-    m_Localized: COURSE
+    m_Localized: En piste
     m_Metadata:
       m_Items: []
   - m_Id: 4010094596
-    m_Localized: GARAGE
+    m_Localized: Garage
     m_Metadata:
       m_Items: []
   - m_Id: 4010094597
-    m_Localized: CLASSEMENT
+    m_Localized: Classement
     m_Metadata:
       m_Items: []
   - m_Id: 4010094598
-    m_Localized: OPTIONS
+    m_Localized: Options
     m_Metadata:
       m_Items: []
   - m_Id: 4010094599
@@ -71,11 +71,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094601
-    m_Localized: '{n} tours'
+    m_Localized: 'Tours : {n}'
     m_Metadata:
       m_Items: []
   - m_Id: 4010094602
-    m_Localized: '{n} rivaux'
+    m_Localized: 'Rivaux : {n}'
     m_Metadata:
       m_Items: []
   - m_Id: 4010094603
@@ -281,7 +281,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4014288922
-    m_Localized: Son
+    m_Localized: Effets sonores
     m_Metadata:
       m_Items: []
   - m_Id: 4014288923
@@ -1710,7 +1710,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 18240820474097664
     m_Localized: "La voiture acc\xE9l\xE8re seule. Dirige-toi avec les fl\xE8ches.
-      Maintiens FREIN pour ralentir. R te ram\xE8ne sur la piste."
+      Maintiens FREIN pour ralentir. Pour revenir, touche \xAB {button} \xBB."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097665
@@ -2049,6 +2049,62 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 28159633902612480
     m_Localized: "Mod\xE8les classiques"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365795790848
+    m_Localized: Prochaine course
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365808373760
+    m_Localized: "Courses d\xE9bloqu\xE9es : {n}/{max}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568064
+    m_Localized: Langue et son
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568065
+    m_Localized: Commandes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568066
+    m_Localized: "Affichage et cam\xE9ra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726132641792
+    m_Localized: En piste
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224704
+    m_Localized: "Bloqu\xE9 ? Touche \xAB {button} \xBB"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224705
+    m_Localized: "\u2605 {n}/3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224706
+    m_Localized: "Secteurs face \xE0 ton fant\xF4me \xB7 \u2212 plus rapide"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224707
+    m_Localized: Pont
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224708
+    m_Localized: Tour
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224709
+    m_Localized: Stands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224710
+    m_Localized: Secteur {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224711
+    m_Localized: '{t} s'
     m_Metadata:
       m_Items: []
   references:

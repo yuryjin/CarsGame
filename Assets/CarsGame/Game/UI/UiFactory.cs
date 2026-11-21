@@ -134,7 +134,8 @@ namespace RacingGame
             var img = rt.GetComponent<Image>(); img.raycastTarget = true;
             var btn = rt.gameObject.AddComponent<Button>();
             var colors = btn.colors;
-            colors.highlightedColor = colors.selectedColor = new Color(1.3f, 1.3f, 1.3f, 1f);
+            colors.highlightedColor = new Color(1.12f, 1.12f, 1.12f, 1f);
+            colors.selectedColor = Color.white;
             colors.pressedColor = new Color(0.72f, 0.72f, 0.72f, 1f);
             colors.disabledColor = new Color(0.6f, 0.6f, 0.6f, 1f);
             colors.fadeDuration = 0.12f; btn.colors = colors;

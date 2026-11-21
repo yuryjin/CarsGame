@@ -23,11 +23,11 @@ namespace RacingGame
         public float Length { get; private set; }
         public float RepairDistance { get; private set; }
 
-        public static TrackFork Create(TrackPath path)
+        public static TrackFork Create(TrackPath path, bool hasRepair = true)
         {
             var fork = new GameObject("TrackFork").AddComponent<TrackFork>();
             fork.path = path;
-            fork.Build(path.reversed ? path.Spline.Reversed() : path.Spline);
+            fork.Build(path.reversed ? path.Spline.Reversed() : path.Spline, hasRepair);
             path.Fork = fork;
             return fork;
         }
@@ -56,7 +56,7 @@ namespace RacingGame
             return path.Wrap(start + span * fraction);
         }
 
-        private void Build(TrackSpline forward)
+        private void Build(TrackSpline forward, bool hasRepair)
         {
             Vector3 a = forward.Position(Entry) + forward.Right(Entry) * 2.2f;
             Vector3 d = forward.Position(Exit) + forward.Right(Exit) * 2.2f;
@@ -147,6 +147,9 @@ namespace RacingGame
             AddMeshes(road, material, true, 0.015f, surface);
             AddMeshes(skirts, material, false, 0.015f);
             AddMeshes(markings, material, false);
+            AddMeshes(CircuitRoadside.ForkSigns(forward, path.halfWidth, hasRepair), material, false);
+            AddMeshes(CircuitRoadside.WaterTower(forward), material, false);
+            AddMeshes(CircuitRoadside.PitWalkway(forward), material, false);
             OpenMergeBarriers();
             foreach (string name in new[] { "Track_LeftKerb", "Track_RightKerb" })
             {

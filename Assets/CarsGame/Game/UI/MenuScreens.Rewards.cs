@@ -10,6 +10,29 @@ namespace RacingGame
     {
         private bool rewardDetailsExpanded;
 
+        private void BuildSectorComparison(RectTransform content, int[] deltas)
+        {
+            var row = Item(content, "SectorComparison", 114f);
+            Label(row, "SectorTitle", Loc.Get("results.sectors"), 23f, Top, Vector2.one,
+                new Vector2(18f, -42f), new Vector2(-18f, -4f), UiFactory.Muted);
+            var path = TrackPath.Instance;
+            var culture = CultureInfo.GetCultureInfo(Loc.Language);
+            for (int i = 0; i < deltas.Length; i++)
+            {
+                int place = path != null && path.reversed ? 2 - i : i;
+                string name = path != null && path.Fork != null
+                    ? Loc.Get(place == 0 ? "results.sector.bridge" : place == 1 ? "results.sector.tower" : "results.sector.pits")
+                    : Loc.Format("results.sector.number", "n", i + 1);
+                int tenths = Mathf.RoundToInt(deltas[i] / 100f);
+                string sign = tenths < 0 ? "−" : tenths > 0 ? "+" : "";
+                string seconds = sign + (Mathf.Abs(tenths) / 10m).ToString("0.0", culture);
+                var color = tenths < 0 ? UiFactory.Positive : tenths > 0 ? UiFactory.Accent : UiFactory.Muted;
+                Label(row, "Sector" + (i + 1), name + "\n" + Loc.Format("results.sector.delta", "t", seconds), 24f,
+                    new Vector2(i / 3f, 0f), new Vector2((i + 1) / 3f, 1f), new Vector2(8f, 5f),
+                    new Vector2(-8f, -40f), color, TextAlignmentOptions.Center);
+            }
+        }
+
         private void BuildRewardDetails(RectTransform content, RaceResultEntry me, bool mission)
         {
             var rows = new List<(string id, string key, int coins)> {

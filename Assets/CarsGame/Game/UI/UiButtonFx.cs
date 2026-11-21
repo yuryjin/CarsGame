@@ -20,6 +20,7 @@ namespace RacingGame
         private bool isHovered;
         private bool isPressed;
         private Selectable button;
+        private Outline focusRing;
 
         private void Awake()
         {
@@ -34,6 +35,7 @@ namespace RacingGame
             targetScale = baseScale;
             isHovered = false;
             isPressed = false;
+            if (focusRing != null) focusRing.enabled = EventSystem.current?.currentSelectedGameObject == gameObject;
         }
 
         private void Update()
@@ -79,6 +81,16 @@ namespace RacingGame
         public void OnSelect(BaseEventData eventData)
         {
             if (button != null && !button.interactable) return;
+            if (button != null && button.navigation.mode != Navigation.Mode.None && button.targetGraphic != null)
+            {
+                if (focusRing == null)
+                {
+                    focusRing = button.targetGraphic.gameObject.AddComponent<Outline>();
+                    focusRing.effectColor = new Color(0.84f, 0.91f, 1f);
+                    focusRing.effectDistance = new Vector2(3f, -3f);
+                }
+                focusRing.enabled = true;
+            }
             isHovered = true;
             UpdateTarget();
             // Keep keyboard/gamepad focus visible inside the native scrolling lists.
@@ -94,6 +106,7 @@ namespace RacingGame
 
         public void OnDeselect(BaseEventData eventData)
         {
+            if (focusRing != null) focusRing.enabled = false;
             isHovered = false;
             isPressed = false;
             UpdateTarget();

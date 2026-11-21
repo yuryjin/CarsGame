@@ -50,6 +50,56 @@ namespace RacingGame.Tests
         }
 
         [UnityTest, Timeout(300000)]
+        public IEnumerator RuinedSkylineAndBomberFormationAppearInTheMatch()
+        {
+            yield return Boot();
+            var arena = race.spawner.Arena.transform;
+            var ruins = arena.Find("RuinedWorks");
+            var formation = arena.Find("BomberFormation");
+            Assert.IsNotNull(ruins);
+            Assert.IsNotNull(formation);
+            Assert.AreEqual(2, formation.childCount);
+            Assert.IsEmpty(ruins.GetComponentsInChildren<Collider>());
+            Assert.IsEmpty(formation.GetComponentsInChildren<Collider>());
+
+            var buildings = ruins.GetComponentsInChildren<MeshRenderer>();
+            var planes = formation.GetComponentsInChildren<MeshRenderer>();
+            Assert.AreEqual(1, buildings.Length, "the static skyline is a single mesh");
+            Assert.AreEqual(2, planes.Length);
+            Assert.AreSame(planes[0].GetComponent<MeshFilter>().sharedMesh, planes[1].GetComponent<MeshFilter>().sharedMesh);
+            foreach (var renderer in new[] { buildings[0], planes[0], planes[1] })
+            {
+                Assert.AreEqual("CarsGame/StylizedLit", renderer.sharedMaterial.shader.name);
+                Assert.IsTrue(renderer.GetComponent<MeshFilter>().sharedMesh.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.Color));
+            }
+            Assert.Greater(buildings[0].bounds.max.y - arena.position.y, ArenaLayout.BridgeHeight);
+            var bridgehead = Resources.Load<GameObject>("Art/Arena/RuinedBridgehead").GetComponentInChildren<MeshFilter>().sharedMesh;
+            int ruinsWithBlockers = 0;
+            foreach (var collider in arena.GetComponentsInChildren<BoxCollider>())
+            {
+                var model = collider.GetComponentInChildren<MeshFilter>();
+                if (model == null || model.sharedMesh != bridgehead) continue;
+                Assert.AreEqual(LayerMask.NameToLayer("Track"), collider.gameObject.layer);
+                Assert.AreEqual(new Vector3(17f, 12f, 24f), collider.size);
+                Assert.That(collider.bounds.max.y - arena.position.y, Is.EqualTo(12f).Within(.01f));
+                ruinsWithBlockers++;
+            }
+            Assert.AreEqual(3, ruinsWithBlockers);
+            var lead = formation.GetChild(0);
+            var start = lead.position;
+            var frustum = GeometryUtility.CalculateFrustumPlanes(Camera.main);
+            foreach (var plane in planes) Assert.IsTrue(GeometryUtility.TestPlanesAABB(frustum, plane.bounds), "visible from the grid");
+            CaptureView(Camera.main, "arena-grid");
+            for (int i = 0; i < 12; i++) yield return null;
+            Assert.Greater(Vector3.Distance(start, lead.position), 1f);
+            PauseController.Set(PauseReason.User, true);
+            yield return null;
+            var paused = lead.position;
+            for (int i = 0; i < 4; i++) yield return null;
+            Assert.AreEqual(paused, lead.position);
+        }
+
+        [UnityTest, Timeout(300000)]
         public IEnumerator BridgeJumpBombPauseDamageAndRetry()
         {
             yield return Boot();
@@ -113,16 +163,30 @@ namespace RacingGame.Tests
 
         private static void CaptureArena(ArenaLayout arena)
         {
-            string work = System.Environment.GetEnvironmentVariable("CG_WORK");
-            if (string.IsNullOrEmpty(work) || SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) return;
             var go = new GameObject("ArenaOverview", typeof(Camera));
             var camera = go.GetComponent<Camera>();
-            camera.transform.position = arena.transform.position + new Vector3(150f, 170f, 150f);
-            camera.transform.LookAt(arena.transform.position);
-            camera.farClipPlane = 600f;
+            try
+            {
+                camera.transform.position = arena.transform.position + new Vector3(150f, 170f, 150f);
+                camera.transform.LookAt(arena.transform.position);
+                camera.farClipPlane = 600f;
+                CaptureView(camera, "arena-overview");
+                var plane = arena.transform.Find("BomberFormation").GetChild(0);
+                camera.transform.position = plane.TransformPoint(new Vector3(-18f, 8f, 23f));
+                camera.transform.LookAt(plane.position);
+                CaptureView(camera, "arena-bomber");
+            }
+            finally { Object.Destroy(go); }
+        }
+
+        private static void CaptureView(Camera camera, string filename)
+        {
+            string work = System.Environment.GetEnvironmentVariable("CG_WORK");
+            if (string.IsNullOrEmpty(work) || SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) return;
             var target = new RenderTexture(1280, 720, 24);
             var pixels = new Texture2D(1280, 720, TextureFormat.RGB24, false);
             var previous = RenderTexture.active;
+            var previousTarget = camera.targetTexture;
             try
             {
                 camera.targetTexture = target;
@@ -130,14 +194,14 @@ namespace RacingGame.Tests
                 RenderTexture.active = target;
                 pixels.ReadPixels(new Rect(0, 0, 1280, 720), 0, 0);
                 pixels.Apply();
-                System.IO.File.WriteAllBytes(System.IO.Path.Combine(work, "arena-overview.png"), pixels.EncodeToPNG());
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(work, filename + ".png"), pixels.EncodeToPNG());
             }
             finally
             {
                 RenderTexture.active = previous;
-                camera.targetTexture = null;
+                camera.targetTexture = previousTarget;
                 target.Release();
-                Object.Destroy(target); Object.Destroy(pixels); Object.Destroy(go);
+                Object.Destroy(target); Object.Destroy(pixels);
             }
         }
 

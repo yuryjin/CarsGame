@@ -99,7 +99,9 @@ namespace RacingGame
             if (stuckTime >= 2f && !stuckShown)
             {
                 stuckShown = true;
-                hud.ShowHint(Loc.Get("hint.stuck"), hintSeconds);
+                string hint = TouchControlsPresenter.IsShown
+                    ? Loc.Format("hint.stuck.touch", "button", Loc.Get("touch.reset")) : Loc.Get("hint.stuck");
+                hud.ShowHint(hint, hintSeconds);
             }
             if (stuckTime >= 4f && !stuckReset && PlatformGlue.Save != null && PlatformGlue.Save.Data.Races < 3)
             {

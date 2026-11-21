@@ -47,19 +47,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094595
-    m_Localized: CORRIDA
+    m_Localized: Correr
     m_Metadata:
       m_Items: []
   - m_Id: 4010094596
-    m_Localized: GARAGEM
+    m_Localized: Garagem
     m_Metadata:
       m_Items: []
   - m_Id: 4010094597
-    m_Localized: "L\xCDDERES"
+    m_Localized: "Classifica\xE7\xE3o"
     m_Metadata:
       m_Items: []
   - m_Id: 4010094598
-    m_Localized: "OP\xC7\xD5ES"
+    m_Localized: "Op\xE7\xF5es"
     m_Metadata:
       m_Items: []
   - m_Id: 4010094599
@@ -71,11 +71,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094601
-    m_Localized: '{n} voltas'
+    m_Localized: 'Voltas: {n}'
     m_Metadata:
       m_Items: []
   - m_Id: 4010094602
-    m_Localized: '{n} rivais'
+    m_Localized: 'Rivais: {n}'
     m_Metadata:
       m_Items: []
   - m_Id: 4010094603
@@ -281,7 +281,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4014288922
-    m_Localized: Som
+    m_Localized: Efeitos sonoros
     m_Metadata:
       m_Items: []
   - m_Id: 4014288923
@@ -1709,8 +1709,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097664
-    m_Localized: "O carro acelera sozinho. Use as setas. Segure FREIO para reduzir
-      a velocidade. Toque em R para voltar \xE0 pista."
+    m_Localized: "O carro acelera sozinho. Use as setas para virar. Segure FREIO
+      para reduzir a velocidade. Para voltar, toque em \u201C{button}\u201D."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097665
@@ -2050,6 +2050,62 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 28159633902612480
     m_Localized: "Modelos cl\xE1ssicos"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365795790848
+    m_Localized: "Pr\xF3xima corrida"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365808373760
+    m_Localized: 'Corridas desbloqueadas: {n}/{max}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568064
+    m_Localized: Idioma e som
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568065
+    m_Localized: Controles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568066
+    m_Localized: "Imagem e c\xE2mera"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726132641792
+    m_Localized: "Voltar \xE0 pista"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224704
+    m_Localized: "Travou? Toque em \u201C{button}\u201D"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224705
+    m_Localized: "\u2605 {n}/3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224706
+    m_Localized: "Setores contra o seu fantasma \xB7 \u2212 \xE9 mais r\xE1pido"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224707
+    m_Localized: Ponte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224708
+    m_Localized: Torre
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224709
+    m_Localized: Boxes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224710
+    m_Localized: Setor {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224711
+    m_Localized: '{t} s'
     m_Metadata:
       m_Items: []
   references:

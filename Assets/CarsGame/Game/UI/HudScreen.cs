@@ -449,7 +449,7 @@ namespace RacingGame
 
         private void ShowHelp()
         {
-            helpText.text = Loc.Get(touchLayout ? "help.drive.touch" : "help.drive.keys");
+            helpText.text = touchLayout ? Loc.Format("help.drive.touch", "button", Loc.Get("touch.reset")) : Loc.Get("help.drive.keys");
             if (!touchLayout) helpText.text += "\n\n" + Loc.Get("help.drive.gamepad");
             helpText.text += "\n\n" + Loc.Get("help.launch");
             string context = ControlsHint(touchLayout);
@@ -924,7 +924,7 @@ namespace RacingGame
             float font = Mathf.Max(23f, 12f / scale);
             goalsText.enableAutoSizing = false;
             goalsText.fontSize = font;
-            float width = expanded ? Mathf.Min(820f, 500f * font / 23f) : 500f;
+            float width = expanded ? Mathf.Min(820f, 500f * font / 23f) : touchLayout ? 64f / scale : 500f;
             bool mission = RaceSetup.Event != null && RaceSetup.Event.mode == EventMode.Mission;
             // The mission hides lap/position. Use that free corner, keeping expanded goals
             // beside the boss panel instead of covering its route and enemy count.
@@ -1455,7 +1455,7 @@ namespace RacingGame
                 race.ReadResult(race.Player, goalEntry);
                 bool expanded = goalsExpanded || race.State == RaceState.Countdown;
                 goalsText.text = expanded ? StarGoalText.Progress(RaceSetup.Event, goalEntry)
-                    : Loc.Format("goals.compact", "n", RaceEventDefinition.CountStars(RaceSetup.Event.StarMask(goalEntry)));
+                    : Loc.Format(touchLayout ? "goals.compact.touch" : "goals.compact", "n", RaceEventDefinition.CountStars(RaceSetup.Event.StarMask(goalEntry)));
                 LayoutGoals(expanded);
             }
         }

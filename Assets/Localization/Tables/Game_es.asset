@@ -47,19 +47,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094595
-    m_Localized: CARRERA
+    m_Localized: Correr
     m_Metadata:
       m_Items: []
   - m_Id: 4010094596
-    m_Localized: GARAJE
+    m_Localized: Garaje
     m_Metadata:
       m_Items: []
   - m_Id: 4010094597
-    m_Localized: "L\xCDDERES"
+    m_Localized: "Clasificaci\xF3n"
     m_Metadata:
       m_Items: []
   - m_Id: 4010094598
-    m_Localized: AJUSTES
+    m_Localized: Ajustes
     m_Metadata:
       m_Items: []
   - m_Id: 4010094599
@@ -71,11 +71,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094601
-    m_Localized: '{n} vueltas'
+    m_Localized: 'Vueltas: {n}'
     m_Metadata:
       m_Items: []
   - m_Id: 4010094602
-    m_Localized: '{n} rivales'
+    m_Localized: 'Rivales: {n}'
     m_Metadata:
       m_Items: []
   - m_Id: 4010094603
@@ -285,7 +285,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4014288922
-    m_Localized: Sonido
+    m_Localized: Efectos de sonido
     m_Metadata:
       m_Items: []
   - m_Id: 4014288923
@@ -1714,7 +1714,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 18240820474097664
     m_Localized: "El coche acelera solo. Gira con las flechas. Mant\xE9n FRENO para
-      reducir la velocidad. Pulsa R para volver a la pista."
+      reducir la velocidad. Pulsa \xAB{button}\xBB para volver."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097665
@@ -2053,6 +2053,62 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 28159633902612480
     m_Localized: "Modelos cl\xE1sicos"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365795790848
+    m_Localized: "Pr\xF3xima carrera"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365808373760
+    m_Localized: 'Carreras desbloqueadas: {n}/{max}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568064
+    m_Localized: Idioma y sonido
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568065
+    m_Localized: Controles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568066
+    m_Localized: "Imagen y c\xE1mara"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726132641792
+    m_Localized: A pista
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224704
+    m_Localized: "\xBFAtascado? Toca \xAB{button}\xBB"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224705
+    m_Localized: "\u2605 {n}/3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224706
+    m_Localized: "Sectores frente a tu fantasma \xB7 \u2212 es m\xE1s r\xE1pido"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224707
+    m_Localized: Puente
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224708
+    m_Localized: Torre
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224709
+    m_Localized: Boxes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224710
+    m_Localized: Sector {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224711
+    m_Localized: '{t} s'
     m_Metadata:
       m_Items: []
   references:

@@ -47,19 +47,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094595
-    m_Localized: RACE
+    m_Localized: Race
     m_Metadata:
       m_Items: []
   - m_Id: 4010094596
-    m_Localized: GARAGE
+    m_Localized: Garage
     m_Metadata:
       m_Items: []
   - m_Id: 4010094597
-    m_Localized: LEADERS
+    m_Localized: Leaderboard
     m_Metadata:
       m_Items: []
   - m_Id: 4010094598
-    m_Localized: SETTINGS
+    m_Localized: Settings
     m_Metadata:
       m_Items: []
   - m_Id: 4010094599
@@ -71,11 +71,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094601
-    m_Localized: '{n} laps'
+    m_Localized: 'Laps: {n}'
     m_Metadata:
       m_Items: []
   - m_Id: 4010094602
-    m_Localized: '{n} rivals'
+    m_Localized: 'Rivals: {n}'
     m_Metadata:
       m_Items: []
   - m_Id: 4010094603
@@ -285,7 +285,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4014288922
-    m_Localized: Sound
+    m_Localized: Sound effects
     m_Metadata:
       m_Items: []
   - m_Id: 4014288923
@@ -1710,8 +1710,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097664
-    m_Localized: The car accelerates itself. Steer with the arrows. Hold BRAKE to
-      slow down. Tap R to return to the track.
+    m_Localized: "The car accelerates itself. Steer with the arrows. Hold BRAKE to
+      slow down. Tap \u201C{button}\u201D to recover."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097665
@@ -2045,6 +2045,62 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 28159633902612480
     m_Localized: Classic models
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365795790848
+    m_Localized: Next race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365808373760
+    m_Localized: 'Races unlocked: {n}/{max}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568064
+    m_Localized: Language and audio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568065
+    m_Localized: Controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568066
+    m_Localized: Display and camera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726132641792
+    m_Localized: Back on track
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224704
+    m_Localized: "Stuck? Tap \u201C{button}\u201D"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224705
+    m_Localized: "\u2605 {n}/3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224706
+    m_Localized: "Sectors vs. your ghost \xB7 \u2212 is faster"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224707
+    m_Localized: Bridge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224708
+    m_Localized: Tower
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224709
+    m_Localized: Pits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224710
+    m_Localized: Sector {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224711
+    m_Localized: '{t} s'
     m_Metadata:
       m_Items: []
   references:

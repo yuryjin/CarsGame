@@ -89,6 +89,13 @@ namespace RacingGame.Tests
                 ev.reversed = reverse;
                 flow.StartRace(ev, normal);
                 var fork = path.Fork;
+                foreach (string model in new[] { "ForkSigns_0", "CircuitWaterTower_0", "CircuitPitWalkway_0" })
+                {
+                    var child = fork.transform.Find(model);
+                    Assert.NotNull(child, model);
+                    Assert.Greater(child.GetComponent<MeshFilter>().sharedMesh.vertexCount, 20);
+                    Assert.IsNull(child.GetComponent<Collider>(), model + " must not catch a passing car");
+                }
                 Assert.IsNotNull(fork);
                 foreach (var pair in originalMeshes)
                 {

@@ -47,19 +47,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094595
-    m_Localized: "YARI\u015E"
+    m_Localized: "Yar\u0131\u015F"
     m_Metadata:
       m_Items: []
   - m_Id: 4010094596
-    m_Localized: GARAJ
+    m_Localized: Garaj
     m_Metadata:
       m_Items: []
   - m_Id: 4010094597
-    m_Localized: "L\u0130DERLER"
+    m_Localized: Liderler
     m_Metadata:
       m_Items: []
   - m_Id: 4010094598
-    m_Localized: AYARLAR
+    m_Localized: Ayarlar
     m_Metadata:
       m_Items: []
   - m_Id: 4010094599
@@ -281,7 +281,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4014288922
-    m_Localized: Ses
+    m_Localized: Ses efektleri
     m_Metadata:
       m_Items: []
   - m_Id: 4014288923
@@ -1727,8 +1727,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 18240820474097664
     m_Localized: "Ara\xE7 kendisi h\u0131zlan\u0131r. Oklarla d\xF6n. Yava\u015Flamak
-      i\xE7in FREN bas\u0131l\u0131 tut. Piste d\xF6nmek i\xE7in R d\xFC\u011Fmesine
-      dokun."
+      i\xE7in FREN tu\u015Funu bas\u0131l\u0131 tut. Geri d\xF6nmek i\xE7in \u201C{button}\u201D
+      d\xFC\u011Fmesine dokun."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097665
@@ -2069,6 +2069,63 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 28159633902612480
     m_Localized: Klasik modeller
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365795790848
+    m_Localized: "S\u0131radaki yar\u0131\u015F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365808373760
+    m_Localized: "A\xE7\u0131lan yar\u0131\u015Flar: {n}/{max}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568064
+    m_Localized: Dil ve ses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568065
+    m_Localized: Kontroller
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568066
+    m_Localized: "G\xF6r\xFCnt\xFC ve kamera"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726132641792
+    m_Localized: "Piste d\xF6n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224704
+    m_Localized: "Tak\u0131ld\u0131n m\u0131? \u201C{button}\u201D d\xFC\u011Fmesine
+      dokun"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224705
+    m_Localized: "\u2605 {n}/3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224706
+    m_Localized: "Hayaletine g\xF6re sekt\xF6rler \xB7 \u2212 daha h\u0131zl\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224707
+    m_Localized: "K\xF6pr\xFC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224708
+    m_Localized: Kule
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224709
+    m_Localized: Pit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224710
+    m_Localized: "Sekt\xF6r {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224711
+    m_Localized: '{t} sn'
     m_Metadata:
       m_Items: []
   references:

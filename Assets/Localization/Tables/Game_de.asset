@@ -47,19 +47,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094595
-    m_Localized: RENNEN
+    m_Localized: Starten
     m_Metadata:
       m_Items: []
   - m_Id: 4010094596
-    m_Localized: GARAGE
+    m_Localized: Garage
     m_Metadata:
       m_Items: []
   - m_Id: 4010094597
-    m_Localized: BESTENLISTE
+    m_Localized: Bestenliste
     m_Metadata:
       m_Items: []
   - m_Id: 4010094598
-    m_Localized: EINSTELLUNGEN
+    m_Localized: Einstellungen
     m_Metadata:
       m_Items: []
   - m_Id: 4010094599
@@ -71,11 +71,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4010094601
-    m_Localized: '{n} Runden'
+    m_Localized: 'Runden: {n}'
     m_Metadata:
       m_Items: []
   - m_Id: 4010094602
-    m_Localized: '{n} Gegner'
+    m_Localized: 'Gegner: {n}'
     m_Metadata:
       m_Items: []
   - m_Id: 4010094603
@@ -281,7 +281,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4014288922
-    m_Localized: Ton
+    m_Localized: Soundeffekte
     m_Metadata:
       m_Items: []
   - m_Id: 4014288923
@@ -1707,7 +1707,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 18240820474097664
     m_Localized: "Das Auto beschleunigt selbst. Lenke mit den Pfeilen. Halte BREMSE
-      zum Verlangsamen. R bringt dich zur\xFCck auf die Strecke."
+      zum Verlangsamen. Tippe zum Zur\xFCcksetzen auf \u201E{button}\u201C."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097665
@@ -2045,6 +2045,62 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 28159633902612480
     m_Localized: Klassische Modelle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365795790848
+    m_Localized: "N\xE4chstes Rennen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365808373760
+    m_Localized: 'Rennen freigeschaltet: {n}/{max}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568064
+    m_Localized: Sprache und Ton
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568065
+    m_Localized: Steuerung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262365812568066
+    m_Localized: Grafik und Kamera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726132641792
+    m_Localized: Zur Strecke
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224704
+    m_Localized: "Festgefahren? Tippe auf \u201E{button}\u201C"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224705
+    m_Localized: "\u2605 {n}/3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224706
+    m_Localized: "Sektoren gegen deinen Geist \xB7 \u2212 ist schneller"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224707
+    m_Localized: "Br\xFCcke"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224708
+    m_Localized: Turm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224709
+    m_Localized: Boxen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224710
+    m_Localized: Sektor {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28262726145224711
+    m_Localized: '{t} s'
     m_Metadata:
       m_Items: []
   references:
