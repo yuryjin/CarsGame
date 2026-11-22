@@ -2208,6 +2208,30 @@ MonoBehaviour:
     m_Localized: "Pr\xEAmio da corrida \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: '{n} de {target}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "Posi\xE7\xF5es que faltaram \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: Atraso +{t} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "Perdas do carro \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "Perdas {wrecks} \xB7 reposi\xE7\xF5es {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "Posi\xE7\xE3o {p} \xB7 reparos {repairs}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

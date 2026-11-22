@@ -2208,6 +2208,30 @@ MonoBehaviour:
     m_Localized: "Gain de course \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: '{n} sur {target}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "Places manquantes \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: Retard +{t} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "Destructions subies \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "Destructions {wrecks} \xB7 retours en piste {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "Place {p} \xB7 r\xE9parations {repairs}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

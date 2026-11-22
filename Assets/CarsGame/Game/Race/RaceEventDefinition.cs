@@ -60,6 +60,10 @@ namespace RacingGame
         public RacingGame.Core.Daily.RaceTwist twist;
         [Min(1f)] public float targetSeconds = 210f;
 
+        public int RequiredPosition => star1TargetPosition > 0 ? star1TargetPosition : 3;
+        public int RequiredSkillCount => skillGoal == SkillGoal.Kills
+            ? (star2TargetKills > 0 ? star2TargetKills : 2) : Mathf.Max(1, skillTarget);
+
         public int StarMask(RaceResultEntry me)
         {
             if (me == null) return 0;
@@ -67,7 +71,7 @@ namespace RacingGame
             if (skillGoal != SkillGoal.Kills)
             {
                 mask &= ~2;
-                if (SkillCount(me) >= Mathf.Max(1, skillTarget)) mask |= 2;
+                if (SkillCount(me) >= RequiredSkillCount) mask |= 2;
             }
             return mask;
         }
@@ -89,8 +93,8 @@ namespace RacingGame
         public int StarMask(bool finished, int position, int kills, int deaths, int repairsUsed = 0, double totalTime = double.PositiveInfinity, int resets = 0)
         {
             int mask = 0;
-            if (finished && position <= (star1TargetPosition > 0 ? star1TargetPosition : 3)) mask |= 1;
-            if (skillGoal == SkillGoal.Kills && kills >= (star2TargetKills > 0 ? star2TargetKills : 2)) mask |= 2;
+            if (finished && position <= RequiredPosition) mask |= 1;
+            if (skillGoal == SkillGoal.Kills && kills >= RequiredSkillCount) mask |= 2;
             bool goalMet = finishGoal == FinishGoal.WinWithoutRepair ? position == 1 && repairsUsed == 0
                 : finishGoal == FinishGoal.BeatTime ? totalTime > 0 && totalTime <= targetSeconds
                 : finishGoal == FinishGoal.CleanRun ? deaths == 0 && resets == 0

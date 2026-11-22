@@ -885,7 +885,7 @@ namespace RacingGame
             return best;
         }
 
-        private void BuildResultStars(Transform content)
+        private void BuildResultStars(Transform content, RaceResultEntry me)
         {
             if (DailyRace.IsDaily(flow.CurrentEvent)) return;
             int currentStars = flow.LastStarsEarned;
@@ -905,7 +905,13 @@ namespace RacingGame
                 float bottom = 12f + (2 - s) * 84f;
                 var starRow = UiFactory.Panel(starsCard, "Star" + s, Vector2.zero, new Vector2(1f, 0f), new Vector2(24f, bottom), new Vector2(-24f, bottom + 80f));
                 Label(starRow, "StarIcon", wonThisRace ? "★" : "☆", 34f, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(34f, 0f), wonThisRace ? UiFactory.Accent : UiFactory.Muted);
-                Label(starRow, "StarDesc", StarGoalText.Description(flow.CurrentEvent, s), 25f, new Vector2(0f, 0.4f), Vector2.one, new Vector2(46f, 0f), Vector2.zero, wonThisRace ? Color.white : UiFactory.Muted);
+                string description = StarGoalText.Description(flow.CurrentEvent, s);
+                if (!wonThisRace)
+                {
+                    string progress = StarGoalText.MissedProgress(flow.CurrentEvent, me, s);
+                    if (progress.Length > 0) description += "  ·  " + progress;
+                }
+                Label(starRow, "StarDesc", description, 25f, new Vector2(0f, 0.4f), Vector2.one, new Vector2(46f, 0f), Vector2.zero, wonThisRace ? Color.white : UiFactory.Muted);
                 string status = wonThisRace ? "results.star_earned" : wonOverall ? "results.star_previous" : "results.star_missed";
                 Label(starRow, "StarStatus", Loc.Get(status), 22f, Vector2.zero, new Vector2(1f, 0.4f), new Vector2(46f, 0f), Vector2.zero, wonThisRace ? UiFactory.Positive : UiFactory.Muted);
             }
@@ -942,7 +948,7 @@ namespace RacingGame
             if (me != null && me.Finished && flow.LastSectorDeltaMs != null)
                 BuildSectorComparison(content, flow.LastSectorDeltaMs);
             BuildRewardDetails(content, me, missionEvent);
-            BuildResultStars(content);
+            BuildResultStars(content, me);
             var next = RecommendedNext();
             BuildNextGoal(content, next);
             var actions = UiFactory.Panel(overview, "Actions", Vector2.zero, new Vector2(1f, 0f),

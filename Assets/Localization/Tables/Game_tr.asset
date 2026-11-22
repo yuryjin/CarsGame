@@ -2229,6 +2229,30 @@ MonoBehaviour:
     m_Localized: "Yar\u0131\u015F \xF6d\xFCl\xFC \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: '{n}/{target}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "Hedefe kalan s\u0131ra \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: Gecikme +{t} sn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "Ara\xE7 kayb\u0131 \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "Kay\u0131p {wrecks} \xB7 s\u0131f\u0131rlama {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "S\u0131ra {p} \xB7 onar\u0131m {repairs}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -2203,6 +2203,30 @@ MonoBehaviour:
     m_Localized: "Rennbelohnung \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: '{n} von {target}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "Pl\xE4tze zum Ziel \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: "\xDCber dem Limit +{t} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "Totalsch\xE4den \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "Totalsch\xE4den {wrecks} \xB7 R\xFCcksetzungen {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "Platz {p} \xB7 Reparaturen {repairs}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

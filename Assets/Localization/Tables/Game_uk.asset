@@ -2525,6 +2525,35 @@ MonoBehaviour:
       \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: "{n} \u0456\u0437 {target}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "\u0417\u0430\u0431\u0440\u0430\u043A\u043B\u043E \u043C\u0456\u0441\u0446\u044C
+      \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: "\u0417\u0430\u043F\u0456\u0437\u043D\u0435\u043D\u043D\u044F +{t}
+      \u0441"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "\u0412\u0442\u0440\u0430\u0442 \u043C\u0430\u0448\u0438\u043D\u0438
+      \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "\u0412\u0442\u0440\u0430\u0442 {wrecks} \xB7 \u043F\u043E\u0432\u0435\u0440\u043D\u0435\u043D\u044C
+      {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "\u041C\u0456\u0441\u0446\u0435 {p} \xB7 \u0440\u0435\u043C\u043E\u043D\u0442\u0456\u0432
+      {repairs}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

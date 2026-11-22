@@ -2151,6 +2151,30 @@ MonoBehaviour:
     m_Key: events.race_reward
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Key: results.goal.count
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Key: results.goal.places
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Key: results.goal.late
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Key: results.goal.wrecks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Key: results.goal.clean
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Key: results.goal.win_clean
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

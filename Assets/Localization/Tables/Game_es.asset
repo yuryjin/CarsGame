@@ -2211,6 +2211,30 @@ MonoBehaviour:
     m_Localized: "Premio de la carrera \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: '{n} de {target}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "Puestos de diferencia \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: Retraso +{t} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "Bajas propias \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "Bajas {wrecks} \xB7 reinicios {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "Puesto {p} \xB7 reparaciones {repairs}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

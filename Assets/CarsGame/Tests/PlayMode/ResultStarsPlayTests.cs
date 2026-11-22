@@ -55,6 +55,7 @@ namespace RacingGame.Tests
 
             flow.StartRace(practice, flow.tiers[0]);
             while (race.State == RaceState.Countdown) yield return null;
+            race.Player.KillTally.Record(101);
             race.Player.Deaths = 1;
             race.QaFinishNow(); yield return null; yield return null;
             Assert.AreEqual(1, flow.LastStarsEarned);
@@ -64,8 +65,10 @@ namespace RacingGame.Tests
             Assert.AreEqual(Loc.Get("results.star_earned"), Label("StarStatus", "Star0").text);
             Assert.AreEqual("☆", Label("StarIcon", "Star1").text);
             Assert.AreEqual(Loc.Get("results.star_missed"), Label("StarStatus", "Star1").text);
+            StringAssert.Contains(Loc.Format("results.goal.count", "n", 1, "target", 2), Label("StarDesc", "Star1").text);
             Assert.AreEqual("☆", Label("StarIcon", "Star2").text);
             Assert.AreEqual(Loc.Get("results.star_previous"), Label("StarStatus", "Star2").text);
+            StringAssert.Contains(Loc.Format("results.goal.wrecks", "n", 1), Label("StarDesc", "Star2").text);
             Assert.AreNotEqual(Label("StarIcon", "Star0").color, Label("StarIcon", "Star2").color);
 
             flow.RetryRace();
@@ -89,6 +92,31 @@ namespace RacingGame.Tests
             Assert.AreEqual(7, best.stars);
             for (int i = 0; i < 3; i++)
                 Assert.AreEqual(Loc.Get("results.star_previous"), Label("StarStatus", "Star" + i).text);
+
+            practice.finishGoal = FinishGoal.BeatTime;
+            practice.targetSeconds = 2f;
+            Time.captureDeltaTime = 0.125f;
+            race.countdownSeconds = 0;
+            foreach (bool late in new[] { false, true })
+            {
+                flow.RetryRace();
+                while (race.State == RaceState.Countdown) yield return null;
+                // A controlled race clock gives exactly the limit, then 125 ms over it.
+                double target = practice.targetSeconds + (late ? 0.125 : 0);
+                for (int i = 0; i < 20 && target > race.RaceTime; i++)
+                    RaceClock.Advance((float)System.Math.Min(0.125, target - race.RaceTime));
+                race.QaFinishNow(); yield return null;
+                Assert.AreEqual(target, race.Results.Player.TotalTime);
+                Assert.AreEqual(!late, (flow.LastStarsEarned & 4) != 0);
+                string desc = StarGoalText.Description(practice, 2);
+                if (late)
+                {
+                    string seconds = 0.125.ToString("0.000", System.Globalization.CultureInfo.GetCultureInfo(Loc.Language));
+                    StringAssert.Contains(Loc.Format("results.goal.late", "t", seconds), Label("StarDesc", "Star2").text);
+                    Assert.AreEqual(Loc.Get("results.star_previous"), Label("StarStatus", "Star2").text);
+                }
+                else Assert.AreEqual(desc, Label("StarDesc", "Star2").text);
+            }
 
             flow.StartRace(flow.DailyEvent, flow.tiers[0]);
             while (race.State == RaceState.Countdown) yield return null;
