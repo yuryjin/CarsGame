@@ -7,12 +7,13 @@ const out=process.env.OUT||'/tmp/cars-save-recovery';await fs.mkdir(out,{recursi
 const browser=await chromium.launch({channel:'chrome',args:[...process.env.WEBTEST_CHROME_ARGS.split(' '),'--no-proxy-server']});
 const evidence=[],errors=[];
 try{
- for(const [width,height,mode] of [[640,360,'corrupt'],[640,360,'write'],[812,375,'write'],[1280,720,'write'],[640,360,'read']]){
+ for(const [width,height,mode] of [[1280,720,'purchase'],[640,360,'corrupt'],[640,360,'write'],[812,375,'write'],[1280,720,'write'],[640,360,'read']]){
   const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage();
   await context.addInitScript(mode=>{
    const key='cars.local.cars.save.v1',get=Storage.prototype.getItem,set=Storage.prototype.setItem;
    const saved={version:6,updatedAtUnixMs:Date.now(),settings:{lang:'ru',hintsSeen:65535,sfx:mode==='read'?0:1},progress:{ledger:[{deviceId:'qa-browser-storage',coinsEarned:123}]}};
-   if(mode==='corrupt'){
+   if(mode==='corrupt'||mode==='purchase'){
+    if(mode==='purchase')saved.progress.ledger[0].coinsEarned=923;
     saved.progress.ledger[0].races=1;
     saved.progress.bests=[{eventId:'e1',bestTimeMs:60000,stars:1}];
     saved.progress.unlockedEvents=['e2'];
@@ -31,11 +32,19 @@ try{
   try{
    await page.goto(process.env.URL||'http://127.0.0.1:8848/?sdk=mock&lang=ru');await ready();
    const renderer=await page.evaluate(()=>{const g=document.querySelector('canvas').getContext('webgl2'),e=g.getExtension('WEBGL_debug_renderer_info');return g.getParameter(e?e.UNMASKED_RENDERER_WEBGL:g.RENDERER);});assert.match(renderer,/NVIDIA/i);
-   if(mode==='corrupt'){
+   if(mode==='corrupt'||mode==='purchase'){
     const key='cars.local.cars.save.v1', damaged='{"version":6,"progress":';
+    if(mode==='purchase'){
+     await click('garage');await click('NextBody');await click('ShowcaseEquip');
+     const purchased=await cmd('ui');
+     assert.equal(purchased.coins,123,'Arrow costs 800 coins');
+     assert(purchased.buttons.some(b=>b.name==='Use_arrow'&&!b.interactable),'The purchased Arrow is equipped');
+     await click('Back');
+    }
     await click('ModelStyle');
     const backup=await page.evaluate(key=>JSON.parse(localStorage.getItem(key+'.backup')),key);
-    assert.equal(backup.progress.ledger.find(row=>row.deviceId==='qa-browser-storage')?.coinsEarned,123);
+    assert.equal(backup.progress.ledger.find(row=>row.deviceId==='qa-browser-storage')?.coinsEarned,mode==='purchase'?923:123);
+    if(mode==='purchase')assert(backup.progress.cosmetics.includes('body:arrow'));
     await page.evaluate(([key,damaged])=>{
      localStorage.removeItem('cars.mock.playerdata');
      localStorage.removeItem('cars.save.mirror');
@@ -46,6 +55,14 @@ try{
     assert.equal(restored.coins,123);assert.equal(restored.races,1);
     assert.equal(await page.evaluate(key=>localStorage.getItem(key+'.damaged'),key),damaged);
     assert(restored.labels.some(l=>l.name==='Message'&&l.text.includes('резервной копии')&&!l.truncated));
+    if(mode==='purchase'){
+     await click('garage');
+     const garage=await cmd('ui');
+     assert(garage.buttons.some(b=>b.name==='Use_arrow'&&!b.interactable),'The recovered garage equips the purchased Arrow');
+     assert(!garage.buttons.some(b=>b.name==='Buy_arrow'));
+     evidence.push({mode,phase:'recovered-purchase',body:backup.progress.body,owned:backup.progress.cosmetics,coins:garage.coins});
+     await click('Back');
+    }
     await click('ChooseRace');assert.equal((await cmd('ui')).screen,'events');
     await click('Back');await click('Play');
     const started=await cmd('state');assert.equal(started.evt,'e2');assert.equal(started.races,1);
