@@ -137,7 +137,8 @@ namespace RacingGame.Core.Ghost
                     }
                 }
             }
-            catch (Exception exception) when (exception is IOException || exception is ArgumentException || exception is InvalidOperationException)
+            catch (Exception exception) when (exception is IOException || exception is InvalidDataException
+                || exception is ArgumentException || exception is InvalidOperationException)
             { return null; }
         }
 

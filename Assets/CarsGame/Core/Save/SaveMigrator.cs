@@ -7,6 +7,8 @@ namespace RacingGame.Core.Save
 
     public static class SaveMigrator
     {
+        [System.Serializable] private class LegacyGhost { public string bestGhost = ""; }
+
         public static SaveData FromJson(string json) => Parse(json, out _);
 
         /// <summary>Parses and reports why a blob was rejected, so callers can tell "no save yet" from "unsafe to overwrite".</summary>
@@ -45,6 +47,11 @@ namespace RacingGame.Core.Save
                 data.version = 6;
             }
             if (data.version > SaveData.CurrentVersion) { status = SaveParseStatus.NewerVersion; return null; }    // from a newer build: refuse rather than corrupt
+            data.personalGhosts ??= new PersonalGhosts();
+            // Unversioned profiles can also carry the old slot. Current writers omit it entirely.
+            string legacy = json.IndexOf("\"bestGhost\"", System.StringComparison.Ordinal) >= 0
+                ? JsonUtility.FromJson<LegacyGhost>(json).bestGhost : null;
+            data.personalGhosts.Restore(legacy, data.updatedAtUnixMs);
             status = SaveParseStatus.Ok;
             data.settings ??= new SettingsData();
             data.progress ??= new ProgressData();

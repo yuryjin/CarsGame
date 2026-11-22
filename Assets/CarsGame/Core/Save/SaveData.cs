@@ -101,13 +101,13 @@ namespace RacingGame.Core.Save
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 6;
+        public const int CurrentVersion = 7;
         public int version = CurrentVersion;
         public long updatedAtUnixMs;
         public string deviceId = "";
         public SettingsData settings = new SettingsData();
         public ProgressData progress = new ProgressData();
-        public string bestGhost = "";
+        public PersonalGhosts personalGhosts = new PersonalGhosts();
 
         public DeviceLedger Local(string id)
         {

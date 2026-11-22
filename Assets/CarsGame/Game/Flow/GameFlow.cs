@@ -301,8 +301,12 @@ namespace RacingGame
             if (prefab == null) return;
             int hash = TrackHash(ev);
             var save = PlatformGlue.Save;
-            var own = save != null ? Core.Ghost.GhostRecord.FromBase64(save.Data.bestGhost) : null;
-            if (own != null && own.TrackHash == hash)
+            string eventId = ev != null ? ev.eventId : "e1";
+            var personal = save?.Data.personalGhosts;
+            if (personal != null && personal.ResolveLegacy(eventId, hash, race.laps,
+                record => GhostSectorTimes.Measure(track, record, race.laps) != null)) save.MarkDirty();
+            var own = personal?.Find(eventId, hash, race.laps);
+            if (own != null)
             {
                 AddGhost(GhostCar.Spawn(prefab, own, GhostTint));
                 personalGhostSectors = GhostSectorTimes.Measure(track, own, race.laps);
@@ -553,11 +557,10 @@ namespace RacingGame
             string encoded = rec.ToBase64();
             if (string.IsNullOrEmpty(encoded)) return; // An incomplete or oversized replay cannot replace a valid best.
             var save = PlatformGlue.Save;
-            if (save != null)
-            {
-                var prev = Core.Ghost.GhostRecord.FromBase64(save.Data.bestGhost);
-                if (prev == null || prev.TrackHash != rec.TrackHash || rec.DurationMilliseconds < prev.DurationMilliseconds) { save.Data.bestGhost = encoded; save.MarkDirty(); }
-            }
+            var ev = RaceSetup.Event;
+            if (save != null && (ev == null || ev.mode == EventMode.Race) && save.Data.personalGhosts.KeepBest(
+                ev != null ? ev.eventId : "e1", race.laps, encoded, System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()))
+                save.MarkDirty();
             var sessions = PlatformGlue.Platform?.Sessions;
             if (sessions != null)
             {
