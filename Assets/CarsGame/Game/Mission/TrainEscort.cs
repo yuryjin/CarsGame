@@ -6,6 +6,7 @@ namespace RacingGame
 {
     public sealed class TrainEscort : MonoBehaviour, ICarInputSource
     {
+        public const float BaseFireCooldown = 1.6f;
         public CarController Guard { get; private set; }
         public bool Released { get; private set; }
         public bool ApproachClear { get; private set; }
@@ -41,7 +42,7 @@ namespace RacingGame
             go.AddComponent<CarDamageSmoke>();
             go.GetComponent<CarPaint>().SetColor(new Color(0.79f, 0.18f, 0.055f));
             gunner = go.AddComponent<AiGunner>();
-            gunner.Initialize(null, 1.6f);
+            gunner.Initialize(null, BaseFireCooldown);
             gunner.telegraphSeconds = BotAim.BaseTelegraph(RaceSetup.TierId);
             gunner.hardTier = RaceSetup.TierId == "hard";
 

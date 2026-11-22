@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -401,6 +402,16 @@ namespace RacingGame
         private static string MissionDetail(RaceEventDefinition ev, int allies) => ev.eventId == TrainMission.EventId
             ? Loc.Get("train.detail") : Loc.Format("mission.detail", "n", allies);
 
+        private static string EventFireDetail(RaceEventDefinition ev, float tierInterval, CultureInfo culture)
+        {
+            if (ev.twist == Core.Daily.RaceTwist.MinesOnly || ev.twist == Core.Daily.RaceTwist.HotBomb)
+                return Loc.Get("events.guns_disabled");
+            if (ev.mode == EventMode.Mission && ev.eventId == TrainMission.EventId)
+                return Loc.Format("train.guard_fire", "s", TrainEscort.BaseFireCooldown.ToString("0.##", culture));
+            string key = ev.mode == EventMode.Mission ? "mission.ally_fire" : "events.rival_fire";
+            return Loc.Format(key, "s", tierInterval.ToString("0.##", culture));
+        }
+
         private void BuildEvents(RectTransform root)
         {
             var body = Header(root, "events.title");
@@ -414,6 +425,11 @@ namespace RacingGame
                     UiFactory.Button(body, "Tier" + i, Loc.Get("difficulty." + tiers[i].tierId), () => SelectTier(tiers, index), new Vector2(i / (float)tiers.Length, 1f), new Vector2((i + 1f) / tiers.Length, 1f), new Vector2(4f, -68f), new Vector2(-8f, 0f), 27f, i == tierIndex ? UiFactory.Accent : UiFactory.Raised);
                 }
             }
+            var tier = tiers.Length > 0 ? tiers[tierIndex] : RaceSetup.Tier;
+            var culture = CultureInfo.GetCultureInfo(Loc.Language);
+            float fireInterval = tier != null ? tier.aiFireCooldown : race.spawner.aiFireCooldown;
+            float multiplier = tier != null ? tier.rewardMultiplier : 1f;
+            string reward = Loc.Format("events.race_reward", "m", multiplier.ToString("0.##", culture));
             var content = UiFactory.Scroll(body, "EventsScroll", Vector2.zero, new Vector2(0f, tiers.Length > 0 ? -90f : 0f));
             var list = Events();
             // Surface the modes a new player can actually enter before the locked career chain.
@@ -428,26 +444,28 @@ namespace RacingGame
                 {
                     var ev = list[i]; bool unlocked = flow.IsUnlocked(ev);
                     if (unlocked != available) continue;
-                    var row = Item(content, ev.eventId, Narrow ? 310f : 270f);
+                    var row = Item(content, ev.eventId, Narrow ? 376f : 354f);
                     Label(row, "Number", (i + 1).ToString("00"), 52f, Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(116f, -24f), unlocked ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
                     Label(row, "Name", Loc.Get(ev.nameKey), 34f, Top, Vector2.one, new Vector2(144f, -60f), new Vector2(-236f, -12f)).fontStyle = FontStyles.Bold;
-                    int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : tiers.Length > 0 ? tiers[tierIndex].aiCount : 3;
+                    int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : tier != null ? tier.aiCount : race.spawner.aiCount;
                     string detail = ev.mode == EventMode.Mission ? MissionDetail(ev, rivals)
                         : ev.mode == EventMode.Arena ? Loc.Format("arena.detail", "n", rivals)
                         : Loc.Format("events.laps", "n", ev.laps) + "   /   " + Loc.Format("events.rivals", "n", rivals) + TwistSuffix(ev);
-                    Label(row, "Stats", detail, 23f, Top, Vector2.one, new Vector2(144f, -96f), new Vector2(-236f, -58f), UiFactory.Muted);
+                    Label(row, "Stats", detail, 23f, Top, Vector2.one, new Vector2(144f, -114f), new Vector2(-236f, -60f), UiFactory.Muted);
+                    Label(row, "Difficulty", EventFireDetail(ev, fireInterval, culture) + "\n" + reward, 23f, Top, Vector2.one,
+                        new Vector2(144f, -178f), new Vector2(-236f, -114f));
                     var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
                     int starMask = best != null ? best.stars : 0;
                     string s1 = (starMask & 1) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
                     string s2 = (starMask & 2) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
                     string s3 = (starMask & 4) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
                     string starDisplay = s1 + " " + StarGoalText.Description(ev, 0) + "\n" + s2 + " " + StarGoalText.Description(ev, 1) + "\n" + s3 + " " + StarGoalText.Description(ev, 2);
-                    Label(row, "Stars", starDisplay, 22f, Top, Vector2.one, new Vector2(144f, -222f), new Vector2(-236f, -98f));
+                    Label(row, "Stars", starDisplay, 22f, Top, Vector2.one, new Vector2(144f, -302f), new Vector2(-236f, -178f));
                     var prerequisite = unlocked ? null : list.Find(e => e.eventId == ev.unlockAfterEventId);
                     string status = unlocked ? best != null && best.bestTimeMs > 0 ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) : ""
                         : prerequisite != null ? Loc.Format("events.locked_after", "name", Loc.Get(prerequisite.nameKey)) : Loc.Get("events.locked");
                     Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 64f : 44f), unlocked ? UiFactory.Positive : UiFactory.Muted);
-                    UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—", unlocked ? () => flow.StartRace(ev, tiers.Length > 0 ? tiers[tierIndex] : null) : null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-216f, -36f), new Vector2(-24f, 36f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
+                    UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—", unlocked ? () => flow.StartRace(ev, tier) : null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-216f, -36f), new Vector2(-24f, 36f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
                 }
             }
         }

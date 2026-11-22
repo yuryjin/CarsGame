@@ -2126,7 +2126,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 28966960868175872
-    m_Localized: "Recupere a ta\xE7a roubada"
+    m_Localized: "Recupere a ta\xE7a \xB7 1 buggy de escolta"
     m_Metadata:
       m_Items: []
   - m_Id: 28966960868175873
@@ -2186,6 +2186,26 @@ MonoBehaviour:
     m_Localized: "Passe pela escolta e fique ao lado do \xFAltimo vag\xE3o por {s}
       segundos. Ou corte pelo leito seco, chegue ao desvio antes do trem e pegue
       a ta\xE7a na esta\xE7\xE3o."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668464279552
+    m_Localized: "Rivais \xB7 intervalo base de tiro {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668160
+    m_Localized: "Aliados \xB7 intervalo base de tiro {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668161
+    m_Localized: "Guarda \xB7 intervalo base de tiro {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668162
+    m_Localized: "Canh\xF5es desativados"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668163
+    m_Localized: "Pr\xEAmio da corrida \xD7{m}"
     m_Metadata:
       m_Items: []
   references:

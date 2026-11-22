@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using TMPro;
@@ -26,6 +27,7 @@ namespace RacingGame.Tests
         }
 
         private static Button StartButton(string id) => Object.FindObjectsByType<Button>().Single(b => b.name == "Start_" + id);
+        private static string CardText(Button start, string name) => start.transform.parent.Find(name).GetComponent<TMP_Text>().text;
 
         private static void AssertAvailableFirst(GameFlow flow)
         {
@@ -137,6 +139,110 @@ namespace RacingGame.Tests
             Assert.AreSame(next, flow.CurrentEvent);
             Assert.AreEqual(selectedTier, RaceSetup.TierId);
             Assert.AreEqual(1, save.Data.Races, "Starting a race cannot grant a finish");
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator DifficultyCardsMatchSpawnedFieldsAndCreditedRewards()
+        {
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float until = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < until) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null;
+            profile = JsonUtility.ToJson(PlatformGlue.Save.Data);
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = flow.GetComponent<RaceManager>();
+            var menu = flow.GetComponent<MenuScreens>();
+            var culture = CultureInfo.GetCultureInfo(Loc.Language);
+            race.countdownSeconds = 0f;
+            for (int i = 0; i < flow.tiers.Length; i++)
+            {
+                foreach (string id in new[] { "e1", "a1" })
+                {
+                    menu.Show("events");
+                    GameObject.Find("Tier" + i).GetComponent<Button>().onClick.Invoke();
+                    var start = StartButton(id);
+                    string stats = CardText(start, "Stats"), difficulty = CardText(start, "Difficulty");
+                    start.onClick.Invoke();
+                    Assert.AreSame(flow.tiers[i], race.tier);
+                    var field = race.Participants.Where(p => !p.isPlayer).ToArray();
+                    var ev = RaceSetup.Event;
+                    int expectedCount = id == "a1" ? ev.aiCountOverride : race.tier.aiCount;
+                    Assert.AreEqual(expectedCount, field.Length, id + " on " + race.tier.tierId);
+                    StringAssert.Contains(Loc.Format(id == "a1" ? "arena.detail" : "events.rivals", "n", field.Length), stats);
+                    foreach (var racer in field)
+                    {
+                        float interval = racer.GetComponent<AiGunner>().fireCooldown;
+                        Assert.AreEqual(race.tier.aiFireCooldown, interval);
+                        StringAssert.Contains(Loc.Format("events.rival_fire", "s", interval.ToString("0.##", culture)), difficulty);
+                    }
+                    while (race.State == RaceState.Countdown) yield return null;
+                    race.QaFinishNow();
+                    Assert.AreEqual(FlowState.Results, flow.State);
+                    var payout = flow.LastPayout;
+                    Assert.AreEqual(race.tier.rewardMultiplier, payout.Multiplier);
+                    Assert.Greater(payout.BaseCoins, 0);
+                    StringAssert.Contains(Loc.Format("events.race_reward", "m", payout.Multiplier.ToString("0.##", culture)), difficulty);
+                    flow.EnterMenu();
+                    yield return null;
+                }
+            }
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator SpecialEventCardsIdentifyAlliesGuardAndDisabledGuns()
+        {
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float until = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < until) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null;
+            profile = JsonUtility.ToJson(PlatformGlue.Save.Data);
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = flow.GetComponent<RaceManager>();
+            var menu = flow.GetComponent<MenuScreens>();
+            var culture = CultureInfo.GetCultureInfo(Loc.Language);
+            if (!PlatformGlue.Save.Data.progress.unlockedEvents.Contains("e6"))
+                PlatformGlue.Save.Data.progress.unlockedEvents.Add("e6");
+            foreach (string id in new[] { "m1", TrainMission.EventId, "e18", "e6" })
+            {
+                menu.Show("events");
+                GameObject.Find("Tier2").GetComponent<Button>().onClick.Invoke();
+                var start = StartButton(id);
+                string stats = CardText(start, "Stats"), difficulty = CardText(start, "Difficulty");
+                Assert.IsTrue(start.interactable);
+                start.onClick.Invoke();
+                var field = race.Participants.Where(p => !p.isPlayer).ToArray();
+                if (id == "m1")
+                {
+                    Assert.IsNotEmpty(field);
+                    Assert.AreEqual(Loc.Format("mission.detail", "n", field.Length), stats);
+                    foreach (var ally in field)
+                    {
+                        Assert.AreEqual(Team.Players, Teams.Of(ally.gameObject));
+                        float interval = ally.GetComponent<AiGunner>().fireCooldown;
+                        StringAssert.Contains(Loc.Format("mission.ally_fire", "s", interval.ToString("0.##", culture)), difficulty);
+                    }
+                }
+                else if (id == TrainMission.EventId)
+                {
+                    Assert.IsEmpty(field);
+                    var guard = TrainMission.Current.Escort.Guard;
+                    Assert.AreEqual(Team.Enemy, Teams.Of(guard.gameObject));
+                    float interval = guard.GetComponent<AiGunner>().fireCooldown;
+                    Assert.AreEqual(Loc.Get("train.detail"), stats);
+                    StringAssert.Contains("1", stats);
+                    StringAssert.Contains(Loc.Format("train.guard_fire", "s", interval.ToString("0.##", culture)), difficulty);
+                }
+                else
+                {
+                    Assert.IsNotEmpty(field);
+                    Assert.IsTrue(field.All(p => p.Car.Cannon.locked));
+                    StringAssert.Contains(Loc.Get("events.guns_disabled"), difficulty);
+                }
+                flow.EnterMenu();
+                yield return null;
+            }
         }
     }
 }
