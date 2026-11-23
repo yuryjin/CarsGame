@@ -2200,6 +2200,83 @@ MonoBehaviour:
     m_Localized: "Race reward \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: '{n} of {target}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "Places short \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: Over by +{t} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "Wrecks \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "Wrecks {wrecks} \xB7 resets {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "Place {p} \xB7 repairs {repairs}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795364048896
+    m_Localized: Back to race results
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795376631808
+    m_Localized: "Practice \xB7 {lesson}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000609390592
+    m_Localized: Launch timing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Localized: Press the throttle at GO. A minus means early, a plus means late.
+      Retry to practise again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Localized: "{ms} ms \xB7 Boost earned"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Localized: "{ms} ms \xB7 No boost"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29707364823543808
+    m_Localized: "Top 3 in {name} or {n} more \u2605"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175632175104
+    m_Localized: Catch a rival and fire when the reticle lights up.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Localized: Enter the bend in a drift, then release the brake to boost.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Localized: Build up speed before the broken bridge and jump the gap.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Localized: Map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Localized: DRAFTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Localized: "Training lap from best sectors \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

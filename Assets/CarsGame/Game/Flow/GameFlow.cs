@@ -8,6 +8,7 @@ using RacingGame.Core.Daily;
 namespace RacingGame
 {
     public enum FlowState { Menu, Racing, Results }
+    public enum FirstSessionStage { Loading, MenuReady, FirstStart, FirstResults, NextStart }
 
     /// <summary>
     /// Top-level game loop of the single scene: menu → race (event + tier from the menu) →
@@ -21,6 +22,7 @@ namespace RacingGame
         public DifficultyTier[] tiers;
 
         public FlowState State { get; private set; } = FlowState.Menu;
+        public FirstSessionStage SessionStage { get; private set; }
         public RaceEventDefinition CurrentEvent => RaceSetup.Event;
         public int LastReward { get; private set; }
         public RacePayout LastPayout { get; private set; }
@@ -33,7 +35,9 @@ namespace RacingGame
         public bool LastHadPreviousBest { get; private set; }
         public bool LastWasPersonalBest { get; private set; }
         public int[] LastSectorDeltaMs { get; private set; }
-        private int[] personalGhostSectors;
+        public Core.Save.SectorBest LastTrainingSectors { get; private set; }
+        private GhostSectorTimes.Run personalGhostSectors, playerSectors;
+        private int shownSectorCount;
         public bool LastBestComparable { get; private set; }
         public bool LastBestSetupKnown { get; private set; }
         private Core.Save.RecordSetup raceRecordSetup;
@@ -116,6 +120,8 @@ namespace RacingGame
 
         private void OnEnable()
         {
+            PlatformGlue.Ready += ObserveSessionMenu;
+            StateChanged += ObserveSessionState;
             race.OnFieldSpawned += OnFieldSpawned;
             race.OnCountdownTick += OnCountdown;
             race.OnRaceStarted += OnStarted;
@@ -125,6 +131,8 @@ namespace RacingGame
 
         private void OnDisable()
         {
+            PlatformGlue.Ready -= ObserveSessionMenu;
+            StateChanged -= ObserveSessionState;
             race.OnFieldSpawned -= OnFieldSpawned;
             race.OnCountdownTick -= OnCountdown;
             race.OnRaceStarted -= OnStarted;
@@ -181,6 +189,11 @@ namespace RacingGame
                 }
             }
             TickTestDrive();
+            if (playerSectors != null && recorder.Recording)
+            {
+                playerSectors.Advance(recorder.Record);
+                ShowCompletedSectors();
+            }
         }
 
         // ---------- transitions ----------
@@ -188,10 +201,12 @@ namespace RacingGame
         {
             ReturningFromPractice = IsPractice;
             ReturningFromTestDrive = IsTestDrive;
+            bool resumeResult = IsPractice && practiceReturnResults != null;
+            if (!resumeResult) practiceReturnResults = null;
             Teardown();
             RestoreTestDrive();
             if (hud != null) hud.SetVisible(false);
-            SetState(FlowState.Menu);
+            SetState(resumeResult ? FlowState.Results : FlowState.Menu);
         }
 
         public void StartRace(RaceEventDefinition ev, DifficultyTier tier)
@@ -205,6 +220,7 @@ namespace RacingGame
             if (ev != null && !IsUnlocked(ev)) { MenuScreens.Toast(Loc.Get("events.locked")); return; }
             // A rejected request must leave the current race and any test-drive snapshot intact.
             if (IsTestDrive && ev != testDriveEvent) RestoreTestDrive();
+            if (!IsTestDrive) practiceReturnResults = null;
             RaceSetup.Event = ev;
             RaceSetup.Tier = tier;
             Teardown();
@@ -237,12 +253,15 @@ namespace RacingGame
             // Look before the field spawns so the first frame of the countdown is already correct.
             if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
 
-            LastReward = 0; LastStarsEarned = 0; LastRewardDoubled = false; LastDailyBonus = 0; LastDailyStreak = 0;
-            LastPayout = default; LastTurretReward = LastFirstFinishBonus = 0;
+            if (practiceReturnResults == null)
+            {
+                LastReward = 0; LastStarsEarned = 0; LastRewardDoubled = false; LastDailyBonus = 0; LastDailyStreak = 0;
+                LastPayout = default; LastTurretReward = LastFirstFinishBonus = 0;
+                LastBestDeltaMs = 0; LastHadPreviousBest = false; LastWasPersonalBest = false; LastUnlocked.Clear();
+                LastBestComparable = LastBestSetupKnown = false;
+            }
             // The daily race is the same race for everyone that day: AI and weapon streams from the day's seed.
             if (DailyRace.IsDaily(ev)) { var director = RaceDirector.Current ?? RaceDirector.Instance; if (director != null) director.Reseed(DailyChallenge.For(DailyRace.DayOf(ev)).Seed); }
-            LastBestDeltaMs = 0; LastHadPreviousBest = false; LastWasPersonalBest = false; LastUnlocked.Clear();
-            LastBestComparable = LastBestSetupKnown = false;
             raceRecordSetup = null;
             if (MenuCameraDirector.Instance != null) MenuCameraDirector.Instance.Activate(false);   // camera hand-over before cars exist
             race.StartRace();
@@ -292,11 +311,18 @@ namespace RacingGame
         {
             foreach (var g in ghosts) if (g != null) Destroy(g.gameObject);
             ghosts.Clear();
-            personalGhostSectors = LastSectorDeltaMs = null;
+            personalGhostSectors = playerSectors = null;
+            if (practiceReturnResults == null)
+            {
+                LastSectorDeltaMs = null;
+                LastTrainingSectors = null;
+            }
+            shownSectorCount = 0;
         }
 
         private async void SpawnGhosts(RaceEventDefinition ev, int generation)
         {
+            if (track != null) playerSectors = new GhostSectorTimes.Run(track, race.laps);
             var prefab = race.spawner != null ? race.spawner.raceCarPrefab : null;
             if (prefab == null) return;
             int hash = TrackHash(ev);
@@ -309,7 +335,7 @@ namespace RacingGame
             if (own != null)
             {
                 AddGhost(GhostCar.Spawn(prefab, own, GhostTint));
-                personalGhostSectors = GhostSectorTimes.Measure(track, own, race.laps);
+                personalGhostSectors = GhostSectorTimes.MeasureLaps(track, own, race.laps);
             }
 
             var sessions = PlatformGlue.Platform?.Sessions;
@@ -345,6 +371,7 @@ namespace RacingGame
 
         public void RetryRace()
         {
+            if (maneuverApproach.HasValue) { RetryManeuver(maneuverApproach.Value); return; }
             if (IsTestDrive)
             {
                 string body = race.spawner.playerBodyId;
@@ -356,6 +383,19 @@ namespace RacingGame
         }
 
         private void SetState(FlowState s) { State = s; StateChanged?.Invoke(s); }
+
+        private void ObserveSessionMenu()
+        {
+            if (SessionStage == FirstSessionStage.Loading && State == FlowState.Menu && PlatformGlue.IsReady)
+                SessionStage = FirstSessionStage.MenuReady;
+        }
+
+        private void ObserveSessionState(FlowState state)
+        {
+            if (state == FlowState.Menu) ObserveSessionMenu();
+            else if (state == FlowState.Results && SessionStage == FirstSessionStage.FirstStart && !IsTestDrive)
+                SessionStage = FirstSessionStage.FirstResults;
+        }
 
         // ---------- race events ----------
         private void OnFieldSpawned()
@@ -534,6 +574,11 @@ namespace RacingGame
         }
         private void OnStarted()
         {
+            if (!IsTestDrive)
+            {
+                if (SessionStage == FirstSessionStage.MenuReady) SessionStage = FirstSessionStage.FirstStart;
+                else if (SessionStage == FirstSessionStage.FirstResults) SessionStage = FirstSessionStage.NextStart;
+            }
             if (playerEngine != null) playerEngine.SetRunning(true);
             foreach (var g in ghosts) if (g != null) g.Begin(race.RaceStartTime);
             if (!IsTestDrive && trainMission == null && race.Player != null) recorder.Begin(race.Player, TrackHash(RaceSetup.Event), UiFactory.Escape(PlatformGlue.Platform != null ? PlatformGlue.Platform.Player.Name : "You"));
@@ -545,14 +590,12 @@ namespace RacingGame
             SfxPlayer.Instance.PlayUi(SfxSynth.Finish);
             var rec = recorder.Stop();
             if (rec == null || rec.Samples.Count < 10) return;
-            if (personalGhostSectors != null)
+            if (playerSectors != null && playerSectors.Finish(rec) && personalGhostSectors != null)
             {
-                var times = GhostSectorTimes.Measure(track, rec, race.laps);
-                if (times != null)
-                {
-                    for (int i = 0; i < times.Length; i++) times[i] -= personalGhostSectors[i];
-                    LastSectorDeltaMs = times;
-                }
+                ShowCompletedSectors();
+                LastSectorDeltaMs = new int[3];
+                for (int i = 0; i < playerSectors.Count; i++)
+                    LastSectorDeltaMs[i % 3] += playerSectors.Duration(i) - personalGhostSectors.Duration(i);
             }
             string encoded = rec.ToBase64();
             if (string.IsNullOrEmpty(encoded)) return; // An incomplete or oversized replay cannot replace a valid best.
@@ -569,6 +612,14 @@ namespace RacingGame
             }
         }
 
+        private void ShowCompletedSectors()
+        {
+            if (personalGhostSectors == null) return;
+            for (; shownSectorCount < playerSectors.Count; shownSectorCount++)
+                hud?.ShowSectorDelta(track, shownSectorCount % 3,
+                    playerSectors.Duration(shownSectorCount) - personalGhostSectors.Duration(shownSectorCount));
+        }
+
         private void OnFinished(RaceResults results)
         {
             if (IsTestDrive) { EnterMenu(); return; }
@@ -577,6 +628,7 @@ namespace RacingGame
             recorder.Stop();                                   // DNF path never reached OnParticipantFinished
             if (ContinueOpen) { ContinueOpen = false; if (overlays != null) overlays.HideContinuePrompt(); }
             var me = results.Player;
+            if (me != null && !me.Finished) playerSectors?.Advance(recorder.Record, stopped: true);
             var save = PlatformGlue.Save;
             var ev = RaceSetup.Event;
             float mult = RaceSetup.Tier != null ? RaceSetup.Tier.rewardMultiplier : 1f;
@@ -601,6 +653,7 @@ namespace RacingGame
 
             if (save != null && me != null)
             {
+                int previousStars = save.Data.TotalStars;
                 var row = save.Local;
                 row.coinsEarned += LastReward;
                 row.races++;
@@ -634,7 +687,9 @@ namespace RacingGame
                     }
                     if (LastWasPersonalBest || me.Finished && LastHadPreviousBest && LastBestDeltaMs == 0 && !LastBestSetupKnown)
                         best.setup = raceRecordSetup?.Copy();
-                    if (me.Finished && me.Position <= 3) UnlockNext(ev, save);
+                    if (playerSectors != null)
+                        LastTrainingSectors = best.KeepSectors(TrackHash(ev), race.laps, playerSectors.BestDurations());
+                    if (!daily) UnlockNext(ev, me.Finished && me.Position <= 3, previousStars, save);
                     if (daily) RecordDaily(ev, me, save, row);
                 }
                 Core.Economy.RaceCups.GrantCompleted(save.Data.progress);
@@ -673,13 +728,17 @@ namespace RacingGame
         }
 
 
-        private void UnlockNext(RaceEventDefinition finished, Core.Save.SaveService save)
+        private void UnlockNext(RaceEventDefinition finished, bool podium, int previousStars, Core.Save.SaveService save)
         {
             if (events == null) return;
+            int stars = save.Data.TotalStars;
             foreach (var e in events)
             {
-                if (e == null || e.unlockAfterEventId != finished.eventId) continue;
-                if (!save.Data.progress.unlockedEvents.Contains(e.eventId)) { save.Data.progress.unlockedEvents.Add(e.eventId); LastUnlocked.Add(e); }
+                if (e == null || string.IsNullOrEmpty(e.unlockAfterEventId) || save.Data.progress.unlockedEvents.Contains(e.eventId)) continue;
+                bool openedByPlace = podium && e.unlockAfterEventId == finished.eventId;
+                if (!openedByPlace && !e.OpenedByStars(stars)) continue;
+                save.Data.progress.unlockedEvents.Add(e.eventId);
+                if (!e.OpenedByStars(previousStars)) LastUnlocked.Add(e);
             }
         }
 
@@ -701,7 +760,7 @@ namespace RacingGame
             if (e == null) return false;
             if (string.IsNullOrEmpty(e.unlockAfterEventId)) return true;
             var save = PlatformGlue.Save;
-            return save != null && save.Data.progress.unlockedEvents.Contains(e.eventId);
+            return save != null && (save.Data.progress.unlockedEvents.Contains(e.eventId) || e.OpenedByStars(save.Data.TotalStars));
         }
 
         /// <summary>Rewarded ad on the results screen: doubles the payout once.</summary>

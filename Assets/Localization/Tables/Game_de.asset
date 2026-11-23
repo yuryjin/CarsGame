@@ -2203,6 +2203,84 @@ MonoBehaviour:
     m_Localized: "Rennbelohnung \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: '{n} von {target}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "Pl\xE4tze zum Ziel \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: "\xDCber dem Limit +{t} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "Totalsch\xE4den \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "Totalsch\xE4den {wrecks} \xB7 R\xFCcksetzungen {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "Platz {p} \xB7 Reparaturen {repairs}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795364048896
+    m_Localized: "Zur\xFCck zum Rennergebnis"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795376631808
+    m_Localized: "Trainieren \xB7 {lesson}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000609390592
+    m_Localized: Starttiming
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Localized: "Gib beim Startsignal Gas. Minus bedeutet zu fr\xFCh, Plus zu sp\xE4t.
+      Starte einen neuen Versuch mit \u201ENochmal\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Localized: "{ms} ms \xB7 Startboost"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Localized: "{ms} ms \xB7 Kein Startboost"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29707364823543808
+    m_Localized: "Top 3 in {name} oder noch {n} \u2605"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175632175104
+    m_Localized: Hol einen Gegner ein und feuere, sobald das Fadenkreuz aufleuchtet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Localized: "Drifte in die Kurve und l\xF6se die Bremse f\xFCr einen Schub."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Localized: "Beschleunige vor der kaputten Br\xFCcke und \xFCberspringe die
+      L\xFCcke."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Localized: Karte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Localized: WINDSCHATTEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Localized: "Trainingsrunde aus Bestsektoren \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

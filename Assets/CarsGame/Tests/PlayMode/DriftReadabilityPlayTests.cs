@@ -24,6 +24,74 @@ namespace RacingGame.Tests
         }
 
         [UnityTest, Timeout(180000)]
+        public IEnumerator SlipstreamMeterChargesBehindAMovingCarFadesOnPassingAndStaysOffForSoloNitro()
+        {
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float until = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < until) yield return null;
+            yield return null; yield return null;
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = Object.FindAnyObjectByType<RaceManager>();
+            Assert.IsTrue(flow.StartTestDrive("classic"));
+            while (race.State == RaceState.Countdown) yield return null;
+
+            var path = TrackPath.Instance;
+            float straight = 0f, bestSpeed = -1f;
+            for (float d = 0f; d < path.Length; d += 20f)
+            {
+                float speed = path.Profile.MinSpeedAhead(d, 75f);
+                if (speed > bestSpeed) { bestSpeed = speed; straight = d; }
+            }
+            var player = race.Player.Car;
+            var local = Place(player, straight);
+            var rival = race.Participants[0].isPlayer ? race.Participants[1].Car : race.Participants[0].Car;
+            var ahead = Place(rival, straight + 13f);
+            var label = System.Array.Find(Object.FindObjectsByType<TMP_Text>(FindObjectsInactive.Include),
+                t => t.name == "Nitro" && t.transform.parent.name == "Speedometer");
+            Assert.NotNull(label);
+            for (int i = 0; i < 140 && player.DraftCharge01 < .6f; i++) yield return null;
+            yield return null;
+            Assert.GreaterOrEqual(player.DraftCharge01, .6f, "Two cars driving in the same lane must fill the meter");
+            Assert.IsTrue(player.IsBoosting);
+            Assert.IsTrue(label.gameObject.activeInHierarchy);
+            Assert.AreEqual(Loc.Get("hud.slipstream"), label.text);
+            float peak = player.DraftCharge01;
+            local.Set(1f, .55f); ahead.Set(0f, -.55f, true);
+            bool sawDecay = false;
+            for (int i = 0; i < 180 && player.DraftCharge01 > 0f; i++)
+            {
+                yield return null;
+                if (player.DraftCharge01 > .05f && player.DraftCharge01 < peak - .1f) sawDecay = true;
+            }
+            Assert.IsTrue(sawDecay, "Leaving the wake bleeds off its stored charge");
+            Assert.AreEqual(0f, player.DraftCharge01);
+            flow.EnterMenu();
+            Assert.IsTrue(flow.StartPractice(PracticeLesson.Drift));
+            while (race.State == RaceState.Countdown) yield return null;
+            Assert.AreEqual(1, race.Participants.Count);
+            player = race.Player.Car;
+            player.ApplyBoost(1f);
+            for (int i = 0; i < 4; i++) yield return null;
+            Assert.IsTrue(player.IsBoosting);
+            Assert.AreEqual(0f, player.DraftCharge01);
+            Assert.IsTrue(label.gameObject.activeInHierarchy);
+            Assert.AreEqual(Loc.Get("hud.nitro"), label.text);
+            Debug.Log($"[Slipstream] peak={peak:F2}, pass bleeds charge to zero, solo boost={player.IsBoosting}");
+
+            ScriptedDriverInput Place(CarController car, float distance)
+            {
+                path.Pose(distance, 0f, out var position, out var rotation);
+                car.Teleport(position + Vector3.up * .5f, rotation);
+                car.Body.linearVelocity = car.transform.forward * 14f;
+                var input = car.gameObject.AddComponent<ScriptedDriverInput>();
+                car.SetInputSource(input);
+                input.Set(.55f, 0f);
+                return input;
+            }
+        }
+
+        [UnityTest, Timeout(180000)]
         public IEnumerator ActualDriftKeepsItsChargeAndReleaseInstructionsReadableAtPhoneScale()
         {
             Time.captureDeltaTime = SimulationDriver.FixedStep;

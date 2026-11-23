@@ -111,7 +111,7 @@ namespace RacingGame.Core.Save
             if (e == null || string.IsNullOrEmpty(e.eventId)) return;
             if (!d.TryGetValue(e.eventId, out var cur))
             {
-                d[e.eventId] = new EventBest { eventId = e.eventId, bestTimeMs = e.bestTimeMs, stars = e.stars, setup = e.bestTimeMs > 0 ? e.setup?.Copy() : null };
+                cur = d[e.eventId] = new EventBest { eventId = e.eventId, bestTimeMs = e.bestTimeMs, stars = e.stars, setup = e.bestTimeMs > 0 ? e.setup?.Copy() : null };
             }
             else
             {
@@ -123,6 +123,7 @@ namespace RacingGame.Core.Save
                 }
                 cur.stars |= e.stars;
             }
+            cur.MergeSectors(e.sectors);
         }
         private static SettingsData Clone(SettingsData s) => new SettingsData
         {

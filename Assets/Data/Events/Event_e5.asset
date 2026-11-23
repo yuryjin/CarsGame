@@ -15,6 +15,7 @@ MonoBehaviour:
   eventId: e5
   nameKey: events.e5.name
   laps: 5
+  referenceSeconds: 304
   aiCountOverride: -1
   reversed: 1
   night: 0
@@ -22,6 +23,7 @@ MonoBehaviour:
   damageMultiplier: 1
   pickupCount: 9
   unlockAfterEventId: e4
+  unlockStars: 8
   order: 4
   finishGoal: 2
   targetSeconds: 330

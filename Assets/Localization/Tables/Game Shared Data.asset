@@ -2151,6 +2151,82 @@ MonoBehaviour:
     m_Key: events.race_reward
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Key: results.goal.count
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Key: results.goal.places
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Key: results.goal.late
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Key: results.goal.wrecks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Key: results.goal.clean
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Key: results.goal.win_clean
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795364048896
+    m_Key: practice.return_results
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795376631808
+    m_Key: results.practice_goal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000609390592
+    m_Key: practice.launch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Key: practice.launch.help
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Key: practice.launch.hit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Key: practice.launch.miss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29707364823543808
+    m_Key: events.locked_stars
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175632175104
+    m_Key: route.aim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Key: route.drift_boost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Key: route.bridge_jump
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Key: hud.mini_map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Key: hud.slipstream
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Key: results.sector.training
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

@@ -2211,6 +2211,83 @@ MonoBehaviour:
     m_Localized: "Premio de la carrera \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: '{n} de {target}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "Puestos de diferencia \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: Retraso +{t} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "Bajas propias \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "Bajas {wrecks} \xB7 reinicios {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "Puesto {p} \xB7 reparaciones {repairs}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795364048896
+    m_Localized: Volver al resultado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795376631808
+    m_Localized: "Practicar \xB7 {lesson}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000609390592
+    m_Localized: Salida precisa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Localized: "Acelera con la se\xF1al de salida. Menos indica que te adelantaste,
+      m\xE1s que llegaste tarde. Pulsa Reintentar para repetir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Localized: "{ms} ms \xB7 Impulso conseguido"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Localized: "{ms} ms \xB7 Sin impulso"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29707364823543808
+    m_Localized: "Top 3 en {name} o {n} \u2605 m\xE1s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175632175104
+    m_Localized: Alcanza a un rival y dispara cuando se ilumine la mira.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Localized: Entra derrapando en la curva y suelta el freno para acelerar.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Localized: Gana velocidad antes del puente roto y salta el hueco.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Localized: Mapa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Localized: REBUFO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Localized: "Vuelta de pr\xE1ctica con tus mejores sectores \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

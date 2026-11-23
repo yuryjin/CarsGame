@@ -2229,6 +2229,86 @@ MonoBehaviour:
     m_Localized: "Yar\u0131\u015F \xF6d\xFCl\xFC \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: '{n}/{target}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "Hedefe kalan s\u0131ra \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: Gecikme +{t} sn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "Ara\xE7 kayb\u0131 \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "Kay\u0131p {wrecks} \xB7 s\u0131f\u0131rlama {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "S\u0131ra {p} \xB7 onar\u0131m {repairs}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795364048896
+    m_Localized: "Yar\u0131\u015F sonu\xE7lar\u0131na d\xF6n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795376631808
+    m_Localized: "Antrenman \xB7 {lesson}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000609390592
+    m_Localized: "Kalk\u0131\u015F zamanlamas\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Localized: "Ba\u015Flang\u0131\xE7 i\u015Faretinde gaza bas. Eksi erken, art\u0131
+      ge\xE7 bast\u0131\u011F\u0131n\u0131 g\xF6sterir. Yeniden ba\u015Flamak i\xE7in
+      Tekrar'a bas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Localized: "{ms} ms \xB7 H\u0131zlanma kazan\u0131ld\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Localized: "{ms} ms \xB7 H\u0131zlanma yok"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29707364823543808
+    m_Localized: "{name} yar\u0131\u015F\u0131nda ilk 3 veya {n} \u2605 daha"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175632175104
+    m_Localized: "Bir rakibe yeti\u015F ve ni\u015Fang\xE2h yand\u0131\u011F\u0131nda
+      ate\u015F et."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Localized: "Viraja drift yaparak gir ve h\u0131zlanmak i\xE7in freni b\u0131rak."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Localized: "Y\u0131k\u0131k k\xF6pr\xFCden \xF6nce h\u0131zlan ve bo\u015Flu\u011Fu
+      a\u015F."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Localized: Harita
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Localized: HAVA AKIMI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Localized: "En iyi sekt\xF6rlerden antrenman turu \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

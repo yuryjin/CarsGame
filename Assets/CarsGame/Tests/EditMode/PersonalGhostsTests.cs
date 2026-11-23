@@ -21,6 +21,28 @@ namespace RacingGame.Tests
             SaveMigrator.FromJson("{\"version\":6,\"bestGhost\":\"" + replay + "\"}");
 
         [Test]
+        public void SectorTrainingSurvivesRestartAndMergesMinimaOnlyWithinItsRoute()
+        {
+            var a = new SaveData();
+            var first = new EventBest { eventId = "e1" };
+            a.progress.bests.Add(first);
+            var lap = first.KeepSectors(10, 2, new[] { 4000, 2400, 2800 });
+            Assert.AreEqual(9200, lap.LapMilliseconds);
+            var other = first.KeepSectors(11, 2, new[] { 700, 0, 0 });
+            Assert.AreEqual(0, other.LapMilliseconds);
+            first.KeepSectors(10, 1, new[] { 1, 1, 1 });
+            var b = new SaveData();
+            var second = new EventBest { eventId = "e1" };
+            b.progress.bests.Add(second);
+            second.KeepSectors(10, 2, new[] { 0, 2200, 4000 });
+            var merged = SaveMigrator.FromJson(SaveMigrator.ToJson(SaveMerge.Merge(a,b))).progress.bests[0];
+            CollectionAssert.AreEqual(new[] { 4000, 2200, 2800 }, merged.sectors.Find(s => s.trackHash == 10 && s.laps == 2).milliseconds);
+            Assert.AreEqual(0, merged.sectors.Find(s => s.trackHash == 11).LapMilliseconds);
+            Assert.AreEqual(3, merged.sectors.Find(s => s.laps == 1).LapMilliseconds);
+            Assert.AreEqual(9200, lap.LapMilliseconds, "merging another device cannot mutate its input");
+        }
+
+        [Test]
         public void RouteIncludesEventLayoutAndLapsAndEachDeviceCanContributeAWinner()
         {
             var local = new SaveData { updatedAtUnixMs = 200 };

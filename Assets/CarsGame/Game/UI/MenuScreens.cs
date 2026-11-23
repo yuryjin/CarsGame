@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using RacingGame.Core.Economy;
 using RacingGame.Core.Platform;
+using RacingGame.Core.Track;
 
 namespace RacingGame
 {
@@ -146,9 +147,10 @@ namespace RacingGame
                 case FlowState.Menu: string target = pendingScreen ?? (flow.ReturningFromPractice ? "practice" : flow.ReturningFromTestDrive ? "garage" : "main"); pendingScreen = null; Show(target); break;
                 case FlowState.Racing: rewardDetailsExpanded = false; Show(""); break;
                 case FlowState.Results:
-                    rewardShownAt = Time.unscaledTime;
+                    rewardShownAt = flow.ReturningToResults ? float.NegativeInfinity : Time.unscaledTime;
                     Show("results");
-                    foreach (var e in flow.LastUnlocked) Toast(Loc.Format("results.unlocked", "name", Loc.Get(e.nameKey)));
+                    if (!flow.ReturningToResults)
+                        foreach (var e in flow.LastUnlocked) Toast(Loc.Format("results.unlocked", "name", Loc.Get(e.nameKey)));
                     break;
             }
         }
@@ -432,6 +434,9 @@ namespace RacingGame
             string reward = Loc.Format("events.race_reward", "m", multiplier.ToString("0.##", culture));
             var content = UiFactory.Scroll(body, "EventsScroll", Vector2.zero, new Vector2(0f, tiers.Length > 0 ? -90f : 0f));
             var list = Events();
+            var path = TrackPath.Instance;
+            var forward = path != null ? path.Spline : null;
+            var reverse = forward?.Reversed();
             // Surface the modes a new player can actually enter before the locked career chain.
             // Keep the original indices for card numbers and campaign progression.
             foreach (bool available in new[] { true, false })
@@ -444,8 +449,11 @@ namespace RacingGame
                 {
                     var ev = list[i]; bool unlocked = flow.IsUnlocked(ev);
                     if (unlocked != available) continue;
-                    var row = Item(content, ev.eventId, Narrow ? 376f : 354f);
-                    Label(row, "Number", (i + 1).ToString("00"), 52f, Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(116f, -24f), unlocked ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
+                    bool circuit = ev.mode == EventMode.Race && forward != null;
+                    var row = Item(content, ev.eventId, (Narrow ? 376f : 354f) + (circuit ? 92f : 0f));
+                    Label(row, "Number", (i + 1).ToString("00"), circuit ? 36f : 52f, circuit ? Top : Vector2.zero, Top,
+                        circuit ? new Vector2(24f, -62f) : new Vector2(24f, 24f), new Vector2(116f, circuit ? -12f : -24f),
+                        unlocked ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
                     Label(row, "Name", Loc.Get(ev.nameKey), 34f, Top, Vector2.one, new Vector2(144f, -60f), new Vector2(-236f, -12f)).fontStyle = FontStyles.Bold;
                     int rivals = ev.aiCountOverride >= 0 ? ev.aiCountOverride : tier != null ? tier.aiCount : race.spawner.aiCount;
                     string detail = ev.mode == EventMode.Mission ? MissionDetail(ev, rivals)
@@ -460,14 +468,50 @@ namespace RacingGame
                     string s2 = (starMask & 2) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
                     string s3 = (starMask & 4) != 0 ? "<color=#FFCC40>★</color>" : "<color=#455568>★</color>";
                     string starDisplay = s1 + " " + StarGoalText.Description(ev, 0) + "\n" + s2 + " " + StarGoalText.Description(ev, 1) + "\n" + s3 + " " + StarGoalText.Description(ev, 2);
-                    Label(row, "Stars", starDisplay, 22f, Top, Vector2.one, new Vector2(144f, -302f), new Vector2(-236f, -178f));
+                    float starOffset = circuit ? -92f : 0f;
+                    Label(row, "Stars", starDisplay, 22f, Top, Vector2.one, new Vector2(144f, -302f + starOffset), new Vector2(-236f, -178f + starOffset));
+                    if (circuit) BuildCircuitPreview(row, ev, ev.reversed ? reverse : forward, path.startLineDistance);
                     var prerequisite = unlocked ? null : list.Find(e => e.eventId == ev.unlockAfterEventId);
                     string status = unlocked ? best != null && best.bestTimeMs > 0 ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) : ""
-                        : prerequisite != null ? Loc.Format("events.locked_after", "name", Loc.Get(prerequisite.nameKey)) : Loc.Get("events.locked");
+                        : prerequisite == null ? Loc.Get("events.locked")
+                        : ev.unlockStars > 0 ? Loc.Format("events.locked_stars", "name", Loc.Get(prerequisite.nameKey),
+                            "n", Mathf.Max(0, ev.unlockStars - (PlatformGlue.Save?.Data.TotalStars ?? 0)))
+                        : Loc.Format("events.locked_after", "name", Loc.Get(prerequisite.nameKey));
                     Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 64f : 44f), unlocked ? UiFactory.Positive : UiFactory.Muted);
                     UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—", unlocked ? () => flow.StartRace(ev, tier) : null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-216f, -36f), new Vector2(-24f, 36f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
                 }
             }
+        }
+
+        private static void BuildCircuitPreview(RectTransform row, RaceEventDefinition ev, TrackSpline spline, float grid)
+        {
+            if (ev.wastelandTrack)
+            {
+                var layout = new WastelandLayout();
+                spline = new TrackSpline(layout.Points); grid = layout.StartLine;
+            }
+            else if (ev.starRingTrack)
+            {
+                var layout = new StarRingLayout();
+                spline = new TrackSpline(layout.Points); grid = layout.StartLine;
+            }
+            if ((ev.wastelandTrack || ev.starRingTrack) && ev.reversed) spline = spline.Reversed();
+            var map = UiFactory.Panel(row, "RouteMap", Top, Top, new Vector2(12f, -208f), new Vector2(134f, -65f));
+            map.gameObject.AddComponent<CircuitMapGraphic>().SetRoute(spline, grid);
+            string hint = ev.twist == Core.Daily.RaceTwist.HotBomb ? "bomb.pass"
+                : ev.twist == Core.Daily.RaceTwist.MinesOnly ? "lesson.mines"
+                : ev.wastelandTrack ? "route.bridge_jump" : ev.starRingTrack ? "lesson.wall"
+                : ev.spaceTrack ? "lesson.space" : ev.abyssTrack ? "lesson.abyss"
+                : ev.skillGoal == SkillGoal.DriftBoosts ? "route.drift_boost"
+                : ev.eventId == "e1" ? "route.aim" : "lesson.shortcut";
+            Label(row, "RouteHint", Loc.Get(hint), 23f, Top, Vector2.one,
+                new Vector2(144f, -268f), new Vector2(-236f, -178f));
+            if (ev.referenceSeconds <= 0) return;
+            int duration = Mathf.RoundToInt(ev.referenceSeconds / 5f) * 5;
+            string time = $"~{duration / 60}:{duration % 60:00}";
+            Label(row, "ReferenceTime", time + "\n" + Loc.Get("body.classic") + " / " + Loc.Get("difficulty.normal"), 23f,
+                new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-225f, -134f), new Vector2(-19f, -43f),
+                UiFactory.Muted, TextAlignmentOptions.Center);
         }
 
         private void BuildGarage(RectTransform root)
@@ -885,7 +929,7 @@ namespace RacingGame
             return best;
         }
 
-        private void BuildResultStars(Transform content)
+        private void BuildResultStars(Transform content, RaceResultEntry me)
         {
             if (DailyRace.IsDaily(flow.CurrentEvent)) return;
             int currentStars = flow.LastStarsEarned;
@@ -905,7 +949,13 @@ namespace RacingGame
                 float bottom = 12f + (2 - s) * 84f;
                 var starRow = UiFactory.Panel(starsCard, "Star" + s, Vector2.zero, new Vector2(1f, 0f), new Vector2(24f, bottom), new Vector2(-24f, bottom + 80f));
                 Label(starRow, "StarIcon", wonThisRace ? "★" : "☆", 34f, Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(34f, 0f), wonThisRace ? UiFactory.Accent : UiFactory.Muted);
-                Label(starRow, "StarDesc", StarGoalText.Description(flow.CurrentEvent, s), 25f, new Vector2(0f, 0.4f), Vector2.one, new Vector2(46f, 0f), Vector2.zero, wonThisRace ? Color.white : UiFactory.Muted);
+                string description = StarGoalText.Description(flow.CurrentEvent, s);
+                if (!wonThisRace)
+                {
+                    string progress = StarGoalText.MissedProgress(flow.CurrentEvent, me, s);
+                    if (progress.Length > 0) description += "  ·  " + progress;
+                }
+                Label(starRow, "StarDesc", description, 25f, new Vector2(0f, 0.4f), Vector2.one, new Vector2(46f, 0f), Vector2.zero, wonThisRace ? Color.white : UiFactory.Muted);
                 string status = wonThisRace ? "results.star_earned" : wonOverall ? "results.star_previous" : "results.star_missed";
                 Label(starRow, "StarStatus", Loc.Get(status), 22f, Vector2.zero, new Vector2(1f, 0.4f), new Vector2(46f, 0f), Vector2.zero, wonThisRace ? UiFactory.Positive : UiFactory.Muted);
             }
@@ -913,7 +963,7 @@ namespace RacingGame
 
         private void BuildResults(RectTransform root)
         {
-            var results = race.Results;
+            var results = flow.ResultsForMenu;
             if (results == null) { Show("main"); return; }
             var body = Header(root, "results.title");
             bool columns = root.rect.width >= 1280f;
@@ -941,8 +991,18 @@ namespace RacingGame
 
             if (me != null && me.Finished && flow.LastSectorDeltaMs != null)
                 BuildSectorComparison(content, flow.LastSectorDeltaMs);
+            var training = flow.LastTrainingSectors;
+            if (training != null && training.LapMilliseconds > 0)
+                BuildSectorComparison(content, training.milliseconds, training.LapMilliseconds);
             BuildRewardDetails(content, me, missionEvent);
-            BuildResultStars(content);
+            BuildResultStars(content, me);
+            var lesson = flow.MissedLesson;
+            if (lesson != PracticeLesson.None)
+            {
+                var row = Item(content, "MissedGoalLesson", 80f, false);
+                UiFactory.Button(row, "PracticeMissedGoal", Loc.Format("results.practice_goal", "lesson", Loc.Get(GameFlow.PracticeTitleKey(lesson))),
+                    () => flow.StartPractice(lesson), Vector2.zero, Vector2.one, new Vector2(4f, 4f), new Vector2(-4f, -4f), 26f, UiFactory.Raised);
+            }
             var next = RecommendedNext();
             BuildNextGoal(content, next);
             var actions = UiFactory.Panel(overview, "Actions", Vector2.zero, new Vector2(1f, 0f),

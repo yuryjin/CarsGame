@@ -2208,6 +2208,83 @@ MonoBehaviour:
     m_Localized: "Pr\xEAmio da corrida \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: '{n} de {target}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "Posi\xE7\xF5es que faltaram \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: Atraso +{t} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "Perdas do carro \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "Perdas {wrecks} \xB7 reposi\xE7\xF5es {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "Posi\xE7\xE3o {p} \xB7 reparos {repairs}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795364048896
+    m_Localized: Voltar ao resultado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795376631808
+    m_Localized: "Treinar \xB7 {lesson}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000609390592
+    m_Localized: Largada precisa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Localized: Acelere no sinal de largada. Menos indica que foi cedo e mais indica
+      atraso. Toque em Tentar de novo para repetir.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Localized: "{ms} ms \xB7 Turbo obtido"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Localized: "{ms} ms \xB7 Sem turbo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29707364823543808
+    m_Localized: "P\xF3dio em {name} ou mais {n} \u2605"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175632175104
+    m_Localized: Alcance um rival e atire quando a mira acender.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Localized: Entre na curva derrapando e solte o freio para acelerar.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Localized: "Ganhe velocidade antes da ponte quebrada e salte o v\xE3o."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Localized: Mapa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Localized: "V\xC1CUO"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Localized: "Volta de treino com os melhores setores \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

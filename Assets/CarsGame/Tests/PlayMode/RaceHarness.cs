@@ -65,6 +65,8 @@ namespace RacingGame.Tests
         {
             public string evt, tier, parameters; public int seed, ticks, shots, hits, mines, mineHits;
             public bool turretsEnabled, reversed;
+            public int playerPosition, playerStarMask, playerSkillCount;
+            public bool nextEventUnlocked;
             public float raceSeconds; public CarReport[] cars;
         }
 
@@ -241,6 +243,15 @@ namespace RacingGame.Tests
                 mines = director.MinesDropped, mineHits = director.MineHits, turretsEnabled = turretsEnabled, reversed = ev.reversed
             };
             report.raceSeconds = report.ticks * SimulationDriver.FixedStep;
+            var finish = race.Results?.Player;
+            if (finish != null)
+            {
+                report.playerPosition = finish.Position;
+                report.playerStarMask = ev.StarMask(finish);
+                report.playerSkillCount = ev.SkillCount(finish);
+                var next = System.Array.Find(flow.events, candidate => candidate != null && candidate.unlockAfterEventId == ev.eventId);
+                report.nextEventUnlocked = next != null && flow.IsUnlocked(next);
+            }
             var cars = new List<CarReport>();
             foreach (var p in drivers)
             {

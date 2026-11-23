@@ -16,6 +16,7 @@ MonoBehaviour:
   mode: 0
   nameKey: events.e6.name
   laps: 3
+  referenceSeconds: 158
   aiCountOverride: -1
   reversed: 1
   night: 0
@@ -24,6 +25,7 @@ MonoBehaviour:
   pickupCount: 12
   mineFieldCount: 12
   unlockAfterEventId: e5
+  unlockStars: 10
   order: 5
   star1TargetPosition: 3
   star2TargetKills: 1

@@ -16,6 +16,7 @@ MonoBehaviour:
   mode: 0
   nameKey: events.e16.name
   laps: 3
+  referenceSeconds: 219
   aiCountOverride: -1
   reversed: 0
   abyssTrack: 1

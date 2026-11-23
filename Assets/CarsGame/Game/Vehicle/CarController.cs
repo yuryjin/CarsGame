@@ -98,6 +98,7 @@ namespace RacingGame
         private int boostUntilTick = -1;
         private const float BoostSpeedFactor = 1.25f, BoostTorqueFactor = 1.6f;
         private float draftCharge;
+        public float DraftCharge01 => draftCharge;
         private readonly DriftCharge drift = new DriftCharge();
 
         public bool IsDrifting => drift.Drifting;

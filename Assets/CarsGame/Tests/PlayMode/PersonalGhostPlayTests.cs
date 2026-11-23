@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using RacingGame.Core.Ghost;
@@ -105,8 +107,7 @@ namespace RacingGame.Tests
 
         private static GhostCar Ghost() => Object.FindAnyObjectByType<GhostCar>();
 
-        [UnityTest, Timeout(300000)]
-        public IEnumerator LegacyGhostThenE1E2AndSlowerE1KeepBothWinnersAfterCloudMergeAndRestart()
+        private IEnumerator OpenProfile()
         {
             Time.captureDeltaTime = SimulationDriver.FixedStep * 2;
             yield return SceneManager.LoadSceneAsync("SampleScene");
@@ -121,6 +122,12 @@ namespace RacingGame.Tests
             flow = Object.FindAnyObjectByType<GameFlow>();
             race = Object.FindAnyObjectByType<RaceManager>();
             e1 = Solo("e1"); e2 = Solo("e2");
+        }
+
+        [UnityTest, Timeout(300000)]
+        public IEnumerator LegacyGhostThenE1E2AndSlowerE1KeepBothWinnersAfterCloudMergeAndRestart()
+        {
+            yield return OpenProfile();
             yield return Start(e1);
             int h1 = flow.GetComponent<GhostRecorder>().Record.TrackHash;
             var legacy = LegacyCircuit(h1, TrackPath.Instance, e1.laps);
@@ -169,6 +176,91 @@ namespace RacingGame.Tests
             yield return Start(e1);
             Assert.AreEqual(first.DurationMilliseconds, Ghost().Record.DurationMilliseconds);
             Assert.AreEqual(first.PlayerName, Ghost().Record.PlayerName);
+        }
+
+        [UnityTest, Timeout(300000)]
+        public IEnumerator FirstTimedRunShowsTheTrainingLapAndStoresItWithoutAPreviousGhost()
+        {
+            yield return OpenProfile();
+            e1.laps = 2;
+            yield return Start(e1);
+            Assert.IsNull(Ghost());
+            yield return DriveToFinish();
+            var replay = flow.GetComponent<GhostRecorder>().Record;
+            int[] sectors = GhostSectorTimes.MeasureLaps(TrackPath.Instance, replay, e1.laps).BestDurations();
+            CollectionAssert.AreEqual(sectors, flow.LastTrainingSectors.milliseconds);
+            Assert.That(sectors, Has.All.GreaterThan(0));
+            var card = GameObject.Find("TrainingSectors");
+            Assert.IsNotNull(card);
+            int sum = sectors[0] + sectors[1] + sectors[2];
+            string heading = card.transform.Find("SectorTitle").GetComponent<TMPro.TMP_Text>().text;
+            Assert.AreEqual(Loc.Format("results.sector.training", "t", UiFactory.FormatMilliseconds(sum)), heading);
+            for (int i = 0; i < 3; i++)
+                StringAssert.EndsWith(UiFactory.FormatMilliseconds(sectors[i]), card.transform.Find("Sector" + (i + 1)).GetComponent<TMPro.TMP_Text>().text);
+            var flush = PlatformGlue.Save.FlushAsync();
+            while (!flush.IsCompleted) yield return null;
+            flush.GetAwaiter().GetResult();
+            yield return Reload();
+            Assert.AreEqual(sum, PlatformGlue.Save.Data.progress.bests.Find(b => b.eventId == e1.eventId).sectors[0].LapMilliseconds);
+            TestContext.WriteLine(heading + " = " + string.Join(" + ", sectors) + " ms");
+        }
+
+        [UnityTest, Timeout(240000)]
+        public IEnumerator LiveSectorLabelsMatchEveryLapAndTheResultsOnBothDirections()
+        {
+            yield return OpenProfile();
+            PlatformGlue.Save.Data.progress.unlockedEvents.Add(e2.eventId);
+            foreach (var ev in new[] { e1, e2 })
+            {
+                bool reverse = ev.reversed;
+                ev.aiCountOverride = 1; // keep a rival behind to inspect the finish HUD
+                yield return Start(ev);
+                int hash = flow.GetComponent<GhostRecorder>().Record.TrackHash;
+                var path = TrackPath.Instance;
+                var reference = LegacyCircuit(hash, path, ev.laps);
+                string payload = reverse ? Retimed(reference, "Faster", .003) : reference.ToBase64();
+                flow.EnterMenu();
+                PlatformGlue.Save.Data.personalGhosts.KeepBest(ev.eventId, ev.laps, payload, 1);
+                yield return Start(ev);
+                foreach (var participant in race.Participants)
+                    if (!participant.isPlayer)
+                    {
+                        participant.Car.Body.constraints = RigidbodyConstraints.FreezeAll;
+                        var gunner = participant.GetComponent<AiGunner>();
+                        if (gunner != null) gunner.enabled = false;
+                    }
+                var label = Array.Find(Object.FindAnyObjectByType<HudScreen>().GetComponentsInChildren<TMPro.TMP_Text>(true),
+                    t => t.name == "SectorDelta");
+                Assert.IsFalse(label.gameObject.activeInHierarchy);
+                var shown = new List<string>();
+                Object.FindAnyObjectByType<DebugBus>().Execute("autopilot", "on");
+                while (race.State == RaceState.Racing && race.RaceTime < 180)
+                {
+                    yield return null;
+                    if (label.gameObject.activeInHierarchy && (shown.Count == 0 || shown[shown.Count - 1] != label.text))
+                        shown.Add(label.text);
+                }
+                Assert.AreEqual(RaceState.Finishing, race.State);
+                var baseline = GhostSectorTimes.MeasureLaps(path, GhostRecord.FromBase64(payload), ev.laps);
+                var actual = GhostSectorTimes.MeasureLaps(path, flow.GetComponent<GhostRecorder>().Record, ev.laps);
+                Assert.NotNull(actual);
+                Assert.AreEqual(3 * ev.laps, shown.Count, ev.eventId + " " + string.Join(" / ", shown));
+                var totals = new int[3];
+                for (int i = 0; i < shown.Count; i++)
+                {
+                    int delta = actual.Duration(i) - baseline.Duration(i);
+                    totals[i % 3] += delta;
+                    Assert.AreEqual(reverse ? 1 : -1, Math.Sign(delta));
+                    int place = reverse ? 2 - i % 3 : i % 3;
+                    string sector = Loc.Get(place == 0 ? "results.sector.bridge" : place == 1 ? "results.sector.tower" : "results.sector.pits");
+                    string digits = (Mathf.Abs(Mathf.RoundToInt(delta / 100f)) / 10m).ToString("0.0", CultureInfo.GetCultureInfo(Loc.Language));
+                    string signed = (delta < 0 ? "−" : "+") + digits;
+                    Assert.AreEqual(sector + "  " + Loc.Format("results.sector.delta", "t", signed), shown[i]);
+                }
+                CollectionAssert.AreEqual(totals, flow.LastSectorDeltaMs);
+                TestContext.WriteLine(ev.eventId + " " + string.Join(" / ", shown) + " → " + string.Join(", ", totals) + " ms");
+                flow.EnterMenu();
+            }
         }
     }
 }

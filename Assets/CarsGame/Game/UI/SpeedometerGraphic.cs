@@ -10,14 +10,17 @@ namespace RacingGame
         public const float MaxSpeed = 240f;
         public static readonly Color Accent = new Color(1f, 0.81f, 0.22f);
         public static readonly Color BoostColor = new Color(0.25f, 0.85f, 1f);
-        private float reading;
+        public static readonly Color DraftColor = new Color(0.42f, 1f, 0.64f);
+        private float reading, draft;
 
-        public void SetSpeed(float speed, bool boosting)
+        public void SetSpeed(float speed, bool boosting, float draftCharge = 0f)
         {
             float next = Mathf.Clamp01(Mathf.Abs(speed) / MaxSpeed);
+            float nextDraft = Mathf.Clamp01(draftCharge);
             Color tint = boosting ? BoostColor : Accent;
-            if (Mathf.Approximately(next, reading) && color == tint) return;
+            if (Mathf.Approximately(next, reading) && Mathf.Approximately(nextDraft, draft) && color == tint) return;
             reading = next;
+            draft = nextDraft;
             color = tint;
             SetVerticesDirty();
         }
@@ -37,6 +40,7 @@ namespace RacingGame
             Arc(vh, center, 104f * scale, 3f * scale, 0f, 1f, new Color(0.25f, 0.32f, 0.4f));
             Arc(vh, center, 104f * scale, 3f * scale, 0.8f, 1f, new Color(1f, 0.36f, 0.3f));
             Arc(vh, center, 104f * scale, 4f * scale, 0f, reading, color);
+            if (draft > 0f) Arc(vh, center, 82f * scale, 4f * scale, 0f, draft, DraftColor);
 
             for (int i = 0; i <= 24; i++)
             {

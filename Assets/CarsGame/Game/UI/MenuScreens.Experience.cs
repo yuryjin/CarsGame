@@ -15,14 +15,14 @@ namespace RacingGame
             var content = UiFactory.Scroll(Header(root, "practice.title"), "PracticeScroll", Vector2.zero, Vector2.zero);
             var note = Item(content, "PracticeNote", 100f, false);
             Label(note, "Text", Loc.Get("practice.note"), 26f, Vector2.zero, Vector2.one, new Vector2(20f, 8f), new Vector2(-20f, -8f), UiFactory.Muted);
-            foreach (var lesson in new[] { PracticeLesson.Drift, PracticeLesson.Shortcut, PracticeLesson.WallRide, PracticeLesson.Aim })
+            foreach (var lesson in new[] { PracticeLesson.Drift, PracticeLesson.Shortcut, PracticeLesson.WallRide, PracticeLesson.Aim, PracticeLesson.Launch })
             {
                 var selected = lesson;
                 var row = Item(content, "Lesson" + lesson, 270f);
                 Label(row, "Name", Loc.Get(GameFlow.PracticeTitleKey(lesson)), 32f, Top, Vector2.one,
                     new Vector2(24f, -66f), new Vector2(-24f, -12f)).fontStyle = FontStyles.Bold;
                 string key = lesson == PracticeLesson.Drift ? (PlatformGlue.IsMobileDevice ? "lesson.drift.touch" : "lesson.drift.keys")
-                    : lesson == PracticeLesson.Shortcut ? "lesson.shortcut" : lesson == PracticeLesson.WallRide ? "lesson.wall" : "practice.aim.help";
+                    : lesson == PracticeLesson.Shortcut ? "lesson.shortcut" : lesson == PracticeLesson.WallRide ? "lesson.wall" : GameFlow.PracticeTitleKey(lesson) + ".help";
                 Label(row, "Instruction", Loc.Get(key), 26f, Top, Vector2.one,
                     new Vector2(24f, -174f), new Vector2(-24f, -70f));
                 UiFactory.Button(row, "Practice" + lesson, Loc.Get("practice.start"), () => flow.StartPractice(selected),
@@ -129,8 +129,7 @@ namespace RacingGame
                 if (best == null || best.bestTimeMs <= 0) return ev;
                 if (missingStar == null && (best.stars & 7) != 7) missingStar = ev;
             }
-            // A finish outside the podium records a time but does not open the next event.
-            // Help open the rest of the cup before sending the player back to farm old stars.
+            // A locked cup stage takes priority over replaying one for missing stars.
             return unlockStep ?? missingStar;
         }
 
@@ -156,13 +155,19 @@ namespace RacingGame
 
         private RaceEventDefinition RecommendedNext()
         {
-            var cup = RaceCups.ForEvent(flow.CurrentEvent != null ? flow.CurrentEvent.eventId : null);
-            if (cup != null && !cup.Complete(PlatformGlue.Save?.Data.progress))
+            var current = flow.CurrentEvent;
+            var nextCareer = flow.NextEvent(current);
+            var progress = PlatformGlue.Save?.Data.progress;
+            if (current != null && nextCareer != null && nextCareer.unlockAfterEventId == current.eventId
+                && progress?.bests.Exists(b => b != null && b.eventId == nextCareer.eventId && b.bestTimeMs > 0) != true)
+                return nextCareer;
+            var cup = RaceCups.ForEvent(current != null ? current.eventId : null);
+            if (cup != null && !cup.Complete(progress))
             {
                 var next = CupNext(cup);
                 if (next != null) return next;
             }
-            return flow.NextEvent(flow.CurrentEvent);
+            return nextCareer;
         }
 
         private void BuildNextGoal(Transform content, RaceEventDefinition next)

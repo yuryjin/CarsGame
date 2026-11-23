@@ -29,6 +29,53 @@ namespace RacingGame.Tests
         private static Button StartButton(string id) => Object.FindObjectsByType<Button>().Single(b => b.name == "Start_" + id);
         private static string CardText(Button start, string name) => start.transform.parent.Find(name).GetComponent<TMP_Text>().text;
 
+        [UnityTest, Timeout(180000)]
+        public IEnumerator CardMapArrowMatchesTheCourseThatStarts()
+        {
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float deadline = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null;
+            profile = JsonUtility.ToJson(PlatformGlue.Save.Data);
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var menu = flow.GetComponent<MenuScreens>();
+            foreach (string id in new[] { "e1", "e2", "e3", "e19", "e20" })
+            {
+                var ev = flow.events.Single(e => e.eventId == id);
+                if (!flow.IsUnlocked(ev)) PlatformGlue.Save.Data.progress.unlockedEvents.Add(id);
+                menu.Show("events");
+                Canvas.ForceUpdateCanvases();
+                var button = StartButton(id);
+                var map = button.transform.parent.Find("RouteMap").GetComponent<CircuitMapGraphic>();
+                Assert.IsFalse(map.raycastTarget);
+                var scroller = button.GetComponentInParent<ScrollRect>();
+                var offset = scroller.viewport.InverseTransformPoint(map.transform.position).y - scroller.viewport.rect.center.y;
+                scroller.content.anchoredPosition -= new Vector2(0, offset);
+                yield return null;
+                Canvas.ForceUpdateCanvases();
+                var mesh = map.canvasRenderer.GetMesh();
+                Assert.IsNotNull(mesh, id + " visible route");
+                var vertices = mesh.vertices;
+                Assert.Greater(vertices.Length, 12);
+                Vector2 tip = vertices[vertices.Length - 3];
+                Vector2 middle = (vertices[vertices.Length - 1] + vertices[vertices.Length - 2]) * 0.5f;
+                Vector2 arrow = (tip - middle).normalized;
+                string hint = CardText(button, "RouteHint");
+                Assert.IsNotEmpty(hint);
+                if (id == "e2") Assert.AreEqual(Loc.Get("route.drift_boost"), hint);
+                StringAssert.Contains(Loc.Get("body.classic"), CardText(button, "ReferenceTime"));
+                StringAssert.Contains(Loc.Get("difficulty.normal"), CardText(button, "ReferenceTime"));
+                button.onClick.Invoke();
+                Assert.AreSame(ev, flow.CurrentEvent);
+                var path = TrackPath.Instance;
+                Vector3 tangent = path.Tangent(path.startLineDistance);
+                Assert.Greater(Vector2.Dot(arrow, new Vector2(tangent.x, tangent.z)), 0.99f, id);
+                flow.EnterMenu();
+                yield return null;
+            }
+        }
+
         private static void AssertAvailableFirst(GameFlow flow)
         {
             var events = flow.events.Where(e => e != null).OrderBy(e => e.order).ToArray();
@@ -55,6 +102,45 @@ namespace RacingGame.Tests
             Assert.Less(StartButton("e1").transform.parent.GetSiblingIndex(),
                 StartButton("e1").transform.parent.parent.Find("CupsTitle").GetSiblingIndex(),
                 "Playable race cards lead the list before longer-term cup goals");
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator HudMapFollowsTheLeaderAndTheApproachingSideOfTheFork()
+        {
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float deadline = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null;
+            profile = JsonUtility.ToJson(PlatformGlue.Save.Data);
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = flow.GetComponent<RaceManager>();
+            foreach (string id in new[] { "e1", "e2", "e19" })
+            {
+                var ev = flow.events.Single(e => e.eventId == id);
+                if (!flow.IsUnlocked(ev)) PlatformGlue.Save.Data.progress.unlockedEvents.Add(id);
+                flow.StartRace(ev, flow.tiers[1]);
+                yield return null;
+                var button = GameObject.Find("ToggleMiniMap").GetComponent<Button>();
+                var map = button.GetComponentInChildren<CircuitMapGraphic>();
+                Assert.IsNotNull(map, id);
+                var entry = (RectTransform)map.transform.Find("NextFork");
+                var leader = (RectTransform)map.transform.Find("Leader");
+                var path = TrackPath.Instance;
+                Assert.AreEqual(id != "e19", entry.gameObject.activeSelf);
+                if (path.Fork != null)
+                    Assert.Less(Vector2.Distance(entry.anchoredPosition, map.MapPosition(path.Fork.Position(ev.reversed ? 1f : 0f))), 1f);
+                var first = race.Participants.First(p => race.PositionOf(p) == 1);
+                Assert.IsTrue(leader.gameObject.activeSelf);
+                Assert.Less(Vector2.Distance(leader.anchoredPosition, map.MapPosition(first.transform.position)), 2f);
+                button.onClick.Invoke();
+                Assert.IsFalse(map.gameObject.activeSelf);
+                Assert.AreEqual(Loc.Get("hud.mini_map"), button.GetComponentInChildren<TMP_Text>().text);
+                button.onClick.Invoke();
+                Assert.IsTrue(map.gameObject.activeSelf);
+                flow.EnterMenu();
+                yield return null;
+            }
         }
 
         [UnityTest, Timeout(180000)]

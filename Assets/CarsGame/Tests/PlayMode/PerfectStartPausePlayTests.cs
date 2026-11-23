@@ -43,7 +43,7 @@ namespace RacingGame.Tests
             PauseController.ResetAll();
         }
 
-        private IEnumerator Boot()
+        private IEnumerator Boot(bool ordinaryRace = true)
         {
             yield return SceneManager.LoadSceneAsync("SampleScene");
             float until = Time.realtimeSinceStartup + 60f;
@@ -53,9 +53,83 @@ namespace RacingGame.Tests
             flow = Object.FindAnyObjectByType<GameFlow>();
             race = Object.FindAnyObjectByType<RaceManager>();
             launch = Object.FindAnyObjectByType<PerfectStart>();
+            if (!ordinaryRace) yield break;
             flow.StartRace(System.Array.Find(flow.events, e => e.eventId == "e1"), flow.tiers[0]);
             while (RaceClock.Now < race.countdownSeconds - 0.15f) yield return null;
             Assert.AreEqual(RaceState.Countdown, race.State);
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator TrainingMeasuresEarlyOnTimeAndLatePressesAndResetsOnRetry()
+        {
+            yield return Boot(false);
+            GameObject.Find("Practice").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+            yield return null;
+            var entry = GameObject.Find("PracticeLaunch");
+            Assert.NotNull(entry, "The training menu must offer the launch drill");
+            entry.GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+            string progress = JsonUtility.ToJson(PlatformGlue.Save.Data.progress);
+            foreach (float target in new[] { -.50f, 0f, .50f })
+            {
+                yield return null;
+                Assert.AreEqual(RaceState.Countdown, race.State);
+                Assert.IsFalse(launch.Awarded);
+                var display = GameObject.Find("ReturnToGarage").GetComponentInChildren<TMPro.TMP_Text>();
+                StringAssert.Contains(Loc.Get("practice.launch"), display.text);
+                double pressedAt;
+                if (target == 0f)
+                {
+                    void PressOnGo()
+                    {
+                        InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W));
+                        InputSystem.Update();
+                    }
+                    race.OnRaceStarted += PressOnGo;
+                    while (race.State == RaceState.Countdown) yield return null;
+                    race.OnRaceStarted -= PressOnGo;
+                    pressedAt = race.RaceStartTime;
+                    yield return null;
+                }
+                else
+                {
+                    if (target < 0f)
+                        while (RaceClock.Now < race.countdownSeconds + target) yield return null;
+                    else
+                        while (race.State == RaceState.Countdown || race.RaceTime < target) yield return null;
+                    InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W));
+                    yield return null;
+                    pressedAt = RaceClock.Now;
+                }
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                while (race.State == RaceState.Countdown) yield return null;
+                for (int frame = 0; frame < 5; frame++) yield return null;
+                bool hit = target == 0f;
+                Assert.AreEqual(hit, launch.Awarded);
+                Assert.AreEqual(hit, race.Player.Car.IsBoosting);
+                Assert.AreEqual(hit, flow.PracticeCompleted);
+                var match = System.Text.RegularExpressions.Regex.Match(display.text, @"[+-]?\d+");
+                Assert.IsTrue(match.Success, "Expected the signed timing error on screen: " + display.text);
+                int shown = int.Parse(match.Value, System.Globalization.CultureInfo.InvariantCulture);
+                Assert.AreEqual((pressedAt - race.RaceStartTime) * 1000d, shown, 24d);
+                if (target < 0f) Assert.Less(shown, -launch.earlySeconds * 1000f);
+                if (target > 0f) Assert.Greater(shown, launch.lateSeconds * 1000f);
+                StringAssert.Contains(Loc.Format(hit ? "practice.launch.hit" : "practice.launch.miss", "ms", match.Value), display.text);
+                Debug.Log($"[LaunchTraining] expected={target:F2}s shown={shown}ms boost={race.Player.Car.IsBoosting}");
+                GameObject.Find("PracticeRetry").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+            }
+
+            yield return null;
+            while (RaceClock.Now < race.countdownSeconds - .15f) yield return null;
+            PauseController.Set(PauseReason.User, true);
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W));
+            for (int frame = 0; frame < 5; frame++) yield return null;
+            PauseController.Set(PauseReason.User, false);
+            while (RaceClock.Now < race.countdownSeconds + .6f) yield return null;
+            Assert.IsFalse(launch.Awarded);
+            Assert.IsFalse(race.Player.Car.IsBoosting);
+            StringAssert.Contains(Loc.Get("practice.launch"),
+                GameObject.Find("ReturnToGarage").GetComponentInChildren<TMPro.TMP_Text>().text);
+            Assert.AreEqual(progress, JsonUtility.ToJson(PlatformGlue.Save.Data.progress));
         }
 
         [UnityTest, Timeout(180000)]

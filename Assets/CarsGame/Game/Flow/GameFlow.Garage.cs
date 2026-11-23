@@ -1,10 +1,11 @@
 using TMPro;
 using UnityEngine;
 using RacingGame.Core.Economy;
+using RacingGame.Core.Platform;
 
 namespace RacingGame
 {
-    public enum PracticeLesson { None, Drift, Shortcut, WallRide, Aim }
+    public enum PracticeLesson { None, Drift, Shortcut, WallRide, Aim, Launch }
 
     public sealed partial class GameFlow
     {
@@ -17,12 +18,15 @@ namespace RacingGame
         public bool PracticeCompleted { get; private set; }
         public float TestDriveRemaining => Mathf.Max(0f, TestDriveSeconds - (float)race.RaceTime);
         internal float TestDriveOverlayBottomPixels => testDriveTimer != null && testDriveCanvas.gameObject.activeInHierarchy
-            ? -((RectTransform)testDriveTimer.transform.parent).offsetMin.y * testDriveCanvas.scaleFactor : 0f;
+            ? -((RectTransform)(practiceRetryLabel != null ? practiceRetryLabel : testDriveTimer).transform.parent).offsetMin.y * testDriveCanvas.scaleFactor : 0f;
         private RaceEventDefinition testDriveEvent, beforeTestEvent;
         private DifficultyTier beforeTestTier;
         private string beforeTestBody;
         private Canvas testDriveCanvas;
         private TextMeshProUGUI testDriveTimer;
+        private TextMeshProUGUI practiceRetryLabel;
+        private PerfectStart launchTraining;
+        private Pose? maneuverApproach;
         private int shownTestSecond = -1;
         private string shownTestLanguage;
         private float testDrivePixelScale = -1f;
@@ -34,7 +38,7 @@ namespace RacingGame
 
         public bool StartPractice(PracticeLesson lesson)
         {
-            if (lesson < PracticeLesson.Drift || lesson > PracticeLesson.Aim || PlatformGlue.Save == null) return false;
+            if (lesson < PracticeLesson.Drift || lesson > PracticeLesson.Launch || PlatformGlue.Save == null) return false;
             var progress = PlatformGlue.Save.Data.progress;
             return StartDrive(CarBodies.Selected(progress.cosmetics, progress.body), lesson);
         }
@@ -43,9 +47,11 @@ namespace RacingGame
 
         private bool StartDrive(string bodyId, PracticeLesson lesson)
         {
-            if (State != FlowState.Menu || IsTestDrive || !PlatformGlue.IsReady || race.spawner == null || race.spawner.raceCarPrefab == null) return false;
+            bool fromResults = State == FlowState.Results && lesson != PracticeLesson.None && lesson == MissedLesson && !IsDoublingReward;
+            if ((State != FlowState.Menu && !fromResults) || IsTestDrive || !PlatformGlue.IsReady || race.spawner == null || race.spawner.raceCarPrefab == null) return false;
             if (PlatformGlue.Save.LocalVersionTooNew) return false;
             if (CarBodies.Get(bodyId).Id != bodyId) return false;
+            if (fromResults) practiceReturnResults = ResultsForMenu;
             beforeTestEvent = RaceSetup.Event;
             beforeTestTier = RaceSetup.Tier;
             beforeTestBody = race.spawner.playerBodyId;
@@ -72,6 +78,18 @@ namespace RacingGame
             StartRace(testDriveEvent, practiceTier != null ? practiceTier : beforeTestTier);
             if (!IsTestDrive) return false;
 
+            if (lesson == PracticeLesson.Drift || lesson == PracticeLesson.Shortcut || lesson == PracticeLesson.WallRide)
+            {
+                var car = race.Player.Car;
+                if (lesson != PracticeLesson.Drift)
+                {
+                    float entry = lesson == PracticeLesson.Shortcut ? TrackFork.Entry : starRing.Layout.TunnelStart;
+                    track.Pose(track.Wrap(entry - 30f), 0f, out var position, out var rotation);
+                    car.Teleport(position + Vector3.up * race.spawner.grid.dropHeight, rotation);
+                }
+                maneuverApproach = new Pose(car.transform.position, car.transform.rotation);
+            }
+
             // A moving target lets the player try their weapons without being shot during the comparison.
             foreach (var p in race.Participants)
             {
@@ -95,9 +113,32 @@ namespace RacingGame
             var back = UiFactory.Button(testDriveCanvas.transform, "ReturnToGarage", Loc.Get("garage.test_return"), EnterMenu,
                 new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-300f, -178f), new Vector2(300f, -110f), 26f);
             testDriveTimer = back.GetComponentInChildren<TextMeshProUGUI>();
+            if (lesson == PracticeLesson.Launch || maneuverApproach.HasValue)
+            {
+                if (lesson == PracticeLesson.Launch) launchTraining = GetComponent<PerfectStart>();
+                var retry = UiFactory.Button(testDriveCanvas.transform, "PracticeRetry", Loc.Get("results.retry"), RetryRace,
+                    new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, 26f, UiFactory.Raised);
+                practiceRetryLabel = retry.GetComponentInChildren<TextMeshProUGUI>();
+            }
             shownTestSecond = -1;
             testDrivePixelScale = -1f;
             return true;
+        }
+
+        private void RetryManeuver(Pose approach)
+        {
+            PauseController.Set(PauseReason.User | PauseReason.Menu, false);
+            race.AbortRace();
+            RaceDirector.Current?.ResetRace();
+            PracticeCompleted = false;
+            shownTestSecond = -1;
+            race.StartRace();
+            if (race.Player == null) { EnterMenu(); return; }
+            race.Player.Car.Teleport(approach.position, approach.rotation);
+            if (pickups != null) pickups.Spawn(testDriveEvent.pickupCount);
+            if (starRing != null) starRing.Follow(race);
+            if (hud != null) hud.SetVisible(true);
+            race.StartPracticeImmediately();
         }
 
         private void OnPracticeHit(GameObject shooter, GameObject victim)
@@ -145,20 +186,37 @@ namespace RacingGame
                     testDriveTimer.fontSizeMax = Mathf.Max(26f, 14f / scale);
                     testDriveTimer.fontSizeMin = 14f / scale;
                     testDriveTimer.enableWordWrapping = IsPractice;
+                    if (practiceRetryLabel != null)
+                    {
+                        var retry = (RectTransform)practiceRetryLabel.transform.parent;
+                        float retryTop = button.offsetMin.y - 4f / scale;
+                        retry.offsetMin = new Vector2(-width * .5f, retryTop - Mathf.Max(44f / scale, 60f));
+                        retry.offsetMax = new Vector2(width * .5f, retryTop);
+                        practiceRetryLabel.fontSizeMin = 14f / scale;
+                        practiceRetryLabel.fontSizeMax = Mathf.Max(26f, practiceRetryLabel.fontSizeMin);
+                    }
                 }
             }
-            int seconds = IsPractice ? (PracticeCompleted ? 1 : 0) : Mathf.CeilToInt(TestDriveRemaining);
+            int? launchOffset = launchTraining != null ? launchTraining.TrainingOffsetMs : null;
+            if (launchOffset.HasValue) PracticeCompleted = launchTraining.Awarded;
+            int seconds = IsPractice ? (PracticeCompleted || launchOffset.HasValue ? 1 : 0) : Mathf.CeilToInt(TestDriveRemaining);
             if (Loc.Ready && testDriveTimer != null && (seconds != shownTestSecond || shownTestLanguage != Loc.Language))
             {
                 shownTestSecond = seconds;
                 shownTestLanguage = Loc.Language;
-                testDriveTimer.text = IsPractice ? Loc.Get(PracticeTitleKey(CurrentPractice)) + "  " + seconds + "/1\n" + Loc.Get("practice.return")
-                    : Loc.Get("garage.test_return") + "  ·  " + seconds;
                 if (IsPractice)
                 {
+                    string status = Loc.Get(PracticeTitleKey(CurrentPractice));
+                    if (launchOffset.HasValue)
+                        status = Loc.Format(PracticeCompleted ? "practice.launch.hit" : "practice.launch.miss", "ms",
+                            launchOffset.Value.ToString("+0;-0;0", System.Globalization.CultureInfo.InvariantCulture));
+                    else if (launchTraining == null) status += "  " + seconds + "/1";
+                    testDriveTimer.text = status + "\n" + Loc.Get(practiceReturnResults != null ? "practice.return_results" : "practice.return");
+                    if (practiceRetryLabel != null) practiceRetryLabel.text = Loc.Get("results.retry");
                     testDriveTimer.color = UiFactory.Ink;
                     testDriveTimer.transform.parent.GetComponent<UnityEngine.UI.Image>().color = PracticeCompleted ? UiFactory.Positive : UiFactory.Accent;
                 }
+                else testDriveTimer.text = Loc.Get("garage.test_return") + "  ·  " + seconds;
             }
             if (!IsPractice && (race.State == RaceState.Racing || race.State == RaceState.Finishing) && seconds <= 0) EnterMenu();
         }
@@ -174,6 +232,8 @@ namespace RacingGame
             if (race != null && race.spawner != null) race.spawner.playerBodyId = beforeTestBody;
             if (testDriveCanvas != null) { testDriveCanvas.gameObject.SetActive(false); Destroy(testDriveCanvas.gameObject); }
             testDriveCanvas = null; testDriveTimer = null;
+            practiceRetryLabel = null; launchTraining = null;
+            maneuverApproach = null;
             Destroy(testDriveEvent);
             testDriveEvent = null; beforeTestEvent = null; beforeTestTier = null;
             CurrentPractice = PracticeLesson.None;

@@ -17,11 +17,12 @@ namespace RacingGame
         private RaceManager race;
         private HudScreen hud;
         private double lastPressAt = double.NaN, goAt = double.NaN;
-        private bool wasPressed, judged;
+        private bool wasPressed, judged, training;
         private static readonly Color PerfectColor = new Color(0.5f, 1f, 0.6f);
 
         /// <summary>Test hook: the last race awarded a perfect start.</summary>
         public bool Awarded { get; private set; }
+        internal int? TrainingOffsetMs { get; private set; }
         public bool AcceptingInput => !judged && race != null
             && (race.State == RaceState.Countdown || race.State == RaceState.Racing);
 
@@ -29,7 +30,14 @@ namespace RacingGame
         private void OnEnable() { race.OnFieldSpawned += ResetState; race.OnRaceStarted += OnGo; }
         private void OnDisable() { race.OnFieldSpawned -= ResetState; race.OnRaceStarted -= OnGo; }
 
-        private void ResetState() { lastPressAt = goAt = double.NaN; wasPressed = judged = Awarded = false; }
+        private void ResetState()
+        {
+            lastPressAt = goAt = double.NaN;
+            judged = Awarded = false;
+            TrainingOffsetMs = null;
+            training = GetComponent<GameFlow>()?.CurrentPractice == PracticeLesson.Launch;
+            wasPressed = race.Player != null && race.Player.TryGetComponent<PlayerDriverInput>(out var input) && input.RawThrottle > 0.9f;
+        }
         private void OnGo() { goAt = RaceClock.Now; }
 
         private void Update()
@@ -43,12 +51,18 @@ namespace RacingGame
             // The race clock stands still while paused: a press then would land "inside" the window forever.
             // Track the key state so a key held through the pause is not a fresh press on resume.
             if (PauseController.IsPaused) { wasPressed = pressed; return; }
-            if (pressed && !wasPressed) lastPressAt = now;   // latch the press; a release keeps the timestamp
+            if (pressed && !wasPressed && (!training || double.IsNaN(lastPressAt))) lastPressAt = now;
             wasPressed = pressed;
 
             if (double.IsNaN(goAt)) return;
             bool inWindow = !double.IsNaN(lastPressAt) && lastPressAt >= goAt - earlySeconds && lastPressAt <= goAt + lateSeconds;
-            if (!inWindow && now - goAt <= lateSeconds) return;   // still time to press
+            if (training)
+            {
+                // One press per drill. A late press still gets a measured result after the boost window closes.
+                if (double.IsNaN(lastPressAt)) return;
+                TrainingOffsetMs = Mathf.RoundToInt((float)((lastPressAt - goAt) * 1000d));
+            }
+            else if (!inWindow && now - goAt <= lateSeconds) return;
             judged = true;
             if (!inWindow) return;
             Awarded = true;

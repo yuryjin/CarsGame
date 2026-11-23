@@ -55,6 +55,8 @@ try {
         const current = state.labels.find(t => t.name === 'StarStatus' && t.parent === 'Star0').text;
         const missed = state.labels.find(t => t.name === 'StarStatus' && t.parent === 'Star1').text;
         assert.notEqual(current, missed);
+        const goal = state.labels.find(t => t.name === 'StarDesc' && t.parent === 'Star1');
+        if (eventId === 'e1') assert.match(goal.renderedText, /0\D+2/, lang + ' current run shows zero of two wrecks');
         if (lang === 'ru') assert.match(missed, previous ? /раньше.*сохранена/ : /Не получена/);
         // Calibrate UGUI's scroll sensitivity instead of treating wheel units as screen
         // pixels: that oscillates between the ends and captures a clipped card.

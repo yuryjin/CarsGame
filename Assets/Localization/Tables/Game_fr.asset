@@ -2208,6 +2208,85 @@ MonoBehaviour:
     m_Localized: "Gain de course \xD7{m}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29278481313771520
+    m_Localized: '{n} sur {target}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160128
+    m_Localized: "Places manquantes \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160129
+    m_Localized: Retard +{t} s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160130
+    m_Localized: "Destructions subies \xB7 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160131
+    m_Localized: "Destructions {wrecks} \xB7 retours en piste {resets}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29278481322160132
+    m_Localized: "Place {p} \xB7 r\xE9parations {repairs}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795364048896
+    m_Localized: "Revoir le r\xE9sultat"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795376631808
+    m_Localized: "S\u2019entra\xEEner \xB7 {lesson}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000609390592
+    m_Localized: "D\xE9part pr\xE9cis"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Localized: "Acc\xE9l\xE8re au signal de d\xE9part. Un moins indique une avance,
+      un plus un retard. Appuie sur R\xE9essayer pour recommencer."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Localized: "{ms} ms \xB7 Boost obtenu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Localized: "{ms} ms \xB7 Sans boost"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29707364823543808
+    m_Localized: "Podium dans {name} ou encore {n} \u2605"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175632175104
+    m_Localized: "Rattrape un adversaire et tire quand le viseur s\u2019allume."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Localized: "Entre en d\xE9rapage dans le virage et rel\xE2che le frein pour
+      acc\xE9l\xE9rer."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Localized: "Prends de la vitesse avant le pont d\xE9truit pour franchir le
+      vide."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Localized: Carte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Localized: ASPIRATION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Localized: "Tour d\u2019entra\xEEnement avec tes meilleurs secteurs \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

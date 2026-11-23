@@ -58,6 +58,74 @@ namespace RacingGame.Tests
         private static Button Button(string name) => System.Array.Find(Object.FindObjectsByType<Button>(), b => b.name == name);
 
         [UnityTest, Timeout(180000)]
+        public IEnumerator BridgeRetryRestoresTheApproachAfterMissingTheTurn() => RetryMissedManeuver(PracticeLesson.Shortcut);
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator WallRetryRestoresTheApproachAfterDrivingUnderThePad() => RetryMissedManeuver(PracticeLesson.WallRide);
+
+        private IEnumerator RetryMissedManeuver(PracticeLesson lesson)
+        {
+            yield return Boot();
+            var savedEvent = RaceSetup.Event;
+            var savedTier = RaceSetup.Tier;
+            string progress = JsonUtility.ToJson(PlatformGlue.Save.Data.progress);
+            Assert.IsTrue(flow.StartPractice(lesson));
+            var car = race.Player.Car;
+            var start = new Pose(car.transform.position, car.transform.rotation);
+            var path = TrackPath.Instance;
+            var ring = Object.FindAnyObjectByType<StarRingTrack>();
+            float entry = lesson == PracticeLesson.Shortcut ? TrackFork.Entry : ring.Layout.TunnelStart;
+            int hint = -1;
+            float approach = path.SignedDelta(path.Project(start.position, ref hint), entry);
+            while (race.State == RaceState.Countdown) yield return null;
+
+            // Stay on the long road at the fork, or on the tunnel floor under the ceiling pad.
+            var input = car.gameObject.AddComponent<ScriptedDriverInput>();
+            car.SetInputSource(input);
+            path.Pose(entry - 6f, 0f, out var approachPosition, out var approachRotation);
+            car.Teleport(approachPosition + Vector3.up * .55f, approachRotation);
+            float end = lesson == PracticeLesson.Shortcut ? entry + 42f : (entry + ring.Layout.TunnelEnd) * .5f + 12f;
+            for (int tick = 0; tick < 2200 && path.SignedDelta(race.Player.Progress.Distance, end) > 0f; tick++)
+            {
+                float look = race.Player.Progress.Distance + 10f;
+                var point = path.Position(look) + path.Right(look) * (lesson == PracticeLesson.Shortcut ? -1.7f : 0f);
+                float angle = Vector3.SignedAngle(car.transform.forward, Vector3.ProjectOnPlane(point - car.transform.position, Vector3.up), Vector3.up);
+                input.Set(car.SpeedKmh < 54f ? 1f : 0f, Mathf.Clamp(angle / 22f - car.Body.angularVelocity.y * .35f, -1f, 1f));
+                yield return null;
+            }
+            Assert.LessOrEqual(path.SignedDelta(race.Player.Progress.Distance, end), 0f, "The car must drive past the missed entrance");
+            Assert.IsFalse(flow.PracticeCompleted);
+            car.ResetCar();
+            Assert.Greater(race.Player.Resets, 0);
+            double elapsed = race.RaceTime;
+            var retry = Button("PracticeRetry");
+            if (retry != null) retry.onClick.Invoke();
+            else flow.RetryRace(); // Compare with the existing pause-menu retry on builds without the shortcut.
+            var next = race.Player;
+            Debug.Log($"[ManeuverRetry] {lesson} entryLead={approach:F1}m elapsed={elapsed:F2}s state={race.State} after={race.RaceTime:F2}s resets={next.Resets}");
+            Assert.NotNull(retry, "A missed maneuver needs a retry on the driving HUD");
+            Assert.That(approach, Is.InRange(5f, 40f), "Start on the approach to this maneuver");
+            Assert.AreEqual(RaceState.Racing, race.State, "The retry gives control back immediately");
+            Assert.AreEqual(0d, race.RaceTime, .001d);
+            Assert.AreEqual(0, next.Resets + next.AutoResets + next.Shortcuts + next.CeilingBoosts + next.DriftBoosts);
+            Assert.IsFalse(flow.PracticeCompleted);
+            Assert.IsTrue(next.Car.inputEnabled);
+            Assert.Less(Vector3.Distance(start.position, next.transform.position), .05f);
+            Assert.Less(Quaternion.Angle(start.rotation, next.transform.rotation), .1f);
+
+            var nextInput = next.gameObject.AddComponent<ScriptedDriverInput>();
+            next.Car.SetInputSource(nextInput);
+            nextInput.Set(1f, 0f);
+            for (int frame = 0; frame < 55; frame++) yield return null;
+            Assert.Greater(Vector3.Distance(next.transform.position, start.position), 1f, "Throttle drives the next approach");
+            flow.EnterMenu();
+            Assert.AreSame(savedEvent, RaceSetup.Event);
+            Assert.AreSame(savedTier, RaceSetup.Tier);
+            Assert.AreEqual(progress, JsonUtility.ToJson(PlatformGlue.Save.Data.progress));
+            Assert.AreEqual(0, flow.LastReward);
+        }
+
+        [UnityTest, Timeout(180000)]
         public IEnumerator ChangingLanguageInPausedPracticeRefreshesThePersistentGoal()
         {
             yield return Boot();
@@ -171,6 +239,17 @@ namespace RacingGame.Tests
             yield return Boot();
             string progress = JsonUtility.ToJson(PlatformGlue.Save.Data.progress);
             Assert.IsTrue(flow.StartPractice(PracticeLesson.Drift));
+            yield return DriveDriftLesson();
+            Assert.AreEqual(progress, JsonUtility.ToJson(PlatformGlue.Save.Data.progress));
+            flow.RetryRace();
+            Assert.IsFalse(flow.PracticeCompleted);
+            Assert.AreEqual(0, race.Player.DriftBoosts);
+            flow.EnterMenu();
+            Assert.AreEqual("practice", menu.Current);
+        }
+
+        private IEnumerator DriveDriftLesson()
+        {
             var car = race.Player.Car;
             var input = car.gameObject.AddComponent<ScriptedDriverInput>();
             car.SetInputSource(input);
@@ -189,12 +268,61 @@ namespace RacingGame.Tests
             Assert.Greater(race.Player.DriftBoosts, 0);
             Assert.IsTrue(flow.PracticeCompleted);
             StringAssert.Contains("1/1", Button("ReturnToGarage").GetComponentInChildren<TMPro.TMP_Text>().text);
-            Assert.AreEqual(progress, JsonUtility.ToJson(PlatformGlue.Save.Data.progress));
-            flow.RetryRace();
-            Assert.IsFalse(flow.PracticeCompleted);
-            Assert.AreEqual(0, race.Player.DriftBoosts);
-            flow.EnterMenu();
-            Assert.AreEqual("practice", menu.Current);
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator MissedDriftOpensItsLessonAndRestoresTheAwardedRace()
+        {
+            yield return Boot();
+            var progress = PlatformGlue.Save.Data.progress;
+            if (!progress.unlockedEvents.Contains("e2")) progress.unlockedEvents.Add("e2");
+            var ev = System.Array.Find(flow.events, e => e.eventId == "e2");
+            var tier = System.Array.Find(flow.tiers, t => t.tierId == "hard");
+            flow.StartRace(ev, tier);
+            while (race.State == RaceState.Countdown) yield return null;
+            var previous = progress.bests.Find(b => b.eventId == ev.eventId);
+            if (previous == null)
+            {
+                previous = new Core.Save.EventBest { eventId = ev.eventId };
+                progress.bests.Add(previous);
+            }
+            var training = previous.KeepSectors(flow.GetComponent<GhostRecorder>().Record.TrackHash,
+                race.laps, new[] { 18000, 20000, 16000 });
+            race.QaFinishNow(); yield return null;
+            Assert.AreSame(training, flow.LastTrainingSectors);
+            Assert.AreEqual(0, race.Results.Player.DriftBoosts);
+            Assert.AreEqual(0, flow.LastStarsEarned & 2);
+            int stars = flow.LastStarsEarned, reward = flow.LastTotalReward;
+            Assert.Greater(reward, 0);
+            string credited = JsonUtility.ToJson(progress);
+            string next = Button("ResultAction0").GetComponentInChildren<TMPro.TMP_Text>().text;
+            foreach (bool complete in new[] { false, true })
+            {
+                var lesson = Button("PracticeMissedGoal");
+                Assert.AreEqual(Loc.Format("results.practice_goal", "lesson", Loc.Get("practice.drift")),
+                    lesson.GetComponentInChildren<TMPro.TMP_Text>().text);
+                lesson.onClick.Invoke(); yield return null;
+                Assert.AreEqual(PracticeLesson.Drift, flow.CurrentPractice);
+                if (complete) yield return DriveDriftLesson();
+                else Assert.IsFalse(flow.PracticeCompleted);
+                var back = Button("ReturnToGarage");
+                StringAssert.Contains(Loc.Get("practice.return_results"), back.GetComponentInChildren<TMPro.TMP_Text>().text);
+                back.onClick.Invoke(); yield return null;
+                Assert.AreEqual(FlowState.Results, flow.State);
+                Assert.AreEqual("results", menu.Current);
+                Assert.AreSame(ev, RaceSetup.Event);
+                Assert.AreSame(tier, RaceSetup.Tier);
+                Assert.AreEqual(stars, flow.LastStarsEarned);
+                Assert.AreEqual(reward, flow.LastTotalReward);
+                Assert.AreSame(training, flow.LastTrainingSectors, "Coming back from a lesson must restore the same training lap.");
+                Assert.AreEqual(credited, JsonUtility.ToJson(progress));
+                Assert.AreEqual(next, Button("ResultAction0").GetComponentInChildren<TMPro.TMP_Text>().text);
+            }
+            Button("ResultAction0").onClick.Invoke();
+            Assert.AreEqual(FlowState.Racing, flow.State);
+            Assert.IsFalse(flow.IsPractice);
+            Assert.AreSame(tier, RaceSetup.Tier);
+            Assert.AreEqual(credited, JsonUtility.ToJson(progress));
         }
 
         [UnityTest, Timeout(180000)]

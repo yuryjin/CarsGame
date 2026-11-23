@@ -16,6 +16,7 @@ MonoBehaviour:
   mode: 0
   nameKey: events.e11.name
   laps: 3
+  referenceSeconds: 166
   aiCountOverride: -1
   reversed: 0
   night: 0
@@ -23,6 +24,7 @@ MonoBehaviour:
   damageMultiplier: 1
   pickupCount: 18
   unlockAfterEventId: e10
+  unlockStars: 20
   order: 10
   star1TargetPosition: 3
   star2TargetKills: 3
