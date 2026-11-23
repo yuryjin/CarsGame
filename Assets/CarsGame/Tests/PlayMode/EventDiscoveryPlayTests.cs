@@ -298,6 +298,11 @@ namespace RacingGame.Tests
                 string stats = CardText(start, "Stats"), difficulty = CardText(start, "Difficulty");
                 Assert.IsTrue(start.interactable);
                 start.onClick.Invoke();
+                if (id == "m1")
+                {
+                    Assert.AreEqual("missionBriefing", menu.Current);
+                    GameObject.Find("Deploy").GetComponent<Button>().onClick.Invoke();
+                }
                 var field = race.Participants.Where(p => !p.isPlayer).ToArray();
                 if (id == "m1")
                 {
