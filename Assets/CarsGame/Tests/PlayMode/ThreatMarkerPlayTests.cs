@@ -47,7 +47,11 @@ namespace RacingGame.Tests
             while (race.State == RaceState.Countdown) yield return null;
             var player = race.Player.Car;
             var rivals = race.Participants.Where(p => !p.isPlayer).Select(p => p.Car).ToArray();
-            var gunner = rivals[0].GetComponent<AiGunner>();
+            const int rearDistance = 36;
+            var gunner = rivals.Select(c => c.GetComponent<AiGunner>()).FirstOrDefault(g =>
+                g.MinShotRange <= rearDistance - 3 && g.MaxShotRange >= rearDistance);
+            Assert.IsNotNull(gunner, "The rear contact needs a weapon that can aim from 36 metres");
+            var rearCar = gunner.GetComponent<CarController>();
             gunner.suppressed = true;
             foreach (var p in race.Participants)
             {
@@ -56,29 +60,29 @@ namespace RacingGame.Tests
                 if (!p.isPlayer) p.Car.Teleport(player.transform.position + player.transform.right * 110f, player.transform.rotation);
             }
             Vector3 origin = player.transform.position, forward = player.transform.forward, right = player.transform.right;
-            rivals[0].Teleport(origin - forward * 36f, player.transform.rotation);
-            rivals[1].Teleport(origin + right * 56f, Quaternion.LookRotation(right));
+            rearCar.Teleport(origin - forward * rearDistance, player.transform.rotation);
+            rivals.First(c => c != rearCar).Teleport(origin + right * 56f, Quaternion.LookRotation(right));
             var markers = GameObject.Find("ThreatMarkers").transform;
             ThreatShapeGraphic Shape(int metres) => markers.Cast<Transform>()
                 .Single(t => t.gameObject.activeInHierarchy && t.Find("Dist").GetComponent<TMP_Text>().text == metres + "m")
                 .Find("Arrow").GetComponent<ThreatShapeGraphic>();
             for (int frame = 0; frame < 12; frame++) yield return null;
-            Assert.AreEqual(1, Shape(36).Level);
+            Assert.AreEqual(1, Shape(rearDistance).Level);
             Assert.AreEqual(0, Shape(56).Level);
             gunner.startGraceSeconds = 0;
             gunner.telegraphSeconds = 5f;
             gunner.coneFromAggression = false;
             gunner.coneDegrees = 30f;
-            int tick = SimulationDriver.Instance.Tick;
-            for (int frame = 0; frame < 450 && gunner.AimTarget != player; frame++)
+            int endTick = SimulationDriver.Instance.Tick + 450;
+            while (gunner.AimTarget != player && SimulationDriver.Instance.Tick < endTick)
             {
                 gunner.suppressed = false;
-                gunner.WantsFire(++tick);
-                yield return null;
+                gunner.WantsFire(SimulationDriver.Instance.Tick);
+                yield return new WaitForFixedUpdate();
             }
             Assert.AreSame(player, gunner.AimTarget, "The opponent's own targeting must commit to the player");
             for (int frame = 0; frame < 65; frame++) yield return null;
-            var rear = Shape(36);
+            var rear = Shape(rearDistance);
             Assert.AreEqual(2, rear.Level, "Aiming raises the same contact above the proximity marker");
             Assert.AreEqual(0, Shape(56).Level);
             Assert.Less((rear.rectTransform.localRotation * Vector3.up).y, -0.8f);
