@@ -81,12 +81,8 @@ namespace RacingGame
                     nextBridgeTick = tick + SimulationDriver.SecondsToTicks(12f + car.CarId % 3 * 5f);
                 }
             }
-            if (!crossing && arena.Threatens(transform.position))
-            {
-                var away = localPosition; away.y = 0f;
-                if (away.sqrMagnitude < 1f) away = transform.forward;
-                aim = arena.transform.TransformPoint(away.normalized * 55f);
-            }
+            if (!crossing && outerNode < 0 && arena.Threatens(transform.position))
+                aim = arena.EscapeTarget(localPosition, transform.forward);
             Vector3 delta = aim - transform.position;
             delta.y = 0f;
             bool overturned = Vector3.Dot(transform.up, Vector3.up) < 0.2f;

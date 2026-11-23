@@ -107,6 +107,8 @@ namespace RacingGame.Core.Save
         public int kills;
         public int deaths;
         public double distanceKm;
+        public int[] mastery = new int[4];
+        public List<BodyFinishCount> bodyFinishes = new List<BodyFinishCount>();
     }
 
     /// <summary>One paid daily first-finish bonus. Keyed by day, so merged saves pay each day once.</summary>
@@ -131,6 +133,10 @@ namespace RacingGame.Core.Save
 
     [Serializable] public class ProgressData
     {
+        public string bodyGoal = "";
+        public FinishGap closestFinish;
+        public List<WeaponPin> weaponPins = new List<WeaponPin>();
+        public GarageSet[] garageSets = new GarageSet[GarageSet.Slots];
         public List<DeviceLedger> ledger = new List<DeviceLedger>();
         public int[] upgrades = new int[3];
         public int[] weapons = new int[4];   // WeaponKind levels
@@ -151,13 +157,20 @@ namespace RacingGame.Core.Save
         public string stripe = "";
         /// <summary>Selected car body id (<c>CarBodies</c>); "" = the standard car. Bought bodies live in <see cref="cosmetics"/> as "body:id".</summary>
         public string body = "";
+        public void ResolveBodyGoal()
+        {
+            if (string.IsNullOrEmpty(bodyGoal)) return;
+            int index = Economy.CarBodies.Index(bodyGoal);
+            if (index < 0 || Economy.CarBodies.All[index].Unlock != Economy.UnlockKind.Coins || Economy.CarBodies.Owns(cosmetics, bodyGoal)) bodyGoal = "";
+        }
+
         public DailyData daily = new DailyData();
     }
 
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 10;
+        public const int CurrentVersion = 15;
         public int version = CurrentVersion;
         public long updatedAtUnixMs;
         public string deviceId = "";

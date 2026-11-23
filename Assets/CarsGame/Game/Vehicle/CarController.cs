@@ -400,6 +400,33 @@ namespace RacingGame
             groundSurface = layer == trackLayer ? GroundSurface.Track : (layer == groundLayer ? GroundSurface.Ground : GroundSurface.Other);
         }
 
+        public bool TryGetTireContact(Transform wheel, out RaycastHit hit, out TireSurface surface)
+        {
+            hit = default; surface = TireSurface.Asphalt;
+            if (!isGrounded || wheel == null || !Physics.Raycast(wheel.position + GravityUp * .2f, -GravityUp, out hit,
+                wheelRadius + .48f, groundMask, QueryTriggerInteraction.Ignore)) return false;
+            if (hit.collider.TryGetComponent(out TireAudioSurface marker)) surface = marker.surface;
+            else if (hit.collider.gameObject.layer == groundLayer) surface = TireSurface.Sand;
+            else if (hit.collider.gameObject.layer != trackLayer) return false;
+            return true;
+        }
+
+        public Vector3 TireContactMix()
+        {
+            if (!isGrounded) return Vector3.zero;
+            Vector3 mix = Vector3.zero;
+            void Sample(Transform wheel)
+            {
+                if (!TryGetTireContact(wheel, out _, out var surface)) return;
+                if (surface == TireSurface.Sand) mix.y += .25f;
+                else if (surface == TireSurface.Bridge) mix.z += .25f;
+                else mix.x += .25f;
+            }
+            Sample(frontLeftWheel); Sample(frontRightWheel);
+            Sample(rearLeftWheel); Sample(rearRightWheel);
+            return mix;
+        }
+
         // Wall ride: on a GravitySurface and fast enough, gravity points into the surface under the wheels.
         // Hysteresis between attach and detach speed; leaving the surface or slowing down drops the car.
         private void StepSurfaceGravity()

@@ -51,6 +51,98 @@ namespace RacingGame.Tests
         private static Button Button(string name) => System.Array.Find(Object.FindObjectsByType<Button>(), b => b.name == name);
         private static Bounds Bounds(RectTransform rect) => RectTransformUtility.CalculateRelativeRectTransformBounds(rect.root, rect);
 
+        [UnityTest, Timeout(180000)]
+        public IEnumerator ThirdFingerChoosesAVisibleRivalWhileSteeringAndFiring()
+        {
+            IEnumerator Frames(int count) { while (count-- > 0) yield return null; }
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float deadline = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady); yield return Frames(3);
+            saved = JsonUtility.ToJson(PlatformGlue.Save.Data);
+            syntheticTouch = InputSystem.AddDevice<Touchscreen>();
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = flow.GetComponent<RaceManager>();
+            var touch = flow.GetComponent<TouchControlsPresenter>();
+            touch.forceShow = true;
+            flow.StartRace(System.Array.Find(flow.events, e => e.eventId == "e1"), flow.tiers[0]);
+            while (race.State == RaceState.Countdown) yield return null;
+            var player = race.Player;
+            var rivals = new System.Collections.Generic.List<RaceParticipant>(race.Participants);
+            rivals.Remove(player); Assert.GreaterOrEqual(rivals.Count, 2);
+            var near = rivals[0]; var far = rivals[1];
+            var origin = new Vector3(0f, 1000f, 0f);
+            foreach (var p in race.Participants)
+            {
+                p.offTrackResetSeconds = 1000f; p.Progress.enabled = false;
+                p.Car.Body.constraints = RigidbodyConstraints.FreezeAll;
+                p.Car.Teleport(origin + (p.isPlayer ? Vector3.zero : Vector3.back * 22f), Quaternion.identity);
+                if (!p.isPlayer) { p.Car.inputEnabled = false; p.GetComponent<CarCannon>().enabled = false; }
+            }
+            near.Car.Teleport(origin + new Vector3(0f, 0f, 22f), Quaternion.identity);
+            far.Car.Teleport(origin + new Vector3(6f, 0f, 34f), Quaternion.identity);
+            var camera = Camera.main;
+            camera.GetComponent<CarCameraFollow>().enabled = false;
+            var menuCamera = camera.GetComponent<MenuCameraDirector>();
+            if (menuCamera != null) menuCamera.enabled = false;
+            camera.transform.position = origin + new Vector3(0f, 5f, -8f);
+            camera.transform.LookAt(origin + new Vector3(0f, .5f, 24f));
+            var cannon = player.GetComponent<CarCannon>();
+            cannon.magazineSize = 0; cannon.fireInterval = .38f; cannon.shellDamage = 1f;
+            Physics.SyncTransforms(); yield return Frames(10);
+            void Finger(int id, UnityEngine.InputSystem.TouchPhase phase, Vector2 point) =>
+                InputSystem.QueueStateEvent(syntheticTouch, new TouchState { touchId = id, phase = phase, position = point });
+            Vector2 Center(string name)
+            {
+                var rect = (RectTransform)GameObject.Find(name).transform;
+                return RectTransformUtility.WorldToScreenPoint(null, rect.TransformPoint(rect.rect.center));
+            }
+            IEnumerator Tap(RaceParticipant target)
+            {
+                var point = camera.WorldToScreenPoint(target.transform.position + Vector3.up * .6f);
+                Assert.Greater(point.z, 0f);
+                Assert.IsTrue(Physics.Raycast(camera.ScreenPointToRay(point), out var hit, 120f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore));
+                Assert.AreSame(target.Car, hit.collider.GetComponentInParent<CarController>(), "Only a visible vehicle can be tapped");
+                Finger(3, UnityEngine.InputSystem.TouchPhase.Began, point); yield return Frames(3);
+                Finger(3, UnityEngine.InputSystem.TouchPhase.Ended, point); yield return Frames(15);
+                Assert.AreSame(target.Car, cannon.TurretTarget);
+            }
+            IEnumerator CheckNextShell(RaceParticipant target)
+            {
+                int shots = RaceDirector.Instance.ShotsFired;
+                for (int i = 0; i < 100 && shots == RaceDirector.Instance.ShotsFired; i++) yield return null;
+                Assert.Greater(RaceDirector.Instance.ShotsFired, shots);
+                var shell = System.Array.Find(Object.FindObjectsByType<Projectile>(), s => s.Owner == player.gameObject &&
+                    s.IsLive && Vector3.Distance(s.transform.position, cannon.muzzle.position) < 10f);
+                Assert.NotNull(shell, "A newly emitted player projectile");
+                var toTarget = target.transform.position - cannon.muzzle.position;
+                var velocity = shell.GetComponent<Rigidbody>().linearVelocity;
+                float angle = Vector3.Angle(Vector3.ProjectOnPlane(velocity, Vector3.up), Vector3.ProjectOnPlane(toTarget, Vector3.up));
+                Debug.Log($"Touch target {target.name} shell yaw error {angle:F2} degrees");
+                Assert.Less(angle, 3f);
+                Assert.IsTrue(player.Car.LastCommand.Fire);
+                Assert.Greater(player.Car.LastCommand.Steer, .3f);
+            }
+            Vector2 steer = Center("Right"), fire = Center("Fire");
+            Finger(1, UnityEngine.InputSystem.TouchPhase.Began, steer);
+            Finger(2, UnityEngine.InputSystem.TouchPhase.Began, fire); yield return Frames(6);
+            Assert.AreSame(near.Car, cannon.TurretTarget);
+            yield return Tap(far); yield return CheckNextShell(far);
+            yield return Tap(near); yield return CheckNextShell(near);
+            yield return Tap(far);
+            far.Car.Teleport(origin + new Vector3(30f, 0f, 5f), Quaternion.identity);
+            yield return Frames(12);
+            Assert.AreSame(near.Car, cannon.TurretTarget, "Return to automatic selection outside the cone");
+            far.Car.Teleport(origin + new Vector3(6f, 0f, 34f), Quaternion.identity);
+            yield return Frames(6); Assert.AreSame(near.Car, cannon.TurretTarget);
+            yield return Tap(far);
+            far.Health.TakeDamage(10000f, player.gameObject); yield return Frames(12);
+            Assert.IsTrue(far.Health.IsDead); Assert.AreSame(near.Car, cannon.TurretTarget);
+            Finger(1, UnityEngine.InputSystem.TouchPhase.Ended, steer);
+            Finger(2, UnityEngine.InputSystem.TouchPhase.Ended, fire); yield return Frames(3);
+        }
+
         [UnityTest, Timeout(240000)]
         public IEnumerator DraggedControlsSurviveRestartOnBothHandsAndResetToTheirPreset()
         {

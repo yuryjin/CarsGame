@@ -9,12 +9,8 @@ namespace RacingGame
     {
         private string challengeInput = "";
 
-        private void BuildFriendChallenge(Transform content, RaceEventDefinition selected)
+        private static TMP_InputField LineInput(RectTransform field, int limit, string initial)
         {
-            var row = Item(content, "FriendChallenge", 240f);
-            var status = Label(row, "ChallengeStatus", Loc.Get("challenge.code"), 27f, Top, Vector2.one,
-                new Vector2(18f, -64f), new Vector2(-18f, -8f));
-            var field = UiFactory.Panel(row, "ChallengeCode", Vector2.zero, Vector2.one, new Vector2(16f, 91f), new Vector2(-16f, -68f), UiFactory.Raised);
             field.GetComponent<Image>().raycastTarget = true;
             var viewport = UiFactory.Panel(field, "Viewport", Vector2.zero, Vector2.one, new Vector2(12f, 4f), new Vector2(-12f, -4f));
             viewport.gameObject.AddComponent<RectMask2D>();
@@ -22,8 +18,18 @@ namespace RacingGame
             text.richText = false; text.textWrappingMode = TextWrappingModes.NoWrap;
             var input = field.gameObject.AddComponent<TMP_InputField>();
             input.textViewport = viewport; input.textComponent = text; input.targetGraphic = field.GetComponent<Image>();
-            input.lineType = TMP_InputField.LineType.SingleLine; input.richText = false; input.characterLimit = FriendChallenge.MaxCodeLength;
-            input.text = challengeInput;
+            input.lineType = TMP_InputField.LineType.SingleLine; input.richText = false; input.characterLimit = limit;
+            input.text = initial;
+            return input;
+        }
+
+        private void BuildFriendChallenge(Transform content, RaceEventDefinition selected)
+        {
+            var row = Item(content, "FriendChallenge", 240f);
+            var status = Label(row, "ChallengeStatus", Loc.Get("challenge.code"), 27f, Top, Vector2.one,
+                new Vector2(18f, -64f), new Vector2(-18f, -8f));
+            var field = UiFactory.Panel(row, "ChallengeCode", Vector2.zero, Vector2.one, new Vector2(16f, 91f), new Vector2(-16f, -68f), UiFactory.Raised);
+            var input = LineInput(field, FriendChallenge.MaxCodeLength, challengeInput);
             input.onValueChanged.AddListener(value => challengeInput = value);
 
             var best = selected != null && selected.mode == EventMode.Race ? PlatformGlue.Save?.Data.progress.bests.Find(b => b != null && b.eventId == selected.eventId) : null;

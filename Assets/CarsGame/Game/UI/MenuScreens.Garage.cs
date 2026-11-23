@@ -9,6 +9,47 @@ namespace RacingGame
     {
         private string previewBodyId;
 
+        private void ShowSavingsProgress(Transform content)
+        {
+            var save = PlatformGlue.Save;
+            var progress = save?.Data.progress;
+            if (progress == null || string.IsNullOrEmpty(progress.bodyGoal)) return;
+            var target = CarBodies.Get(progress.bodyGoal);
+            long remaining = System.Math.Max(0, target.Cost - save.Data.Coins);
+            string text = remaining > 0 ? Loc.Format("garage.savings_left", "name", Loc.Get(target.NameKey), "n", remaining)
+                : Loc.Format("garage.savings_ready", "name", Loc.Get(target.NameKey));
+            var row = Item(content, "BodySavings", 94f);
+            Label(row, "Progress", text, 26f, Vector2.zero, Vector2.one, new Vector2(16f, 4f), new Vector2(-16f, -4f),
+                remaining == 0 ? UiFactory.Positive : UiFactory.Accent);
+        }
+
+        private void BuildBodySavings(Transform content)
+        {
+            var save = PlatformGlue.Save;
+            if (save == null) return;
+            var p = save.Data.progress;
+            ShowSavingsProgress(content);
+            var preview = CarBodies.Get(previewBodyId);
+            if (preview.Unlock != UnlockKind.Coins || CarBodies.Owns(p.cosmetics, preview.Id)) return;
+            bool selected = p.bodyGoal == preview.Id;
+            var row = Item(content, "SavingsTarget", 92f, false);
+            UiFactory.Button(row, "SaveForBody", Loc.Format(selected ? "garage.savings_clear" : "garage.savings_pick", "name", Loc.Get(preview.NameKey)),
+                () => { p.bodyGoal = selected ? "" : preview.Id; save.MarkDirty(); Show("garage"); }, Vector2.zero, Vector2.one,
+                new Vector2(6f, 5f), new Vector2(-6f, -5f), 24f, UiFactory.Raised);
+        }
+
+        private void BuildWeaponDrills(Transform content)
+        {
+            Section(content, "WeaponDrills", Loc.Get("drill.title"));
+            foreach (var lesson in new[] { PracticeLesson.CannonTarget, PracticeLesson.BeamShield, PracticeLesson.PursuitMine })
+            {
+                var row = Item(content, "Drill" + lesson, 100f, false);
+                UiFactory.Button(row, "StartDrill" + lesson, Loc.Get(GameFlow.PracticeTitleKey(lesson)),
+                    () => flow.StartWeaponDrill(previewBodyId, lesson), Vector2.zero, Vector2.one,
+                    new Vector2(6f, 7f), new Vector2(-6f, -7f), 25f, UiFactory.Raised);
+            }
+        }
+
         public void PreviewBody(string id)
         {
             previewBodyId = CarBodies.Get(id).Id;

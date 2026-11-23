@@ -9,6 +9,7 @@ namespace RacingGame
         private Vector3 velocity;
         public override Vector3 AimPoint => transform.position + transform.up * 2.1f;
         public override Vector3 Velocity => velocity;
+        public bool FixedInPlace => body == null;
 
         public static SettlementObjective Tanker(Transform parent, Pose pose)
         {
@@ -27,6 +28,28 @@ namespace RacingGame
             objective.body.isKinematic = true;
             objective.CollectRenderers();
             return objective;
+        }
+
+        public static SettlementObjective Well(Transform parent, Vector3 point)
+        {
+            var go = new GameObject("LastWell");
+            go.transform.SetParent(parent, false);
+            go.transform.position = point;
+            var well = go.AddComponent<SettlementObjective>();
+            well.Kind = UnitKind.ProtectedObjective;
+            well.Radius = 3.2f;
+            well.SetHealth(125f);
+            Teams.Set(go, Team.Players);
+            MissionArt.Attach(go.transform, MissionArt.Cached("LastWellPump", (w, g) =>
+            {
+                LowPoly.Cylinder(w, Matrix4x4.identity, Vector3.zero, 2.9f, 3.1f, 2.4f, 12, MissionArt.Bone);
+                LowPoly.Cylinder(g, Matrix4x4.identity, Vector3.up * 2.4f, 2.55f, 2.55f, .12f, 12, MissionArt.CyanGlow);
+            }), 0);
+            var collider = go.AddComponent<BoxCollider>();
+            collider.center = Vector3.up * 1.2f;
+            collider.size = new Vector3(5.4f, 2.4f, 5.4f);
+            well.CollectRenderers();
+            return well;
         }
 
         private static void TankerShape(MeshChunkWriter solid, MeshChunkWriter glow)

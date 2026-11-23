@@ -111,13 +111,15 @@ namespace RacingGame.Tests
             Assert.IsFalse(race.Results.Player.Survived);
             CollectionAssert.AreEqual(new[] { 2, 1 }, race.Results.Player.KillsPerVictim);
             Assert.AreEqual(3, race.Results.Player.Kills);
-            var arenaRow = GameObject.Find("Result" + race.Results.Player.Position);
-            Assert.AreEqual(Loc.Format("results.kills", "k", 3, "d", 1),
-                arenaRow.transform.Find("Detail").GetComponent<TMPro.TMP_Text>().text,
-                "Arena results show combat instead of a nonexistent best lap");
+            var arenaRow = GameObject.Find("ArenaResult" + race.Results.Player.CarId);
+            Assert.IsNotNull(arenaRow);
+            string detail = arenaRow.transform.Find("Detail").GetComponent<TMPro.TMP_Text>().text;
+            StringAssert.Contains(Loc.Format("results.kills", "k", 3, "d", 1), detail);
+            StringAssert.Contains(Loc.Format("arena.assists", "n", race.Results.Player.Assists), detail);
             int expected = RacingGame.Core.Economy.Economy.RaceReward(race.Results.Player.Position, true,
-                new[] { 2, 1 }, RaceSetup.Tier.rewardMultiplier);
-            Assert.AreEqual(expected, flow.LastReward);
+                new[] { 3 }, RaceSetup.Tier.rewardMultiplier);
+            Assert.AreEqual(expected, flow.LastPayout.Total);
+            Assert.AreEqual(expected + flow.LastFirstFinishBonus, flow.LastReward);
         }
 
         [UnityTest, Timeout(180000)]

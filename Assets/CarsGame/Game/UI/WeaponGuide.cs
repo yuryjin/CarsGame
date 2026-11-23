@@ -1,9 +1,11 @@
 using System.Globalization;
 using RacingGame.Core.Combat;
+using RacingGame.Core.Save;
+using RacingGame.Core.Economy;
 
 namespace RacingGame
 {
-    public enum ArsenalGroup { All, Ranged, Close, Control, Traps }
+    public enum ArsenalGroup { All, Ranged, Close, Control, Traps, Pinned }
 
     /// <summary>Player-facing guidance derived from the same profiles used by the attacks.</summary>
     public static class WeaponGuide
@@ -30,16 +32,22 @@ namespace RacingGame
             return "weapon.role." + p.Mode.ToString().ToLowerInvariant();
         }
 
-        public static string Damage(PrimaryWeaponCatalog.Profile p) => p.Pellets > 1
-            ? Number(p.Damage) + " × " + p.Pellets : Number(p.Damage);
+        public static string Damage(PrimaryWeaponCatalog.Profile p, float factor = 1f) => p.Pellets > 1
+            ? Number(p.Damage * factor) + " × " + p.Pellets : Number(p.Damage * factor);
 
         private static string Number(float n) => n.ToString("0.##", CultureInfo.InvariantCulture);
 
-        public static string Stats(PrimaryWeaponCatalog.Profile p)
+        public static string Stats(PrimaryWeaponType type, ProgressData progress)
         {
-            string text = Loc.Format("loadout.stats", "damage", Damage(p), "interval", Number(p.Interval));
+            var p = PrimaryWeaponCatalog.Get(type);
+            var tuning = PlayerProgression.GunFactors(UpgradeCatalog.For(progress.upgrades), BuildCatalog.For((CarBuild)progress.buildPreset));
+            float seconds = SimulationDriver.SecondsToTicks(p.Interval * tuning.interval) * SimulationDriver.FixedStep;
+            int mgLevel = WeaponCatalog.Level(progress.weapons, (int)WeaponKind.MachineGun);
+            var heat = CarWeapons.HeatProfile(type, WeaponCatalog.For(mgLevel).HeatFactor);
+            string text = Loc.Format("loadout.stats", "damage", Damage(p, tuning.damage), "interval", Number(seconds));
             text += "\n" + (p.Magazine > 0
                 ? Loc.Format("loadout.magazine", "n", p.Magazine, "seconds", Number(p.Reload)) : Loc.Get("loadout.heat_only"));
+            text += "\n" + Loc.Format("arsenal.thermal", "shot", Number(heat.perShot), "cool", Number(heat.cooling));
             if (p.Mode != WeaponMode.Projectile)
                 text += "\n" + Loc.Format(p.Mode == WeaponMode.Trap ? "loadout.radius" : "loadout.range", "n", Number(p.Range));
             if (p.Status != StatusKind.None)

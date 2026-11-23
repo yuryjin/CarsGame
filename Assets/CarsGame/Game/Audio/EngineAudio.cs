@@ -23,6 +23,9 @@ namespace RacingGame
         private CarController car;
         private PlayerDriverInput input;
         private AudioSource engine, screech, wind;
+        private AudioSource asphalt, sand, bridge;
+        private Vector3 contacts, rollingMix;
+        private float nextSurfaceSample;
         private int gear;
         private float dipUntil;
         private bool wasBoosting, running;
@@ -41,6 +44,9 @@ namespace RacingGame
             engine = MakeSource("Engine", SfxSynth.EngineFor(body != null ? body.Class : BodyClass.Sport));
             screech = MakeSource("Screech", SfxSynth.Screech);
             wind = MakeSource("Wind", SfxSynth.Wind);
+            asphalt = MakeSource("Asphalt", SfxSynth.TireRoll(TireSurface.Asphalt));
+            sand = MakeSource("Sand", SfxSynth.TireRoll(TireSurface.Sand));
+            bridge = MakeSource("Bridge", SfxSynth.TireRoll(TireSurface.Bridge));
         }
 
         private AudioSource MakeSource(string name, AudioClip clip)
@@ -56,6 +62,11 @@ namespace RacingGame
         public void SetRunning(bool on)
         {
             running = on;
+            if (!on)
+            {
+                asphalt.Stop(); sand.Stop(); bridge.Stop();
+                contacts = rollingMix = Vector3.zero;
+            }
             if (on)
             {
                 var body = GetComponent<CarBody>();
@@ -115,8 +126,26 @@ namespace RacingGame
             screech.volume = screechGain * master;
             screech.pitch = 0.9f + 0.2f * s01;
 
+            if (Time.unscaledTime >= nextSurfaceSample)
+            {
+                nextSurfaceSample = Time.unscaledTime + .06f;
+                contacts = car.TireContactMix();
+            }
+            rollingMix = Vector3.Lerp(rollingMix, contacts, 1f - Mathf.Exp(-9f * Time.unscaledDeltaTime));
+            float rolling = Mathf.InverseLerp(3f, 70f, speed) * master;
+            float tirePitch = Mathf.Lerp(.65f, 1.65f, speedNorm);
+            Roll(asphalt, rollingMix.x * rolling * .19f, tirePitch);
+            Roll(sand, rollingMix.y * rolling * .29f, tirePitch);
+            Roll(bridge, rollingMix.z * rolling * .34f, tirePitch);
             wind.volume = speedNorm * speedNorm * speedNorm * 0.3f * master;
             wind.pitch = 0.8f + 0.4f * speedNorm;
+        }
+        private static void Roll(AudioSource source, float gain, float pitch)
+        {
+            source.volume = gain;
+            source.pitch = pitch;
+            if (gain > .001f) { if (!source.isPlaying) source.Play(); }
+            else if (source.isPlaying) source.Stop();
         }
     }
 }

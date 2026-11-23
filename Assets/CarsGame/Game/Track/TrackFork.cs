@@ -298,7 +298,11 @@ namespace RacingGame
                 go.layer = LayerMask.NameToLayer("Track");
                 go.GetComponent<MeshFilter>().sharedMesh = mesh;
                 go.GetComponent<MeshRenderer>().sharedMaterial = material;
-                if (solid) go.AddComponent<MeshCollider>().sharedMesh = collision;
+                if (solid)
+                {
+                    go.AddComponent<MeshCollider>().sharedMesh = collision;
+                    go.AddComponent<TireAudioSurface>().surface = TireSurface.Bridge;
+                }
             }
         }
 

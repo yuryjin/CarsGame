@@ -2657,6 +2657,154 @@ MonoBehaviour:
     m_Localized: '{name}  {s} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 29732681093033984
+    m_Localized: Pulse coming! Take cover behind a rock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754240
+    m_Localized: Air raid! Leave the striped lane
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754241
+    m_Localized: The roof is falling! Drive out
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754242
+    m_Localized: Last Well defence
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754243
+    m_Localized: Repel both waves before the well falls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754244
+    m_Localized: Both waves repelled. The well is safe.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754245
+    m_Localized: The well was destroyed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754246
+    m_Localized: "Wave 1 from the west   \xB7   Well {h}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754247
+    m_Localized: "Wave 2 from the east   \xB7   Well {h}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754248
+    m_Localized: "Buggy \xB7 Take a shortcut"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754249
+    m_Localized: "Sport \xB7 Release a drift boost"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754250
+    m_Localized: "Armored \xB7 Knock out a rival"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754251
+    m_Localized: "Tank \xB7 Pass the hot bomb"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754252
+    m_Localized: Mastery badge earned
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754253
+    m_Localized: Driver profile
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754254
+    m_Localized: Most finishes by body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754255
+    m_Localized: Earned cup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754256
+    m_Localized: Closest finish
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754257
+    m_Localized: No recorded result yet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754258
+    m_Localized: Saved setups
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754259
+    m_Localized: Name this setup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754260
+    m_Localized: Save current setup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754261
+    m_Localized: Compare weapons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754262
+    m_Localized: "Heat per shot {shot} \xB7 cooling {cool}/s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754263
+    m_Localized: Weapon drills
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754264
+    m_Localized: Hit the moving car with the cannon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754265
+    m_Localized: Break the shield with a beam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754266
+    m_Localized: Catch the pursuer with a mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754267
+    m_Localized: Repeat exercise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754268
+    m_Localized: Favorites
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754269
+    m_Localized: Add to favorites
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754270
+    m_Localized: Remove favorite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754271
+    m_Localized: Save for {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754272
+    m_Localized: Stop saving for {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754273
+    m_Localized: "{name} \xB7 {n} coins to go"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754274
+    m_Localized: You can now buy {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754275
+    m_Localized: '{n} s'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

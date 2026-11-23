@@ -2663,6 +2663,154 @@ MonoBehaviour:
     m_Localized: '{name}  {s} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 29732681093033984
+    m_Localized: "Pulso! Proteja-se atr\xE1s de uma rocha"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754240
+    m_Localized: "Ataque a\xE9reo! Saia da faixa listrada"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754241
+    m_Localized: O teto vai cair! Saia da garagem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754242
+    m_Localized: "Defesa do \xDAltimo Po\xE7o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754243
+    m_Localized: "Repila as duas ondas e proteja o po\xE7o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754244
+    m_Localized: "As duas ondas recuaram. O po\xE7o est\xE1 salvo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754245
+    m_Localized: "O po\xE7o foi destru\xEDdo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754246
+    m_Localized: "Onda 1 do oeste   \xB7   Po\xE7o {h}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754247
+    m_Localized: "Onda 2 do leste   \xB7   Po\xE7o {h}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754248
+    m_Localized: "Buggy \xB7 Pegue um atalho"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754249
+    m_Localized: "Esportivo \xB7 Ative um impulso de drift"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754250
+    m_Localized: "Blindado \xB7 Elimine um rival"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754251
+    m_Localized: "Tanque \xB7 Passe a bomba quente"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754252
+    m_Localized: Distintivo de maestria
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754253
+    m_Localized: Perfil do piloto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754254
+    m_Localized: Carroceria com mais chegadas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754255
+    m_Localized: Copa conquistada
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754256
+    m_Localized: Chegada mais apertada
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754257
+    m_Localized: Nenhum resultado ainda
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754258
+    m_Localized: Conjuntos salvos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754259
+    m_Localized: "D\xEA um nome ao conjunto"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754260
+    m_Localized: Salvar conjunto atual
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754261
+    m_Localized: Comparar armas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754262
+    m_Localized: "Calor por tiro {shot} \xB7 resfriamento {cool}/s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754263
+    m_Localized: Treinos de armas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754264
+    m_Localized: "Acerte o carro em movimento com o canh\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754265
+    m_Localized: Quebre o escudo com um raio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754266
+    m_Localized: Acerte o perseguidor com uma mina
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754267
+    m_Localized: "Repetir exerc\xEDcio"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754268
+    m_Localized: Favoritos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754269
+    m_Localized: Favoritar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754270
+    m_Localized: Desfavoritar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754271
+    m_Localized: Poupar para {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754272
+    m_Localized: Retirar meta {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754273
+    m_Localized: "{name} \xB7 faltam {n} moedas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754274
+    m_Localized: "J\xE1 pode comprar {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754275
+    m_Localized: '{n} s'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

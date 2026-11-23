@@ -1138,6 +1138,11 @@ namespace RacingGame
                     lastStatusSlowed = slowed;
                     UpdateStatusIndicators(shield, frozen, jammed, punctured, slowed);
                 }
+                for (int index = 0; index < 3; index++)
+                {
+                    var indicator = statusIndicators[index];
+                    if (indicator != null && indicator.IsActive) indicator.ShowSeconds(playerStatus.GetRemainingSeconds(indicator.Kind));
+                }
             }
             else if (statusPanel != null && statusPanel.gameObject.activeSelf)
             {
@@ -1902,6 +1907,8 @@ namespace RacingGame
         public string Glyph { get; }
         public string LocKey { get; }
         public string CachedLabel { get; private set; }
+        private int lastSecond = -1, lastWidth;
+        private float lastScale;
         public bool IsActive => Root != null && Root.gameObject.activeSelf;
 
         public StatusIndicatorWidget(RectTransform root, Image background, TextMeshProUGUI glyphText, TextMeshProUGUI labelText, StatusKind kind, Color themeColor, string glyph, string locKey)
@@ -1927,9 +1934,38 @@ namespace RacingGame
 
         public void RefreshLocalization()
         {
+            lastSecond = -1;
             CachedLabel = Loc.Get(LocKey);
             if (LabelText != null) LabelText.text = CachedLabel;
             if (GlyphText != null) GlyphText.text = Glyph;
+        }
+
+        public void ShowSeconds(float remaining)
+        {
+            float scale = Mathf.Max(.01f, Root.lossyScale.x);
+            int width = Mathf.RoundToInt(Root.rect.width * scale);
+            int seconds = Mathf.CeilToInt(remaining);
+            if (lastSecond == seconds && lastWidth == width && Mathf.Approximately(lastScale, scale)) return;
+            lastSecond = seconds; lastWidth = width; lastScale = scale;
+            string time = Loc.Format("hud.effect_seconds", "n", seconds);
+            LabelText.text = width < 92 ? time : CachedLabel + "  " + time;
+            bool stacked = width < 50;
+            var glyph = GlyphText.rectTransform;
+            glyph.anchorMin = stacked ? new Vector2(0f, .48f) : Vector2.zero;
+            glyph.anchorMax = stacked ? Vector2.one : new Vector2(0f, 1f);
+            glyph.offsetMin = new Vector2(1f / scale, 0f);
+            glyph.offsetMax = new Vector2((stacked ? -1f : 15f) / scale, 0f);
+            GlyphText.fontSize = 12f / scale;
+            GlyphText.alignment = TextAlignmentOptions.Center;
+            var label = LabelText.rectTransform;
+            label.anchorMin = Vector2.zero;
+            label.anchorMax = stacked ? new Vector2(1f, .56f) : Vector2.one;
+            label.offsetMin = new Vector2((stacked ? 1f : 16f) / scale, 0f);
+            label.offsetMax = new Vector2(-1f / scale, 0f);
+            LabelText.fontSizeMin = 9f / scale;
+            LabelText.fontSizeMax = 13f / scale * UiFactory.TextScale;
+            LabelText.alignment = stacked ? TextAlignmentOptions.Center : TextAlignmentOptions.MidlineLeft;
+            LabelText.textWrappingMode = TextWrappingModes.NoWrap;
         }
     }
 }

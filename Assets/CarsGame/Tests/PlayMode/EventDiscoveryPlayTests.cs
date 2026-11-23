@@ -290,7 +290,7 @@ namespace RacingGame.Tests
             var culture = CultureInfo.GetCultureInfo(Loc.Language);
             if (!PlatformGlue.Save.Data.progress.unlockedEvents.Contains("e6"))
                 PlatformGlue.Save.Data.progress.unlockedEvents.Add("e6");
-            foreach (string id in new[] { "m1", TrainMission.EventId, SettlementMission.TankerEvent, "e18", "e6" })
+            foreach (string id in new[] { "m1", TrainMission.EventId, SettlementMission.TankerEvent, SettlementMission.WellEvent, "e18", "e6" })
             {
                 menu.Show("events");
                 GameObject.Find("Tier2").GetComponent<Button>().onClick.Invoke();
@@ -328,7 +328,9 @@ namespace RacingGame.Tests
                 else if (SettlementMission.Supports(id))
                 {
                     Assert.IsEmpty(field);
-                    Assert.IsNotEmpty(SettlementMission.Current.Attackers);
+                    Assert.IsNotNull(SettlementMission.Current.Objective);
+                    if (id == SettlementMission.TankerEvent) Assert.IsNotEmpty(SettlementMission.Current.Attackers);
+                    else Assert.IsTrue(SettlementMission.Current.DefendingWell);
                     StringAssert.Contains(Loc.Get("mission.raider_fire"), difficulty);
                 }
                 else

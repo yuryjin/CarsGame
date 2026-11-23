@@ -55,7 +55,7 @@ namespace RacingGame
                 var type = (PrimaryWeaponType)(i == 0 ? p.equippedPrimary : p.reservePrimary);
                 var row = Item(content, "LoadoutSlot" + i, 100f);
                 UiFactory.Button(row, "ChooseSlot" + i, (i + 1) + "  ·  " + Loc.Get(PrimaryWeaponCatalog.Get(type).NameKey) + "  ›",
-                    () => { loadoutSlot = slot; arsenalGroup = ArsenalGroup.All; Show("arsenal"); }, Vector2.zero, Vector2.one,
+                    () => { loadoutSlot = slot; arsenalGroup = p.weaponPins?.Exists(pin => pin != null && pin.slot == slot && pin.pinned) == true ? ArsenalGroup.Pinned : ArsenalGroup.All; Show("arsenal"); }, Vector2.zero, Vector2.one,
                     new Vector2(12f, 12f), new Vector2(-12f, -12f), 27f, UiFactory.Raised);
             }
             var hint = Item(content, "SwapHelp", 90f, false);
@@ -76,32 +76,69 @@ namespace RacingGame
             UiFactory.Button(actions, "TryLoadout", Loc.Get("garage.test_drive"),
                 () => flow.StartTestDrive(CarBodies.Selected(p.cosmetics, p.body)), new Vector2(0.5f, 0f), Vector2.one,
                 new Vector2(4f, 4f), new Vector2(-4f, -4f), 25f);
+            BuildWeaponComparison(content, p);
             var filters = Item(content, "ArsenalFilters", 92f, false);
-            for (int i = 0; i < 5; i++)
+            int groups = (int)ArsenalGroup.Pinned + 1;
+            for (int i = 0; i < groups; i++)
             {
                 var group = (ArsenalGroup)i;
                 UiFactory.Button(filters, "Filter_" + group, Loc.Get("arsenal." + group.ToString().ToLowerInvariant()),
-                    () => { arsenalGroup = group; Show("arsenal"); }, new Vector2(i / 5f, 0f), new Vector2((i + 1) / 5f, 1f),
+                    () => { arsenalGroup = group; Show("arsenal"); }, new Vector2(i / (float)groups, 0f), new Vector2((i + 1f) / groups, 1f),
                     new Vector2(4f, 8f), new Vector2(-4f, -8f), 23f, arsenalGroup == group ? UiFactory.Accent : UiFactory.Raised);
             }
             for (int i = 0; i < PrimaryWeaponCatalog.Count; i++)
             {
                 var type = (PrimaryWeaponType)i;
                 var profile = PrimaryWeaponCatalog.Get(type);
-                if (arsenalGroup != ArsenalGroup.All && WeaponGuide.Group(profile) != arsenalGroup) continue;
+                bool pinned = Core.Save.WeaponPin.Has(p.weaponPins, loadoutSlot, profile.NameKey);
+                if (arsenalGroup == ArsenalGroup.Pinned ? !pinned : arsenalGroup != ArsenalGroup.All && WeaponGuide.Group(profile) != arsenalGroup) continue;
                 bool owned = type != PrimaryWeaponType.MachineGun || WeaponCatalog.Level(p.weapons, (int)WeaponKind.MachineGun) > 0;
                 bool selected = (loadoutSlot == 0 ? p.equippedPrimary : p.reservePrimary) == i;
-                var row = Item(content, "Arsenal_" + i, 300f);
+                var row = Item(content, "Arsenal_" + i, Narrow ? 374f : 334f);
                 Label(row, "Name", Loc.Get(profile.NameKey), 30f, Top, Vector2.one,
                     new Vector2(24f, -56f), new Vector2(-240f, -12f)).fontStyle = FontStyles.Bold;
                 Label(row, "Role", Loc.Get(WeaponGuide.RoleKey(profile)), 22f, Top, Vector2.one,
                     new Vector2(24f, -130f), new Vector2(-240f, -62f), UiFactory.Muted);
-                Label(row, "Stats", WeaponGuide.Stats(profile),
+                Label(row, "Stats", WeaponGuide.Stats(type, p),
                     22f, Vector2.zero, Vector2.one, new Vector2(24f, 12f), new Vector2(-240f, -142f), UiFactory.Accent);
                 UiFactory.Button(row, "EquipSlot_" + i, Loc.Get(selected ? "garage.equipped" : owned ? "garage.equip" : "garage.locked"),
                     owned && !selected ? () => SelectLoadout(type, loadoutSlot) : (Action)null,
-                    new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-220f, -36f), new Vector2(-20f, 36f), 24f,
+                    new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-220f, 50f), new Vector2(-20f, 122f), 24f,
                     selected ? UiFactory.Positive : UiFactory.Accent);
+                UiFactory.Button(row, "CompareWeapon" + i, Loc.Get("arsenal.compare"), () =>
+                {
+                    if (choosingFirstWeapon) comparisonFirst = type; else comparisonSecond = type;
+                    Show("arsenal"); var scroll = GameObject.Find("ArsenalScroll")?.GetComponent<UnityEngine.UI.ScrollRect>();
+                    if (scroll != null) scroll.verticalNormalizedPosition = 1f;
+                }, new Vector2(1f, .5f), new Vector2(1f, .5f), new Vector2(-220f, -28f), new Vector2(-20f, 44f), 24f, UiFactory.Raised);
+                UiFactory.Button(row, "PinWeapon" + i, Loc.Get(pinned ? "arsenal.unpin" : "arsenal.pin"), () =>
+                {
+                    Core.Save.WeaponPin.Toggle(p, loadoutSlot, profile.NameKey);
+                    save.MarkDirty(); Show("arsenal");
+                }, new Vector2(1f, .5f), new Vector2(1f, .5f), new Vector2(-220f, -106f), new Vector2(-20f, -34f), 23f, pinned ? UiFactory.Positive : UiFactory.Raised);
+            }
+        }
+
+        private PrimaryWeaponType? comparisonFirst, comparisonSecond;
+        private bool choosingFirstWeapon;
+
+        private void BuildWeaponComparison(Transform content, Core.Save.ProgressData p)
+        {
+            comparisonFirst ??= (PrimaryWeaponType)p.equippedPrimary;
+            comparisonSecond ??= (PrimaryWeaponType)p.reservePrimary;
+            Section(content, "CompareTitle", Loc.Get("arsenal.compare"));
+            var row = Item(content, "Comparison", Narrow ? 480f : 340f);
+            for (int i = 0; i < 2; i++)
+            {
+                bool left = i == 0;
+                var type = left ? comparisonFirst.Value : comparisonSecond.Value;
+                var side = UiFactory.Panel(row, "Comparison" + i, new Vector2(i * .5f, 0f), new Vector2((i + 1) * .5f, 1f),
+                    new Vector2(9f, 7f), new Vector2(-9f, -7f));
+                UiFactory.Button(side, "ChooseCompare" + i, Loc.Get(PrimaryWeaponCatalog.Get(type).NameKey),
+                    () => { choosingFirstWeapon = left; Show("arsenal"); }, new Vector2(0f, 1f), Vector2.one,
+                    new Vector2(0f, -74f), Vector2.zero, 24f, choosingFirstWeapon == left ? UiFactory.Accent : UiFactory.Raised);
+                Label(side, "Stats", WeaponGuide.Stats(type, p), 22f, Vector2.zero, Vector2.one,
+                    new Vector2(8f, 0f), new Vector2(-8f, -80f));
             }
         }
 

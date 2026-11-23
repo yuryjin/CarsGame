@@ -6,7 +6,7 @@ using RacingGame.World.Gen;
 namespace RacingGame
 {
     /// <summary>Desert basin with six bridge approaches, an open centre and safe perimeter spawns.</summary>
-    public sealed class ArenaLayout : MonoBehaviour, IMineFieldSite, ISimulated
+    public sealed partial class ArenaLayout : MonoBehaviour, IMineFieldSite, ISimulated
     {
         public const float HalfSize = 120f;
         public const float BridgeEnd = 9f, BridgeStart = 65f, BridgeHeight = 12f;
@@ -93,6 +93,7 @@ namespace RacingGame
             }), LayerMask.NameToLayer("Track"));
             BuildScenery();
             BuildOuterRoad();
+            BuildHazards();
             AddBox("NorthRim", new Vector3(0f, 3f, HalfSize), new Vector3(244f, 6f, 3f), rock);
             AddBox("SouthRim", new Vector3(0f, 3f, -HalfSize), new Vector3(244f, 6f, 3f), rock);
             AddBox("EastRim", new Vector3(HalfSize, 3f, 0f), new Vector3(3f, 6f, 238f), rock);
@@ -151,11 +152,13 @@ namespace RacingGame
                 var blocker = ruin.AddComponent<BoxCollider>();
                 blocker.center = centre;
                 blocker.size = size;
+                shelters[arm] = blocker;
                 return;
             }
 
             var mesa = AddBox("SandstoneMesa" + arm, position + centre, size, MissionArt.Rock);
             mesa.localRotation = rotation;
+            shelters[arm] = mesa.GetComponent<BoxCollider>();
             mesa.GetComponent<MeshFilter>().sharedMesh = MissionArt.Cached("ArenaMesa", (w, g) =>
                 LowPoly.Pyramid(w, Matrix4x4.identity, Vector3.down * 0.5f, Vector2.one, 1f, new Vector2(0.12f, -0.1f), MissionArt.Rock))[0];
         }
@@ -203,6 +206,7 @@ namespace RacingGame
                     local.x * local.x + local.z * local.z <= 35f * 35f, p.Car.IsDrifting);
             }
             strikes?.Step(tick);
+            StepHazards(tick);
         }
 
         internal RaceParticipant FindCar(int id)
@@ -216,7 +220,7 @@ namespace RacingGame
         private void LateUpdate()
         {
             if (!Running) return;
-            if (bomberFormation != null) bomberFormation.localRotation = Quaternion.Euler(0f, (float)race.RaceTime * 9f, 0f);
+            if (!strafing && bomberFormation != null) bomberFormation.localRotation = Quaternion.Euler(0f, (float)race.RaceTime * 9f, 0f);
             if (SimulationDriver.Current != null) strikes?.UpdateVisuals(SimulationDriver.Current.Tick, 0f);
         }
 
@@ -243,7 +247,7 @@ namespace RacingGame
             return true;
         }
 
-        public bool Threatens(Vector3 world) => strikes != null && strikes.Threatens(world, 5f);
+        public bool Threatens(Vector3 world) => (strikes != null && strikes.Threatens(world, 5f)) || HazardThreatens(world);
 
         private void Blast(GameObject source, Vector3 point, float radius, float damage)
         {

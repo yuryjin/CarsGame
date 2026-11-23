@@ -8,6 +8,7 @@ namespace RacingGame
     {
         private readonly GameObject owner;
         private readonly CarController car;
+        private readonly CarCannon cannon;
         private CarController pendingTarget;
         private MissionUnit pendingUnit;
         private SpaceTurret pendingTurret;
@@ -21,6 +22,7 @@ namespace RacingGame
         {
             this.owner = owner;
             car = owner.GetComponent<CarController>();
+            cannon = owner.GetComponent<CarCannon>();
         }
 
         public void Configure(PrimaryWeaponType weapon)
@@ -61,7 +63,8 @@ namespace RacingGame
         {
             Vector3 origin = owner.transform.position + Vector3.up;
             float arc = shot.Mode == WeaponMode.Pulse ? 180f : shot.Arc;
-            target = TargetFinder.Find(car, origin, owner.transform.forward, arc, 0.1f, shot.Range);
+            target = cannon != null ? cannon.FindRival(origin, arc, 0.1f, shot.Range)
+                : TargetFinder.Find(car, origin, owner.transform.forward, arc, 0.1f, shot.Range);
             unit = target == null ? TargetFinder.FindUnit(car, origin, owner.transform.forward, arc, 0.1f, shot.Range) : null;
             turret = target == null && unit == null ? TargetFinder.FindTurret(origin, owner.transform.forward, arc, 0.1f, shot.Range) : null;
             end = target != null ? target.transform.position + Vector3.up * 0.5f

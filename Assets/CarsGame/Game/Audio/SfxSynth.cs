@@ -106,6 +106,19 @@ namespace RacingGame
             return v * 0.22f;
         });
 
+        private static AudioClip asphaltRoll, sandRoll, bridgeRoll;
+        public static AudioClip TireRoll(TireSurface surface)
+        {
+            if (surface == TireSurface.Bridge)
+                return bridgeRoll ??= Loop("tire_bridge", 1f, t => Mathf.Exp(-((t * 8f) % 1f) * 21f)
+                    * (.6f * Mathf.Sin(2f * Mathf.PI * 155f * t) + .17f * Noise()));
+            if (surface == TireSurface.Sand)
+                return sandRoll ??= Loop("tire_sand", 1f, t =>
+                    Noise() * (.17f + .43f * Mathf.Pow(Mathf.Abs(Mathf.Sin(2f * Mathf.PI * 19f * t)), 5f)));
+            float smooth = 0f;
+            return asphaltRoll ??= Loop("tire_asphalt", 1f, t => smooth = .79f * smooth + .21f * Noise());
+        }
+
         /// <summary>Tyre squeal: band-limited noise (running average) plus a wavering 1.1 kHz tone.</summary>
         public static AudioClip Screech
         {

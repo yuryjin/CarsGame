@@ -42,7 +42,9 @@ namespace RacingGame
             bool threatened = mission.Threatened;
             status.color = threatened ? new Color(1f, .58f, .32f) : Color.white;
             float health = mission.Objective.Health / mission.Objective.MaxHealth;
-            status.text = Loc.Format(threatened ? "settlement.tanker_threat" : "settlement.tanker_status",
+            string statusKey = mission.DefendingWell ? (mission.Wave == 1 ? "settlement.wave_west" : "settlement.wave_east")
+                : threatened ? "settlement.tanker_threat" : "settlement.tanker_status";
+            status.text = Loc.Format(statusKey,
                 "h", Mathf.CeilToInt(100f * health), "m", Mathf.CeilToInt(mission.Remaining));
             float height = status.GetPreferredValues(status.text, (width - font * 2.4f) / scale, float.PositiveInfinity).y * scale + 10f;
             float top = 24f * scale;
@@ -57,7 +59,7 @@ namespace RacingGame
             var camera = Camera.main;
             if (player == null || camera == null) return;
             var nearest = mission.ClosestThreat(threatened ? 57f : 0f);
-            Vector3 target = nearest != null ? nearest.transform.position : mission.Destination;
+            Vector3 target = nearest != null ? nearest.transform.position : mission.DefendingWell ? mission.WaveOrigin : mission.Destination;
             Vector3 direction = target - player.transform.position;
             Vector3 right = camera.transform.right;
             right.y = 0f;

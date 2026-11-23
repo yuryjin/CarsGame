@@ -74,5 +74,17 @@ namespace RacingGame.Tests
             Assert.AreEqual(7, RacingGame.Core.Save.WeeklyGoals.Mask(replay.progress, 123));
             Assert.AreEqual(1, replay.progress.cosmetics.FindAll(c => c == RacingGame.Core.Save.WeeklyGoals.Reward(123)).Count);
         }
+        [Test]
+        public void MasterySelectsEachClassSkillAndMergesEachDeviceOnlyOnce()
+        {
+            var a = Blob(1); var b = Blob(2);
+            var first = a.Local("A");
+            foreach (var body in Core.Economy.CarBodies.Classes)
+                BodyMastery.Record(first, body, 1, 2, 3, 4);
+            BodyMastery.Record(b.Local("B"), Core.Economy.BodyClass.Sport, 99, 1, 99, 99);
+            var merged = SaveMerge.Merge(b, SaveMerge.Merge(a, b));
+            CollectionAssert.AreEqual(new long[] { 1, 3, 3, 4 },
+                System.Array.ConvertAll(Core.Economy.CarBodies.Classes, body => BodyMastery.Count(merged.progress, body)));
+        }
     }
 }

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.OnScreen;
 using UnityEngine.UI;
@@ -22,6 +24,8 @@ namespace RacingGame
         private static void Publish(bool value) { if (IsShown == value) return; IsShown = value; ShownChanged?.Invoke(value); }
 
         private Canvas canvas;
+        private PointerEventData targetPointer;
+        private readonly List<RaycastResult> pointerHits = new List<RaycastResult>(8);
         private bool built;
         private bool shown;
         private bool keyboardChosen;
@@ -92,12 +96,38 @@ namespace RacingGame
                 if (launch == null && race != null) launch = race.GetComponent<PerfectStart>();
                 launchLabel.transform.parent.gameObject.SetActive(launch != null && launch.AcceptingInput);
                 ApplyTouchTargets();
+                if (controlsActive && input != null && race.State == RaceState.Racing) ReadTargetTouches(input);
                 var weapons = input != null ? input.GetComponent<CarWeapons>() : null;
                 var cannon = input != null ? input.GetComponent<CarCannon>() : null;
                 bool primary = cannon != null && cannon.enabled && !cannon.locked;
                 fireLabel.transform.parent.gameObject.SetActive(primary);
                 swapButton.gameObject.SetActive(primary && weapons != null);
                 UpdateSecondaryLabel(weapons);
+            }
+        }
+
+        private void ReadTargetTouches(PlayerDriverInput input)
+        {
+            var screen = Touchscreen.current;
+            if (screen == null) return;
+            foreach (var finger in screen.touches)
+            {
+                if (!finger.press.wasPressedThisFrame) continue;
+                Vector2 point = finger.position.ReadValue();
+                var events = EventSystem.current;
+                if (events != null)
+                {
+                    targetPointer ??= new PointerEventData(events);
+                    targetPointer.position = point;
+                    pointerHits.Clear(); events.RaycastAll(targetPointer, pointerHits);
+                    if (pointerHits.Exists(h => h.gameObject.GetComponentInParent<Selectable>() != null
+                        || h.gameObject.GetComponentInParent<TouchButton>() != null)) continue;
+                }
+                var camera = Camera.main;
+                if (camera == null || !Physics.Raycast(camera.ScreenPointToRay(point), out var hit, camera.farClipPlane,
+                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)) continue;
+                var rival = hit.collider.GetComponentInParent<CarController>();
+                if (rival != null) input.GetComponent<CarCannon>()?.PreferTouchTarget(rival);
             }
         }
 
