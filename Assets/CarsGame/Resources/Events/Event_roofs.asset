@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d02fbfa66cd42f05ab856c1c4970f124, type: 3}
+  m_Name: Event_roofs
+  m_EditorClassIdentifier: RacingGame.Game::RacingGame.RaceEventDefinition
+  eventId: roofs
+  mode: 0
+  nameKey: events.roofs.name
+  laps: 1
+  referenceSeconds: 50
+  aiCountOverride: -1
+  mountainFork: 3
+  reversed: 0
+  night: 0
+  sky: {fileID: 11400000, guid: 7beefcbf75c496d58bfec6920b6762ae, type: 2}
+  damageMultiplier: 1
+  pickupCount: 18
+  unlockAfterEventId:
+  order: 104
+  star1TargetPosition: 3
+  skillGoal: 2
+  skillTarget: 1
+  star3ZeroDeaths: 1
+  finishGoal: 3
+  targetSeconds: 95
+  twist: 0

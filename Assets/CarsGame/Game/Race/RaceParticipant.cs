@@ -174,7 +174,8 @@ namespace RacingGame
             bool lost = !onFork && lateral > lostLateralMetres;
             bool onDirtRoute = dirt && onFork && Car.Surface == GroundSurface.Ground;
             offTrackTime = ((offAsphalt && !onDirtRoute) || lost) ? offTrackTime + Time.fixedDeltaTime : 0f;
-            if (offTrackTime >= offTrackResetSeconds || (!onFork && lateral > lostLateralMetres * 2f))
+            bool missedRoof = Progress.Path.Fork != null && Progress.Path.Fork.UnderRoofGap(transform.position);
+            if (missedRoof || offTrackTime >= offTrackResetSeconds || (!onFork && lateral > lostLateralMetres * 2f))
             {
                 offTrackTime = 0f;
                 AutoResets++;

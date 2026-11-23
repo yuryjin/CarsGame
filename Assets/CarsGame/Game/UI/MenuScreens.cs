@@ -561,6 +561,7 @@ namespace RacingGame
             map.gameObject.AddComponent<CircuitMapGraphic>().SetRoute(spline, grid);
             string hint = ev.twist == Core.Daily.RaceTwist.HotBomb ? "bomb.pass"
                 : ev.twist == Core.Daily.RaceTwist.MinesOnly ? "lesson.mines"
+                : ev.mountainFork == MountainFork.Rooftops ? "route.roofs"
                 : ev.mountainFork == MountainFork.Quarry ? "route.dirt" : ev.wastelandTrack ? "route.bridge_jump" : ev.starRingTrack ? "lesson.wall"
                 : ev.spaceTrack ? "lesson.space" : ev.abyssTrack ? "lesson.abyss"
                 : ev.skillGoal == SkillGoal.DriftBoosts ? "route.drift_boost"
