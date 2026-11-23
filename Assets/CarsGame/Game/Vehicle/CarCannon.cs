@@ -328,6 +328,18 @@ namespace RacingGame
             return Mathf.Abs(turretYaw - yaw) <= 1.5f && Mathf.Abs(barrelPitch - pitch) <= 1.5f;
         }
 
+        public void ApplyRoomBarrel(float yaw, float pitch, int remaining, float reload)
+        {
+            if (!GameFlow.RoomReplica) return;
+            turretYaw = yaw; barrelPitch = pitch;
+            if (turret != null) turret.localRotation = turretRestRotation * Quaternion.Euler(0f,yaw,0f);
+            if (barrel != null) barrel.localRotation = barrelRestRotation * Quaternion.Euler(pitch,0f,0f);
+            reloadDoneTick = reload >= 1f ? -1 : SimulationDriver.Instance.Tick + SimulationDriver.SecondsToTicks((1f-reload)*reloadSeconds);
+            if (magazineSize <= 0 || ammo == remaining) return;
+            ammo = Mathf.Min(remaining,magazineSize);
+            AmmoChanged?.Invoke(Ammo,AmmoMax);
+        }
+
         private void DesiredAngles(Vector3 aimPoint, out float desiredYaw, out float desiredPitch)
         {
             Vector3 local = turret.parent.InverseTransformDirection(aimPoint - barrel.position);

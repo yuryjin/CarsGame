@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
@@ -28,6 +29,78 @@ namespace RacingGame.Tests
 
         private static Button StartButton(string id) => Object.FindObjectsByType<Button>().Single(b => b.name == "Start_" + id);
         private static string CardText(Button start, string name) => start.transform.parent.Find(name).GetComponent<TMP_Text>().text;
+
+        private static List<Vector2> DrawnBranch(CircuitMapGraphic map)
+        {
+            var mesh = map.canvasRenderer.GetMesh();
+            Assert.NotNull(mesh);
+            var vertices = mesh.vertices;
+            var colors = mesh.colors32;
+            Assert.Greater(vertices.Length, 3);
+            Vector2 origin = map.MapPosition(Vector3.zero);
+            float scale = (map.MapPosition(Vector3.right * 100f).x - origin.x) / 100f;
+            Assert.Greater(scale, 0f);
+            var world = new List<Vector2>();
+            // The last three vertices draw the direction arrow. The side road has the same accent.
+            var accent = colors[colors.Length - 1];
+            for (int i = 0; i < vertices.Length - 3; i += 4)
+            {
+                if (!colors[i].Equals(accent)) continue;
+                if (world.Count == 0) world.Add(((Vector2)(vertices[i] + vertices[i + 3]) * .5f - origin) / scale);
+                world.Add(((Vector2)(vertices[i + 1] + vertices[i + 2]) * .5f - origin) / scale);
+            }
+            return world;
+        }
+
+        [UnityTest, Timeout(240000)]
+        public IEnumerator CardAndHudDrawTheSamePhysicalMountainBranch()
+        {
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            while (!PlatformGlue.IsReady) yield return null;
+            yield return null; yield return null;
+            profile = JsonUtility.ToJson(PlatformGlue.Save.Data);
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var menu = flow.GetComponent<MenuScreens>();
+            var mountainEvents = flow.events.Where(e => e != null && e.mountainFork != MountainFork.Bridge)
+                .GroupBy(e => e.mountainFork).Select(g => g.First().eventId);
+            foreach (string id in new[] { "e1", "e6", "e19" }.Concat(mountainEvents))
+            {
+                var ev = flow.events.First(e => e != null && e.eventId == id);
+                if (!flow.IsUnlocked(ev)) PlatformGlue.Save.Data.progress.unlockedEvents.Add(id);
+                menu.Show("events");
+                Canvas.ForceUpdateCanvases();
+                var button = StartButton(id);
+                var card = button.transform.parent.Find("RouteMap").GetComponent<CircuitMapGraphic>();
+                var scroll = button.GetComponentInParent<ScrollRect>();
+                float offset = scroll.viewport.InverseTransformPoint(card.transform.position).y - scroll.viewport.rect.center.y;
+                scroll.content.anchoredPosition -= Vector2.up * offset;
+                yield return null;
+                Canvas.ForceUpdateCanvases();
+                var preview = DrawnBranch(card);
+                Assert.IsNull(Object.FindAnyObjectByType<TrackFork>(), "Opening an event card must not spawn a driveable road");
+                button.onClick.Invoke();
+                yield return null;
+                Canvas.ForceUpdateCanvases();
+                var hud = GameObject.Find("MiniMapRoute").GetComponent<CircuitMapGraphic>();
+                var inRace = DrawnBranch(hud);
+                var fork = TrackPath.Instance.Fork;
+                Assert.AreEqual(preview.Count, inRace.Count, id);
+                if (fork == null) Assert.IsEmpty(preview, id);
+                else
+                {
+                    Assert.Greater(preview.Count, 2, id);
+                    for (int sample = 0; sample < preview.Count; sample++)
+                    {
+                        var position = fork.Position(sample / (float)(preview.Count - 1));
+                        var expected = new Vector2(position.x, position.z);
+                        Assert.Less(Vector2.Distance(preview[sample], expected), .1f, id + " card");
+                        Assert.Less(Vector2.Distance(inRace[sample], expected), .1f, id + " HUD");
+                    }
+                }
+                Debug.Log($"[ForkMap] {id} reversed={ev.reversed} branch={fork?.Course.ToString() ?? "none"} samples={preview.Count}");
+                flow.EnterMenu(); yield return null;
+            }
+        }
 
         [UnityTest, Timeout(180000)]
         public IEnumerator CardMapArrowMatchesTheCourseThatStarts()
@@ -79,6 +152,7 @@ namespace RacingGame.Tests
         private static void AssertAvailableFirst(GameFlow flow)
         {
             var events = flow.events.Where(e => e != null).OrderBy(e => e.order).ToArray();
+            Assert.That(events.Select(e => e.order), Is.Unique, "Each event has one stable position in the catalog");
             int lastAvailable = -1, firstLocked = int.MaxValue;
             for (int i = 0; i < events.Length; i++)
             {

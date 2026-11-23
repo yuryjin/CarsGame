@@ -92,6 +92,7 @@ namespace RacingGame
 
         public void SimulationStep(int tick)
         {
+            if (GameFlow.RoomReplica) return;
             currentTick = tick;
             if (IsDead && respawnOnDeath && tick >= respawnAtTick) Respawn();
         }
@@ -144,7 +145,7 @@ namespace RacingGame
 
         public HitResult ApplyHit(in HitInfo hit)
         {
-            if (IsDead || IsInvulnerable) return HitResult.Rejected;
+            if (GameFlow.RoomReplica || IsDead || IsInvulnerable) return HitResult.Rejected;
 
             var result = new HitResult();
             float amount = hit.Damage * GlobalDamageMultiplier;
@@ -220,6 +221,16 @@ namespace RacingGame
             };
             var result = ApplyHit(in hit);
             return result.DamageApplied && !result.ShieldAbsorbed && result.DamageDealt > 0f;
+        }
+
+        public void ApplyRoomHealth(float value, bool dead)
+        {
+            if (!GameFlow.RoomReplica) return;
+            if (IsDead != dead) { IsDead = dead; TintWreck(dead); }
+            value = Mathf.Clamp(value,0f,maxHealth);
+            if (Mathf.Approximately(currentHealth,value)) return;
+            currentHealth = value;
+            OnHealthChanged?.Invoke(value,maxHealth);
         }
 
         /// <summary>Change the pool (difficulty tiers, armour upgrades); current HP follows and the event fires.</summary>

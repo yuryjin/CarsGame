@@ -9,12 +9,12 @@ namespace RacingGame
     {
         private string challengeInput = "";
 
-        private static TMP_InputField LineInput(RectTransform field, int limit, string initial)
+        private static TMP_InputField LineInput(RectTransform field, int limit, string initial, float fontSize = 24f)
         {
             field.GetComponent<Image>().raycastTarget = true;
             var viewport = UiFactory.Panel(field, "Viewport", Vector2.zero, Vector2.one, new Vector2(12f, 4f), new Vector2(-12f, -4f));
             viewport.gameObject.AddComponent<RectMask2D>();
-            var text = UiFactory.Text(viewport, "Code", "", 24f, TextAlignmentOptions.MidlineLeft, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            var text = UiFactory.Text(viewport, "Code", "", fontSize, TextAlignmentOptions.MidlineLeft, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
             text.richText = false; text.textWrappingMode = TextWrappingModes.NoWrap;
             var input = field.gameObject.AddComponent<TMP_InputField>();
             input.textViewport = viewport; input.textComponent = text; input.targetGraphic = field.GetComponent<Image>();

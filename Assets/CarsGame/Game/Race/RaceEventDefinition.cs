@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace RacingGame
 {
+    public enum MountainFork { Bridge = 0, Quarry = 1, IceStation = 2, Rooftops = 3, Volcano = 4 }
     public enum FinishGoal { NoDeaths, WinWithoutRepair, BeatTime, CleanRun }
     public enum SkillGoal { Kills, DriftBoosts, Shortcuts, CeilingBoost, CleanFinalLap, BombPasses }
 
@@ -31,6 +32,8 @@ namespace RacingGame
         public CircuitFormat format;
         public string RelayFirst { get; internal set; }
         public string RelaySecond { get; internal set; }
+        [Tooltip("Rival driver profiles keep their selected top speed at every gap.")]
+        public bool fixedRivalPace;
         public bool reversed;
         [Tooltip("Road over an abyss: broken barriers on lap 1, no barriers on lap 2, narrow road on lap 3.")]
         public bool abyssTrack;
@@ -40,6 +43,8 @@ namespace RacingGame
         public bool starRingTrack;
         [Tooltip("Post-apocalyptic wasteland circuit with a broken bridge and drivable tunnel.")]
         public bool wastelandTrack;
+        [Tooltip("Side route on the mountain circuit.")]
+        public MountainFork mountainFork;
         [Tooltip("Ramming shoves the other car this much harder (1 = plain physics).")]
         [Range(1f, 4f)] public float ramPush = 1f;
         [Tooltip("Legacy: night look when no sky preset is assigned.")] public bool night;

@@ -19,7 +19,7 @@ namespace RacingGame
             {
                 if (course.mode != EventMode.Race || course.format != CircuitFormat.Standard || !flow.IsUnlocked(course)) continue;
                 int layout = (course.reversed ? 1 : 0) | (course.abyssTrack ? 2 : 0) | (course.spaceTrack ? 4 : 0)
-                    | (course.starRingTrack ? 8 : 0) | (course.wastelandTrack ? 16 : 0);
+                    | (course.starRingTrack ? 8 : 0) | (course.wastelandTrack ? 16 : 0) | ((int)course.mountainFork << 5);
                 if (layouts.Add(layout)) options.Add(course);
             }
             return options;

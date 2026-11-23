@@ -2,6 +2,8 @@
     "name": "RacingGame.Net",
     "rootNamespace": "RacingGame.Net",
     "references": [
+        "RacingGame.Core",
+        "RacingGame.Game",
         "Unity.Networking.Transport",
         "Unity.Collections"
     ],

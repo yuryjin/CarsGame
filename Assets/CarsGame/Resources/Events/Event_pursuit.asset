@@ -17,6 +17,7 @@ MonoBehaviour:
   format: 2
   nameKey: format.pursuit
   laps: 1
+  referenceSeconds: 35
   aiCountOverride: 2
   reversed: 0
   night: 0

@@ -25,11 +25,11 @@ namespace RacingGame.World.Gen
             LowPoly.Box(w, beam, Vector3.zero, new Vector3(width, (b - a).magnitude, width), color);
         }
 
-        internal static MeshChunkWriter ForkSigns(TrackSpline circuit, float halfWidth, bool hasRepair)
+        internal static MeshChunkWriter ForkSigns(TrackSpline circuit, float halfWidth, bool hasRepair, float exit = TrackFork.Exit)
         {
             var signs = new MeshChunkWriter("ForkSigns");
             Sign(signs, Frame(circuit, TrackFork.Entry - SignAdvance), halfWidth, 1, hasRepair);
-            Sign(signs, Frame(circuit, TrackFork.Exit + SignAdvance, 0f, -1), halfWidth, -1, hasRepair);
+            Sign(signs, Frame(circuit, exit + SignAdvance, 0f, -1), halfWidth, -1, hasRepair);
             return signs;
         }
 

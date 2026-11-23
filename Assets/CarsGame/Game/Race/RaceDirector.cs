@@ -158,6 +158,8 @@ namespace RacingGame
             OilSlicks.SpawnSlick(position, Tick, lifetimeSeconds);
         }
 
+        public event Action<ProjectileSpawn> ProjectileSpawned;
+
         public Projectile RequestProjectile(in ProjectileSpawn spawn)
         {
             var root = ShellRoot;   // prewarms the pool on first use
@@ -174,6 +176,7 @@ namespace RacingGame
             liveShells.Add(shell);
             shell.Activate(this, spawn);
             ShotsFired++;
+            ProjectileSpawned?.Invoke(spawn);
             return shell;
         }
 

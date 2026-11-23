@@ -17,6 +17,7 @@ MonoBehaviour:
   format: 1
   nameKey: format.elimination
   laps: 3
+  referenceSeconds: 132
   aiCountOverride: 3
   reversed: 0
   night: 0

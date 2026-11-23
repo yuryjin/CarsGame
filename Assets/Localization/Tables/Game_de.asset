@@ -2979,6 +2979,102 @@ MonoBehaviour:
       Pr\xE4mien gibt es in Karriere-Events."
     m_Metadata:
       m_Items: []
+  - m_Id: 29752733624250368
+    m_Localized: Steinbruchrennen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833280
+    m_Localized: Die braune Schotterpiste liegt Buggys. Hinter der Kurve trifft sie
+      wieder auf den Asphalt.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833281
+    m_Localized: Mit Freunden spielen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833282
+    m_Localized: Privates Rennen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833283
+    m_Localized: Gemeinsam gegen Leviathan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027584
+    m_Localized: Raumcode eines Freundes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027585
+    m_Localized: Raum beitreten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027586
+    m_Localized: "Spieler {n}/4 \xB7 Einladungscode"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027587
+    m_Localized: Ein Fahrer hat den Raum verlassen. Das Spiel ist beendet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027588
+    m_Localized: "Raum nicht verf\xFCgbar. Code pr\xFCfen oder erneut versuchen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027589
+    m_Localized: Fahrer {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027590
+    m_Localized: Bot {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027591
+    m_Localized: "\xDCber den D\xE4chern"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027592
+    m_Localized: "Beschleunige auf dem Dach. Ziele auf die gelbe Landefl\xE4che oder
+      nimm die Stra\xDFe unten."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027593
+    m_Localized: Festes Tempo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027594
+    m_Localized: "Die Gegner halten bei jedem Abstand das Tempo der gew\xE4hlten
+      Schwierigkeit."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027595
+    m_Localized: Eisstation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027596
+    m_Localized: Die offene blaue Kurve ist vereist. Im Tunnel hast du mehr Grip.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027597
+    m_Localized: Vulkanpass
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027598
+    m_Localized: "In Runde eins auf der Hauptstra\xDFe bleiben. Nach dem Signal \xF6ffnet
+      die Abk\xFCrzung f\xFCr Runde zwei."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027599
+    m_Localized: "Hauptstra\xDFe offen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027600
+    m_Localized: "N\xE4chste Runde die Abk\xFCrzung nehmen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027601
+    m_Localized: "Abk\xFCrzung offen"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

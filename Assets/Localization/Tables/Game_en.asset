@@ -2975,6 +2975,102 @@ MonoBehaviour:
       stay in career events.
     m_Metadata:
       m_Items: []
+  - m_Id: 29752733624250368
+    m_Localized: Quarry Run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833280
+    m_Localized: The brown dirt shortcut suits a buggy. The asphalt road rejoins
+      it beyond the bend.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833281
+    m_Localized: Play with friends
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833282
+    m_Localized: Private race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833283
+    m_Localized: Leviathan co-op
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027584
+    m_Localized: Your friend's room code
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027585
+    m_Localized: Join room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027586
+    m_Localized: "Players {n}/4 \xB7 Invite code"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027587
+    m_Localized: A driver left. The match has ended.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027588
+    m_Localized: Room unavailable. Check the code or try again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027589
+    m_Localized: Driver {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027590
+    m_Localized: Bot {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027591
+    m_Localized: Rooftop Jump
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027592
+    m_Localized: Build speed on the roof. Aim for the yellow landing or follow the
+      road below.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027593
+    m_Localized: Fixed Pace
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027594
+    m_Localized: Rivals keep the pace of your chosen difficulty at any distance from
+      you.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027595
+    m_Localized: Ice Station
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027596
+    m_Localized: The open blue bend is icy. Take the covered road for more grip.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027597
+    m_Localized: Volcano Switchback
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027598
+    m_Localized: Take the main road on lap one. After the warning, the shortcut opens
+      for lap two.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027599
+    m_Localized: Main road open
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027600
+    m_Localized: 'Next lap: take the shortcut'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027601
+    m_Localized: Shortcut open
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

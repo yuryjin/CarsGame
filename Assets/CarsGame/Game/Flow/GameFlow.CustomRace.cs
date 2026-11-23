@@ -21,6 +21,7 @@ namespace RacingGame
             ev.hideFlags = HideFlags.DontSave;
             ev.IsCustom = true; ev.eventId = "custom"; ev.nameKey = "format.custom";
             ev.laps = laps; ev.aiCountOverride = rivals; ev.twist = twist;
+            ev.mountainFork = course.mountainFork;
             ev.reversed = course.reversed; ev.night = course.night; ev.sky = course.sky;
             ev.abyssTrack = course.abyssTrack; ev.spaceTrack = course.spaceTrack;
             ev.starRingTrack = course.starRingTrack; ev.wastelandTrack = course.wastelandTrack;

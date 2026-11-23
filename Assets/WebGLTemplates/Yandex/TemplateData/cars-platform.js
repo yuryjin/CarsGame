@@ -26,6 +26,7 @@
   var saveQueue = null, saveInFlight = null, saveTimes = [];    // rolling setData quota: 100 per 5 minutes; saveInFlight = drain promise
   var saveGeneration = 0;    // a completed write only acknowledges the identity it was sent to
   var SAVE_QUOTA = 90, SAVE_WINDOW = 5 * 60 * 1000;
+  var scoreWrites = Promise.resolve(), nextScoreAt = 0, confirmedScores = new Map(), authRequests = 0;
 
   function log(m) { try { console.log('[CarsPlatform] ' + m); debug.log.push(m); if (debug.log.length > 200) debug.log.shift(); } catch (e) {} }
   function send(method, payload) {
@@ -268,16 +269,23 @@
   function requestAuth(id) {
     var done = once(id);
     if (!ysdk || !ysdk.auth) { done({ ok: false, error: 'unavailable' }); return; }
-    ysdk.auth.openAuthDialog().then(function () {
+    var dialog;
+    try { dialog = ysdk.auth.openAuthDialog(); }
+    catch (e) { done({ ok: false, error: 'declined' }); return; }
+    authRequests++;
+    Promise.resolve(dialog).then(function () {
       return ysdk.getPlayer({ scopes: false }).then(function (p) {
         // New identity: the guest's queued blob must never land in the signed-in account.
         saveGeneration++;
         saveQueue = null; if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+        var previousId = playerId, wasAuthorized = authorized;
         player = p; authorized = true;
         try { playerId = p.getUniqueID(); playerName = p.getName() || playerName; } catch (e) {}
+        if (!wasAuthorized || previousId !== playerId) { confirmedScores = new Map(); lb = null; }
+        authRequests--;
         var e = env(); e.ok = true; done(e);
       });
-    }).catch(function (e) { done({ ok: false, error: 'declined' }); });
+    }).catch(function (e) { authRequests--; done({ ok: false, error: 'declined' }); });
   }
 
   // ---- leaderboards ----
@@ -290,13 +298,46 @@
       lb = { setLeaderboardScore: function (b, s, x) { return v2.setScore(b, s, x); }, getLeaderboardEntries: function (b, o) { return v2.getEntries(b, o); }, v2: true };
       return Promise.resolve(lb);
     }
-    return ysdk.getLeaderboards().then(function (l) { lb = l; return l; });
+    var account = confirmedScores;
+    return ysdk.getLeaderboards().then(function (l) { if (account === confirmedScores) lb = l; return l; });
   }
   function submitScore(id, board, score, extra) {
     var done = once(id);
     if (!ysdk) { done({ ok: false, error: 'unavailable' }); return; }
-    getLb().then(function (l) { debug.lbApi = l.v2 ? 'v2' : 'legacy'; return l.setLeaderboardScore(board, Number(score), extra || undefined); })
-      .then(function () { done({ ok: true }); }).catch(function (e) { done({ ok: false, error: String(e) }); });
+    if (!authorized || authRequests) { done({ ok: false, error: 'sign in first' }); return; }
+    var account = confirmedScores, value = Number(score), data = extra || '', expired = false;
+    async function write() {
+      function checkAccount() {
+        if (expired) throw new Error('setScore timeout');
+        if (authRequests || account !== confirmedScores) throw new Error('player changed');
+      }
+      checkAccount();
+      var last = account.get(board);
+      if (last && last.score === value && last.extra === data) return;
+      var boards = await getLb();
+      if (boards.v2 && ysdk.isAvailableMethod && !(await ysdk.isAvailableMethod('leaderboards.setScore')))
+        throw new Error('setScore unavailable');
+      checkAccount();
+      // The quota is shared by every board. Use a monotonic clock across sign-ins.
+      var delay;
+      while ((delay = nextScoreAt - performance.now()) > 0)
+        await new Promise(function (resolve) { setTimeout(resolve, Math.ceil(delay)); });
+      checkAccount();
+      debug.lbApi = boards.v2 ? 'v2' : 'legacy';
+      nextScoreAt = Math.ceil(performance.now()) + 1000;
+      await boards.setLeaderboardScore(board, value, data || undefined);
+      checkAccount();
+      account.set(board, { score: value, extra: data });
+    }
+    function boundedWrite() {
+      var timer;
+      return new Promise(function (resolve, reject) {
+        timer = setTimeout(function () { expired = true; reject(new Error('setScore timeout')); }, 12000);
+        write().then(resolve, reject);
+      }).finally(function () { clearTimeout(timer); });
+    }
+    scoreWrites = scoreWrites.then(boundedWrite).then(function () { done({ ok: true }); },
+      function (error) { done({ ok: false, error: String(error) }); });
   }
   function getLeaderboard(id, board, top, includeUser, around) {
     var done = once(id);

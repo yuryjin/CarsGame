@@ -2985,6 +2985,103 @@ MonoBehaviour:
       de carri\xE8re se gagnent en \xE9preuve."
     m_Metadata:
       m_Items: []
+  - m_Id: 29752733624250368
+    m_Localized: "La carri\xE8re"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833280
+    m_Localized: "Le chemin de terre brun convient au buggy. Il rejoint la route
+      apr\xE8s le virage."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833281
+    m_Localized: Jouer entre amis
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833282
+    m_Localized: "Course priv\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833283
+    m_Localized: "En \xE9quipe contre le L\xE9viathan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027584
+    m_Localized: Code du salon de votre ami
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027585
+    m_Localized: Rejoindre le salon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027586
+    m_Localized: "Joueurs {n}/4 \xB7 Code d\u2019invitation"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027587
+    m_Localized: "Un pilote est parti. La partie est termin\xE9e."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027588
+    m_Localized: "Salon indisponible. V\xE9rifiez le code ou r\xE9essayez."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027589
+    m_Localized: Pilote {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027590
+    m_Localized: Bot {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027591
+    m_Localized: De toit en toit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027592
+    m_Localized: "Acc\xE9l\xE8re sur le toit. Vise la zone jaune ou emprunte la route
+      du bas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027593
+    m_Localized: Rythme fixe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027594
+    m_Localized: "Les adversaires gardent le rythme de la difficult\xE9 choisie,
+      quel que soit l\u2019\xE9cart."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027595
+    m_Localized: Station de glace
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027596
+    m_Localized: "Le virage bleu \xE0 ciel ouvert est glac\xE9. Le tunnel offre plus
+      d\u2019adh\xE9rence."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027597
+    m_Localized: Col du volcan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027598
+    m_Localized: "Prends la route principale au premier tour. Apr\xE8s le signal,
+      le raccourci ouvre pour le deuxi\xE8me."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027599
+    m_Localized: Route principale ouverte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027600
+    m_Localized: Au prochain tour, prends le raccourci
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027601
+    m_Localized: Raccourci ouvert
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

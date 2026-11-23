@@ -83,9 +83,13 @@ try {
           `${lang}: prerequisite fits the locked card ${id}`);
       }
       const first = cards.find(b => b.name === 'Start_e1');
-      assert(first.y > .2 && first.y < .95, 'First playable race is visible without passing cup cards');
+      const custom = state.buttons.find(b => b.name === 'ConfigureCustom');
+      for (const action of [first, custom]) {
+        assert(action?.interactable && action.y > .2 && action.y * box.height + action.height / 2 <= box.height,
+          lang + ' first race and custom race can both be chosen without scrolling');
+      }
       assert(!cards.find(b => b.name === 'Start_e2').interactable, 'Career gate is preserved');
-      for (const id of ['e1', 'e2', 'e3', 'e4', 'e19', 'e20']) {
+      for (const id of ['e1', 'e2', 'e3', 'e4', 'e19', 'e20', 'tt1', 'dirt', 'pace', 'ice', 'roofs', 'volcano', 'elimination', 'pursuit', 'relay']) {
         const hint = state.labels.find(l => l.parent === id && l.name === 'RouteHint');
         const estimate = state.labels.find(l => l.parent === id && l.name === 'ReferenceTime');
         const button = cards.find(b => b.name === 'Start_' + id);

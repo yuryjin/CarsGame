@@ -6,7 +6,7 @@ using RacingGame.World.Gen;
 namespace RacingGame
 {
     /// <summary>One narrow flyover inside the mountain circuit's north bend.</summary>
-    public sealed class TrackFork : MonoBehaviour
+    public sealed partial class TrackFork : MonoBehaviour
     {
         // ponytail: one authored mountain bend; use per-track endpoints when another ground circuit is added.
         public const float Entry = 85f, Exit = 265f, HalfWidth = 2.2f;
@@ -22,14 +22,90 @@ namespace RacingGame
         private float start, span;
         public float Length { get; private set; }
         public float RepairDistance { get; private set; }
+        public bool HasRepair { get; private set; }
 
-        public static TrackFork Create(TrackPath path, bool hasRepair = true)
+        public MountainFork Course { get; private set; }
+        public bool IsDirt => Course == MountainFork.Quarry;
+        private bool HasWideDeck => Course == MountainFork.IceStation || Course == MountainFork.Volcano;
+        public float RoadHalfWidth => Course switch
+        {
+            MountainFork.Quarry => 4.3f,
+            MountainFork.IceStation or MountainFork.Volcano => 3.4f,
+            MountainFork.Rooftops => 4.8f,
+            _ => HalfWidth
+        };
+        public float DecisionLead => Course == MountainFork.Volcano ? 44f : 27f;
+        public float ExitRunout => Course == MountainFork.Volcano ? 62f : 16f;
+        public float ApproachDistance => path.reversed ? path.Wrap(start + span) : start;
+        public float MainSpan => Mathf.Abs(span);
+
+        public static TrackFork Create(TrackPath path, bool hasRepair = true, MountainFork course = MountainFork.Bridge)
         {
             var fork = new GameObject("TrackFork").AddComponent<TrackFork>();
             fork.path = path;
+            fork.Course = course;
+            fork.HasRepair = hasRepair;
             fork.Build(path.reversed ? path.Spline.Reversed() : path.Spline, hasRepair);
             path.Fork = fork;
             return fork;
+        }
+
+        /// <summary>Drive the narrow route from the approach through its merge in either direction.</summary>
+        public void FollowShortcut(CarController car, float distance, out float steer, out float throttle)
+        {
+            float progress = path.SignedDelta(ApproachDistance, distance) / MainSpan;
+            if (progress >= 0f && progress <= 1f)
+            {
+                Project(car.transform.position, out _, out float fraction);
+                progress = path.reversed ? 1f - fraction : fraction;
+            }
+            const float step = .015f;
+            Vector3 a = DrivingLine(progress - step), centre = DrivingLine(progress), b = DrivingLine(progress + step);
+            Vector3 incoming = Vector3.ProjectOnPlane(centre - a, Vector3.up);
+            Vector3 outgoing = Vector3.ProjectOnPlane(b - centre, Vector3.up);
+            Vector3 right = Vector3.Cross(Vector3.up, incoming + outgoing).normalized;
+            float curvature = Vector3.SignedAngle(incoming, outgoing, Vector3.up) * Mathf.Deg2Rad /
+                Mathf.Max(.1f, (incoming + outgoing).magnitude * .5f);
+            Vector3 target = DrivingLine(progress + .05f) - car.transform.position;
+            target.y = 0f;
+            float speed = car.Body.linearVelocity.magnitude;
+            float facing = Vector3.SignedAngle(car.transform.forward, target, Vector3.up) - target.magnitude * curvature * .5f * Mathf.Rad2Deg;
+            // The narrow bridge can be approached from the far lane. Dampen the
+            // lane change before the car carries lateral speed onto the raised deck.
+            float correction = RoadHalfWidth >= 3f ? .28f : .22f;
+            float damping = RoadHalfWidth >= 3f ? .11f : .20f;
+            float lateral = Vector3.Dot(centre - car.transform.position, right) * correction
+                - Vector3.Dot(car.Body.linearVelocity, right) * damping;
+            steer = Mathf.Clamp(car.SteerForCurvature(curvature, speed) + lateral + facing / 35f
+                - (car.Body.angularVelocity.y - speed * curvature) * .7f, -1f, 1f);
+            if (Course == MountainFork.Rooftops && !path.reversed && progress >= .30f && progress <= .64f)
+                steer = AimForLanding(car, progress, speed);
+            float desired = Mathf.Min(IsDirt ? 76f : 45f, car.MaxSpeedForCurvature(curvature) * 3.6f * (IsDirt ? .78f : .82f));
+            if (progress < .07f) desired = Mathf.Min(desired, 36f);
+            if (IsDirt && progress > .87f) desired = Mathf.Min(desired, 39f);
+            if (Course == MountainFork.Volcano && progress > .93f) desired = Mathf.Min(desired, 36f);
+            throttle = Mathf.Clamp((desired - car.SpeedKmh) / 3f, -1f, 1f);
+        }
+
+        private Vector3 DrivingLine(float t)
+        {
+            if (t >= 0f && t <= 1f)
+            {
+                Vector3 line = Position(path.reversed ? 1f - t : t);
+                // The wide dirt lane rejoins just before a bend. Aim towards the
+                // middle while there is still room to turn on the dirt.
+                const float mergeStart = .8f;
+                if (IsDirt && t > mergeStart)
+                {
+                    Vector3 mergeOffset = Position(path.reversed ? 0f : 1f) - path.Position(ApproachDistance + MainSpan);
+                    line -= mergeOffset * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(mergeStart, 1f, t));
+                }
+                return line;
+            }
+            float d = ApproachDistance + t * MainSpan;
+            if (IsDirt && t > 1f) return path.Position(d);
+            float lane = t < 0f ? 2.2f : 2.2f * Mathf.Clamp01(1f - (t - 1f) * MainSpan / 16f);
+            return path.Position(d) + path.Right(d) * (path.reversed ? -lane : lane);
         }
 
         public Vector3 Position(float fraction)
@@ -40,10 +116,12 @@ namespace RacingGame
         }
 
         /// <summary>Map the physical branch onto the same ordered lap gates as the long road.</summary>
-        public float Project(Vector3 position, out float squaredError)
+        public float Project(Vector3 position, out float squaredError) => Project(position, out squaredError, out _);
+
+        internal float Project(Vector3 position, out float squaredError, out float fraction)
         {
             squaredError = float.MaxValue;
-            float fraction = 0f;
+            fraction = 0f;
             for (int i = 0; i < Steps; i++)
             {
                 Vector3 segment = points[i + 1] - points[i];
@@ -56,31 +134,43 @@ namespace RacingGame
             return path.Wrap(start + span * fraction);
         }
 
-        private void Build(TrackSpline forward, bool hasRepair)
+        internal static bool AppliesTo(RaceEventDefinition ev) =>
+            ev == null || ev.mode == EventMode.Race && !ev.abyssTrack && !ev.spaceTrack && !ev.starRingTrack && !ev.wastelandTrack;
+
+        /// <summary>Sample the authored mountain branch before elevation. Menu cards only need its horizontal path.</summary>
+        internal static float SampleCenterline(TrackSpline forward, MountainFork course, Vector3[] output, Collider surface = null)
         {
+            bool quarry = course == MountainFork.Quarry;
+            float exit = quarry ? 310f : Exit;
             Vector3 a = forward.Position(Entry) + forward.Right(Entry) * 2.2f;
-            Vector3 d = forward.Position(Exit) + forward.Right(Exit) * 2.2f;
+            Vector3 d = forward.Position(exit) + forward.Right(exit) * 2.2f;
             // Authored spline points are painted dashes, 1.5 cm above the road.
             // Anchor the physical deck to the road collider rather than that visual height.
-            var surface = GameObject.Find("RaceTrack/Track_Road")?.GetComponent<Collider>();
             if (surface != null)
             {
                 if (surface.Raycast(new Ray(a + Vector3.up, Vector3.down), out var entryHit, 2f)) a.y = entryHit.point.y;
                 if (surface.Raycast(new Ray(d + Vector3.up, Vector3.down), out var exitHit, 2f)) d.y = exitHit.point.y;
             }
-            Vector3 b = a + forward.Tangent(Entry) * 50f;
-            Vector3 c = d - forward.Tangent(Exit) * 50f;
-            int hint = -1;
-            start = path.Spline.Project(a, ref hint, 0);
-            hint = -1;
-            span = path.SignedDelta(start, path.Spline.Project(d, ref hint, 0));
-            hint = -1;
-            RepairDistance = path.Spline.Project(forward.Position((Entry + Exit) * 0.5f), ref hint, 0);
-            for (int i = 0; i <= Steps; i++)
+            Vector3 b = a + forward.Tangent(Entry) * (quarry ? 40f : 50f);
+            Vector3 c = d - forward.Tangent(exit) * (quarry ? 32f : 50f);
+            for (int i = 0; i < output.Length; i++)
             {
-                float t = i / (float)Steps, u = 1f - t;
-                points[i] = u * u * u * a + 3f * u * u * t * b + 3f * u * t * t * c + t * t * t * d;
+                float t = i / (float)(output.Length - 1), u = 1f - t;
+                output[i] = u * u * u * a + 3f * u * u * t * b + 3f * u * t * t * c + t * t * t * d;
             }
+            return exit;
+        }
+
+        private void Build(TrackSpline forward, bool hasRepair)
+        {
+            var surface = GameObject.Find("RaceTrack/Track_Road")?.GetComponent<Collider>();
+            float exit = SampleCenterline(forward, Course, points, surface);
+            int hint = -1;
+            start = path.Spline.Project(points[0], ref hint, 0);
+            hint = -1;
+            span = path.SignedDelta(start, path.Spline.Project(points[Steps], ref hint, 0));
+            hint = -1;
+            RepairDistance = path.Spline.Project(forward.Position((Entry + exit) * 0.5f), ref hint, 0);
             // A raised deck edge is itself an obstacle even without its visual skirt.
             // Keep both merges flush until the whole branch clears the main road,
             // then form the flyover between those points with zero grade at each end.
@@ -89,43 +179,62 @@ namespace RacingGame
             {
                 hint = -1;
                 float dMain = forward.Project(points[i], ref hint, 0);
-                if (Mathf.Abs(forward.LateralOffset(points[i], dMain)) <= path.halfWidth + HalfWidth + 0.5f) continue;
+                if (Mathf.Abs(forward.LateralOffset(points[i], dMain)) <= path.halfWidth + RoadHalfWidth + 0.5f) continue;
                 if (firstClear < 0) firstClear = i;
                 lastClear = i;
             }
+            float deckRise = IsDirt ? .45f : HasWideDeck ? 2.8f : 6f;
             for (int i = 0; i <= Steps; i++)
             {
                 float t = lastClear > firstClear ? Mathf.Clamp01((i - firstClear) / (float)(lastClear - firstClear)) : 0f;
                 float rise = Mathf.Sin(Mathf.PI * t);
-                points[i].y += rise * rise * 6f;
+                points[i].y += rise * rise * deckRise;
+                if (Course == MountainFork.Rooftops && i >= RoofRampStart && i <= RoofLip)
+                    points[i].y += (i - RoofRampStart) * .26f;
+                if (Course == MountainFork.Rooftops && i >= RoofLanding && i <= RoofLanding + 14)
+                    points[i].y += 1.25f * Mathf.Clamp01((RoofLanding + 14 - i) / 10f);
                 if (i > 0) Length += Vector3.Distance(points[i - 1], points[i]);
             }
-            var road = new MeshChunkWriter("ShortcutBridge");
+            var road = new MeshChunkWriter(IsDirt ? "DirtShortcut" : "ShortcutBridge");
             var skirts = new MeshChunkWriter("ShortcutSkirts");
             var markings = new MeshChunkWriter("ShortcutMarkings");
-            var asphalt = new Color32(64, 70, 78, 0);
+            var asphalt = IsDirt ? new Color32(158, 105, 60, 0) : new Color32(64, 70, 78, 0);
             for (int i = 0; i < Steps; i++)
             {
+                if (Course == MountainFork.Rooftops && i >= RoofLip && i < RoofLanding)
+                    continue;
                 Vector3 rightA = Right(i), rightB = Right(i + 1);
                 Vector3 p = points[i], q = points[i + 1];
-                road.AddQuad(p - rightA * HalfWidth, q - rightB * HalfWidth,
-                    q + rightB * HalfWidth, p + rightA * HalfWidth, asphalt);
+                Color32 deckColor = Course == MountainFork.Rooftops && i >= RoofLanding && i < RoofLanding + 4
+                    ? new Color32(218, 160, 45, 0) : asphalt;
+                road.AddQuad(p - rightA * RoadHalfWidth, q - rightB * RoadHalfWidth,
+                    q + rightB * RoadHalfWidth, p + rightA * RoadHalfWidth, deckColor);
                 foreach (float side in new[] { -1f, 1f })
                 {
-                    Vector3 edgeA = p + rightA * (side * HalfWidth), edgeB = q + rightB * (side * HalfWidth);
+                    Vector3 edgeA = p + rightA * (side * RoadHalfWidth), edgeB = q + rightB * (side * RoadHalfWidth);
                     // These thin visual edges cross the main road at the merges.
                     // Colliding with them snags cars travelling along the long route;
                     // the driveable deck and structural supports remain solid.
+                    if (IsDirt)
+                    {
+                        Vector3 footA = edgeA + rightA * (side * 1.4f), footB = edgeB + rightB * (side * 1.4f);
+                        footA.y = Mathf.Min(edgeA.y - .25f, 0f); footB.y = Mathf.Min(edgeB.y - .25f, 0f);
+                        skirts.AddQuad(edgeA, edgeB, footB, footA, new Color32(112, 75, 43, 0));
+                        Vector3 rutA = p + rightA * (side * .7f) + Vector3.up * .02f;
+                        Vector3 rutB = q + rightB * (side * .7f) + Vector3.up * .02f;
+                        markings.AddQuad(rutA, rutB, rutB + rightB * .2f, rutA + rightA * .2f, new Color32(125, 81, 48, 0));
+                        continue;
+                    }
                     skirts.AddQuad(edgeA, edgeB, edgeB + Vector3.down * 0.25f, edgeA + Vector3.down * 0.25f, asphalt);
                     var color = i % 4 < 2 ? new Color32(255, 180, 35, 0) : new Color32(30, 33, 40, 0);
                     Vector3 up = Vector3.up * 0.025f;
-                    float left = side < 0f ? -HalfWidth : HalfWidth - 0.25f;
+                    float left = side < 0f ? -RoadHalfWidth : RoadHalfWidth - 0.25f;
                     float right = left + 0.25f;
                     markings.AddQuad(p + rightA * left + up, q + rightB * left + up,
                         q + rightB * right + up, p + rightA * right + up, color);
                 }
             }
-            for (int i = 16; i <= 48; i += 16)
+            for (int i = 16; !IsDirt && Course != MountainFork.Rooftops && i <= 48; i += 16)
             {
                 Vector3 foot = points[i];
                 float height = foot.y - 0.25f;
@@ -145,11 +254,18 @@ namespace RacingGame
             var renderer = terrain != null ? terrain.GetComponentInChildren<Renderer>() : null;
             var material = renderer != null ? renderer.sharedMaterial : null;
             AddMeshes(road, material, true, 0.015f, surface);
+            if (Course == MountainFork.Volcano) BuildVolcano(material);
+            if (Course == MountainFork.IceStation) BuildIceStation(material, forward, surface);
             AddMeshes(skirts, material, false, 0.015f);
             AddMeshes(markings, material, false);
-            AddMeshes(CircuitRoadside.ForkSigns(forward, path.halfWidth, hasRepair), material, false);
+            AddMeshes(CircuitRoadside.ForkSigns(forward, path.halfWidth, hasRepair, exit), material, false);
             AddMeshes(CircuitRoadside.WaterTower(forward), material, false);
             AddMeshes(CircuitRoadside.PitWalkway(forward), material, false);
+            if (Course == MountainFork.Rooftops)
+            {
+                BuildRooftops(material);
+                path.RespawnGuard = RoofRespawn;
+            }
             OpenMergeBarriers();
             foreach (string name in new[] { "Track_LeftKerb", "Track_RightKerb" })
             {
@@ -161,7 +277,7 @@ namespace RacingGame
         private bool NearBranch(Vector3 point)
         {
             Project(point, out float error);
-            return error < (HalfWidth + 0.5f) * (HalfWidth + 0.5f);
+            return error < (RoadHalfWidth + 0.5f) * (RoadHalfWidth + 0.5f);
         }
 
         private void OpenMergeBarriers()
@@ -174,7 +290,7 @@ namespace RacingGame
                 Vector3 segment = points[i + 1] - points[i];
                 Vector3 centre = (points[i] + points[i + 1]) * 0.5f + Vector3.up * 0.6f;
                 foreach (var obstacle in Physics.OverlapBox(centre,
-                    new Vector3(HalfWidth + 0.35f, 0.65f, segment.magnitude * 0.5f + 0.2f),
+                    new Vector3(RoadHalfWidth + 0.35f, 0.65f, segment.magnitude * 0.5f + 0.2f),
                     Quaternion.LookRotation(segment), 1 << barriers.gameObject.layer, QueryTriggerInteraction.Ignore))
                     if (obstacle is BoxCollider box && box.transform.IsChildOf(barriers) && !openedBarriers.Contains(box))
                         openedBarriers.Add(box);
@@ -295,7 +411,7 @@ namespace RacingGame
                 }
                 var go = new GameObject(mesh.name, typeof(MeshFilter), typeof(MeshRenderer));
                 go.transform.SetParent(transform, false);
-                go.layer = LayerMask.NameToLayer("Track");
+                go.layer = LayerMask.NameToLayer(solid && IsDirt ? "Ground" : "Track");
                 go.GetComponent<MeshFilter>().sharedMesh = mesh;
                 go.GetComponent<MeshRenderer>().sharedMaterial = material;
                 if (solid)
@@ -308,6 +424,10 @@ namespace RacingGame
 
         public void Restore()
         {
+            if (Course == MountainFork.Rooftops && path != null && path.RespawnGuard == RoofRespawn)
+                path.RespawnGuard = null;
+            if (Course == MountainFork.Volcano) ReleaseVolcano();
+            if (iceStation == this) iceStation = null;
             if (path != null && path.Fork == this) path.Fork = null;
             foreach (var pair in originalSceneryMeshes) if (pair.Key != null) pair.Key.sharedMesh = pair.Value;
             originalSceneryMeshes.Clear();

@@ -85,6 +85,16 @@ namespace RacingGame.Core.Track
             initialised = true;
         }
 
+        public void ApplyStanding(float distance, int laps, int gate, bool armed)
+        {
+            if (laps < 0 || gate < 0 || gate >= GateCount || (armed && gate != 0)) return;
+            Resync(distance);
+            LapsCompleted = laps;
+            NextGate = gate;
+            LineArmed = armed;
+            LapJustCompleted = false;
+        }
+
         /// <summary>Feed the distance for this tick. Returns the signed movement along the track (m).</summary>
         public float Step(float distance)
         {

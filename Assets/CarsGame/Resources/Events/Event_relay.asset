@@ -17,6 +17,7 @@ MonoBehaviour:
   format: 3
   nameKey: format.relay
   laps: 1
+  referenceSeconds: 48
   aiCountOverride: 0
   reversed: 0
   night: 0

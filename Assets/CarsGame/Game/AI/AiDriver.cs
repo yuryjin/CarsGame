@@ -11,7 +11,7 @@ namespace RacingGame
     /// for rubber-banding. All randomness comes from the director's AI stream.
     /// </summary>
     [RequireComponent(typeof(CarController))]
-    public sealed class AiDriver : MonoBehaviour, ICarInputSource
+    public sealed partial class AiDriver : MonoBehaviour, ICarInputSource
     {
         public AiDriverProfile profile;
         [Tooltip("Lane the driver returns to when the road is clear (m, +right). Set by the spawner.")]
@@ -104,6 +104,7 @@ namespace RacingGame
             reversing = false; stuckTime = reverseTime = overturnedTime = 0f;
             recoveryDistance = progress != null ? progress.Distance : 0f;
             passDirection = 0; boxedIn = false; clearTime = 0f;
+            CurrentFork = ForkRoute.Undecided;
             if (path != null && progress != null)
             {
                 currentLane = path.Spline.LateralOffset(transform.position, progress.Distance);
@@ -130,6 +131,8 @@ namespace RacingGame
             if (progress == null) progress = GetComponent<RaceProgress>();
             if (gunner == null) gunner = GetComponent<AiGunner>();
             path = TrackPath.Instance;
+            race = FindAnyObjectByType<RaceManager>();
+            CurrentFork = ForkRoute.Undecided;
             rng = RaceDirector.Instance.Rng;
             targetLane = currentLane = homeLane = baseLaneOffset;
             passDirection = 0; boxedIn = false; clearTime = 0f;
@@ -175,6 +178,8 @@ namespace RacingGame
             float speedMs = Mathf.Abs(car.SpeedKmh) / 3.6f;
             float speedKmh = Mathf.Abs(car.SpeedKmh);
             float d = progress.Distance;
+
+            UpdateForkDecision(d);
 
             // --- Lane choice: pass slower traffic, otherwise drift back to the base lane.
             UpdateLane(dt, speedMs);
@@ -254,6 +259,7 @@ namespace RacingGame
             // Boxed in (car ahead, both sides taken): match its pace instead of ramming through.
             if (boxedIn) desired = Mathf.Min(desired, trafficSpeedKmh);
             if (car.Surface == GroundSurface.Ground) desired = Mathf.Min(desired, car.offTrackMaxSpeedKmh);
+            if (car.Surface == GroundSurface.Ice) desired *= .76f;
             desired = Mathf.Min(desired, bombSpeedLimit);
             LastDesiredSpeed = desired; LastCurvature = curvature;
 
@@ -308,6 +314,12 @@ namespace RacingGame
             overturnedTime = overturned ? overturnedTime + dt : 0f;
             if (overturnedTime > 2f) { reset = true; overturnedTime = 0f; resetCount++; }
 
+            if (CurrentFork == ForkRoute.Shortcut && !reversing && !reset)
+            {
+                path.Fork.FollowShortcut(car, d, out steer, out throttle);
+                float limit = boxedIn ? Mathf.Min(trafficSpeedKmh, bombSpeedLimit) : bombSpeedLimit;
+                if (speedKmh > limit) throttle = Mathf.Min(throttle, Mathf.Clamp((limit - speedKmh) / 3f, -1f, 0f));
+            }
             bool fire = gunner != null && !reversing && gunner.WantsFire(tick);
             bool secondary = gunner != null && !reversing && gunner.WantsSecondary(tick);
             return new DriveCommand { Tick = tick, Throttle = throttle, Steer = steer, Brake = brake, Fire = fire, Secondary = secondary, ResetEdge = reset }.Clamped();
@@ -378,6 +390,9 @@ namespace RacingGame
             }
 
             FollowLures(limit);
+            if (CurrentFork == ForkRoute.Repair && passDirection == 0 && !blocked &&
+                Mathf.Abs(path.SignedDelta(progress.Distance, path.Fork.RepairDistance)) < 38f)
+                targetLane = Mathf.Clamp(-1.8f, -Mathf.Max(limit, halfWidth - 1.2f), limit);
             AvoidMines(Mathf.Max(limit, halfWidth - 1.2f));
 
             bombSpeedLimit = float.PositiveInfinity;

@@ -13,7 +13,7 @@ namespace RacingGame
     /// for start and recovery poses (<see cref="IBattleSite"/>). Created by <see cref="GameFlow"/> for
     /// <see cref="EventMode.Mission"/> events and torn down with <see cref="Dispose"/>.
     /// </summary>
-    public sealed class MissionDirector : MonoBehaviour, ISimulated, IBattleSite
+    public sealed partial class MissionDirector : MonoBehaviour, ISimulated, IBattleSite
     {
         public enum Outcome { None, Victory, Defeat }
 
@@ -86,13 +86,14 @@ namespace RacingGame
         {
             carLayer = LayerMask.NameToLayer("Car");
             if (carLayer >= 0) Physics.IgnoreLayerCollision(carLayer, MissionLayers.SoftUnit, true);
-            foreach (var p in race.Participants)
+            for (int slot = 0; slot < race.Participants.Count; slot++)
             {
+                var p = race.Participants[slot];
                 if (p == null) continue;
                 Teams.Set(p.gameObject, Team.Players);
                 var cannon = p.Car != null ? p.Car.Cannon : null;
                 if (cannon != null) { cannon.barrelPitchLimit = 32f; cannon.turretMaxRange = 70f; cannon.turretYawLimit = Mathf.Max(cannon.turretYawLimit, 80f); }   // drive-by fire at a 46 m target
-                if (p.isPlayer) continue;
+                if (p.isPlayer || GameFlow.IsRoomDriver(slot)) continue;
                 var gunner = p.GetComponent<AiGunner>();
                 if (gunner != null) { gunner.maxRange = 70f; gunner.startGraceSeconds = 1f; }
                 if (p.Weapons != null) { p.Weapons.secondaryType = SecondaryWeaponType.None; p.Weapons.secondaryAmmoMax = 0; }
@@ -110,6 +111,8 @@ namespace RacingGame
             MissionUnit.Killed += OnUnitKilled;
             MissionUnit.Damaged += OnUnitDamaged;
 
+            missionHud = MissionHud.Create(this, hud);
+            if (GameFlow.RoomReplica) return;
             // Escort at the start: two tanks behind, three armoured cars on the flanks.
             for (int i = 0; i < 5; i++)
             {
@@ -122,7 +125,6 @@ namespace RacingGame
             float[] along = { 0.42f, 0.6f, 0.8f };
             for (int i = 0; i < along.Length; i++) BuildOutpost(Map.RouteLength * along[i], i % 2 == 0 ? 1f : -1f);
 
-            missionHud = MissionHud.Create(this, hud);
         }
 
         private void OnStarted()
@@ -307,7 +309,7 @@ namespace RacingGame
 
         public void SimulationStep(int tick)
         {
-            if (Boss == null) return;
+            if (Boss == null || GameFlow.RoomReplica) return;
             bool live = race != null && (race.State == RaceState.Racing || race.State == RaceState.Finishing);
             Boss.Step(tick, live && Result == Outcome.None);
             if (!live) return;

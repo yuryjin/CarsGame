@@ -15,6 +15,7 @@ MonoBehaviour:
   eventId: tt1
   nameKey: events.tt1.name
   laps: 1
+  referenceSeconds: 50
   aiCountOverride: 0
   pickupCount: 0
   mineFieldCount: 0

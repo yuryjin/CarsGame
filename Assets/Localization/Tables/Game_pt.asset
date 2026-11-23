@@ -2982,6 +2982,103 @@ MonoBehaviour:
       e pr\xE9mios de carreira s\xE3o dos eventos."
     m_Metadata:
       m_Items: []
+  - m_Id: 29752733624250368
+    m_Localized: Corrida na pedreira
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833280
+    m_Localized: O atalho de terra marrom favorece o buggy. As pistas se unem depois
+      da curva.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833281
+    m_Localized: Jogar com amigos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833282
+    m_Localized: Corrida privada
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833283
+    m_Localized: "Juntos contra o Leviat\xE3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027584
+    m_Localized: "C\xF3digo da sala do amigo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027585
+    m_Localized: Entrar na sala
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027586
+    m_Localized: "Jogadores {n}/4 \xB7 C\xF3digo de convite"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027587
+    m_Localized: Um piloto saiu. A partida terminou.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027588
+    m_Localized: "Sala indispon\xEDvel. Confira o c\xF3digo ou tente outra vez."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027589
+    m_Localized: Piloto {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027590
+    m_Localized: Bot {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027591
+    m_Localized: Entre telhados
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027592
+    m_Localized: "Acelere no telhado. Mire na \xE1rea amarela ou siga pela estrada
+      de baixo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027593
+    m_Localized: Ritmo fixo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027594
+    m_Localized: "Os rivais mant\xEAm o ritmo da dificuldade escolhida, seja qual
+      for a dist\xE2ncia."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027595
+    m_Localized: "Esta\xE7\xE3o do gelo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027596
+    m_Localized: "A curva azul a c\xE9u aberto tem gelo. O t\xFAnel oferece mais
+      ader\xEAncia."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027597
+    m_Localized: "Passagem do vulc\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027598
+    m_Localized: "Use a estrada principal na primeira volta. Ap\xF3s o aviso, o atalho
+      abre para a segunda."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027599
+    m_Localized: Estrada principal aberta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027600
+    m_Localized: "Na pr\xF3xima volta, pegue o atalho"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027601
+    m_Localized: Atalho aberto
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

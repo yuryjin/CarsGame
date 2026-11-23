@@ -72,6 +72,7 @@ namespace RacingGame
         public bool CleanFinalLap => finalLapStarted && !finalLapMistake;
         private bool finalLapStarted, finalLapMistake, wasOnFork;
         private float forkTravel;
+        private int dirtCheckpoint;
 
         private int carMask;
         private float offTrackTime;
@@ -141,7 +142,7 @@ namespace RacingGame
         }
         private void OnReset()
         {
-            wasOnFork = false; forkTravel = 0f;
+            wasOnFork = false; forkTravel = 0f; dirtCheckpoint = 0;
             if (!Car.inputEnabled) return;
             Resets++;
             if (finalLapStarted) finalLapMistake = true;
@@ -151,15 +152,18 @@ namespace RacingGame
         // grass must never have to find the track again (and AI reuse the same rule).
         private void FixedUpdate()
         {
-            if (Arena != null || Site != null) return;
+            if (GameFlow.RoomReplica || Arena != null || Site != null) return;
             if (Car == null || !Car.inputEnabled || Progress == null || Progress.Path == null) return;
             if (Health != null && Health.IsDead) return;
             bool offAsphalt = Car.Surface == GroundSurface.Ground || (Car.Surface == GroundSurface.None && Car.IsGrounded == false && transform.position.y > -5f);
             float lateral = Mathf.Abs(Progress.Path.Spline.LateralOffset(transform.position, Progress.Distance));
-            bool onFork = Progress.Path.OnFork(transform.position);
-            if (onFork && Progress.SpeedAlongTrack > 0f && Car.IsGrounded)
+            bool onFork = Progress.Path.OnFork(transform.position, out float fraction);
+            var fork = Progress.Path.Fork;
+            bool dirt = fork != null && fork.IsDirt;
+            if (dirt) CountDirtPass(fork, onFork, fraction);
+            else if (onFork && Progress.SpeedAlongTrack > 0f && Car.IsGrounded)
                 forkTravel += Mathf.Min(Car.Body.linearVelocity.magnitude * Time.fixedDeltaTime, 5f);
-            if (wasOnFork && !onFork)
+            if (!dirt && wasOnFork && !onFork)
             {
                 if (Progress.Path.Fork != null && forkTravel >= Progress.Path.Fork.Length * 0.7f && Car.IsGrounded && Progress.SpeedAlongTrack > 0f
                     && Vector3.Distance(transform.position, Progress.Path.Fork.Position(Progress.Path.reversed ? 0f : 1f)) < 20f)
@@ -168,14 +172,34 @@ namespace RacingGame
             }
             wasOnFork = onFork;
             bool lost = !onFork && lateral > lostLateralMetres;
-            offTrackTime = offAsphalt || lost ? offTrackTime + Time.fixedDeltaTime : 0f;
-            if (offTrackTime >= offTrackResetSeconds || (!onFork && lateral > lostLateralMetres * 2f))
+            bool onDirtRoute = dirt && onFork && Car.Surface == GroundSurface.Ground;
+            offTrackTime = ((offAsphalt && !onDirtRoute) || lost) ? offTrackTime + Time.fixedDeltaTime : 0f;
+            bool missedRoof = Progress.Path.Fork != null && Progress.Path.Fork.UnderRoofGap(transform.position);
+            if (missedRoof || offTrackTime >= offTrackResetSeconds || (!onFork && lateral > lostLateralMetres * 2f))
             {
                 offTrackTime = 0f;
                 AutoResets++;
                 Car.ResetCar();
                 if (Health != null) Health.SetInvulnerable(1.5f);
             }
+        }
+
+        // The ends of the low dirt road share the asphalt, and its tyres can leave the
+        // crown briefly. Confirm the loose surface in order, then the return to asphalt.
+        private void CountDirtPass(TrackFork fork, bool onFork, float fraction)
+        {
+            if (!Car.IsGrounded || Progress.SpeedAlongTrack <= 0f) return;
+            if (onFork && Car.Surface == GroundSurface.Ground)
+            {
+                if (fraction < .38f) dirtCheckpoint = 1;
+                else if (dirtCheckpoint == 1 && fraction < .65f) dirtCheckpoint = 2;
+                else if (dirtCheckpoint == 2 && fraction >= .65f) dirtCheckpoint = 3;
+            }
+            if (dirtCheckpoint != 3 || Car.Surface != GroundSurface.Track || fraction < .84f) return;
+            var exit = fork.Position(Progress.Path.reversed ? 0f : 1f);
+            if ((transform.position - exit).sqrMagnitude > 20f * 20f) return;
+            Shortcuts++;
+            dirtCheckpoint = 0;
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -199,7 +223,7 @@ namespace RacingGame
         {
             Deaths++;
             if (finalLapStarted) finalLapMistake = true;
-            forkTravel = 0f;
+            forkTravel = 0f; dirtCheckpoint = 0;
             EliminatedAtTick = SimulationDriver.Instance.Tick;
             if (Score == null && attacker != null)
             {

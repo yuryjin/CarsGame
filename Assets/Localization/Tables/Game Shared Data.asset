@@ -2915,6 +2915,98 @@ MonoBehaviour:
     m_Key: format.custom.exhibition
     m_Metadata:
       m_Items: []
+  - m_Id: 29752733624250368
+    m_Key: events.dirt.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833280
+    m_Key: route.dirt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833281
+    m_Key: room.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833282
+    m_Key: room.race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833283
+    m_Key: room.fortress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027584
+    m_Key: room.code
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027585
+    m_Key: room.join
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027586
+    m_Key: room.lobby
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027587
+    m_Key: room.interrupted
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027588
+    m_Key: room.unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027589
+    m_Key: room.driver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027590
+    m_Key: room.bot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027591
+    m_Key: events.roofs.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027592
+    m_Key: route.roofs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027593
+    m_Key: events.pace.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027594
+    m_Key: route.fixed_pace
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027595
+    m_Key: events.ice.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027596
+    m_Key: route.ice
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027597
+    m_Key: events.volcano.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027598
+    m_Key: route.volcano
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027599
+    m_Key: volcano.main_open
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027600
+    m_Key: volcano.changing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027601
+    m_Key: volcano.shortcut_open
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

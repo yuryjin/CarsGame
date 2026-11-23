@@ -1,19 +1,67 @@
 // Long, uninterrupted WebGL session. Actual races, UI transitions and pause callbacks.
 // Supply a previously earned mock profile with CG_SOAK_STATE; no progress/finish grants.
+// CG_SOAK_TEN_CYCLES=1 runs one warmup and exactly ten comparable tt1/normal/Classic laps.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 const { chromium } = await import(process.env.PLAYWRIGHT_CORE || '/home/user/gstack/node_modules/playwright-core/index.mjs');
 if (!process.env.WEBTEST_CHROME_ARGS) throw new Error('Use webtest');
 const out = process.env.OUT || '/tmp/cars-endurance-20261024/soak';
 await fs.mkdir(out, { recursive: true });
+const tenCycles = process.env.CG_SOAK_TEN_CYCLES === '1';
 const seconds = Number(process.env.CG_SOAK_SECONDS || 3600);
 assert(Number.isFinite(seconds) && seconds >= 60 && seconds <= 36000);
-const events = (process.env.EVENTS || Array.from({ length: 20 }, (_, i) => `e${i + 1}`).join(',')).split(',');
-const tiers = (process.env.TIERS || 'easy,normal,hard').split(',');
+const events = tenCycles ? ['tt1'] : (process.env.EVENTS || Array.from({ length: 20 }, (_, i) => `e${i + 1}`).join(',')).split(',');
+const tiers = tenCycles ? ['normal'] : (process.env.TIERS || 'easy,normal,hard').split(',');
 const browser = await chromium.launch({ channel: 'chrome', args: [...process.env.WEBTEST_CHROME_ARGS.split(' '), '--no-proxy-server'] });
 const report = { startedAt: new Date().toISOString(), seconds, races: [], menus: [], errors: [], warnings: [], outcome: 'running' };
 let page, context;
 const write = () => fs.writeFile(`${out}/report.json`, JSON.stringify(report, null, 2));
+
+// A mark emitted by the game tab identifies its actual renderer among other Chrome processes.
+async function gameRendererPid(browser, page) {
+  const cdp = await browser.newBrowserCDPSession().catch(() => null);
+  if (!cdp) return null;
+  const marker = `cars-soak-renderer-${process.pid}`;
+  let pid = null;
+  try {
+    cdp.on('Tracing.dataCollected', ({ value }) => {
+      for (const event of value) if (event.name === marker) pid = event.pid;
+    });
+    await cdp.send('Tracing.start', { categories: 'blink.user_timing', transferMode: 'ReportEvents' });
+    await page.evaluate(name => { performance.mark(name); performance.clearMarks(name); }, marker);
+    const complete = new Promise(resolve => cdp.once('Tracing.tracingComplete', resolve));
+    await cdp.send('Tracing.end');
+    await Promise.race([complete, new Promise(resolve => setTimeout(resolve, 3000).unref())]);
+    const { processInfo } = await cdp.send('SystemInfo.getProcessInfo');
+    return processInfo.some(p => p.type === 'renderer' && p.id === pid) ? pid : null;
+  } catch {
+    return null;
+  } finally {
+    await cdp.detach().catch(() => {});
+  }
+}
+
+async function residentBytes(pid) {
+  if (!pid) return null;
+  try {
+    const status = await fs.readFile(`/proc/${pid}/status`, 'utf8');
+    const kb = /^VmRSS:\s+(\d+) kB$/m.exec(status);
+    return kb ? Number(kb[1]) * 1024 : null;
+  } catch {
+    return null;
+  }
+}
+
+function compareRows(rows, field) {
+  const values = rows.map(row => row[field]);
+  const measured = values.filter(Number.isFinite);
+  const first = values[0], last = values.at(-1);
+  return { measured: measured.length, first, last,
+    min: measured.length ? Math.min(...measured) : null, max: measured.length ? Math.max(...measured) : null,
+    change: Number.isFinite(first) && Number.isFinite(last) ? last - first : null };
+}
+
 try {
   const options = { viewport: { width: 1280, height: 720 } };
   if (process.env.CG_SOAK_STATE) options.storageState = process.env.CG_SOAK_STATE;
@@ -74,9 +122,43 @@ try {
     if (hidden) await visible(false);
     else { await page.keyboard.press('Escape', { delay: 80 }); await page.waitForTimeout(200); }
   };
+  const raceWindow = async () => {
+    let start = await cmd('state');
+    while (start.race === 'Racing' && start.raceSeconds < 4) start = await cmd('state');
+    assert.equal(start.race, 'Racing');
+    start = await cmd('perf', 'on');  // resets the Unity frame-time buffer and its one-second reporting clock
+    assert(start.raceSeconds >= 4 && start.raceSeconds < 5, 'Frame sample must start in the same second of every lap');
+    let end = start;
+    for (let interval = 0; interval < 4; interval++) {
+      const update = await page.waitForFunction(previous => {
+        const state = window.CarsPlatform.debug.state;
+        return state.perf.sinceStartup > previous ? state : false;
+      }, end.perf.sinceStartup, { polling: 50, timeout: 5000 });
+      end = await update.jsonValue();
+      await update.dispose();
+    }
+    assert.equal(end.race, 'Racing');
+    assert(end.perf.frames > 0 && end.perf.frames < 600, 'All frames since the reset fit the Unity buffer');
+    assert(Number.isFinite(end.perf.p95) && end.perf.p95 > 0, 'Unity reported a frame-time percentile');
+    const elapsed = end.raceSeconds - start.raceSeconds;
+    assert(elapsed >= 3.9 && elapsed < 5, `Expected four consecutive one-second reports, got ${elapsed} s`);
+    return { startSeconds: start.raceSeconds, endSeconds: end.raceSeconds, frames: end.perf.frames, p95Ms: end.perf.p95 };
+  };
   await cmd('perf', 'on');
   report.initial = await cmd('state');
-  if (process.env.CG_SOAK_WARM_GARAGE === '1') {
+  if (tenCycles) {
+    report.seconds = null;
+    report.lab = { platform: 'desktop laboratory', system: [os.type(), os.release(), os.arch()].join(' '),
+      browser: browser.version(), userAgent: await page.evaluate(() => navigator.userAgent), viewport: options.viewport,
+      timeOrigin: await page.evaluate(() => performance.timeOrigin),
+      url: page.url(), buildSha256: process.env.CG_BUILD_SHA256 || null, event: 'tt1', tier: 'normal', body: 'classic',
+      frameWindow: 'Unity unscaled frame times, four consecutive one-second reports starting in race second 4',
+      garage: 'Classic equipped and previewed, 1 second after entering the garage',
+      process: { pid: await gameRendererPid(browser, page), metric: 'Linux /proc/PID/status VmRSS in bytes for the game tab renderer' },
+      wasmMetric: 'Unity WebAssembly linear memory capacity in bytes', warmup: null, cycles: [] };
+    await write();
+  }
+  if (!tenCycles && process.env.CG_SOAK_WARM_GARAGE === '1') {
     // A five-event cycle does not necessarily spawn every rival body. Visit the
     // complete catalog through real preview controls before comparing resources.
     const before = await cmd('resources');
@@ -90,7 +172,7 @@ try {
     await write();
   }
   const deadline = Date.now() + seconds * 1000;
-  for (let round = 0; Date.now() < deadline; round++) {
+  for (let round = 0; tenCycles ? round <= 10 : Date.now() < deadline; round++) {
     const event = events[round % events.length], tier = tiers[Math.floor(round / events.length) % tiers.length];
     const run = { round, event, tier, samples: [], startedAt: new Date().toISOString() };
     report.races.push(run);
@@ -102,6 +184,10 @@ try {
     let s = await cmd('state');
     assert.equal(s.race, 'Racing'); assert.equal(s.evt, event);
     await cmd('autopilot', 'on');
+    if (tenCycles) {
+      assert.equal(s.tier, 'normal');
+      run.frameWindow = await raceWindow();
+    }
     const raceDeadline = Date.now() + 900000;
     let userPaused = false, hiddenPaused = false, continued = false, nextSample = 0;
     while (Date.now() < raceDeadline) {
@@ -119,7 +205,7 @@ try {
           await click('Watch'); continued = true; run.continued = true;
         }
       }
-      if (s.race === 'Racing' && s.health > 0) {
+      if (!tenCycles && s.race === 'Racing' && s.health > 0) {
         if (!userPaused && s.raceSeconds > 12) { await pause(false); userPaused = true; }
         if (!hiddenPaused && s.raceSeconds > 35) { await pause(true); hiddenPaused = true; }
       }
@@ -143,8 +229,35 @@ try {
     assert.equal(run.result.races, report.initial.races + round + 1, 'Each completed result must count once');
     const names = run.result.labels.filter(l => l.name === 'Name' && /^Result\d+$/.test(l.parent)).map(l => l.text.toLocaleLowerCase());
     assert(names.length && names.length === new Set(names).size, 'Distinct participants in results');
-    if (round % events.length === 0) await page.screenshot({ path: `${out}/results-${round}.png` });
+    if (tenCycles ? round === 10 : round % events.length === 0) await page.screenshot({ path: `${out}/results-${round}.png` });
     await cmd('goto', 'garage');
+    if (tenCycles) {
+      assert(run.completed && run.result.laps === 1, 'Each measured time trial must physically finish its lap');
+      await page.waitForFunction(() => {
+        window.CarsPlatform.cmd('state');
+        return window.CarsPlatform.debug.state.screen === 'garage';
+      }, null, { polling: 100, timeout: 15000 });
+      await page.waitForTimeout(1000);
+      const garage = await cmd('ui');
+      assert.equal(garage.screen, 'garage');
+      for (const name of ['Use_classic', 'ShowcaseEquip'])
+        assert(garage.buttons.some(b => b.name === name && !b.interactable), `Classic garage control ${name}`);
+      const classic = garage.labels.find(l => l.parent === 'Body_classic' && l.name === 'Name');
+      assert(classic?.text && garage.labels.some(l => l.name === 'PreviewName' && l.text === classic.text), 'Previewing the equipped Classic');
+      const { timeOrigin, wasmBytes } = await page.evaluate(() => ({
+        timeOrigin: performance.timeOrigin,
+        // Unity 6's optimized loader exports the uint32 view of the same linear memory.
+        wasmBytes: window.CarsPlatform.heapBytes?.() ?? window.unityInstance?.Module?.HEAPU32?.buffer?.byteLength ?? null }));
+      assert.equal(timeOrigin, report.lab.timeOrigin, 'The same tab document survived the full series');
+      const row = { cycle: round, at: new Date().toISOString(), raceSeconds: run.result.raceSeconds,
+        ...run.frameWindow, wasmBytes: Number.isFinite(wasmBytes) && wasmBytes > 0 ? wasmBytes : null,
+        rendererPid: report.lab.process.pid, rendererResidentBytes: await residentBytes(report.lab.process.pid) };
+      if (round === 0) report.lab.warmup = row;
+      else report.lab.cycles.push(row);
+      console.log(round ? 'CYCLE' : 'WARMUP', JSON.stringify(row));
+      await write();
+      continue;
+    }
     for (let i = 0; i < 4; i++) await click('NextBody');
     await cmd('goto', 'settings');
     await cmd('goto', 'main'); await page.waitForTimeout(500);
@@ -155,6 +268,11 @@ try {
     console.log('MENU', round, JSON.stringify(menu.resources), `bytes=${menu.perf?.totalAllocated}`);
     await context.storageState({ path: `${out}/earned-profile.json`, indexedDB: true });
     await write();
+  }
+  if (tenCycles) {
+    assert.equal(report.lab.cycles.length, 10);
+    report.lab.comparison = Object.fromEntries(['p95Ms', 'wasmBytes', 'rendererResidentBytes'].map(
+      field => [field, compareRows(report.lab.cycles, field)]));
   }
   // Compare identical main-menu states after two complete event cycles warmed the caches.
   const warmed = report.menus.filter(m => m.round >= events.length * 2);
@@ -182,6 +300,9 @@ try {
   if (page && !page.isClosed()) await page.screenshot({ path: `${out}/failure.png` }).catch(() => {});
   throw error;
 } finally {
-  report.finishedAt = new Date().toISOString(); await write();
-  await browser.close();
+  try {
+    report.finishedAt = new Date().toISOString(); await write();
+  } finally {
+    await browser.close();
+  }
 }

@@ -29,7 +29,7 @@ namespace RacingGame
         private static TextMeshProUGUI toastText;
         private static RectTransform toastPanel;
         private static float toastUntil;
-        private int tierIndex = -1;               // -1 = not chosen yet this session: derive from the save
+        private string displayedTierPreference;
         private TextMeshProUGUI rewardLabel;
         private float rewardShownAt;
         private const float RewardCountSeconds = 0.8f;
@@ -91,6 +91,11 @@ namespace RacingGame
             }
             if (transition != null) transition.alpha = Mathf.MoveTowards(transition.alpha, 1f, Time.unscaledDeltaTime * 7f);
             if (string.IsNullOrEmpty(current)) return;
+            if (current == "events" && panel != null && displayedTierPreference != PlatformGlue.Save?.Data.settings.tier)
+            {
+                Show("events");
+                return;
+            }
             if (current == "settings" && stickResponse != null) RefreshStickResponse();
             if (current == "capture-key") { CaptureDrivingKey(); return; }
             if (RefreshDailyCard()) return;
@@ -155,6 +160,7 @@ namespace RacingGame
         private void Back()
         {
             if (CloseRaceSettingsIfOpen()) return;
+            if (current == "rooms") { GameFlow.Room?.Leave(); Show("main"); return; }
             if (current == "replay") { Show("leaders"); return; }
             if (current == "results") GoTo("main"); else Show(current == "arsenal" ? "garage" : (current == "missionBriefing" || current == "relay" || current == "customRace") ? "events" : "main");
         }
@@ -188,7 +194,9 @@ namespace RacingGame
             if (save != null && !save.LocalVersionTooNew && !RaceSettingsOpen && RaceCups.GrantCompleted(save.Data.progress)) save.MarkDirty();
             if (save != null && !save.LocalVersionTooNew && !RaceSettingsOpen && PlayerProgression.NormalizeLoadout(save.Data.progress)) save.MarkDirty();
             if (current == "garage" && name != "garage" && !flow.IsTestDrive) previewBodyId = null;
-            string selected = current == name ? EventSystem.current?.currentSelectedGameObject?.name : null;
+            var system = EventSystem.current;
+            var previousFocus = system != null ? system.currentSelectedGameObject : null;
+            string selected = current == name && previousFocus != null ? previousFocus.name : null;
             var scrollPositions = new Dictionary<string, float>();
             if (current == name && panel != null)
             {
@@ -239,6 +247,7 @@ namespace RacingGame
                 case "practice": BuildPractice(frame); break;
                 case "leaders": BuildLeaders(frame); break;
                 case "driver": BuildDriverProfile(frame); break;
+                case "rooms": BuildRooms(frame); break;
                 case "results": BuildResults(frame); break;
             }
             if (UiFactory.TextScale > 1f)
@@ -261,8 +270,9 @@ namespace RacingGame
             var buttons = panel.GetComponentsInChildren<Button>();
             Button focus = Array.Find(buttons, b => b.interactable && b.name == selected)
                 ?? (name == "results" ? Array.Find(buttons, b => b.interactable && b.name == "ResultAction0") : null)
-                ?? Array.Find(buttons, b => b.interactable && b.name != "Back" && b.name != "ModelStyle");
-            if (focus != null) EventSystem.current?.SetSelectedGameObject(focus.gameObject);
+                ?? Array.Find(buttons, b => b.interactable && b.name != "Back" && b.name != "ModelStyle")
+                ?? Array.Find(buttons, b => b.interactable && b.name == "Back");
+            if (system != null) system.SetSelectedGameObject(focus != null ? focus.gameObject : null);
             // OnSelect reveals keyboard focus. During a refresh the player may
             // have scrolled away from that control, so restore their view last.
             foreach (var scroll in panel.GetComponentsInChildren<ScrollRect>())
@@ -402,6 +412,9 @@ namespace RacingGame
             BuildRivalPreview(content, ev);
             BuildDailyCard(content);
             BuildWeeklyGoals(content);
+            if (GameFlow.Room != null)
+                UiFactory.Button(Item(content,"RoomLink",82f,false), "OpenRooms", Loc.Get("room.title"), () => Show("rooms"),
+                    Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 28f, UiFactory.Raised);
         }
 
         private RaceEventDefinition FeaturedEvent(List<RaceEventDefinition> list)
@@ -426,21 +439,19 @@ namespace RacingGame
         private int ResolveTierIndex(DifficultyTier[] tiers)
         {
             if (tiers.Length == 0) return 0;
-            if (tierIndex >= 0) return Mathf.Clamp(tierIndex, 0, tiers.Length - 1);
             var save = PlatformGlue.Save;
             string remembered = save != null ? save.Data.settings.tier : "";
             if (!string.IsNullOrEmpty(remembered))
             {
                 int found = Array.FindIndex(tiers, t => t.tierId == remembered);
-                if (found >= 0) return tierIndex = found;
+                if (found >= 0) return found;
             }
             bool newcomer = save == null || save.Data.Races == 0 || PlatformGlue.IsMobileDevice;
-            return tierIndex = newcomer ? 0 : Mathf.Min(1, tiers.Length - 1);
+            return newcomer ? 0 : Mathf.Min(1, tiers.Length - 1);
         }
 
         private void SelectTier(DifficultyTier[] tiers, int index)
         {
-            tierIndex = index;
             var save = PlatformGlue.Save;
             if (save != null && save.Data.settings.tier != tiers[index].tierId) { save.Data.settings.tier = tiers[index].tierId; save.MarkDirty(); }
             Show("events");
@@ -465,9 +476,10 @@ namespace RacingGame
         {
             var body = Header(root, "events.title");
             var tiers = Tiers();
+            int tierIndex = ResolveTierIndex(tiers);
+            displayedTierPreference = PlatformGlue.Save.Data.settings.tier;
             if (tiers.Length > 0)
             {
-                tierIndex = ResolveTierIndex(tiers);
                 for (int i = 0; i < tiers.Length; i++)
                 {
                     int index = i;
@@ -522,7 +534,7 @@ namespace RacingGame
                     string starDisplay = s1 + " " + StarGoalText.Description(ev, 0) + "\n" + s2 + " " + StarGoalText.Description(ev, 1) + "\n" + s3 + " " + StarGoalText.Description(ev, 2);
                     float starOffset = (circuit ? -92f : 0f) - ruleSpace;
                     Label(row, "Stars", starDisplay, 22f, Top, Vector2.one, new Vector2(144f, -302f + starOffset), new Vector2(-236f, -178f + starOffset));
-                    if (circuit) BuildCircuitPreview(row, ev, ev.reversed ? reverse : forward, path.startLineDistance, ruleSpace);
+                    if (circuit) BuildCircuitPreview(row, ev, forward, reverse, path.startLineDistance, ruleSpace);
                     var prerequisite = unlocked ? null : list.Find(e => e.eventId == ev.unlockAfterEventId);
                     string status = unlocked ? EventBestText(ev, best)
                         : prerequisite == null ? Loc.Get("events.locked")
@@ -530,14 +542,17 @@ namespace RacingGame
                             "n", Mathf.Max(0, ev.unlockStars - (PlatformGlue.Save?.Data.TotalStars ?? 0)))
                         : Loc.Format("events.locked_after", "name", Loc.Get(prerequisite.nameKey));
                     Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 64f : 44f), unlocked ? UiFactory.Positive : UiFactory.Muted);
-                    UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—", unlocked ? () => StartMenuEvent(ev, tier) : null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-216f, -36f), new Vector2(-24f, 36f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
+                    UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—",
+                        unlocked ? () => StartMenuEvent(ev, SelectedTier() ?? tier) : null, Vector2.one, Vector2.one,
+                        new Vector2(-216f, -92f), new Vector2(-24f, -20f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
                     BuildRivalPreview(content, ev);
                 }
             }
         }
 
-        private static void BuildCircuitPreview(RectTransform row, RaceEventDefinition ev, TrackSpline spline, float grid, float ruleSpace)
+        private static void BuildCircuitPreview(RectTransform row, RaceEventDefinition ev, TrackSpline forward, TrackSpline reverse, float grid, float ruleSpace)
         {
+            var spline = ev.reversed ? reverse : forward;
             if (ev.wastelandTrack)
             {
                 var layout = new WastelandLayout();
@@ -550,10 +565,13 @@ namespace RacingGame
             }
             if ((ev.wastelandTrack || ev.starRingTrack) && ev.reversed) spline = spline.Reversed();
             var map = UiFactory.Panel(row, "RouteMap", Top, Top, new Vector2(12f, -208f), new Vector2(134f, -65f));
-            map.gameObject.AddComponent<CircuitMapGraphic>().SetRoute(spline, grid);
-            string hint = ev.twist == Core.Daily.RaceTwist.HotBomb ? "bomb.pass"
+            map.gameObject.AddComponent<CircuitMapGraphic>().SetPreview(spline, grid, TrackFork.AppliesTo(ev) ? forward : null, ev.mountainFork);
+            string hint = ev.fixedRivalPace ? "route.fixed_pace" : ev.twist == Core.Daily.RaceTwist.HotBomb ? "bomb.pass"
                 : ev.twist == Core.Daily.RaceTwist.MinesOnly ? "lesson.mines"
-                : ev.wastelandTrack ? "route.bridge_jump" : ev.starRingTrack ? "lesson.wall"
+                : ev.mountainFork == MountainFork.Rooftops ? "route.roofs"
+                : ev.mountainFork == MountainFork.Volcano ? "route.volcano"
+                : ev.mountainFork == MountainFork.IceStation ? "route.ice"
+                : ev.mountainFork == MountainFork.Quarry ? "route.dirt" : ev.wastelandTrack ? "route.bridge_jump" : ev.starRingTrack ? "lesson.wall"
                 : ev.spaceTrack ? "lesson.space" : ev.abyssTrack ? "lesson.abyss"
                 : ev.skillGoal == SkillGoal.DriftBoosts ? "route.drift_boost"
                 : ev.eventId == "e1" ? "route.aim" : "lesson.shortcut";
