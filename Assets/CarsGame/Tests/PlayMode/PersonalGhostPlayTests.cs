@@ -541,6 +541,98 @@ namespace RacingGame.Tests
         }
 
         [UnityTest, Timeout(300000)]
+        public IEnumerator FriendCodeTransfersTheActualSetupAndRejectsDamagedNewerOrUnavailableChallenges()
+        {
+            yield return OpenProfile();
+            var menu = flow.GetComponent<MenuScreens>();
+            var first = PlatformGlue.Save.Data.progress;
+            first.cosmetics.Add("body:flea"); first.body = "flea"; first.upgrades[0] = 1;
+            PlatformGlue.Save.MarkDirty();
+            yield return StartFromEventList("tt1");
+            yield return DriveToFinish();
+            var originalBest = first.bests.Find(b => b.eventId == "tt1");
+            var originalSetup = originalBest.setup.Copy();
+            Assert.AreEqual("flea", originalSetup.body);
+            menu.GoTo("leaders");
+            GameObject.Find("CreateChallenge").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+            string code = GameObject.Find("ChallengeCode").GetComponent<TMPro.TMP_InputField>().text;
+            Assert.IsTrue(code.StartsWith("CG1-")); Assert.Less(code.Length, 120);
+            var second = new SaveData { updatedAtUnixMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() };
+            second.progress.upgrades[0] = 3; second.settings.tier = "hard";
+            store.Write(SaveMigrator.ToJson(second)); yield return Reload();
+            menu.Show("leaders");
+            var input = GameObject.Find("ChallengeCode").GetComponent<TMPro.TMP_InputField>();
+            var enter = GameObject.Find("StartChallenge").GetComponent<UnityEngine.UI.Button>();
+            string Status() => GameObject.Find("ChallengeStatus").GetComponent<TMPro.TMP_Text>().text;
+            foreach (var rejected in new[] { (code.Substring(0, 10), "challenge.invalid"),
+                ("CG2-" + code.Substring(4), "challenge.version"), (code, "challenge.unavailable") })
+            {
+                input.text = rejected.Item1; enter.onClick.Invoke();
+                Assert.AreEqual(FlowState.Menu, flow.State);
+                Assert.AreEqual(Loc.Get(rejected.Item2), Status());
+            }
+            var garage = PlatformGlue.Save.Data.progress;
+            garage.cosmetics.Add("body:flea");
+            input.text = code; enter.onClick.Invoke();
+            while (race.State == RaceState.Countdown) yield return null;
+            Assert.AreEqual(FlowState.Racing, flow.State);
+            Assert.AreEqual(originalBest.eventId, flow.CurrentEvent.eventId);
+            Assert.AreEqual(originalBest.bestTimeMs, flow.FriendTargetMs);
+            Assert.AreEqual(originalSetup.body, race.Player.GetComponent<CarBody>().BodyId);
+            Assert.AreEqual(originalSetup.tier, race.tier.tierId);
+            yield return DriveToFinish();
+            Assert.IsTrue(RecordSetup.Same(originalSetup, garage.recentAttempts[0].setup));
+            flow.EnterMenu();
+            Assert.AreEqual(0, flow.FriendTargetMs);
+            Assert.AreEqual("", garage.body); Assert.AreEqual(3, garage.upgrades[0]); Assert.AreEqual("hard", PlatformGlue.Save.Data.settings.tier);
+            TestContext.WriteLine($"Transferred {code.Length} characters: {originalBest.eventId}, {originalSetup.body}, {originalSetup.tier}, {originalBest.bestTimeMs} ms");
+        }
+
+        [UnityTest, Timeout(160000)]
+        public IEnumerator ThreeDisciplinesGrantOneWeeklyCosmeticAndANewWeekStartsEmpty()
+        {
+            yield return OpenProfile();
+            var clock = DailyRace.UnixMsSource;
+            var arena = Object.Instantiate(Array.Find(flow.events, ev => ev.eventId == "a1"));
+            arena.matchDuration = 2f; arena.aiCountOverride = 0;
+            try
+            {
+                int day = 20000;
+                while ((WeeklyGoals.Week(Core.Daily.DailyChallenge.DayStartUnixMs(day)) & 1) == 0) day++;
+                long now = Core.Daily.DailyChallenge.DayStartUnixMs(day) + 60000;
+                DailyRace.UnixMsSource = () => now;
+                int week = WeeklyGoals.Week(now);
+                var progress = PlatformGlue.Save.Data.progress;
+                string prize = WeeklyGoals.Reward(week);
+                yield return StartFromEventList("tt1"); yield return DriveToFinish(); flow.EnterMenu();
+                Assert.AreEqual(1, WeeklyGoals.Mask(progress, week));
+                yield return Start(arena);
+                while (flow.State == FlowState.Racing) yield return null;
+                Assert.AreEqual(3, WeeklyGoals.Mask(progress, week));
+                flow.EnterMenu();
+                var missionEvent = Array.Find(flow.events, ev => ev.eventId == "m2");
+                yield return Start(missionEvent);
+                race.EndMission(true); // The train director calls this same finish endpoint on capture.
+                Assert.AreEqual(7, WeeklyGoals.Mask(progress, week));
+                Assert.AreEqual(1, progress.cosmetics.FindAll(c => c == prize).Count);
+                flow.EnterMenu(); yield return Start(missionEvent); race.EndMission(true);
+                Assert.AreEqual(1, progress.cosmetics.FindAll(c => c == prize).Count);
+                flow.EnterMenu();
+                var flush = PlatformGlue.Save.FlushAsync(); while (!flush.IsCompleted) yield return null;
+                flush.GetAwaiter().GetResult(); yield return Reload();
+                now += 7 * 86400000L;
+                flow.GetComponent<MenuScreens>().Show("main");
+                var next = PlatformGlue.Save.Data.progress;
+                Assert.AreEqual(0, WeeklyGoals.Mask(next, week + 1)); Assert.AreEqual(7, WeeklyGoals.Mask(next, week));
+                Assert.AreEqual(1, next.cosmetics.FindAll(c => c == prize).Count);
+                for (int i = 0; i < 3; i++)
+                    StringAssert.StartsWith("–", GameObject.Find("Weekly" + i).GetComponent<TMPro.TMP_Text>().text);
+                TestContext.WriteLine($"week {week}: 1 → 3 → 7, persisted {prize} once; week {week + 1}: 0");
+            }
+            finally { DailyRace.UnixMsSource = clock; Object.DestroyImmediate(arena); }
+        }
+
+        [UnityTest, Timeout(300000)]
         public IEnumerator SoloTimeTrialReplacesItsOwnGhostAndReturnsToAnArmedCareerField()
         {
             yield return OpenProfile();

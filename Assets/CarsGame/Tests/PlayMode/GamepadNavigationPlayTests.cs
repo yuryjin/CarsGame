@@ -52,6 +52,68 @@ namespace RacingGame.Tests
             for (int i = 0; i < 3; i++) yield return null;
         }
 
+        [UnityTest, Timeout(180000)]
+        public IEnumerator EmulatedStickShowsAndAppliesTheSameCalibratedRange()
+        {
+            IEnumerator Move(float raw)
+            {
+                InputSystem.QueueStateEvent(pad, new GamepadState { leftStick = new Vector2(raw, 0f) });
+                for (int i = 0; i < 5; i++) yield return null;
+            }
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float deadline = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null; yield return null;
+            saved = JsonUtility.ToJson(PlatformGlue.Save.Data);
+            pad = InputSystem.AddDevice<Gamepad>();
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var menus = flow.GetComponent<MenuScreens>();
+            menus.Show("settings"); yield return null;
+            var zone = GameObject.Find("StickDeadzoneSlider").GetComponent<Slider>();
+            var gain = GameObject.Find("StickSensitivitySlider").GetComponent<Slider>();
+            zone.value = 25; gain.value = 150;
+            var points = new[] { -1f, -.5f, -.2f, 0f, .2f, .5f, 1f };
+            var values = new float[points.Length];
+            for (int n = 0; n < points.Length; n++)
+            {
+                float x = points[n];
+                values[n] = Mathf.Sign(x) * Mathf.Pow(Mathf.InverseLerp(.25f, InputSystem.settings.defaultDeadzoneMax, Mathf.Abs(x)), 1f / 1.5f);
+                yield return Move(x);
+                string live = GameObject.Find("StickResponse").GetComponent<TMPro.TMP_Text>().text;
+                Assert.AreEqual((values[n] > 0 ? "+" : "") + Mathf.RoundToInt(values[n] * 100f) + "%", live);
+            }
+            yield return Move(0f);
+            var race = flow.GetComponent<RaceManager>();
+            flow.StartRace(System.Array.Find(flow.events, e => e.eventId == "e1"), flow.tiers[0]);
+            while (race.State == RaceState.Countdown) yield return null;
+            for (int n = 0; n < points.Length; n++)
+            {
+                yield return Move(points[n]);
+                float measured = race.Player.Car.LastCommand.Steer;
+                Assert.AreEqual(values[n], measured, .012f);
+                Debug.Log($"Stick calibration emulation raw={points[n]:F2} steer={measured:F3}");
+            }
+            yield return Move(0f);
+            menus.OpenRaceSettings(); yield return null;
+            GameObject.Find("StickDeadzoneSlider").GetComponent<Slider>().value = 0f;
+            GameObject.Find("StickSensitivitySlider").GetComponent<Slider>().value = 100f;
+            menus.CloseRaceSettingsIfOpen(); PauseController.Set(PauseReason.User, false); yield return null;
+            yield return Move(.06f);
+            Assert.Greater(race.Player.Car.LastCommand.Steer, .05f, "A custom deadzone may be smaller than the input package default");
+            menus.OpenRaceSettings(); yield return null;
+            GameObject.Find("RestoreStick").GetComponent<Button>().onClick.Invoke(); yield return null;
+            Assert.AreEqual(0f, PlatformGlue.Save.Data.settings.stickSensitivity);
+            Assert.AreEqual(100f, GameObject.Find("StickSensitivitySlider").GetComponent<Slider>().value);
+            Assert.AreEqual(Mathf.RoundToInt(100f * InputSystem.settings.defaultDeadzoneMin), GameObject.Find("StickDeadzoneSlider").GetComponent<Slider>().value);
+            menus.CloseRaceSettingsIfOpen(); PauseController.Set(PauseReason.User, false); yield return null;
+            yield return Move(.06f);
+            Assert.AreEqual(0f, race.Player.Car.LastCommand.Steer, .001f);
+            yield return Move(-.5f);
+            Assert.AreEqual(pad.leftStick.x.ReadValue(), race.Player.Car.LastCommand.Steer, .005f);
+        }
+
         // Use the same public navigation graph a person explores, then send actual device events.
         // Never call Button.onClick or assign focus to the destination.
         private IEnumerator Navigate(string name)

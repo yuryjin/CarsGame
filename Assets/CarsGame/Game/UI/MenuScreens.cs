@@ -36,6 +36,8 @@ namespace RacingGame
         private bool authInFlight;
         private float layoutWidth, layoutHeight;
         private Button rewardButton;
+        private TextMeshProUGUI stickResponse;
+        private int lastStickPercent = int.MinValue;
         private static readonly Vector2 Top = new Vector2(0f, 1f);
         private static readonly string[] LanguageCycle = { "", "ru", "en", "tr", "zh", "de", "es", "fr", "pt", "uk" };
         private static readonly string[] LanguageNames = { "", "Русский", "English", "Türkçe", "中文", "Deutsch", "Español", "Français", "Português", "Українська" };
@@ -89,6 +91,8 @@ namespace RacingGame
             }
             if (transition != null) transition.alpha = Mathf.MoveTowards(transition.alpha, 1f, Time.unscaledDeltaTime * 7f);
             if (string.IsNullOrEmpty(current)) return;
+            if (current == "settings" && stickResponse != null) RefreshStickResponse();
+            if (current == "capture-key") { CaptureDrivingKey(); return; }
             if (RefreshDailyCard()) return;
             var rect = ((RectTransform)canvas.transform).rect;
             if (Mathf.Abs(rect.width - layoutWidth) > 1f || Mathf.Abs(rect.height - layoutHeight) > 1f) { Rebuild(); return; }
@@ -117,6 +121,16 @@ namespace RacingGame
         }
 
         public void GoTo(string screen) { pendingScreen = screen; flow.EnterMenu(); }
+        internal void CoverTouchSettings(bool covered)
+        {
+            if (transition == null) return;
+            transition.interactable = transition.blocksRaycasts = !covered;
+            if (!covered && current == "settings")
+            {
+                var edit = Array.Find(panel.GetComponentsInChildren<Button>(), b => b.name == "EditTouchLayout");
+                if (edit != null) EventSystem.current?.SetSelectedGameObject(edit.gameObject);
+            }
+        }
         public void OpenRaceSettings()
         {
             if (flow.State != FlowState.Racing || race.State < RaceState.Countdown || race.State >= RaceState.Finished) return;
@@ -128,6 +142,9 @@ namespace RacingGame
 
         public bool CloseRaceSettingsIfOpen()
         {
+            if (current == "capture-key") { Show("keys"); return true; }
+            if (current == "keys") { Show("settings"); return true; }
+            if (GetComponent<TouchControlsPresenter>()?.CloseLayoutEditor() == true) return true;
             if (!RaceSettingsOpen) return false;
             RaceSettingsOpen = false;
             Show("");
@@ -180,6 +197,7 @@ namespace RacingGame
             }
             if (panel != null) { panel.gameObject.SetActive(false); Destroy(panel.gameObject); }
             rewardButton = null; rewardLabel = null; current = name;
+            stickResponse = null; lastStickPercent = int.MinValue;
             if (string.IsNullOrEmpty(name)) { EventSystem.current?.SetSelectedGameObject(null); return; }
             if (!PlatformGlue.IsReady) return;
             Canvas.ForceUpdateCanvases();
@@ -214,6 +232,8 @@ namespace RacingGame
                 case "garage": BuildGarage(frame); break;
                 case "arsenal": BuildArsenal(frame); break;
                 case "settings": BuildSettings(frame); break;
+                case "keys": BuildKeySettings(frame); break;
+                case "capture-key": BuildKeyCapture(frame); break;
                 case "practice": BuildPractice(frame); break;
                 case "leaders": BuildLeaders(frame); break;
                 case "results": BuildResults(frame); break;
@@ -377,6 +397,7 @@ namespace RacingGame
                     new Vector2(-50f, 0f), new Vector2(-20f, 0f), UiFactory.Muted, TextAlignmentOptions.Center);
             }
             BuildDailyCard(content);
+            BuildWeeklyGoals(content);
         }
 
         private RaceEventDefinition FeaturedEvent(List<RaceEventDefinition> list)
@@ -738,7 +759,7 @@ namespace RacingGame
             UiFactory.Button(value, "LanguagePrevious", "‹", () => PlatformGlue.SetLanguageOverride(LanguageCycle[(Mathf.Max(0, index) + LanguageCycle.Length - 1) % LanguageCycle.Length]), Vector2.zero, new Vector2(0f, 1f), Vector2.zero, new Vector2(72f, 0f), 36f, UiFactory.Raised);
             Label(value, "LanguageName", language, 26f, Vector2.zero, Vector2.one, new Vector2(82f, 4f), new Vector2(-82f, -4f), Color.white, TextAlignmentOptions.Center);
             UiFactory.Button(value, "LanguageNext", "›", () => PlatformGlue.SetLanguageOverride(LanguageCycle[(Mathf.Max(0, index) + 1) % LanguageCycle.Length]), new Vector2(1f, 0f), Vector2.one, new Vector2(-72f, 0f), Vector2.zero, 36f, UiFactory.Raised);
-            VolumeRow(content, "Sound", "settings.sound", save != null ? save.Data.settings.sfx : 1f, level =>
+            PercentRow(content, "Sound", "settings.sound", save != null ? save.Data.settings.sfx : 1f, level =>
             {
                 if (save == null) return;
                 // Freeze the legacy effective music level before moving the independent effects slider.
@@ -751,9 +772,32 @@ namespace RacingGame
                 SfxPlayer.Instance.volume = level * 0.8f;
             });
             // MusicPlayer observes changes, including an explicitly chosen 80% value.
-            VolumeRow(content, "Music", "settings.music", save != null ? MusicDirector.MusicLevel(save.Data.settings) : 0f, level =>
+            PercentRow(content, "Music", "settings.music", save != null ? MusicDirector.MusicLevel(save.Data.settings) : 0f, level =>
             { if (save == null) return; save.Data.settings.music = level; save.Data.settings.musicChosen = true; save.MarkDirty(); });
             Section(content, "ControlsTitle", Loc.Get("settings.group.controls"));
+            var steeringSettings = save?.Data.settings;
+            PercentRow(content, "StickDeadzone", "settings.stick_deadzone", PlayerDriverInput.StickDeadzone(steeringSettings), level =>
+            {
+                if (steeringSettings == null) return;
+                steeringSettings.stickSensitivity = PlayerDriverInput.StickSensitivity(steeringSettings);
+                steeringSettings.stickDeadzone = level; save.MarkDirty(); RefreshStickResponse();
+            }, 0, 40, "Slider");
+            PercentRow(content, "StickSensitivity", "settings.stick_sensitivity", PlayerDriverInput.StickSensitivity(steeringSettings), level =>
+            {
+                if (steeringSettings == null) return;
+                steeringSettings.stickDeadzone = PlayerDriverInput.StickDeadzone(steeringSettings);
+                steeringSettings.stickSensitivity = level; save.MarkDirty(); RefreshStickResponse();
+            }, 50, 150, "Slider");
+            var steerValue = SettingValue(content, "StickLive", "settings.stick_response");
+            stickResponse = Label(steerValue, "StickResponse", "", 27f, Vector2.zero, new Vector2(.46f, 1f),
+                Vector2.zero, Vector2.zero, Color.white, TextAlignmentOptions.Center);
+            RefreshStickResponse();
+            UiFactory.Button(steerValue, "RestoreStick", Loc.Get("settings.stick_reset"), () =>
+            {
+                if (steeringSettings == null) return;
+                steeringSettings.stickSensitivity = steeringSettings.stickDeadzone = 0f;
+                save.MarkDirty(); Show("settings");
+            }, new Vector2(.46f, 0f), Vector2.one, new Vector2(4f, 0f), Vector2.zero, 25f, UiFactory.Raised);
             ToggleRow(content, "AutoThrottle", "settings.auto_throttle", save != null && save.Data.settings.autoThrottle, enabled =>
             {
                 if (save == null) return;
@@ -766,9 +810,17 @@ namespace RacingGame
             { if (save == null) return; save.Data.settings.touchLargeButtons = enabled; save.MarkDirty(); Show("settings"); });
             ToggleRow(content, "TouchLeft", "settings.touch_left", save != null && save.Data.settings.touchLeftHanded, enabled =>
             { if (save == null) return; save.Data.settings.touchLeftHanded = enabled; save.MarkDirty(); Show("settings"); });
+            var controls = SettingValue(content, "TouchLayout", "settings.touch_layout");
+            UiFactory.Button(controls, "EditTouchLayout", Loc.Get("settings.move_buttons"),
+                () => GetComponent<TouchControlsPresenter>()?.OpenLayoutEditor(),
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 26f, UiFactory.Raised);
             if (!PlatformGlue.IsMobileDevice)
+            {
+                UiFactory.Button(Item(content, "KeySettings", 88f, false), "EditDrivingKeys", Loc.Get("keys.title"),
+                    () => Show("keys"), Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 28f, UiFactory.Raised);
                 ToggleRow(content, "AutoAim", "settings.auto_aim", save == null || save.Data.settings.autoAim, enabled =>
                 { if (save == null) return; save.Data.settings.autoAim = enabled; save.MarkDirty(); Show("settings"); });
+            }
             var hints = SettingValue(content, "Hints", "settings.hints");
             UiFactory.Button(hints, "ReplayHints", Loc.Get("settings.hints.replay"), () =>
             {
@@ -837,18 +889,28 @@ namespace RacingGame
             }
         }
 
-        private void VolumeRow(Transform content, string name, string key, float level, Action<float> change)
+        private void RefreshStickResponse()
+        {
+            var pad = Gamepad.current;
+            int value = pad == null ? -101 : Mathf.RoundToInt(PlayerDriverInput.ReadStick(pad, PlatformGlue.Save?.Data.settings) * 100f);
+            if (stickResponse == null || value == lastStickPercent) return;
+            lastStickPercent = value;
+            stickResponse.text = value == -101 ? "—" : (value > 0 ? "+" : "") + value + "%";
+        }
+
+        private void PercentRow(Transform content, string name, string key, float level, Action<float> change,
+            int minimum = 0, int maximum = 100, string controlSuffix = "Volume")
         {
             var value = SettingValue(content, name, key);
-            int percent = Mathf.RoundToInt(Mathf.Clamp01(level) * 100f);
+            int percent = Mathf.Clamp(Mathf.RoundToInt(level * 100f), minimum, maximum);
             var label = Label(value, "VolumeValue", percent + "%", 27f, new Vector2(1f, 0f), Vector2.one,
                 new Vector2(-92f, 0f), Vector2.zero, Color.white, TextAlignmentOptions.Center);
-            var root = UiFactory.Panel(value, name + "Volume", Vector2.zero, Vector2.one, Vector2.zero, new Vector2(-104f, 0f), new Color(0f, 0f, 0f, 0f));
-            var slider = BuildSlider(root, 100f, percent, true);
+            var root = UiFactory.Panel(value, name + controlSuffix, Vector2.zero, Vector2.one, Vector2.zero, new Vector2(-104f, 0f), new Color(0f, 0f, 0f, 0f));
+            var slider = BuildSlider(root, maximum, percent, true, minimum);
             slider.onValueChanged.AddListener(v => { label.text = Mathf.RoundToInt(v) + "%"; change(v / 100f); });
         }
 
-        private static Slider BuildSlider(RectTransform root, float maximum, float initial, bool whole)
+        private static Slider BuildSlider(RectTransform root, float maximum, float initial, bool whole, float minimum = 0f)
         {
             root.GetComponent<Image>().raycastTarget = true;
             var rail = UiFactory.Panel(root, "Rail", new Vector2(0f, 0.5f), new Vector2(1f, 0.5f),
@@ -860,7 +922,7 @@ namespace RacingGame
                 new Vector2(-28f, 4f), new Vector2(28f, -4f), Color.white);
             var slider = root.gameObject.AddComponent<Slider>();
             slider.fillRect = fill; slider.handleRect = handle; slider.targetGraphic = handle.GetComponent<Image>();
-            slider.minValue = 0f; slider.maxValue = maximum; slider.wholeNumbers = whole;
+            slider.minValue = minimum; slider.maxValue = maximum; slider.wholeNumbers = whole;
             slider.SetValueWithoutNotify(initial);
             var colors = slider.colors;
             colors.highlightedColor = colors.selectedColor = UiFactory.Accent;
@@ -894,7 +956,8 @@ namespace RacingGame
             }
             BuildAttemptHistory(content);
             var platform = PlatformGlue.Platform;
-            var selected = platform?.Leaderboards != null || platform?.Sessions != null ? BuildBoardSelector(content) : null;
+            var selected = BuildBoardSelector(content);
+            if (!boardSelectorOpen) BuildFriendChallenge(content, selected);
             if (selected != null && !boardSelectorOpen && platform?.Sessions != null) BuildRivalCard(content, selected);
             if (platform != null && platform.HasFeature(PlatformFeature.Auth) && !platform.Player.IsAuthorized)
             {

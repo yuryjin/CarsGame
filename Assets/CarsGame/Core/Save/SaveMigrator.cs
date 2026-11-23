@@ -86,6 +86,7 @@ namespace RacingGame.Core.Save
             data.progress.recentAttempts = RecentAttempts.Merge(data.progress.recentAttempts);
             data.progress.ledger ??= new System.Collections.Generic.List<DeviceLedger>();
             data.progress.cosmetics ??= new System.Collections.Generic.List<string>();
+            WeeklyGoals.MergeInto(data.progress, data.progress.weekly);
             data.progress.paint ??= ""; data.progress.livery ??= ""; data.progress.stripe ??= ""; data.progress.body ??= "";
             data.progress.daily ??= new DailyData();
             data.progress.daily.finishDays ??= new System.Collections.Generic.List<int>();

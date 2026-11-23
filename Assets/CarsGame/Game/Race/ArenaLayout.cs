@@ -11,6 +11,7 @@ namespace RacingGame
         public const float HalfSize = 120f;
         public const float BridgeEnd = 9f, BridgeStart = 65f, BridgeHeight = 12f;
         public const float BombRadius = 16f, BombDelay = 2f;
+        public static IReadOnlyList<Vector3> OuterRoad { get; } = Array.AsReadOnly(MakeOuterRoad());
         private MissionStrikes strikes;
         private RaceSpawner spawner;
         private RaceManager race;
@@ -91,10 +92,49 @@ namespace RacingGame
                 }
             }), LayerMask.NameToLayer("Track"));
             BuildScenery();
+            BuildOuterRoad();
             AddBox("NorthRim", new Vector3(0f, 3f, HalfSize), new Vector3(244f, 6f, 3f), rock);
             AddBox("SouthRim", new Vector3(0f, 3f, -HalfSize), new Vector3(244f, 6f, 3f), rock);
             AddBox("EastRim", new Vector3(HalfSize, 3f, 0f), new Vector3(3f, 6f, 238f), rock);
             AddBox("WestRim", new Vector3(-HalfSize, 3f, 0f), new Vector3(3f, 6f, 238f), rock);
+        }
+
+        private static Vector3[] MakeOuterRoad()
+        {
+            var points = new List<Vector3> { new Vector3(13, 0, 25), new Vector3(16, 0, 46), new Vector3(21, 0, 67),
+                new Vector3(27, 0, 82), new Vector3(35, 0, 91), new Vector3(46, 0, 91) };
+            for (int degrees = 34; degrees <= 322; degrees += 12)
+            {
+                float angle = degrees * Mathf.Deg2Rad;
+                points.Add(new Vector3(Mathf.Sin(angle), 0f, Mathf.Cos(angle)) * 100f);
+            }
+            points.AddRange(new[] { new Vector3(-47, 0, 90), new Vector3(-31, 0, 93), new Vector3(-17, 0, 90),
+                new Vector3(-7, 0, 83), new Vector3(-1, 0, 74), new Vector3(0, 0, 64) });
+            return points.ToArray();
+        }
+
+        private void BuildOuterRoad()
+        {
+            var road = MissionArt.Pivot(transform, "OuterRoad", Vector3.zero);
+            MissionArt.Attach(road, MissionArt.Cached("ArenaOuterRoad", (w, glow) =>
+            {
+                Vector3 previousLeft = default, previousRight = default;
+                for (int i = 0; i < OuterRoad.Count; i++)
+                {
+                    Vector3 tangent = (OuterRoad[Mathf.Min(i + 1, OuterRoad.Count - 1)] - OuterRoad[Mathf.Max(i - 1, 0)]).normalized;
+                    Vector3 right = Vector3.Cross(Vector3.up, tangent);
+                    Vector3 centre = OuterRoad[i] + Vector3.up * .05f;
+                    Vector3 leftEdge = centre - right * 7.5f, rightEdge = centre + right * 7.5f;
+                    if (i > 0) w.AddQuad(previousLeft, leftEdge, rightEdge, previousRight, MissionArt.Hardpan);
+                    if (i % 3 == 1)
+                    {
+                        var frame = Matrix4x4.TRS(centre, Quaternion.LookRotation(tangent), Vector3.one);
+                        for (int side = -1; side <= 1; side += 2)
+                            LowPoly.Box(w, frame, new Vector3(side * 8.1f, .55f, 0f), new Vector3(.45f, 1.1f, .45f), MissionArt.Bone);
+                    }
+                    previousLeft = leftEdge; previousRight = rightEdge;
+                }
+            }), gameObject.layer);
         }
 
         private void AddButtress(int arm, GameObject ruinedBridgehead)
@@ -266,13 +306,15 @@ namespace RacingGame
             int carLayer = LayerMask.NameToLayer("Car");
             int mask = carLayer >= 0 ? 1 << carLayer : Physics.AllLayers;
             Physics.SyncTransforms();
-            // More candidates than the maximum eight cars, including the centre as a fallback.
-            for (int i = 0; i <= 16; i++)
+            var participant = car.GetComponent<RaceParticipant>();
+            int entrance = (car.CarId + (participant != null ? participant.Deaths : 0)) % 2;
+            for (int i = 0; i < 2; i++)
             {
-                GetSpawnPose(i % 16, 16, out position, out rotation);
-                if (i == 16) position = transform.TransformPoint(Vector3.up * 0.5f);
-                var overlaps = Physics.OverlapBox(position + Vector3.up * 0.5f,
-                    new Vector3(1.2f, 0.7f, 2.5f), rotation, mask, QueryTriggerInteraction.Ignore);
+                GetSpawnPose((entrance + i) % 2, 2, out position, out rotation);
+                Vector3 ahead = rotation * Vector3.forward * 5f;
+                if (Threatens(position) || Threatens(position + ahead * 2f)) continue;
+                var overlaps = Physics.OverlapBox(position + ahead + Vector3.up * .5f,
+                    new Vector3(2f, .8f, 7.5f), rotation, mask, QueryTriggerInteraction.Ignore);
                 bool occupied = false;
                 foreach (var hit in overlaps)
                     if (!hit.transform.IsChildOf(car.transform)) { occupied = true; break; }

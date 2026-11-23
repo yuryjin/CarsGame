@@ -33,6 +33,7 @@ namespace RacingGame
 
         private Rigidbody rb;
         private Transform wheel;
+        private AudioSource trackRumble;
         private float speedScale = 1f;
         private int holdUntilTick = -1;
         private readonly Dictionary<int, int> crushTick = new Dictionary<int, int>();
@@ -49,6 +50,14 @@ namespace RacingGame
             boss.rb.isKinematic = true;
             boss.rb.interpolation = RigidbodyInterpolation.Interpolate;
             boss.BuildHull();
+            boss.trackRumble = MissionArt.Pivot(go.transform, "TrackRumble", Vector3.up * 2.6f).gameObject.AddComponent<AudioSource>();
+            boss.trackRumble.clip = SfxSynth.CrawlerTracks;
+            boss.trackRumble.playOnAwake = false;
+            boss.trackRumble.loop = true;
+            boss.trackRumble.spatialBlend = 1f;
+            boss.trackRumble.rolloffMode = AudioRolloffMode.Linear;
+            boss.trackRumble.minDistance = 15f;
+            boss.trackRumble.maxDistance = 180f;
             boss.BuildParts(coreHealth);
             return boss;
         }
@@ -267,6 +276,17 @@ namespace RacingGame
 
         private void Update()
         {
+            if (trackRumble != null)
+            {
+                bool moving = MissionUnit.Running && !Defeated && !PauseController.IsPaused && Velocity.sqrMagnitude > .01f;
+                if (moving)
+                {
+                    trackRumble.volume = .72f * SfxPlayer.Instance.volume;
+                    trackRumble.pitch = Mathf.Clamp(Velocity.magnitude / BaseSpeed, .7f, 1.3f);
+                    if (!trackRumble.isPlaying) trackRumble.Play();
+                }
+                else if (trackRumble.isPlaying) trackRumble.Stop();
+            }
             if (wheel != null && !Defeated && MissionUnit.Running) wheel.localRotation *= Quaternion.Euler(Time.deltaTime * 40f, 0f, 0f);
         }
 

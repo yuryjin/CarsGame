@@ -1,4 +1,5 @@
 using UnityEngine;
+using RacingGame.Core.Economy;
 
 namespace RacingGame
 {
@@ -36,7 +37,8 @@ namespace RacingGame
         {
             car = GetComponent<CarController>();
             input = GetComponent<PlayerDriverInput>();
-            engine = MakeSource("Engine", SfxSynth.EngineRich);
+            var body = GetComponent<CarBody>();
+            engine = MakeSource("Engine", SfxSynth.EngineFor(body != null ? body.Class : BodyClass.Sport));
             screech = MakeSource("Screech", SfxSynth.Screech);
             wind = MakeSource("Wind", SfxSynth.Wind);
         }
@@ -54,6 +56,12 @@ namespace RacingGame
         public void SetRunning(bool on)
         {
             running = on;
+            if (on)
+            {
+                var body = GetComponent<CarBody>();
+                var clip = SfxSynth.EngineFor(body != null ? body.Class : BodyClass.Sport);
+                if (engine.clip != clip) { engine.Stop(); engine.clip = clip; }
+            }
             foreach (var s in new[] { engine, screech, wind })
             {
                 if (s == null) continue;

@@ -66,6 +66,25 @@ namespace RacingGame
             dailyCountdown.text = dailyFooterPrefix + Loc.Format("daily.new_in", "h", minutes / 60, "m", minutes % 60) + dailyFooterSuffix;
         }
 
+        private void BuildWeeklyGoals(Transform content)
+        {
+            var save = PlatformGlue.Save;
+            if (save == null || save.Data.Races == 0) return;
+            int week = Core.Save.WeeklyGoals.Week(DailyRace.NowUnixMs);
+            int mask = Core.Save.WeeklyGoals.Mask(save.Data.progress, week);
+            var card = Item(content, "WeeklyGoals", 240f);
+            Label(card, "WeeklyTitle", Loc.Get("weekly.title"), 30f, Top, Vector2.one, new Vector2(22f, -60f), new Vector2(-22f, -8f)).fontStyle = FontStyles.Bold;
+            for (int i = 0; i < 3; i++)
+            {
+                bool done = (mask & (1 << i)) != 0;
+                Label(card, "Weekly" + i, (done ? "●  " : "–  ") + Loc.Get(Core.Save.WeeklyGoals.Key(week, (Core.Save.WeeklyDiscipline)i)),
+                    23f, Top, Vector2.one, new Vector2(22f, -100f - 33f * i), new Vector2(-22f, -64f - 33f * i), done ? UiFactory.Positive : UiFactory.Muted);
+            }
+            string prize = Loc.Get(Core.Save.WeeklyGoals.Reward(week).Replace(':', '.'));
+            Label(card, "WeeklyReward", Loc.Format("weekly.reward", "name", prize), 23f, Vector2.zero, new Vector2(1f, 0f),
+                new Vector2(22f, 10f), new Vector2(-22f, 62f), mask == 7 ? UiFactory.Positive : UiFactory.Accent);
+        }
+
         private void BuildDailyCard(Transform content)
         {
             var save = PlatformGlue.Save;

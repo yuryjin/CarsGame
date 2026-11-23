@@ -25,6 +25,7 @@ var CarsMusicLib = {
       CarsMusic.s = s;
       s.chans = [CarsMusic.chan(), CarsMusic.chan()];
       s.sting = CarsMusic.chan();
+      s.finalLap = CarsMusic.chan();
       s.sting.el.addEventListener('ended', function () { s.sting.active = false; });
       document.addEventListener('visibilitychange', function () { s.hidden = !!document.hidden; CarsMusic.sync(); });
       var unlock = function () {
@@ -83,7 +84,7 @@ var CarsMusicLib = {
       if (s.ctx) {
         try { if (halt && s.ctx.state === 'running') s.ctx.suspend(); else if (!halt && s.ctx.state !== 'running') s.ctx.resume(); } catch (e) {}
       }
-      var all = s.chans.concat([s.sting]);
+      var all = s.chans.concat([s.sting, s.finalLap]);
       for (var i = 0; i < all.length; i++) {
         var c = all[i], run = c.active && !halt;
         if (run && c.el.paused && !s.locked) CarsMusic.playEl(c);
@@ -127,6 +128,23 @@ var CarsMusicLib = {
     CarsMusic.start(c);
   },
 
+  CarsMusic_FinalLap__deps: ['$CarsMusic'],
+  CarsMusic_FinalLap: function (urlPtr, active, tempo) {
+    var s = CarsMusic.get(), c = s.finalLap;
+    if (!active) { c.active = false; CarsMusic.sync(); return; }
+    CarsMusic.load(c, UTF8ToString(urlPtr), true);
+    c.el.playbackRate = tempo;
+    var main = s.cur >= 0 ? s.chans[s.cur].el : null;
+    function align() {
+      if (main && isFinite(c.el.duration) && c.el.duration > 0)
+        c.el.currentTime = (main.currentTime * tempo) % c.el.duration;
+    }
+    if (c.el.readyState >= 1) align();
+    else c.el.addEventListener('loadedmetadata', align, { once: true });
+    CarsMusic.ramp(c, 0.33, 0.16, 0);
+    CarsMusic.start(c);
+  },
+
   CarsMusic_Preload__deps: ['$CarsMusic'],
   CarsMusic_Preload: function (urlPtr) {
     var s = CarsMusic.get(), url = UTF8ToString(urlPtr);
@@ -140,7 +158,7 @@ var CarsMusicLib = {
     var s = CarsMusic.get();
     s.volume = v;
     if (s.bus) { var t = s.ctx.currentTime, g = s.bus.gain; g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(v, t + 0.15); }
-    else { var all = s.chans.concat([s.sting]); for (var i = 0; i < all.length; i++) all[i].el.volume = Math.max(0, Math.min(1, all[i].level * v)); }
+    else { var all = s.chans.concat([s.sting, s.finalLap]); for (var i = 0; i < all.length; i++) all[i].el.volume = Math.max(0, Math.min(1, all[i].level * v)); }
   },
 
   CarsMusic_SetPaused__deps: ['$CarsMusic'],

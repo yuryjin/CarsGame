@@ -73,6 +73,13 @@ namespace RacingGame
             runnerUpPoints = rankOrder.Count > 1 ? rankBuffer[rankOrder[1]].Points : 0;
             return rankOrder.Count > 0 ? participants[rankOrder[0]] : null;
         }
+
+        public RaceParticipant AtPosition(int position)
+        {
+            if (position < 1 || position > rankOrder.Count || position > participants.Count) return null;
+            return participants[rankOrder[position - 1]];
+        }
+
         /// <summary>Wrecked for good (one-life race): classified DNF and no longer awaited at the finish.</summary>
         public static bool IsOut(RaceParticipant p) => p != null && p.Health != null && p.Health.IsDead && !p.Health.respawnOnDeath;
         // Finished or out. A wrecked player is never "done" here: the flow either revives them (rewarded

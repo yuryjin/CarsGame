@@ -63,5 +63,16 @@ namespace RacingGame.Tests
             Assert.IsNotNull(m.progress.daily);
             Assert.IsNotNull(m.progress.cosmetics);
         }
+        [Test]
+        public void WeeklyMasksMergeAcrossDevicesAndGrantTheCosmeticOnlyOnce()
+        {
+            var a = new RacingGame.Core.Save.SaveData(); var b = new RacingGame.Core.Save.SaveData();
+            a.progress.weekly.Add(new RacingGame.Core.Save.WeeklyGoalState { week = 123, mask = 3 });
+            b.progress.weekly.Add(new RacingGame.Core.Save.WeeklyGoalState { week = 123, mask = 4 });
+            var merged = RacingGame.Core.Save.SaveMerge.Merge(a, b);
+            var replay = RacingGame.Core.Save.SaveMerge.Merge(b, merged);
+            Assert.AreEqual(7, RacingGame.Core.Save.WeeklyGoals.Mask(replay.progress, 123));
+            Assert.AreEqual(1, replay.progress.cosmetics.FindAll(c => c == RacingGame.Core.Save.WeeklyGoals.Reward(123)).Count);
+        }
     }
 }

@@ -410,7 +410,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860361
-    m_Localized: "Ziel erfasst \u2014 Feuer: Strg oder LMT"
+    m_Localized: "Ziel erfasst \u2014 Feuer: {bind.fire} oder LMT"
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860362
@@ -1307,7 +1307,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697473
-    m_Localized: "Festgefahren? Dr\xFCck R"
+    m_Localized: "Festgefahren? Dr\xFCck {bind.reset}"
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697474
@@ -1504,8 +1504,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488779
-    m_Localized: 'Gas: W/hoch. Lenken: A/D oder Pfeile. Feuer: Strg / linke Maus.
-      Hole den Rivalen ein und triff ihn.'
+    m_Localized: 'Gas: {bind.gas}. Lenken: {bind.steer}. Feuer: {bind.fire} / linke
+      Maus. Hole den Rivalen ein und triff ihn.'
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488780
@@ -1514,7 +1514,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488781
-    m_Localized: "Ab 40 km/h: lenken und Leertaste dr\xFCcken. Lade auf und lass
+    m_Localized: "Ab 40 km/h: lenken und {bind.brake} dr\xFCcken. Lade auf und lass
       f\xFCr den Boost los."
     m_Metadata:
       m_Items: []
@@ -1701,8 +1701,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820457320448
-    m_Localized: "Gas: W / hoch. R\xFCckw\xE4rts: S / runter. Lenken: A/D oder Pfeile.
-      Bremse: Leertaste. Zur\xFCck auf die Strecke: R."
+    m_Localized: "Gas: {bind.gas}. R\xFCckw\xE4rts: {bind.reverse}. Lenken: {bind.steer}.
+      Bremse: {bind.brake}. Zur\xFCck auf die Strecke: {bind.reset}."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097664
@@ -1711,14 +1711,14 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097665
-    m_Localized: 'Feuer: Strg / linke Maus. Wechsle deine zwei Waffen: Q / Mausrad
-      oder 1 und 2.'
+    m_Localized: 'Feuer: {bind.fire} / linke Maus. Wechsle deine zwei Waffen: Q /
+      Mausrad oder {bind.one} und {bind.two}.'
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097666
-    m_Localized: "Feuer: Strg / linke Maus. Halte Q und bewege die Maus zur Waffenwahl;
-      lass Q zum Ausr\xFCsten los. Mit gehaltenem Q: Tab / Mausrad f\xFCr Seiten,
-      1\u20130 f\xFCr Pl\xE4tze."
+    m_Localized: "Feuer: {bind.fire} / linke Maus. Halte Q und bewege die Maus zur
+      Waffenwahl; lass Q zum Ausr\xFCsten los. Mit gehaltenem Q: Tab / Mausrad f\xFCr
+      Seiten, {bind.slots} f\xFCr Pl\xE4tze."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097667
@@ -1727,7 +1727,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097668
-    m_Localized: '{action}: E / Umschalt / rechte Maus / LB. Munition und Bereitschaft
+    m_Localized: '{action}: {bind.secondary} / rechte Maus / LB. Munition und Bereitschaft
       werden im HUD angezeigt.'
     m_Metadata:
       m_Items: []
@@ -1751,8 +1751,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820478291969
-    m_Localized: "Nur Minen. \xDCberhole und dr\xFCcke E / Umschalt / rechte Maus,
-      um eine Mine hinter dir abzulegen."
+    m_Localized: "Nur Minen. \xDCberhole und dr\xFCcke {bind.secondary} / rechte
+      Maus, um eine Mine hinter dir abzulegen."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820478291970
@@ -2470,6 +2470,194 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 29723557332594688
     m_Localized: "Nur Pl\xFCnderer k\xF6nnen das Schutzziel besch\xE4digen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860491366400
+    m_Localized: Position der Touch-Tasten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337920
+    m_Localized: Tasten verschieben
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337921
+    m_Localized: Ziehe die Tasten in bequeme Reichweite.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337922
+    m_Localized: "Positionen zur\xFCcksetzen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337923
+    m_Localized: W/hoch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337924
+    m_Localized: S/runter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337925
+    m_Localized: A/D oder Pfeile
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337926
+    m_Localized: Leertaste
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337927
+    m_Localized: Strg
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337928
+    m_Localized: E / Umschalt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337929
+    m_Localized: R
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337930
+    m_Localized: 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337931
+    m_Localized: 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337932
+    m_Localized: "1\u20130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337933
+    m_Localized: V
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337934
+    m_Localized: Tastaturbelegung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337935
+    m_Localized: Beschleunigen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337936
+    m_Localized: "R\xFCckw\xE4rts"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337937
+    m_Localized: Links lenken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337938
+    m_Localized: Rechts lenken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337939
+    m_Localized: "Sekund\xE4rwaffe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337940
+    m_Localized: Waffenwahl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337941
+    m_Localized: Waffenplatz {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532224
+    m_Localized: "Dr\xFCcke eine Taste f\xFCr {action}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532225
+    m_Localized: "{button} ist f\xFCr {action} belegt. W\xE4hle eine andere Taste."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532226
+    m_Localized: Abbrechen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532227
+    m_Localized: Standardtasten wiederherstellen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532228
+    m_Localized: Stick-Totzone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532229
+    m_Localized: Stick-Empfindlichkeit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532230
+    m_Localized: Lenkeingabe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532231
+    m_Localized: "Zur\xFCcksetzen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532232
+    m_Localized: Duellcode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532233
+    m_Localized: Meinen Code anzeigen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532234
+    m_Localized: Mit Code starten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532235
+    m_Localized: "Der Duellcode ist ung\xFCltig oder unvollst\xE4ndig."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532236
+    m_Localized: "Diese Version des Duellcodes wird nicht unterst\xFCtzt."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532237
+    m_Localized: "Strecke oder ben\xF6tigte Ausr\xFCstung ist nicht verf\xFCgbar."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532238
+    m_Localized: "Zielzeit \xB7 {t}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532239
+    m_Localized: Wochenziele
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532240
+    m_Localized: Beende ein Rundrennen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532241
+    m_Localized: Erreiche das Podium im Rundrennen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532242
+    m_Localized: Beende einen Arenakampf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532243
+    m_Localized: Beende einen Arenakampf mit einem K. o.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532244
+    m_Localized: "Schlie\xDFe eine Mission ab"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532245
+    m_Localized: Beende eine Mission ohne Totalschaden
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532246
+    m_Localized: "Preis f\xFCr alle drei \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532247
+    m_Localized: '{name}  {s} s'
     m_Metadata:
       m_Items: []
   references:

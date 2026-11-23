@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using RacingGame.Core.Save;
 using RacingGame.Core.Sim;
 
 namespace RacingGame
@@ -219,6 +220,10 @@ namespace RacingGame
         {
             throttle = throttleAction != null ? throttleAction.ReadValue<float>() : 0f;
             steer = steerAction != null ? steerAction.ReadValue<float>() : 0f;
+            var steeringControl = steerAction?.activeControl;
+            var pad = steeringControl?.device as Gamepad;
+            if (steeringControl == null || pad != null && steeringControl == pad.leftStick.x)
+                steer = ReadStick(pad ?? Gamepad.current, PlatformGlue.Save?.Data.settings);
             brake = brakeAction != null && brakeAction.IsPressed();
             fire = fireAction != null && fireAction.IsPressed();
             secondary = secondaryAction != null && secondaryAction.IsPressed();
@@ -253,8 +258,8 @@ namespace RacingGame
             var g = Gamepad.current;
             if (g != null)
             {
-                float x = g.leftStick.x.ReadValue();
-                if (Mathf.Abs(x) > 0.15f) steer = x;
+                float x = ReadStick(g, PlatformGlue.Save?.Data.settings);
+                if (x != 0f) steer = x;
                 float rt = g.rightTrigger.ReadValue(), lt = g.leftTrigger.ReadValue();
                 if (rt > 0.05f || lt > 0.05f) throttle = rt - lt;
                 if (g.buttonSouth.isPressed) brake = true;
@@ -264,6 +269,21 @@ namespace RacingGame
                 if (g.dpad.down.wasPressedThisFrame) SelectSlot(0);
                 if (g.dpad.up.wasPressedThisFrame) SelectSlot(1);
             }
+        }
+
+        public static float StickDeadzone(SettingsData settings) => settings != null && settings.stickSensitivity > 0f
+            ? Mathf.Clamp(settings.stickDeadzone, 0f, .4f) : InputSystem.settings.defaultDeadzoneMin;
+
+        public static float StickSensitivity(SettingsData settings) => settings != null && settings.stickSensitivity > 0f
+            ? Mathf.Clamp(settings.stickSensitivity, .5f, 1.5f) : 1f;
+
+        public static float ReadStick(Gamepad pad, SettingsData settings)
+        {
+            if (pad == null) return 0f;
+            if (settings == null || settings.stickSensitivity <= 0f) return pad.leftStick.x.ReadValue();
+            float raw = pad.leftStick.x.ReadUnprocessedValue();
+            float range = Mathf.InverseLerp(StickDeadzone(settings), InputSystem.settings.defaultDeadzoneMax, Mathf.Abs(raw));
+            return Mathf.Sign(raw) * Mathf.Pow(range, 1f / StickSensitivity(settings));
         }
 
         private float AssistedSteer()

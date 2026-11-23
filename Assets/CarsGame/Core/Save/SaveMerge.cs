@@ -50,6 +50,7 @@ namespace RacingGame.Core.Save
             var owned = new HashSet<string>(a.progress.cosmetics ?? new List<string>());
             foreach (var c in b.progress.cosmetics ?? new List<string>()) owned.Add(c);
             m.progress.cosmetics = new List<string>(owned);
+            WeeklyGoals.MergeInto(m.progress, a.progress.weekly, b.progress.weekly);
             m.progress.cosmetics.Sort(StringComparer.Ordinal);
             m.progress.paint = newer.progress.paint ?? "";
             m.progress.livery = newer.progress.livery ?? "";
@@ -137,6 +138,9 @@ namespace RacingGame.Core.Save
             lang = s.lang, sfx = s.sfx, music = s.music, musicChosen = s.musicChosen, quality = s.quality, qualityAuto = s.qualityAuto,
             autoThrottle = s.autoThrottle, cameraShake = s.cameraShake, autoAim = s.autoAim, tier = s.tier, hintsSeen = s.hintsSeen,
             touchLargeButtons = s.touchLargeButtons, touchLeftHanded = s.touchLeftHanded,
+            touchPositions = s.touchPositions == null ? null : (TouchPosition[])s.touchPositions.Clone(),
+            drivingKeyBindings = s.drivingKeyBindings,
+            stickDeadzone = s.stickDeadzone, stickSensitivity = s.stickSensitivity,
             dynamicCamera = s.dynamicCamera, classicCarModels = s.classicCarModels, compactHud = s.compactHud,
             largeText = s.largeText, reducedCombatFlashes = s.reducedCombatFlashes, cameraDistance = s.cameraDistance
         };

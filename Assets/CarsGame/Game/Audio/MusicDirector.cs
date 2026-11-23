@@ -12,6 +12,7 @@ namespace RacingGame
         /// <summary>A one-shot over the music channel (win/lose).</summary>
         void Sting(string track, float volume);
         void Preload(string track);
+        void SetFinalLap(bool active, float tempo);
         void SetVolume(float volume);
         void SetPaused(bool paused);
         /// <summary>Dip the music by <paramref name="depth"/> (0..1) for a loud moment, then recover.</summary>
@@ -45,6 +46,8 @@ namespace RacingGame
         private readonly IMusicOutput output;
         private FlowState? state;
         private int races;
+        private bool contested, layer;
+        private float raceTempo = 1f;
         private bool stung;
         private float menuAt = -1f;
         private float level = -1f;
@@ -67,6 +70,8 @@ namespace RacingGame
         {
             if (state == s) return;             // GameFlow re-announces the state (e.g. reward doubled)
             state = s;
+            contested = false;
+            ApplyLayer();
             switch (s)
             {
                 case FlowState.Menu:
@@ -76,7 +81,7 @@ namespace RacingGame
                 case FlowState.Racing:
                     menuAt = -1f; stung = false;
                     output.Stop(0.8f);
-                    output.Preload(Win); output.Preload(Lose);
+                    output.Preload(Win); output.Preload(Lose); output.Preload("final_lap");
                     break;
                 case FlowState.Results:
                     if (!stung) output.Stop(1f);
@@ -89,13 +94,16 @@ namespace RacingGame
         public void OnRaceStarted()
         {
             if (state != FlowState.Racing) return;
-            output.Play(RaceTracks[races++ % RaceTracks.Length], true, 0.25f);
+            int track = races++ % RaceTracks.Length;
+            raceTempo = track == 0 ? 1f : 150f / 140f;
+            output.Play(RaceTracks[track], true, 0.25f);
         }
 
         public void OnPlayerFinished(int position)
         {
             if (stung || state != FlowState.Racing) return;
             stung = true;
+            ApplyLayer();
             output.Stop(0.3f);
             output.Sting(position >= 1 && position <= WinPlaces ? Win : Lose, 1f);
         }
@@ -110,7 +118,22 @@ namespace RacingGame
         /// <summary>Music setting 0..1 (see <see cref="MusicLevel"/>).</summary>
         public void SetLevel(float value) { level = value; Apply(); }
 
-        public void SetPauseReasons(PauseReason value) { reasons = value; Apply(); }
+        public void SetPauseReasons(PauseReason value) { reasons = value; Apply(); ApplyLayer(); }
+
+        public void SetFinalLapGap(bool finalLap, float nearestRivalMetres)
+        {
+            // A car momentarily drifting back a few metres should not restart the percussion.
+            contested = finalLap && nearestRivalMetres <= (contested ? 22f : 14f);
+            ApplyLayer();
+        }
+
+        private void ApplyLayer()
+        {
+            bool active = state == FlowState.Racing && !stung && contested && reasons == PauseReason.None;
+            if (layer == active) return;
+            layer = active;
+            output.SetFinalLap(active, raceTempo);
+        }
 
         public void Duck(float depth, float attack, float hold, float release) => output.Duck(depth, attack, hold, release);
 
