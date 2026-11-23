@@ -146,9 +146,10 @@ namespace RacingGame
                 case FlowState.Menu: string target = pendingScreen ?? (flow.ReturningFromPractice ? "practice" : flow.ReturningFromTestDrive ? "garage" : "main"); pendingScreen = null; Show(target); break;
                 case FlowState.Racing: rewardDetailsExpanded = false; Show(""); break;
                 case FlowState.Results:
-                    rewardShownAt = Time.unscaledTime;
+                    rewardShownAt = flow.ReturningToResults ? float.NegativeInfinity : Time.unscaledTime;
                     Show("results");
-                    foreach (var e in flow.LastUnlocked) Toast(Loc.Format("results.unlocked", "name", Loc.Get(e.nameKey)));
+                    if (!flow.ReturningToResults)
+                        foreach (var e in flow.LastUnlocked) Toast(Loc.Format("results.unlocked", "name", Loc.Get(e.nameKey)));
                     break;
             }
         }
@@ -919,7 +920,7 @@ namespace RacingGame
 
         private void BuildResults(RectTransform root)
         {
-            var results = race.Results;
+            var results = flow.ResultsForMenu;
             if (results == null) { Show("main"); return; }
             var body = Header(root, "results.title");
             bool columns = root.rect.width >= 1280f;
@@ -949,6 +950,13 @@ namespace RacingGame
                 BuildSectorComparison(content, flow.LastSectorDeltaMs);
             BuildRewardDetails(content, me, missionEvent);
             BuildResultStars(content, me);
+            var lesson = flow.MissedLesson;
+            if (lesson != PracticeLesson.None)
+            {
+                var row = Item(content, "MissedGoalLesson", 80f, false);
+                UiFactory.Button(row, "PracticeMissedGoal", Loc.Format("results.practice_goal", "lesson", Loc.Get(GameFlow.PracticeTitleKey(lesson))),
+                    () => flow.StartPractice(lesson), Vector2.zero, Vector2.one, new Vector2(4f, 4f), new Vector2(-4f, -4f), 26f, UiFactory.Raised);
+            }
             var next = RecommendedNext();
             BuildNextGoal(content, next);
             var actions = UiFactory.Panel(overview, "Actions", Vector2.zero, new Vector2(1f, 0f),

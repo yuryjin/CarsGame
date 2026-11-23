@@ -2232,6 +2232,14 @@ MonoBehaviour:
     m_Localized: "Place {p} \xB7 r\xE9parations {repairs}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29279795364048896
+    m_Localized: "Revoir le r\xE9sultat"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795376631808
+    m_Localized: "S\u2019entra\xEEner \xB7 {lesson}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

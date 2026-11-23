@@ -2227,6 +2227,14 @@ MonoBehaviour:
     m_Localized: "Platz {p} \xB7 Reparaturen {repairs}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29279795364048896
+    m_Localized: "Zur\xFCck zum Rennergebnis"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795376631808
+    m_Localized: "Trainieren \xB7 {lesson}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

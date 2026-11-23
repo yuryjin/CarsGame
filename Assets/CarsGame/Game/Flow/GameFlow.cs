@@ -194,10 +194,13 @@ namespace RacingGame
         {
             ReturningFromPractice = IsPractice;
             ReturningFromTestDrive = IsTestDrive;
+            bool resumeResult = IsPractice && practiceReturnResults != null;
             Teardown();
             RestoreTestDrive();
             if (hud != null) hud.SetVisible(false);
-            SetState(FlowState.Menu);
+            if (resumeResult) LastSectorDeltaMs = practiceReturnSectors;
+            else { practiceReturnResults = null; practiceReturnSectors = null; }
+            SetState(resumeResult ? FlowState.Results : FlowState.Menu);
         }
 
         public void StartRace(RaceEventDefinition ev, DifficultyTier tier)
@@ -211,6 +214,7 @@ namespace RacingGame
             if (ev != null && !IsUnlocked(ev)) { MenuScreens.Toast(Loc.Get("events.locked")); return; }
             // A rejected request must leave the current race and any test-drive snapshot intact.
             if (IsTestDrive && ev != testDriveEvent) RestoreTestDrive();
+            if (!IsTestDrive) { practiceReturnResults = null; practiceReturnSectors = null; }
             RaceSetup.Event = ev;
             RaceSetup.Tier = tier;
             Teardown();
@@ -243,12 +247,15 @@ namespace RacingGame
             // Look before the field spawns so the first frame of the countdown is already correct.
             if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
 
-            LastReward = 0; LastStarsEarned = 0; LastRewardDoubled = false; LastDailyBonus = 0; LastDailyStreak = 0;
-            LastPayout = default; LastTurretReward = LastFirstFinishBonus = 0;
+            if (practiceReturnResults == null)
+            {
+                LastReward = 0; LastStarsEarned = 0; LastRewardDoubled = false; LastDailyBonus = 0; LastDailyStreak = 0;
+                LastPayout = default; LastTurretReward = LastFirstFinishBonus = 0;
+                LastBestDeltaMs = 0; LastHadPreviousBest = false; LastWasPersonalBest = false; LastUnlocked.Clear();
+                LastBestComparable = LastBestSetupKnown = false;
+            }
             // The daily race is the same race for everyone that day: AI and weapon streams from the day's seed.
             if (DailyRace.IsDaily(ev)) { var director = RaceDirector.Current ?? RaceDirector.Instance; if (director != null) director.Reseed(DailyChallenge.For(DailyRace.DayOf(ev)).Seed); }
-            LastBestDeltaMs = 0; LastHadPreviousBest = false; LastWasPersonalBest = false; LastUnlocked.Clear();
-            LastBestComparable = LastBestSetupKnown = false;
             raceRecordSetup = null;
             if (MenuCameraDirector.Instance != null) MenuCameraDirector.Instance.Activate(false);   // camera hand-over before cars exist
             race.StartRace();

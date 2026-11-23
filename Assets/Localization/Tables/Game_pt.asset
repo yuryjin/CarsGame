@@ -2232,6 +2232,14 @@ MonoBehaviour:
     m_Localized: "Posi\xE7\xE3o {p} \xB7 reparos {repairs}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29279795364048896
+    m_Localized: Voltar ao resultado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795376631808
+    m_Localized: "Treinar \xB7 {lesson}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

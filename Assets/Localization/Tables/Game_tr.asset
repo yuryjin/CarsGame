@@ -2253,6 +2253,14 @@ MonoBehaviour:
     m_Localized: "S\u0131ra {p} \xB7 onar\u0131m {repairs}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29279795364048896
+    m_Localized: "Yar\u0131\u015F sonu\xE7lar\u0131na d\xF6n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29279795376631808
+    m_Localized: "Antrenman \xB7 {lesson}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

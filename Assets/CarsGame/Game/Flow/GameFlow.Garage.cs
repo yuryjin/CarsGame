@@ -43,9 +43,15 @@ namespace RacingGame
 
         private bool StartDrive(string bodyId, PracticeLesson lesson)
         {
-            if (State != FlowState.Menu || IsTestDrive || !PlatformGlue.IsReady || race.spawner == null || race.spawner.raceCarPrefab == null) return false;
+            bool fromResults = State == FlowState.Results && lesson != PracticeLesson.None && lesson == MissedLesson && !IsDoublingReward;
+            if ((State != FlowState.Menu && !fromResults) || IsTestDrive || !PlatformGlue.IsReady || race.spawner == null || race.spawner.raceCarPrefab == null) return false;
             if (PlatformGlue.Save.LocalVersionTooNew) return false;
             if (CarBodies.Get(bodyId).Id != bodyId) return false;
+            if (fromResults)
+            {
+                practiceReturnResults = ResultsForMenu;
+                practiceReturnSectors = LastSectorDeltaMs;
+            }
             beforeTestEvent = RaceSetup.Event;
             beforeTestTier = RaceSetup.Tier;
             beforeTestBody = race.spawner.playerBodyId;
@@ -152,7 +158,8 @@ namespace RacingGame
             {
                 shownTestSecond = seconds;
                 shownTestLanguage = Loc.Language;
-                testDriveTimer.text = IsPractice ? Loc.Get(PracticeTitleKey(CurrentPractice)) + "  " + seconds + "/1\n" + Loc.Get("practice.return")
+                testDriveTimer.text = IsPractice ? Loc.Get(PracticeTitleKey(CurrentPractice)) + "  " + seconds + "/1\n"
+                    + Loc.Get(practiceReturnResults != null ? "practice.return_results" : "practice.return")
                     : Loc.Get("garage.test_return") + "  ·  " + seconds;
                 if (IsPractice)
                 {

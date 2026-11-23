@@ -171,6 +171,17 @@ namespace RacingGame.Tests
             yield return Boot();
             string progress = JsonUtility.ToJson(PlatformGlue.Save.Data.progress);
             Assert.IsTrue(flow.StartPractice(PracticeLesson.Drift));
+            yield return DriveDriftLesson();
+            Assert.AreEqual(progress, JsonUtility.ToJson(PlatformGlue.Save.Data.progress));
+            flow.RetryRace();
+            Assert.IsFalse(flow.PracticeCompleted);
+            Assert.AreEqual(0, race.Player.DriftBoosts);
+            flow.EnterMenu();
+            Assert.AreEqual("practice", menu.Current);
+        }
+
+        private IEnumerator DriveDriftLesson()
+        {
             var car = race.Player.Car;
             var input = car.gameObject.AddComponent<ScriptedDriverInput>();
             car.SetInputSource(input);
@@ -189,12 +200,51 @@ namespace RacingGame.Tests
             Assert.Greater(race.Player.DriftBoosts, 0);
             Assert.IsTrue(flow.PracticeCompleted);
             StringAssert.Contains("1/1", Button("ReturnToGarage").GetComponentInChildren<TMPro.TMP_Text>().text);
-            Assert.AreEqual(progress, JsonUtility.ToJson(PlatformGlue.Save.Data.progress));
-            flow.RetryRace();
-            Assert.IsFalse(flow.PracticeCompleted);
-            Assert.AreEqual(0, race.Player.DriftBoosts);
-            flow.EnterMenu();
-            Assert.AreEqual("practice", menu.Current);
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator MissedDriftOpensItsLessonAndRestoresTheAwardedRace()
+        {
+            yield return Boot();
+            var progress = PlatformGlue.Save.Data.progress;
+            if (!progress.unlockedEvents.Contains("e2")) progress.unlockedEvents.Add("e2");
+            var ev = System.Array.Find(flow.events, e => e.eventId == "e2");
+            var tier = System.Array.Find(flow.tiers, t => t.tierId == "hard");
+            flow.StartRace(ev, tier);
+            while (race.State == RaceState.Countdown) yield return null;
+            race.QaFinishNow(); yield return null;
+            Assert.AreEqual(0, race.Results.Player.DriftBoosts);
+            Assert.AreEqual(0, flow.LastStarsEarned & 2);
+            int stars = flow.LastStarsEarned, reward = flow.LastTotalReward;
+            Assert.Greater(reward, 0);
+            string credited = JsonUtility.ToJson(progress);
+            string next = Button("ResultAction0").GetComponentInChildren<TMPro.TMP_Text>().text;
+            foreach (bool complete in new[] { false, true })
+            {
+                var lesson = Button("PracticeMissedGoal");
+                Assert.AreEqual(Loc.Format("results.practice_goal", "lesson", Loc.Get("practice.drift")),
+                    lesson.GetComponentInChildren<TMPro.TMP_Text>().text);
+                lesson.onClick.Invoke(); yield return null;
+                Assert.AreEqual(PracticeLesson.Drift, flow.CurrentPractice);
+                if (complete) yield return DriveDriftLesson();
+                else Assert.IsFalse(flow.PracticeCompleted);
+                var back = Button("ReturnToGarage");
+                StringAssert.Contains(Loc.Get("practice.return_results"), back.GetComponentInChildren<TMPro.TMP_Text>().text);
+                back.onClick.Invoke(); yield return null;
+                Assert.AreEqual(FlowState.Results, flow.State);
+                Assert.AreEqual("results", menu.Current);
+                Assert.AreSame(ev, RaceSetup.Event);
+                Assert.AreSame(tier, RaceSetup.Tier);
+                Assert.AreEqual(stars, flow.LastStarsEarned);
+                Assert.AreEqual(reward, flow.LastTotalReward);
+                Assert.AreEqual(credited, JsonUtility.ToJson(progress));
+                Assert.AreEqual(next, Button("ResultAction0").GetComponentInChildren<TMPro.TMP_Text>().text);
+            }
+            Button("ResultAction0").onClick.Invoke();
+            Assert.AreEqual(FlowState.Racing, flow.State);
+            Assert.IsFalse(flow.IsPractice);
+            Assert.AreSame(tier, RaceSetup.Tier);
+            Assert.AreEqual(credited, JsonUtility.ToJson(progress));
         }
 
         [UnityTest, Timeout(180000)]
