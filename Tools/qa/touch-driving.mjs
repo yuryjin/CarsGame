@@ -70,8 +70,13 @@ try {
   const before = await cmd('ui');
   const foldedMap = before.buttons.find(b => b.name === 'ToggleMiniMap');
   assert(foldedMap.interactable && foldedMap.width < openMap.width && foldedMap.height >= 43.9);
-  assert(before.labels.some(l => l.parent === 'ToggleMiniMap' && l.renderedText === 'Map'));
-  evidence.push({ phase: 'folded-map', openMap, foldedMap });
+  const language = await page.evaluate(() => window.CarsPlatform.env().lang);
+  const strings = (await fs.readFile(new URL('../../Assets/CarsGame/Localization/Source/strings.csv', import.meta.url), 'utf8')).split(/\r?\n/);
+  const localeColumn = strings[0].split(',').indexOf(language);
+  const expectedMap = strings.find(row => row.startsWith('hud.mini_map,')).split(',')[localeColumn];
+  const mapText = before.labels.find(l => l.parent === 'ToggleMiniMap');
+  assert(expectedMap && mapText && mapText.renderedText === expectedMap && !mapText.truncated, `${language}: ${mapText?.renderedText} / ${expectedMap}`);
+  evidence.push({ phase: 'folded-map', openMap, foldedMap, language, mapText });
   const fire = await point('Fire', 1), right = await point('Right', 2);
   await send('touchStart', [fire, right]); await page.waitForTimeout(800);
   const held = await cmd('ui');
