@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Linq;
-using System.Reflection;
 using NUnit.Framework;
 using RacingGame.Core.Save;
 using TMPro;
@@ -100,8 +99,6 @@ namespace RacingGame.Tests
             var data = PlatformGlue.Save.Data;
             var e1 = Event("e1");
             var e2 = Event("e2");
-            var finish = typeof(RaceManager).GetMethod("Finish", BindingFlags.NonPublic | BindingFlags.Instance);
-            Assert.IsNotNull(finish);
             for (int attempt = 0; attempt < 4; attempt++)
             {
                 flow.StartRace(e1, flow.tiers.Single(t => t.tierId == "normal"));
@@ -109,10 +106,17 @@ namespace RacingGame.Tests
                 // Control only the arrival order and the two goal counters; payout and unlock run normally.
                 var rivals = race.Participants.Where(p => !p.isPlayer).Take(3).ToArray();
                 Assert.AreEqual(3, rivals.Length);
-                foreach (var rival in rivals)
+                for (int slot = 0; slot < rivals.Length; slot++)
                 {
-                    finish.Invoke(race, new object[] { rival });
-                    yield return null;
+                    var rival = rivals[slot];
+                    var progress = rival.Progress;
+                    var path = progress.Path;
+                    path.Pose(path.startLineDistance - 1f, (slot - 1) * 2.5f, out var at, out var facing);
+                    rival.Car.Teleport(at + Vector3.up * .43f, facing);
+                    progress.Counter.ApplyStanding(progress.Distance, race.laps - 1, 0, true);
+                    rival.Car.Body.linearVelocity = facing * Vector3.forward * 16f;
+                    for (int tick = 0; tick < 80 && !race.HasFinished(rival); tick++) yield return new WaitForFixedUpdate();
+                    Assert.IsTrue(race.HasFinished(rival), rival.displayName + " crossed the line before the player");
                 }
                 race.Player.Deaths = attempt == 1 ? 0 : 1;
                 if (attempt >= 2)
