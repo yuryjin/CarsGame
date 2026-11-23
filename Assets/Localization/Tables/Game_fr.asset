@@ -2240,6 +2240,23 @@ MonoBehaviour:
     m_Localized: "S\u2019entra\xEEner \xB7 {lesson}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29706000609390592
+    m_Localized: "D\xE9part pr\xE9cis"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Localized: "Acc\xE9l\xE8re au signal de d\xE9part. Un moins indique une avance,
+      un plus un retard. Appuie sur R\xE9essayer pour recommencer."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Localized: "{ms} ms \xB7 Boost obtenu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Localized: "{ms} ms \xB7 Sans boost"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

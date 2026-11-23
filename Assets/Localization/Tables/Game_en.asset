@@ -2232,6 +2232,23 @@ MonoBehaviour:
     m_Localized: "Practice \xB7 {lesson}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29706000609390592
+    m_Localized: Launch timing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Localized: Press the throttle at GO. A minus means early, a plus means late.
+      Retry to practise again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Localized: "{ms} ms \xB7 Boost earned"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Localized: "{ms} ms \xB7 No boost"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

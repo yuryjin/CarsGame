@@ -2235,6 +2235,23 @@ MonoBehaviour:
     m_Localized: "Trainieren \xB7 {lesson}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29706000609390592
+    m_Localized: Starttiming
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Localized: "Gib beim Startsignal Gas. Minus bedeutet zu fr\xFCh, Plus zu sp\xE4t.
+      Starte einen neuen Versuch mit \u201ENochmal\u201C."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Localized: "{ms} ms \xB7 Startboost"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Localized: "{ms} ms \xB7 Kein Startboost"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

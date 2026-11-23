@@ -2240,6 +2240,23 @@ MonoBehaviour:
     m_Localized: "Treinar \xB7 {lesson}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29706000609390592
+    m_Localized: Largada precisa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Localized: Acelere no sinal de largada. Menos indica que foi cedo e mais indica
+      atraso. Toque em Tentar de novo para repetir.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Localized: "{ms} ms \xB7 Turbo obtido"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Localized: "{ms} ms \xB7 Sem turbo"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

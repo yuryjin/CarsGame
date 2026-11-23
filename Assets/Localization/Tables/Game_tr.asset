@@ -2261,6 +2261,24 @@ MonoBehaviour:
     m_Localized: "Antrenman \xB7 {lesson}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29706000609390592
+    m_Localized: "Kalk\u0131\u015F zamanlamas\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167808
+    m_Localized: "Ba\u015Flang\u0131\xE7 i\u015Faretinde gaza bas. Eksi erken, art\u0131
+      ge\xE7 bast\u0131\u011F\u0131n\u0131 g\xF6sterir. Yeniden ba\u015Flamak i\xE7in
+      Tekrar'a bas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167809
+    m_Localized: "{ms} ms \xB7 H\u0131zlanma kazan\u0131ld\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29706000626167810
+    m_Localized: "{ms} ms \xB7 H\u0131zlanma yok"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
