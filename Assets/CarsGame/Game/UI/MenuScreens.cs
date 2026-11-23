@@ -538,7 +538,9 @@ namespace RacingGame
                             "n", Mathf.Max(0, ev.unlockStars - (PlatformGlue.Save?.Data.TotalStars ?? 0)))
                         : Loc.Format("events.locked_after", "name", Loc.Get(prerequisite.nameKey));
                     Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 64f : 44f), unlocked ? UiFactory.Positive : UiFactory.Muted);
-                    UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—", unlocked ? () => StartMenuEvent(ev, tier) : null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-216f, -36f), new Vector2(-24f, 36f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
+                    UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—",
+                        unlocked ? () => StartMenuEvent(ev, tier) : null, Vector2.one, Vector2.one,
+                        new Vector2(-216f, -92f), new Vector2(-24f, -20f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
                     BuildRivalPreview(content, ev);
                 }
             }
