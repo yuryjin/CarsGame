@@ -65,6 +65,14 @@ namespace RacingGame
         private float rankTimer, bandTimer;
 
         public int PositionOf(RaceParticipant p) => positions.TryGetValue(p, out int pos) ? pos : participants.Count;
+
+        internal RaceParticipant ArenaLeader(out bool shared, out int runnerUpPoints)
+        {
+            Rank();
+            shared = rankOrder.Count > 1 && rankPositions[rankOrder[1]] == 1;
+            runnerUpPoints = rankOrder.Count > 1 ? rankBuffer[rankOrder[1]].Points : 0;
+            return rankOrder.Count > 0 ? participants[rankOrder[0]] : null;
+        }
         /// <summary>Wrecked for good (one-life race): classified DNF and no longer awaited at the finish.</summary>
         public static bool IsOut(RaceParticipant p) => p != null && p.Health != null && p.Health.IsDead && !p.Health.respawnOnDeath;
         // Finished or out. A wrecked player is never "done" here: the flow either revives them (rewarded
@@ -321,12 +329,13 @@ namespace RacingGame
                     FinishTime = t,
                     TotalProgress = p.Progress != null ? p.Progress.TotalProgress : 0d,
                     Kills = p.Kills,
+                    Points = p.Score?.Points.Total ?? 0,
                     Deaths = p.Deaths
                 });
             }
             if (rankPositions.Length < rankBuffer.Count) rankPositions = new int[rankBuffer.Count];
             if (combatRanking)
-                RaceRanking.RankArena(rankBuffer, rankOrder, rankPositions);
+                RaceRanking.RankArena(rankBuffer, rankOrder, rankPositions, sharedPlaces: IsArenaMode);
             else
                 RaceRanking.Rank(rankBuffer, rankOrder, rankPositions);
 
@@ -366,6 +375,9 @@ namespace RacingGame
         {
             finishEntries.TryGetValue(p, out var finishedEntry);
             entry.Name = p.displayName; entry.IsPlayer = p.isPlayer;
+            entry.CarId = p.Car.CarId;
+            entry.ArenaPoints = p.Score?.Points ?? default;
+            entry.Assists = p.Score?.Assists ?? 0;
             entry.Position = PositionOf(p);
             entry.Finished = finishTimes.TryGetValue(p, out double time);
             entry.Eliminated = !entry.Finished && IsOut(p);
@@ -391,8 +403,10 @@ namespace RacingGame
             if (State == RaceState.Finished) return;
             State = RaceState.Finished;
             DetachLapHandlers();
-            Rank();
             bool isArena = IsArenaMode;
+            if (isArena && RaceTime >= MatchDuration)
+                foreach (var p in participants) p.Score?.Finish(p.Deaths == 0);
+            Rank();
             var results = new RaceResults
             {
                 IsArena = isArena,
@@ -413,7 +427,7 @@ namespace RacingGame
                 results.Entries.Add(entry);
                 if (p.Car != null) p.Car.inputEnabled = false;
             }
-            results.Entries.Sort((a, b) => a.Position.CompareTo(b.Position));
+            results.Entries.Sort((a, b) => a.Position != b.Position ? a.Position.CompareTo(b.Position) : a.CarId.CompareTo(b.CarId));
             Results = results;
             OnRaceFinished?.Invoke(results);
         }

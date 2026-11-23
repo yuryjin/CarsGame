@@ -139,6 +139,7 @@ namespace RacingGame
         private Rigidbody rb;
         private Transform legL, legR;
         private CarController target;
+        public MissionUnit AssaultTarget { get; set; }
         private bool rocket;
         private int readyTick, burstLeft, retargetTick, aimUntil = -1;
         private float stride, facing;
@@ -175,16 +176,19 @@ namespace RacingGame
         {
             float dt = SimulationDriver.FixedStep;
             if (tick % 3 == 0 && CheckSquash()) return;
-            if (tick >= retargetTick || target == null)
+            bool assault = AssaultTarget != null && AssaultTarget.Targetable;
+            if (!assault && (tick >= retargetTick || target == null))
             {
                 target = FindHostileCar(AimPoint, 110f, false);
                 retargetTick = tick + 40;
             }
             walking = false;
             Vector3 pos = transform.position;
-            if (target != null)
+            if (assault || target != null)
             {
-                Vector3 to = target.transform.position - pos; to.y = 0f;
+                Vector3 aim = assault ? AssaultTarget.AimPoint : target.transform.position + Vector3.up * .5f;
+                Vector3 velocity = assault ? AssaultTarget.Velocity : target.Body != null ? target.Body.linearVelocity : Vector3.zero;
+                Vector3 to = aim - pos; to.y = 0f;
                 float dist = to.magnitude;
                 facing = Mathf.MoveTowardsAngle(facing, Mathf.Atan2(to.x, to.z) * Mathf.Rad2Deg, 220f * dt);
                 bool inRange = dist < (rocket ? 55f : 38f);
@@ -193,20 +197,18 @@ namespace RacingGame
                     walking = true;
                     pos += to / Mathf.Max(0.01f, dist) * WalkSpeed * dt;
                 }
-                else if (inRange) TryShoot(tick, dist);
+                else if (inRange) TryShoot(tick, aim, velocity);
             }
             pos.y = map.Height(pos);
             rb.MovePosition(pos);
             rb.MoveRotation(Quaternion.Euler(0f, facing, 0f));
         }
 
-        private void TryShoot(int tick, float dist)
+        private void TryShoot(int tick, Vector3 aim, Vector3 v)
         {
             if (tick < readyTick) return;
             Vector3 muzzle = transform.position + Vector3.up * 1.4f + transform.forward * 0.8f;
-            Vector3 aim = target.transform.position + Vector3.up * 0.5f;
             if (Physics.Linecast(muzzle, aim, TargetFinder.ObstacleMask, QueryTriggerInteraction.Ignore)) { readyTick = tick + 25; return; }
-            Vector3 v = target.Body != null ? target.Body.linearVelocity : Vector3.zero;
             if (rocket)
             {
                 if (aimUntil < 0) { aimUntil = tick + SimulationDriver.SecondsToTicks(0.9f); return; }   // shoulder the tube: the tell

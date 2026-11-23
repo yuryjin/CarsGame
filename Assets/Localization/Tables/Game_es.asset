@@ -2030,13 +2030,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998272
-    m_Localized: "3 minutos / {n} rivales / gana quien m\xE1s destruya"
+    m_Localized: "3 minutos / {n} rivales / gana quien m\xE1s punt\xFAe"
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998273
     m_Localized: "Acelera por el puente. Al saltar sobre el centro, pulsa disparo
-      para soltar una bomba. Sal del c\xEDrculo rojo antes del impacto. Gana quien
-      m\xE1s destruya."
+      para soltar una bomba. Sal del c\xEDrculo rojo antes del impacto."
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998274
@@ -2376,6 +2375,107 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 29718720087928836
     m_Localized: "\xDAltima llegada de pr\xE1ctica \xB7 {t}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473942106112
+    m_Localized: Convoy de agua
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077632
+    m_Localized: "Escolta la cisterna hasta el \xDAltimo Pozo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077633
+    m_Localized: "El agua lleg\xF3 al poblado"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077634
+    m_Localized: La cisterna fue destruida
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077635
+    m_Localized: "Cisterna {h}%   \xB7   Pozo {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077636
+    m_Localized: "\xA1Emboscada! Cisterna {h}%   \xB7   {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077637
+    m_Localized: "Ver atr\xE1s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077638
+    m_Localized: "Mant\xE9n {button} al girar para mirar atr\xE1s."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077639
+    m_Localized: '{n} ptos.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077640
+    m_Localized: "Furia \xD7{n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077641
+    m_Localized: Turbo de derrape
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077642
+    m_Localized: Acierta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077643
+    m_Localized: Embiste a 70 km/h
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077644
+    m_Localized: Combo logrado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077645
+    m_Localized: Perdiste velocidad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077646
+    m_Localized: Liderato compartido
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077647
+    m_Localized: Lideras por {n} ptos.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077648
+    m_Localized: "L\xEDder {name} \xB7 diferencia {n} ptos."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077649
+    m_Localized: "Velocidad {s} \xB7 impactos {h} \xB7 bajas {k} \xB7 centro {c}
+      \xB7 supervivencia {l}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077650
+    m_Localized: Asistencias {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077651
+    m_Localized: Puntos, bajas y menos muertes. Los empates comparten puesto.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077652
+    m_Localized: Buscar rival parejo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077653
+    m_Localized: Sin rival compatible. Puedes correr igual.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077654
+    m_Localized: "Rival {t} \xB7 Diferencia con tu tiempo {d}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29723557332594688
+    m_Localized: "Solo los saqueadores pueden da\xF1ar el objetivo"
     m_Metadata:
       m_Items: []
   references:

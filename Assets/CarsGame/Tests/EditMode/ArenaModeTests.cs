@@ -8,7 +8,97 @@ namespace RacingGame.Tests
     public class ArenaModeTests
     {
         [Test]
-        public void ArenaRankingSortsByKillsDeathsAndDeterministicCarId()
+        public void FiveSharesUseDrivingDamageAndLongestLifeAndCapAtOneThousand()
+        {
+            var score = new Core.Sim.ArenaScore(50, 9000);
+            for (int i = 0; i < 100; i++) score.Step(80, false, true, false);
+            var p = score.Points;
+            Assert.AreEqual(4, p.Speed); Assert.AreEqual(4, p.Centre); Assert.AreEqual(2, p.Survival);
+            Assert.AreEqual(0, p.Hits); Assert.AreEqual(0, p.Knockouts);
+            score.Hit(false, 80);
+            score.Knockout(true);
+            Assert.AreEqual(35, score.Points.Total);
+            score.Died();
+            for (int i = 0; i < 50; i++) score.Step(0, false, true, false);
+            Assert.AreEqual(2, score.Points.Survival);
+            Assert.AreEqual(4, score.Points.Centre);
+            for (int i = 0; i < 9000; i++) score.Step(90, true, true, false);
+            for (int i = 0; i < 100; i++) { score.Hit(false, 90); score.Knockout(false); }
+            Assert.AreEqual(1000, score.Points.Total);
+        }
+
+        [Test]
+        public void ADriftHitAndFastRamRaiseHeatOnceAndOnlyCombatUsesIt()
+        {
+            var score = new ArenaScore(50, 9000);
+            score.Hit(true, 100);
+            score.DriftBoosted();
+            score.Hit(false, 80);
+            score.Hit(true, 69);
+            Assert.AreEqual(1, score.Multiplier);
+            score.Hit(true, 70);
+            score.Hit(true, 80);
+            Assert.AreEqual(2, score.Multiplier);
+            Assert.AreEqual(35, score.Points.Hits);
+            score.Knockout(true);
+            Assert.AreEqual(40, score.Points.Knockouts);
+            for (int i = 0; i < 50; i++) score.Step(90, true, true, false);
+            Assert.AreEqual(3, score.Points.Speed);
+            Assert.AreEqual(2, score.Points.Centre);
+            for (int i = 0; i < 150; i++) score.Step(0, false, true, true);
+            Assert.AreEqual(2, score.Multiplier);
+            for (int i = 0; i < 150; i++) score.Step(0, false, true, false);
+            Assert.AreEqual(1, score.Multiplier);
+            Assert.AreEqual(ArenaScore.HeatChange.Slowed, score.Change);
+        }
+
+        [Test]
+        public void AssistsExpireAfterFiveSecondsAndAtRespawn()
+        {
+            var victim = new ArenaScore(50, 9000);
+            victim.DamagedBy(5, 50);
+            victim.DamagedBy(7, 299);
+            Assert.AreEqual(5, victim.RecentAttacker(300, 7));
+            Assert.AreEqual(-1, victim.RecentAttacker(301, 7));
+            Assert.AreEqual(7, victim.RecentAttacker(301));
+            victim.Died();
+            Assert.AreEqual(-1, victim.RecentAttacker(301));
+        }
+
+        [Test]
+        public void SharedPlacesAndPrizesIgnoreCarIdButTheMissionKeepsItsOrder()
+        {
+            var entries = new List<RankEntry> {
+                new RankEntry {CarId = 9, Points = 250, Kills = 1, Deaths = 2},
+                new RankEntry {CarId = 3, Points = 250, Kills = 1, Deaths = 2},
+                new RankEntry {CarId = 5, Points = 249, Kills = 8}
+            };
+            var places = RaceRanking.RankArena(entries);
+            Assert.AreEqual(new[] {1, 1, 3}, places);
+            var a = entries[0]; a.CarId = 2; entries[0] = a;
+            Assert.AreEqual(places, RaceRanking.RankArena(entries));
+            Assert.AreEqual(Core.Economy.Economy.RaceReward(places[0], true, new[]{1}, 1),
+                Core.Economy.Economy.RaceReward(places[1], true, new[]{1}, 1));
+            for (int i = 0; i < entries.Count; i++) { var e = entries[i]; e.Points = 0; entries[i] = e; }
+            Assert.AreEqual(new[] {2, 3, 1}, RaceRanking.RankArena(entries, sharedPlaces:false));
+        }
+
+        [Test]
+        public void AnOldMatchDurationNeverBecomesAnArenaScoreAfterLoadingOrMerging()
+        {
+            var old = Core.Save.SaveMigrator.Parse("{\"version\":7,\"progress\":{\"bests\":[{\"eventId\":\"a1\",\"bestTimeMs\":180000,\"stars\":3}]}}", out _);
+            Assert.IsFalse(old.progress.bests[0].hasArenaScore);
+            var fresh = new Core.Save.SaveData();
+            fresh.progress.bests.Add(new Core.Save.EventBest {eventId="a1",hasArenaScore=true,arenaPoints=314});
+            var m = Core.Save.SaveMerge.Merge(old, fresh).progress.bests[0];
+            Assert.AreEqual(314, m.arenaPoints); Assert.IsTrue(m.hasArenaScore); Assert.AreEqual(3, m.stars);
+            fresh.progress.bests[0].arenaPoints = 290;
+            var weaker = Core.Save.SaveMerge.Merge(fresh, old);
+            weaker.progress.bests[0] = m;
+            Assert.AreEqual(314, Core.Save.SaveMerge.Merge(weaker, fresh).progress.bests[0].arenaPoints);
+        }
+        [Test]
+        public void ArenaUsesKillsThenDeathsWhenScoreIsEqual()
         {
             var entries = new List<RankEntry>
             {
@@ -19,17 +109,11 @@ namespace RacingGame.Tests
                 new RankEntry { CarId = 50, Kills = 0, Deaths = 4 }
             };
 
-            // Order:
-            // 1st: Car 20 (5 kills, 1 death, ID 20 < 40)
-            // 2nd: Car 40 (5 kills, 1 death, ID 40 > 20)
-            // 3rd: Car 30 (3 kills, 0 deaths)
-            // 4th: Car 10 (3 kills, 2 deaths)
-            // 5th: Car 50 (0 kills, 4 deaths)
             var positions = RaceRanking.RankArena(entries);
             Assert.AreEqual(4, positions[0]); // Car 10 is 4th
             Assert.AreEqual(1, positions[1]); // Car 20 is 1st
             Assert.AreEqual(3, positions[2]); // Car 30 is 3rd
-            Assert.AreEqual(2, positions[3]); // Car 40 is 2nd
+            Assert.AreEqual(1, positions[3]); // Car 40 shares the lead with car 20.
             Assert.AreEqual(5, positions[4]); // Car 50 is 5th
         }
 

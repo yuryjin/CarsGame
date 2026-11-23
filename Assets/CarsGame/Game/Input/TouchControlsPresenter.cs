@@ -34,7 +34,7 @@ namespace RacingGame
         private Button swapButton;
         private TMPro.TextMeshProUGUI launchLabel;
         private PerfectStart launch;
-        private RectTransform resetButton, brakeButton, leftButton, rightButton;
+        private RectTransform resetButton, brakeButton, leftButton, rightButton, rearButton;
         private float targetScale = -1f;
         private float targetTextScale;
         private bool targetLarge, targetLeft, targetCompact;
@@ -129,6 +129,8 @@ namespace RacingGame
             secondaryLabel.transform.parent.gameObject.SetActive(false);
             brakeButton = (RectTransform)Button(root, "Brake", Loc.Get("touch.brake"), "<Gamepad>/buttonSouth", new Vector2(1f, 0f), new Vector2(-480f, 40f), new Vector2(-280f, 160f)).transform.parent;
             resetButton = (RectTransform)Button(root, "Reset", Loc.Get("touch.reset"), "<Gamepad>/buttonNorth", new Vector2(1f, 1f), new Vector2(-140f, -140f), new Vector2(-40f, -40f)).transform.parent;
+            rearButton = (RectTransform)Button(root, "RearView", Loc.Get("touch.rear_view"), "<Gamepad>/rightStickPress",
+                Vector2.zero, Vector2.zero, Vector2.one).transform.parent;
             launchLabel = Button(root, "Launch", Loc.Get("touch.launch"), "<Gamepad>/rightTrigger",
                 new Vector2(0.5f, 0f), new Vector2(-200f, 40f), new Vector2(200f, 190f));
             targetScale = -1f;
@@ -172,6 +174,12 @@ namespace RacingGame
             Action((RectTransform)secondaryLabel.transform.parent, 280f, 480f, 180f, 300f);
             Action((RectTransform)swapButton.transform, 40f, 260f, 280f, 370f);
             float edge = 44f / scale;
+            float rearNear = steeringRight + 8f / scale, rearWidth = Mathf.Max(150f, 68f / scale);
+            Place(rearButton, left ? new Vector2(1f, 0f) : Vector2.zero,
+                new Vector2(left ? -rearNear - rearWidth : rearNear, 40f),
+                new Vector2(left ? -rearNear : rearNear + rearWidth, 40f + Mathf.Max(edge, 100f)));
+            var rearLabel = rearButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            rearLabel.fontSizeMin = 11f / scale; rearLabel.fontSizeMax = Mathf.Max(24f, 13f / scale) * textScale;
             float reset = Mathf.Max(100f, edge);
             float resetTop = (HudScreen.TopControlsBottomPixels(scale, compact) + 8f) / scale;
             float resetWidth = Mathf.Max(reset, 84f / scale);

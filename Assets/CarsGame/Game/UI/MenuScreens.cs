@@ -422,7 +422,7 @@ namespace RacingGame
         }
 
         private static string MissionDetail(RaceEventDefinition ev, int allies) => ev.eventId == TrainMission.EventId
-            ? Loc.Get("train.detail") : Loc.Format("mission.detail", "n", allies);
+            ? Loc.Get("train.detail") : SettlementMission.Supports(ev.eventId) ? Loc.Get(ev.nameKey + ".goal") : Loc.Format("mission.detail", "n", allies);
 
         private static string EventFireDetail(RaceEventDefinition ev, float tierInterval, CultureInfo culture)
         {
@@ -431,6 +431,7 @@ namespace RacingGame
                 return Loc.Get("events.guns_disabled");
             if (ev.mode == EventMode.Mission && ev.eventId == TrainMission.EventId)
                 return Loc.Format("train.guard_fire", "s", TrainEscort.BaseFireCooldown.ToString("0.##", culture));
+            if (SettlementMission.Supports(ev.eventId)) return Loc.Get("mission.raider_fire");
             string key = ev.mode == EventMode.Mission ? "mission.ally_fire" : "events.rival_fire";
             return Loc.Format(key, "s", tierInterval.ToString("0.##", culture));
         }
@@ -493,7 +494,7 @@ namespace RacingGame
                     Label(row, "Stars", starDisplay, 22f, Top, Vector2.one, new Vector2(144f, -302f + starOffset), new Vector2(-236f, -178f + starOffset));
                     if (circuit) BuildCircuitPreview(row, ev, ev.reversed ? reverse : forward, path.startLineDistance);
                     var prerequisite = unlocked ? null : list.Find(e => e.eventId == ev.unlockAfterEventId);
-                    string status = unlocked ? best != null && best.bestTimeMs > 0 ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) : ""
+                    string status = unlocked ? EventBestText(ev, best)
                         : prerequisite == null ? Loc.Get("events.locked")
                         : ev.unlockStars > 0 ? Loc.Format("events.locked_stars", "name", Loc.Get(prerequisite.nameKey),
                             "n", Mathf.Max(0, ev.unlockStars - (PlatformGlue.Save?.Data.TotalStars ?? 0)))
@@ -876,11 +877,14 @@ namespace RacingGame
             foreach (var ev in Events())
             {
                 var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
-                if (best == null || best.bestTimeMs <= 0) continue;
+                string record = EventBestText(ev, best);
+                if (record.Length == 0) continue;
                 Action watch = null;
                 if (ev.mode == EventMode.Race && PlatformGlue.Save.Data.personalGhosts.HasForEvent(ev.eventId, ev.laps))
                     watch = () => { if (flow.OpenReplay(ev)) Show("replay"); else Toast(Loc.Get("replay.unavailable")); };
-                BoardRow(content, "Local_" + ev.eventId, (++count).ToString("00"), Loc.Get(ev.nameKey), UiFactory.FormatTime(best.bestTimeMs / 1000.0), true, RecordSetupText(best.setup), watch);
+                BoardRow(content, "Local_" + ev.eventId, (++count).ToString("00"), Loc.Get(ev.nameKey),
+                    ev.mode == EventMode.Arena ? record : UiFactory.FormatTime(best.bestTimeMs / 1000.0), true,
+                    ev.mode == EventMode.Arena ? null : RecordSetupText(best.setup), watch);
             }
             if (count == 0)
             {
@@ -890,6 +894,8 @@ namespace RacingGame
             }
             BuildAttemptHistory(content);
             var platform = PlatformGlue.Platform;
+            var selected = platform?.Leaderboards != null || platform?.Sessions != null ? BuildBoardSelector(content) : null;
+            if (selected != null && !boardSelectorOpen && platform?.Sessions != null) BuildRivalCard(content, selected);
             if (platform != null && platform.HasFeature(PlatformFeature.Auth) && !platform.Player.IsAuthorized)
             {
                 var auth = Item(content, "Account", Narrow ? 220f : 176f);
@@ -907,8 +913,30 @@ namespace RacingGame
                     finally { if (this != null) { authInFlight = false; if (current == "leaders") Show("leaders"); } }
                 }, Vector2.zero, new Vector2(1f, 0f), new Vector2(28f, 22f), new Vector2(-28f, 88f), 26f, UiFactory.Raised);
             }
-            else if (platform?.Leaderboards != null) FillBoards(content, platform.Leaderboards);
+            else if (!boardSelectorOpen && platform?.Leaderboards != null) FillBoards(content, platform.Leaderboards, selected);
         }
+        private void BuildRivalCard(Transform content, RaceEventDefinition ev)
+        {
+            var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b != null && b.eventId == ev.eventId);
+            if (ev.mode != EventMode.Race || ev.twist == Core.Daily.RaceTwist.TimeTrial || best?.setup == null || !best.setup.IsKnown) return;
+            var card = Item(content, "RivalMatch", 160f);
+            var status = Label(card, "RivalStatus", Loc.Format("events.best", "t", UiFactory.FormatMilliseconds(best.bestTimeMs)), 26f,
+                Top, Vector2.one, new Vector2(22f, -76f), new Vector2(-22f, -8f));
+            Button find = null;
+            find = UiFactory.Button(card, "FindRival", Loc.Get("rival.find"), async () =>
+            {
+                find.interactable = false; status.text = Loc.Get("common.loading");
+                var pick = await flow.PreviewRivalAsync(ev);
+                if (status == null || !status.gameObject.activeInHierarchy) return;
+                find.interactable = true;
+                if (pick == null) { status.text = Loc.Get("rival.empty"); return; }
+                string delta = (pick.DifferenceMs < 0 ? "−" : pick.DifferenceMs > 0 ? "+" : "") + UiFactory.FormatMilliseconds(Math.Abs(pick.DifferenceMs));
+                status.text = Loc.Format("rival.match", "t", UiFactory.FormatMilliseconds(pick.Replay.DurationMilliseconds), "d", delta);
+            }, Vector2.zero, new Vector2(.64f, 0f), new Vector2(16f, 10f), new Vector2(-6f, 78f), 23f, UiFactory.Raised);
+            UiFactory.Button(card, "StartMatchedRace", Loc.Get("menu.play"), () => flow.StartRace(ev, SelectedTier()),
+                new Vector2(.64f, 0f), new Vector2(1f, 0f), new Vector2(6f, 10f), new Vector2(-16f, 78f), 25f);
+        }
+
         private void BuildAttemptHistory(Transform content)
         {
             var attempts = PlatformGlue.Save?.Data.progress.recentAttempts;
@@ -920,13 +948,13 @@ namespace RacingGame
                 var ev = Array.Find(flow.events, e => e != null && e.eventId == attempt.eventId);
                 string name = ev != null ? Loc.Get(ev.nameKey) : attempt.eventId.StartsWith("d", StringComparison.Ordinal)
                     && int.TryParse(attempt.eventId.Substring(1), out _) ? Loc.Get("daily.title") : UiFactory.Escape(attempt.eventId);
-                string time = UiFactory.FormatMilliseconds(attempt.timeMs);
+                string time = attempt.hasArenaScore ? Loc.Format("arena.points", "n", attempt.arenaPoints) : UiFactory.FormatMilliseconds(attempt.timeMs);
                 var older = Core.Save.RecentAttempts.PreviousComparable(attempts, i);
                 if (older != null)
                 {
-                    long difference = attempt.timeMs - older.timeMs;
+                    long difference = attempt.hasArenaScore ? attempt.arenaPoints - older.arenaPoints : attempt.timeMs - older.timeMs;
                     string sign = difference < 0 ? "−" : difference > 0 ? "+" : "";
-                    time += "\n" + sign + UiFactory.FormatMilliseconds(Math.Abs(difference));
+                    time += "\n" + sign + (attempt.hasArenaScore ? Loc.Format("arena.points", "n", Math.Abs(difference)) : UiFactory.FormatMilliseconds(Math.Abs(difference)));
                 }
                 BoardRow(content, "RecentAttempt" + i, (i + 1).ToString(), name, time, false, RecordSetupText(attempt.setup));
             }
@@ -964,17 +992,27 @@ namespace RacingGame
                 UiFactory.Button(row, "Replay_" + id, Loc.Get("replay.watch"), watch, new Vector2(1f, 0f), new Vector2(1f, 0f),
                     new Vector2(-216f, 18f), new Vector2(-26f, 86f), 25f, UiFactory.Raised);
         }
-        private async void FillCloudBoard(RectTransform content, ILeaderboards boards)
+        private async void FillCloudBoard(RectTransform content, ILeaderboards boards, RaceEventDefinition selected)
         {
-            Section(content, "CloudTitle", Loc.Get("lb.title"));
+            if (selected == null) return;
+            Section(content, "CloudTitle", Loc.Get("lb.title") + " · " + Loc.Get(selected.nameKey));
             var status = Item(content, "CloudStatus", 90f);
             var label = Label(status, "Status", Loc.Get("common.loading"), 26f, Vector2.zero, Vector2.one, new Vector2(28f, 12f), new Vector2(-28f, -12f), UiFactory.Muted);
-            var result = await boards.GetAsync(RaceSetup.BoardName, 10, true, 3);
+            string board = RaceSetup.BoardNameFor(selected);
+            var result = await boards.GetAsync(board, 10, true, 3);
             if (content == null || !content.gameObject.activeInHierarchy) return;
             if (!result.Ok) { label.text = Loc.Get("common.unavailable"); return; }
             if (result.Value == null || result.Value.Count == 0) { label.text = Loc.Get("lb.empty"); return; }
             status.gameObject.SetActive(false); Destroy(status.gameObject);
-            foreach (var entry in result.Value) BoardRow(content, "Cloud" + entry.Rank, entry.Rank.ToString("00"), UiFactory.Escape(entry.Name), UiFactory.FormatTime(entry.Score / 1000.0), false);
+            foreach (var entry in result.Value) BoardRow(content, "Cloud" + entry.Rank, entry.Rank.ToString("00"), UiFactory.Escape(entry.Name),
+                board == Core.Sim.ArenaScore.Board ? Loc.Format("arena.points", "n", entry.Score) : UiFactory.FormatTime(entry.Score / 1000.0), false);
+        }
+
+        private static string EventBestText(RaceEventDefinition ev, Core.Save.EventBest best)
+        {
+            if (best == null) return "";
+            if (ev.mode == EventMode.Arena) return best.hasArenaScore ? Loc.Format("arena.points", "n", best.arenaPoints) : "";
+            return best.bestTimeMs > 0 ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) : "";
         }
 
         private static readonly Color Gold = new Color(1f, 0.8f, 0.25f), Silver = new Color(0.78f, 0.82f, 0.86f), Bronze = new Color(0.85f, 0.56f, 0.35f);
@@ -988,6 +1026,8 @@ namespace RacingGame
         private string RecordLine(RaceResultEntry me)
         {
             if (me == null || !me.Finished) return "";
+            if (flow.CurrentEvent != null && flow.CurrentEvent.mode == EventMode.Arena)
+                return (flow.LastWasPersonalBest ? Loc.Get("results.pb_first") + "  " : "") + Loc.Format("arena.points", "n", me.ArenaPoints.Total);
             if (!flow.LastHadPreviousBest) return Loc.Get("results.pb_first");
             if (!flow.LastWasPersonalBest && !flow.LastBestComparable)
                 return Loc.Get(flow.LastBestSetupKnown ? "results.pb_other_setup" : "results.pb_unknown_setup");
@@ -1061,6 +1101,7 @@ namespace RacingGame
             rewardText.fontStyle = FontStyles.Bold;
             if (Time.unscaledTime - rewardShownAt < RewardCountSeconds) rewardLabel = rewardText;   // count up once, not on every rebuild
             Label(summary, "Detail", flow.CurrentEvent != null && flow.CurrentEvent.eventId == TrainMission.EventId ? Loc.Get(TrainHud.ResultKey(TrainMission.Current?.Outcome ?? TrainOutcome.Running))
+                : SettlementMission.Current != null ? Loc.Get(flow.CurrentEvent.nameKey + (me != null && me.Finished ? ".win" : ".loss"))
                 : flow.LastRewardDoubled ? Loc.Get("results.ad_received") : missionEvent ? Loc.Get(me != null && me.Finished ? "mission.victory" : "mission.defeat")
                 : flow.CurrentEvent != null ? Loc.Get(flow.CurrentEvent.nameKey) : Loc.Get("results.title"), 26f, Top, Vector2.one, new Vector2(234f, -124f), new Vector2(-28f, -84f), UiFactory.Muted);
             string record = RecordLine(me);
@@ -1120,9 +1161,10 @@ namespace RacingGame
             var standings = columns ? UiFactory.Panel(body, "Standings", new Vector2(0.48f, 0f), Vector2.one, new Vector2(16f, 0f), Vector2.zero) : null;
             var board = columns ? UiFactory.Scroll(standings, "StandingsScroll", Vector2.zero, Vector2.zero) : content;
             Section(board, "StandingsTitle", Loc.Get("lb.title"));
+            if (results.IsArena) Section(board, "TieRule", Loc.Get("arena.tie_rule"));
             foreach (var entry in results.Entries)
             {
-                var row = Item(board, "Result" + entry.Position, 154f);
+                var row = Item(board, results.IsArena ? "ArenaResult" + entry.CarId : "Result" + entry.Position, results.IsArena ? 202f : 154f);
                 if (entry.IsPlayer) row.GetComponent<Image>().color = new Color(0.19f, 0.17f, 0.105f);
                 if (entry.IsPlayer) UiFactory.Panel(row, "Accent", Vector2.zero, new Vector2(0f, 1f), new Vector2(0f, 14f), new Vector2(4f, -14f), UiFactory.Accent, false);
                 Label(row, "Rank", entry.Position.ToString("00"), 42f, Vector2.zero, new Vector2(0f, 1f), new Vector2(22f, 18f), new Vector2(112f, -18f), entry.IsPlayer ? UiFactory.Accent : UiFactory.Muted, TextAlignmentOptions.Center).fontStyle = FontStyles.Bold;
@@ -1130,8 +1172,10 @@ namespace RacingGame
                 string progress = entry.Finished ? Loc.Format("results.best_lap", "t", UiFactory.FormatTime(entry.BestLap))
                     : Loc.Format("results.laps_completed", "n", entry.Laps, "total", results.LapsRequired);
                 string combat = Loc.Format("results.kills", "k", entry.Kills, "d", entry.Deaths);
+                if (results.IsArena) combat += "   " + Loc.Format("arena.assists", "n", entry.Assists) + "\n" + HudScreen.ArenaBreakdown(entry.ArenaPoints);
                 Label(row, "Detail", missionEvent || results.IsArena ? combat : progress + "   /   " + combat, 22f, Vector2.zero, Vector2.one, new Vector2(120f, 16f), new Vector2(-224f, -76f), UiFactory.Muted);
-                Label(row, "Time", entry.Finished ? UiFactory.FormatTime(entry.TotalTime) : Loc.Get(entry.Eliminated ? "results.eliminated" : unfinishedKey), 30f, new Vector2(1f, 0f), Vector2.one, new Vector2(-214f, 16f), new Vector2(-26f, -76f), entry.IsPlayer ? UiFactory.Positive : Color.white, TextAlignmentOptions.MidlineRight);
+                Label(row, "Time", results.IsArena ? Loc.Format("arena.points", "n", entry.ArenaPoints.Total)
+                    : entry.Finished ? UiFactory.FormatTime(entry.TotalTime) : Loc.Get(entry.Eliminated ? "results.eliminated" : unfinishedKey), 30f, new Vector2(1f, 0f), Vector2.one, new Vector2(-214f, 16f), new Vector2(-26f, -76f), entry.IsPlayer ? UiFactory.Positive : Color.white, TextAlignmentOptions.MidlineRight);
             }
         }
     }

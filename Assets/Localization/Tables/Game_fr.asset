@@ -2026,13 +2026,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998272
-    m_Localized: 3 minutes / {n} adversaires / le plus de destructions gagne
+    m_Localized: 3 minutes / {n} rivaux / le meilleur score gagne
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998273
     m_Localized: "Acc\xE9l\xE8re sur le pont. Pendant le saut au-dessus du centre,
-      appuie sur tir pour l\xE2cher une bombe. Quitte le cercle rouge avant l\u2019impact.
-      Le plus de destructions gagne."
+      appuie sur tir pour l\xE2cher une bombe. Quitte le cercle rouge avant l\u2019impact."
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998274
@@ -2375,6 +2374,108 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 29718720087928836
     m_Localized: "Dernier temps en entra\xEEnement \xB7 {t}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473942106112
+    m_Localized: "Convoi d\u2019eau"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077632
+    m_Localized: "Escortez la citerne jusqu\u2019au Dernier Puits"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077633
+    m_Localized: "L\u2019eau est arriv\xE9e au village"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077634
+    m_Localized: "La citerne a \xE9t\xE9 d\xE9truite"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077635
+    m_Localized: "Citerne {h}%   \xB7   Puits {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077636
+    m_Localized: "Embuscade ! Citerne {h}%   \xB7   {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077637
+    m_Localized: "Vue arri\xE8re"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077638
+    m_Localized: "Maintiens {button} pour regarder derri\xE8re toi en tournant."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077639
+    m_Localized: '{n} pts'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077640
+    m_Localized: "Furie \xD7{n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077641
+    m_Localized: "Turbo de d\xE9rapage"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077642
+    m_Localized: Touche une cible
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077643
+    m_Localized: "Percute \xE0 70 km/h"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077644
+    m_Localized: "Encha\xEEnement r\xE9ussi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077645
+    m_Localized: Vitesse perdue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077646
+    m_Localized: "En t\xEAte \xE0 \xE9galit\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077647
+    m_Localized: "Tu m\xE8nes de {n} pts"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077648
+    m_Localized: "T\xEAte {name} \xB7 \xE9cart {n} pts"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077649
+    m_Localized: "Vitesse {s} \xB7 touches {h} \xB7 \xE9liminations {k} \xB7 centre
+      {c} \xB7 survie {l}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077650
+    m_Localized: Assistances {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077651
+    m_Localized: "Points, \xE9liminations, puis moins de morts. \xC0 \xE9galit\xE9,
+      m\xEAme place."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077652
+    m_Localized: Chercher un rival proche
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077653
+    m_Localized: "Aucun rival compatible. Tu peux prendre le d\xE9part."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077654
+    m_Localized: "Rival {t} \xB7 \xC9cart avec ton temps {d}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29723557332594688
+    m_Localized: "Seuls les pillards peuvent endommager l\u2019objectif"
     m_Metadata:
       m_Items: []
   references:

@@ -2027,13 +2027,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998272
-    m_Localized: "3 minutos / {n} rivais / mais destrui\xE7\xF5es vence"
+    m_Localized: "3 minutos / {n} rivais / vence a maior pontua\xE7\xE3o"
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998273
     m_Localized: "Acelere na ponte. Ao saltar sobre o centro, pressione tiro para
-      soltar uma bomba. Saia do c\xEDrculo vermelho antes do impacto. Mais destrui\xE7\xF5es
-      vence."
+      soltar uma bomba. Saia do c\xEDrculo vermelho antes do impacto."
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998274
@@ -2373,6 +2372,107 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 29718720087928836
     m_Localized: "\xDAltima chegada de treino \xB7 {t}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473942106112
+    m_Localized: "Comboio de \xE1gua"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077632
+    m_Localized: "Escolte o caminh\xE3o at\xE9 o \xDAltimo Po\xE7o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077633
+    m_Localized: "A \xE1gua chegou ao povoado"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077634
+    m_Localized: "O caminh\xE3o foi destru\xEDdo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077635
+    m_Localized: "Caminh\xE3o {h}%   \xB7   Po\xE7o {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077636
+    m_Localized: "Emboscada! Caminh\xE3o {h}%   \xB7   {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077637
+    m_Localized: "Olhar atr\xE1s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077638
+    m_Localized: "Segure {button} para olhar para tr\xE1s enquanto faz a curva."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077639
+    m_Localized: '{n} pts'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077640
+    m_Localized: "F\xFAria \xD7{n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077641
+    m_Localized: Turbo de drift
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077642
+    m_Localized: Acerte o alvo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077643
+    m_Localized: Colida a 70 km/h
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077644
+    m_Localized: Combo completo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077645
+    m_Localized: Perdeu velocidade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077646
+    m_Localized: "Lideran\xE7a dividida"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077647
+    m_Localized: "Voc\xEA lidera por {n} pts"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077648
+    m_Localized: "L\xEDder {name} \xB7 diferen\xE7a {n} pts"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077649
+    m_Localized: "Velocidade {s} \xB7 acertos {h} \xB7 elimina\xE7\xF5es {k} \xB7
+      centro {c} \xB7 sobreviv\xEAncia {l}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077650
+    m_Localized: "Assist\xEAncias {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077651
+    m_Localized: "Pontos, elimina\xE7\xF5es e menos mortes. Empates dividem a posi\xE7\xE3o."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077652
+    m_Localized: "Buscar rival pr\xF3ximo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077653
+    m_Localized: "Sem rival compat\xEDvel. Voc\xEA pode correr."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077654
+    m_Localized: "Rival {t} \xB7 Diferen\xE7a para seu tempo {d}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29723557332594688
+    m_Localized: "S\xF3 os saqueadores podem danificar o objetivo"
     m_Metadata:
       m_Items: []
   references:

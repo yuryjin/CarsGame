@@ -92,6 +92,12 @@ namespace RacingGame
             int today = DailyRace.Today;
             foreach (var b in Save.Data.progress.bests)
             {
+                if (b == null) continue;
+                if (b.eventId == "a1")
+                {
+                    if (b.hasArenaScore) await p.Leaderboards.SubmitAsync(Core.Sim.ArenaScore.Board, b.arenaPoints);
+                    continue;
+                }
                 if (b.bestTimeMs <= 0) continue;   // stars-only rows have no time
                 if (b.eventId != null && b.eventId.Length > 1 && b.eventId[0] == 'd' && char.IsDigit(b.eventId[1]))
                 {

@@ -2022,13 +2022,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998272
-    m_Localized: "3 Minuten / {n} Gegner / die meisten Absch\xFCsse gewinnen"
+    m_Localized: "3 Minuten / {n} Gegner / h\xF6chste Punktzahl gewinnt"
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998273
     m_Localized: "Beschleunige auf der Br\xFCcke. Halte beim Sprung \xFCber die Mitte
-      Feuer, um eine Bombe abzuwerfen. Verlasse den roten Kreis vor dem Einschlag.
-      Die meisten Absch\xFCsse gewinnen."
+      Feuer, um eine Bombe abzuwerfen. Verlasse den roten Kreis vor dem Einschlag."
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998274
@@ -2370,6 +2369,107 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 29718720087928836
     m_Localized: "Letztes Trainingsziel \xB7 {t}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473942106112
+    m_Localized: Wasserkonvoi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077632
+    m_Localized: Begleite den Tanker zum Letzten Brunnen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077633
+    m_Localized: Das Wasser hat die Siedlung erreicht
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077634
+    m_Localized: "Der Tanker wurde zerst\xF6rt"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077635
+    m_Localized: "Tanker {h}%   \xB7   Brunnen {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077636
+    m_Localized: "Hinterhalt! Tanker {h}%   \xB7   {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077637
+    m_Localized: "R\xFCckblick"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077638
+    m_Localized: "Halte {button} beim Lenken f\xFCr den Blick nach hinten."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077639
+    m_Localized: '{n} Pkt.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077640
+    m_Localized: "Rausch \xD7{n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077641
+    m_Localized: Driftboost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077642
+    m_Localized: Treffer landen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077643
+    m_Localized: Rammen ab 70 km/h
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077644
+    m_Localized: Kette komplett
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077645
+    m_Localized: Zu langsam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077646
+    m_Localized: "Geteilte F\xFChrung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077647
+    m_Localized: "Du f\xFChrst mit {n} Pkt."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077648
+    m_Localized: "F\xFChrung {name} \xB7 Abstand {n} Pkt."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077649
+    m_Localized: "Tempo {s} \xB7 Treffer {h} \xB7 Absch\xFCsse {k} \xB7 Mitte {c}
+      \xB7 \xDCberleben {l}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077650
+    m_Localized: Vorlagen {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077651
+    m_Localized: "Punkte, Absch\xFCsse, weniger Tode. Bei Gleichstand geteilter Platz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077652
+    m_Localized: "\xC4hnlichen Gegner suchen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077653
+    m_Localized: Kein passender Gegner. Du kannst trotzdem starten.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077654
+    m_Localized: "Gegner {t} \xB7 Abstand zu deiner Zeit {d}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29723557332594688
+    m_Localized: "Nur Pl\xFCnderer k\xF6nnen das Schutzziel besch\xE4digen"
     m_Metadata:
       m_Items: []
   references:

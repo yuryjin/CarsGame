@@ -71,6 +71,7 @@ namespace RacingGame
         private float layoutTextScale = 1f;
         private TextMeshProUGUI helpText;
         private TrainHud trainHud;
+        private SettlementHud settlementHud;
         private CanvasGroup pauseControls;
         private string shownCenter;
         private SpeedometerGraphic speedDial;
@@ -462,6 +463,7 @@ namespace RacingGame
         {
             helpText.text = touchLayout ? Loc.Format("help.drive.touch", "button", Loc.Get("touch.reset")) : Loc.Get("help.drive.keys");
             if (!touchLayout) helpText.text += "\n\n" + Loc.Get("help.drive.gamepad");
+            helpText.text += "\n\n" + Loc.Format("help.rear_view", "button", touchLayout ? Loc.Get("touch.rear_view") : "V / R3");
             helpText.text += "\n\n" + Loc.Get("help.launch");
             string context = ControlsHint(touchLayout);
             string drift = Loc.Get(touchLayout ? "lesson.drift.touch" : "lesson.drift.keys");
@@ -966,12 +968,14 @@ namespace RacingGame
             goalsText.enableAutoSizing = false;
             goalsText.fontSize = font;
             float width = expanded ? Mathf.Min(820f, 500f * font / 23f) : touchLayout ? 64f / scale : 500f;
+            bool arena = race != null && race.IsArenaMode;
+            if (arena && !expanded) width = Mathf.Min(hudRoot.rect.width * .44f, 590f * font / 23f);
             bool mission = RaceSetup.Event != null && RaceSetup.Event.mode == EventMode.Mission;
             // The mission hides lap/position. Use that free corner, keeping expanded goals
             // beside the boss panel instead of covering its route and enemy count.
             if (mission)
                 width = Mathf.Min(width, Mathf.Max(260f, (hudRoot.rect.width - MissionHud.StatusWidthPixels(Screen.width, scale) / scale) * 0.5f - 60f));
-            float height = expanded ? Mathf.Max(152f, goalsText.GetPreferredValues(goalsText.text, width - 32f, float.PositiveInfinity).y + 24f)
+            float height = expanded || arena ? Mathf.Max(expanded ? 152f : 68f, goalsText.GetPreferredValues(goalsText.text, width - 32f, float.PositiveInfinity).y + 24f)
                 : Mathf.Max(62f, (touchLayout ? 44f : 28f) / scale);
             float top = mission ? -24f : touchLayout ? -332f : Mathf.Min(-190f, racePanel.offsetMin.y - 16f);
             if (touchLayout && expanded)
@@ -1245,6 +1249,7 @@ namespace RacingGame
         public static string ControlsHint(bool touch)
         {
             var ev = RaceSetup.Event;
+            if (ev != null && SettlementMission.Supports(ev.eventId)) return Loc.Get(ev.nameKey + ".goal");
             if (ev != null && ev.eventId == TrainMission.EventId) return Loc.Format("train.lesson", "s", TrainMission.HoldSeconds);
             if (ev != null && ev.mode == EventMode.Arena) return Loc.Get("arena.lesson");
             if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.HotBomb) return Loc.Get("lesson.bomb");
@@ -1508,11 +1513,39 @@ namespace RacingGame
             {
                 race.ReadResult(race.Player, goalEntry);
                 bool expanded = goalsExpanded || race.State == RaceState.Countdown;
-                goalsText.text = expanded ? StarGoalText.Progress(RaceSetup.Event, goalEntry)
+                goalsText.text = race.IsArenaMode && race.Player.Score != null ? ArenaStanding(expanded)
+                    : expanded ? StarGoalText.Progress(RaceSetup.Event, goalEntry)
                     : Loc.Format(touchLayout ? "goals.compact.touch" : "goals.compact", "n", RaceEventDefinition.CountStars(RaceSetup.Event.StarMask(goalEntry)));
                 LayoutGoals(expanded);
             }
         }
+
+        private string ArenaStanding(bool expanded)
+        {
+            var score = race.Player.Score;
+            var points = score.Points;
+            string next = score.ComboStep == 0 ? "arena.combo.drift" : score.ComboStep == 1 ? "arena.combo.hit" : "arena.combo.ram";
+            string reason = score.Change == Core.Sim.ArenaScore.HeatChange.Chain ? "arena.combo.chain"
+                : score.Change == Core.Sim.ArenaScore.HeatChange.Slowed ? "arena.combo.slow"
+                : score.Change == Core.Sim.ArenaScore.HeatChange.Death ? "hud.wrecked" : next;
+            string text = Loc.Format("arena.points", "n", points.Total) + "   " + Loc.Format("arena.heat", "n", score.Multiplier) + " · " + Loc.Get(reason);
+            if (expanded) text += "\n" + ArenaBreakdown(points);
+            if (race.State == RaceState.Racing && race.RemainingTime <= 30d)
+            {
+                var leader = race.ArenaLeader(out bool shared, out int runnerUpPoints);
+                if (leader != null)
+                {
+                    if (race.PositionOf(race.Player) == 1)
+                        text += "\n" + (shared ? Loc.Get("arena.tied") : Loc.Format("arena.leading", "n", points.Total - runnerUpPoints));
+                    else text += "\n" + Loc.Format("arena.chase", "name", UiFactory.Escape(GetLocalizedRacerName(leader.displayName)),
+                        "n", leader.Score.Points.Total - points.Total);
+                }
+            }
+            return text;
+        }
+
+        internal static string ArenaBreakdown(Core.Sim.ArenaPoints p) => Loc.Format("arena.portions",
+            "s", p.Speed, "h", p.Hits, "k", p.Knockouts, "c", p.Centre, "l", p.Survival);
 
         private void OnKillRegistered(KillEvent evt)
         {
@@ -1666,6 +1699,7 @@ namespace RacingGame
         public void SetVisible(bool visible)
         {
             if (trainHud != null) { trainHud.gameObject.SetActive(false); Destroy(trainHud.gameObject); trainHud = null; }
+            if (settlementHud != null) { settlementHud.gameObject.SetActive(false); Destroy(settlementHud.gameObject); settlementHud = null; }
             foreach (var c in GetComponentsInChildren<Canvas>(true)) if (c.name == "HUD") c.gameObject.SetActive(visible);
             pausePanel.gameObject.SetActive(visible && PauseController.IsPaused);
             helpPanel.gameObject.SetActive(false);
@@ -1677,14 +1711,15 @@ namespace RacingGame
                 bool practice = gameFlow != null && gameFlow.IsPractice;
                 var train = TrainMission.Current;
                 if (train != null) trainHud = TrainHud.Create(train, this, hudRoot);
+                if (SettlementMission.Current != null) settlementHud = SettlementHud.Create(SettlementMission.Current, this, hudRoot);
                 racePanel.gameObject.SetActive(!practice && !race.IsMissionMode);
-                timerPanel.gameObject.SetActive(!practice && train == null);
+                timerPanel.gameObject.SetActive(!practice && train == null && settlementHud == null);
                 SetTimer(0d);
                 goalsExpanded = false;
                 hintText.text = ControlsHint(touchLayout);
                 LayoutHint();
-                hintUntil = train == null ? Time.unscaledTime + ControlsHintSeconds : -1f;
-                hintPanel.gameObject.SetActive(train == null); playerCar = null;
+                hintUntil = train == null && settlementHud == null ? Time.unscaledTime + ControlsHintSeconds : -1f;
+                hintPanel.gameObject.SetActive(train == null && settlementHud == null); playerCar = null;
             }
             if (eventPanel != null) eventPanel.gameObject.SetActive(false);
             sectorPanel.gameObject.SetActive(false);

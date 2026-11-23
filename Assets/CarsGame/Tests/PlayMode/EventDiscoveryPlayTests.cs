@@ -290,7 +290,7 @@ namespace RacingGame.Tests
             var culture = CultureInfo.GetCultureInfo(Loc.Language);
             if (!PlatformGlue.Save.Data.progress.unlockedEvents.Contains("e6"))
                 PlatformGlue.Save.Data.progress.unlockedEvents.Add("e6");
-            foreach (string id in new[] { "m1", TrainMission.EventId, "e18", "e6" })
+            foreach (string id in new[] { "m1", TrainMission.EventId, SettlementMission.TankerEvent, "e18", "e6" })
             {
                 menu.Show("events");
                 GameObject.Find("Tier2").GetComponent<Button>().onClick.Invoke();
@@ -298,6 +298,11 @@ namespace RacingGame.Tests
                 string stats = CardText(start, "Stats"), difficulty = CardText(start, "Difficulty");
                 Assert.IsTrue(start.interactable);
                 start.onClick.Invoke();
+                if (id == "m1")
+                {
+                    Assert.AreEqual("missionBriefing", menu.Current);
+                    GameObject.Find("Deploy").GetComponent<Button>().onClick.Invoke();
+                }
                 var field = race.Participants.Where(p => !p.isPlayer).ToArray();
                 if (id == "m1")
                 {
@@ -319,6 +324,12 @@ namespace RacingGame.Tests
                     Assert.AreEqual(Loc.Get("train.detail"), stats);
                     StringAssert.Contains("1", stats);
                     StringAssert.Contains(Loc.Format("train.guard_fire", "s", interval.ToString("0.##", culture)), difficulty);
+                }
+                else if (SettlementMission.Supports(id))
+                {
+                    Assert.IsEmpty(field);
+                    Assert.IsNotEmpty(SettlementMission.Current.Attackers);
+                    StringAssert.Contains(Loc.Get("mission.raider_fire"), difficulty);
                 }
                 else
                 {

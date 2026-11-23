@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace RacingGame
 {
-    public enum UnitKind { Drone, Infantry, RocketTrooper, Turret, Plane, BossPart, BossCore, BossHull }
+    public enum UnitKind { Drone, Infantry, RocketTrooper, Turret, Plane, BossPart, BossCore, BossHull, ProtectedObjective }
 
     /// <summary>
     /// A mission enemy that is not a car (drone, cyborg trooper, turret, plane, a part of the boss). Owns its hit

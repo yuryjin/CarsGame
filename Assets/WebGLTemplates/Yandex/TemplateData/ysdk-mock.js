@@ -16,8 +16,8 @@
   };
   // Leaderboards: v2 (ysdk.leaderboards) unless ?lb=legacy, so both code paths can be exercised.
   var boards = {}; try { boards = JSON.parse(localStorage.getItem('cars.mock.lb') || '{}'); } catch (e) {}
-  // Boards are ascending (times) except 'daily', which is created DESCENDING in the console (day-encoded score).
-  function mockSetScore(b, s) { var desc = b === 'daily'; if (!(b in boards) || (desc ? s > boards[b] : s < boards[b])) boards[b] = s; try { localStorage.setItem('cars.mock.lb', JSON.stringify(boards)); } catch (e) {} return Promise.resolve(); }
+  // Time boards keep the lowest score. Daily and arena boards keep the highest.
+  function mockSetScore(b, s) { var desc = b === 'daily' || b === 'arena_points_v1'; if (!(b in boards) || (desc ? s > boards[b] : s < boards[b])) boards[b] = s; try { localStorage.setItem('cars.mock.lb', JSON.stringify(boards)); } catch (e) {} return Promise.resolve(); }
   function mockGetEntries(b) { return Promise.resolve({ entries: b in boards ? [{ rank: 1, score: boards[b], player: { uniqueID: 'mock-user', publicName: 'Mock Player' } }] : [] }); }
   var sdk = {
     environment: { i18n: { lang: params.get('lang') || 'ru' }, app: { id: 'mock' } },

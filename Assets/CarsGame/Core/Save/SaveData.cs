@@ -47,6 +47,8 @@ namespace RacingGame.Core.Save
     {
         public string eventId;
         public long bestTimeMs;
+        public bool hasArenaScore;
+        public int arenaPoints;
         public int stars;
         // Missing on legacy records: never infer old conditions from today's garage selection.
         public RecordSetup setup;
@@ -141,7 +143,7 @@ namespace RacingGame.Core.Save
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 9;
+        public const int CurrentVersion = 10;
         public int version = CurrentVersion;
         public long updatedAtUnixMs;
         public string deviceId = "";

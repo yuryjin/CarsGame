@@ -2315,6 +2315,106 @@ MonoBehaviour:
     m_Key: practice.last_time
     m_Metadata:
       m_Items: []
+  - m_Id: 29721473942106112
+    m_Key: events.m3.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077632
+    m_Key: events.m3.name.goal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077633
+    m_Key: events.m3.name.win
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077634
+    m_Key: events.m3.name.loss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077635
+    m_Key: settlement.tanker_status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077636
+    m_Key: settlement.tanker_threat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077637
+    m_Key: touch.rear_view
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077638
+    m_Key: help.rear_view
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077639
+    m_Key: arena.points
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077640
+    m_Key: arena.heat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077641
+    m_Key: arena.combo.drift
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077642
+    m_Key: arena.combo.hit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077643
+    m_Key: arena.combo.ram
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077644
+    m_Key: arena.combo.chain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077645
+    m_Key: arena.combo.slow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077646
+    m_Key: arena.tied
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077647
+    m_Key: arena.leading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077648
+    m_Key: arena.chase
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077649
+    m_Key: arena.portions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077650
+    m_Key: arena.assists
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077651
+    m_Key: arena.tie_rule
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077652
+    m_Key: rival.find
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077653
+    m_Key: rival.empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077654
+    m_Key: rival.match
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29723557332594688
+    m_Key: mission.raider_fire
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

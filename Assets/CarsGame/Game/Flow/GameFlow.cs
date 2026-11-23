@@ -69,6 +69,7 @@ namespace RacingGame
         private BrakingBoards brakingBoards;
         private MissionDirector mission;
         private TrainMission trainMission;
+        private SettlementMission settlementMission;
         private TrackFork trackFork;
         private HotBombRace hotBomb;
         private PickupSpawner pickups;
@@ -78,7 +79,7 @@ namespace RacingGame
         private readonly System.Collections.Generic.List<GhostCar> ghosts = new System.Collections.Generic.List<GhostCar>();
         private int raceGeneration;               // invalidates async work (ghost loads, ads) from an earlier race
         private bool doubling;
-        [System.Serializable] private class GhostSession { public string ghost; public string name; }
+        [System.Serializable] private class GhostSession { public string ghost; public string name; public int laps; }
         private static readonly Color GhostTint = new Color(0.6f, 0.8f, 1f, 0.35f);
 
         private void Awake()
@@ -160,6 +161,7 @@ namespace RacingGame
             PauseController.Set(PauseReason.User | PauseReason.Menu, false);
             if (mission != null) { mission.Dispose(); Destroy(mission.gameObject); mission = null; }
             if (trainMission != null) { trainMission.Dispose(); Destroy(trainMission.gameObject); trainMission = null; }
+            if (settlementMission != null) { settlementMission.Dispose(); Destroy(settlementMission.gameObject); settlementMission = null; }
             if (pickups != null) pickups.Clear();
             if (trackFork != null) { trackFork.Restore(); Destroy(trackFork.gameObject); trackFork = null; }
             if (spaceTrack != null) { spaceTrack.Restore(); Destroy(spaceTrack.gameObject); spaceTrack = null; }
@@ -253,6 +255,7 @@ namespace RacingGame
             if (ev != null && ev.mode == EventMode.Mission)
             {
                 if (ev.eventId == TrainMission.EventId) trainMission = TrainMission.Create(race);
+                else if (SettlementMission.Supports(ev.eventId)) settlementMission = SettlementMission.Create(race);
                 else mission = MissionDirector.Create(race);
             }
             bool onCircuit = ev == null || ev.mode == EventMode.Race;
@@ -370,23 +373,38 @@ namespace RacingGame
             }
 
             if (ev != null && ev.twist == RaceTwist.TimeTrial) return;
+            long target = RivalTarget(ev, hash, race.laps, own);
+            var choice = preparedRival;
+            preparedRival = null;
+            if (choice != null && choice.Replay.TrackHash == hash && choice.Laps == race.laps && choice.TargetMs == target && choice.EventId == ev?.eventId)
+            {
+                AddGhost(GhostCar.Spawn(prefab, choice.Replay, GhostTint));
+                return;
+            }
             var sessions = PlatformGlue.Platform?.Sessions;
             if (sessions == null) return;
             // Yandex sessions filter by numeric meta1..meta3: meta1 = event/layout hash, meta2 = finish time (ms).
             var r = await sessions.LoadOpponentsAsync(3, "{\"meta1\":" + EventMeta(ev) + "}");
             if (this == null || generation != raceGeneration || State != FlowState.Racing || !r.Ok) return;   // race changed meanwhile
+            if (target > 0)
+            {
+                var match = ChooseRival(r.Value, ev, hash, race.laps, target);
+                if (match != null) AddGhost(GhostCar.Spawn(prefab, match.Replay, GhostTint));
+                return;
+            }
+            if (r.Value == null) return;
             foreach (var payload in r.Value)
             {
                 var session = ParseSession(payload);
                 var rec = session != null ? Core.Ghost.GhostRecord.FromBase64(session.ghost) : null;
-                if (rec == null || rec.TrackHash != hash || ghosts.Count >= 4) continue;
+                if (rec == null || rec.TrackHash != hash || session.laps != 0 && session.laps != race.laps || ghosts.Count >= 4) continue;
                 if (!string.IsNullOrEmpty(session.name)) rec.PlayerName = UiFactory.Escape(session.name);
                 AddGhost(GhostCar.Spawn(prefab, rec, GhostTint));
             }
         }
 
         /// <summary>Positive, stable numeric id for the event + direction (Yandex session meta fields are numbers).</summary>
-        private int EventMeta(RaceEventDefinition ev) => (TrackHash(ev) & 0x7fffffff) % 1000000000;
+        private int EventMeta(RaceEventDefinition ev) => SessionMeta(TrackHash(ev));
 
         // A ghost that arrives after GO starts from the elapsed race time instead of frozen at the line.
         private void AddGhost(GhostCar g)
@@ -616,7 +634,8 @@ namespace RacingGame
             }
             if (playerEngine != null) playerEngine.SetRunning(true);
             foreach (var g in ghosts) if (g != null) g.Begin(race.RaceStartTime);
-            if (!IsTestDrive && yesterdayPractice == null && trainMission == null && race.Player != null) recorder.Begin(race.Player, TrackHash(RaceSetup.Event), UiFactory.Escape(PlatformGlue.Platform != null ? PlatformGlue.Platform.Player.Name : "You"));
+            if (!IsTestDrive && yesterdayPractice == null && trainMission == null && settlementMission == null && race.Player != null)
+                recorder.Begin(race.Player, TrackHash(RaceSetup.Event), UiFactory.Escape(PlatformGlue.Platform != null ? PlatformGlue.Platform.Player.Name : "You"));
         }
         private void OnParticipantFinished(RaceParticipant p)
         {
@@ -644,7 +663,7 @@ namespace RacingGame
             if (sessions != null)
             {
                 sessions.Commit(encoded);
-                _ = sessions.PushAsync("{\"meta1\":" + EventMeta(RaceSetup.Event) + ",\"meta2\":" + rec.DurationMilliseconds + "}");
+                _ = sessions.PushAsync("{\"meta1\":" + EventMeta(RaceSetup.Event) + ",\"meta2\":" + rec.DurationMilliseconds + ",\"meta3\":" + race.laps + "}");
             }
         }
 
@@ -669,13 +688,13 @@ namespace RacingGame
             var save = PlatformGlue.Save;
             var ev = RaceSetup.Event;
             float mult = RaceSetup.Tier != null ? RaceSetup.Tier.rewardMultiplier : 1f;
-            int[] killsPerVictim = me != null ? me.KillsPerVictim : null;
+            // A tied arena place pays the same kill bonus regardless of which rivals were hit.
+            int[] killsPerVictim = results.IsArena && me != null ? new[] { me.Kills } : me?.KillsPerVictim;
             LastPayout = me != null ? Economy.Payout(me.Position, me.Finished, me.Laps, race.laps, killsPerVictim, mult) : default;
             if (mission != null) LastPayout = mission.Payout(me, mult);
             LastTurretReward = me != null && starRing != null ? Mathf.RoundToInt(me.TurretPoints * mult) : 0;
             LastReward = LastPayout.Total + LastTurretReward;
-            // The floor is for the first FINISHED race (a DNF before it must not use it up); a finish always leaves a timed best.
-            bool firstFinish = save != null && !save.Data.progress.bests.Exists(b => b != null && b.bestTimeMs > 0);
+            bool firstFinish = save != null && !save.Data.progress.bests.Exists(b => b != null && (b.bestTimeMs > 0 || b.hasArenaScore));
             LastFirstFinishBonus = me != null && save != null ? Economy.WithFirstRaceFloor(LastReward, me.Finished, firstFinish) - LastReward : 0;
             LastReward += LastFirstFinishBonus;
             LastRewardFinished = me != null && me.Finished;
@@ -700,10 +719,11 @@ namespace RacingGame
                 {
                     var best = save.Data.progress.bests.Find(b => b.eventId == ev.eventId);
                     if (raceRecordSetup != null) raceRecordSetup.continued = continueUsed;
+                    bool timed = ev.mode != EventMode.Arena;
                     if (me.Finished)
                         Core.Save.RecentAttempts.Record(save.Data.progress, row.deviceId + "/" + row.races.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                            ev.eventId, (long)(me.TotalTime * 1000d), DailyRace.NowUnixMs, raceRecordSetup);
-                    if (me.Finished && best != null && best.bestTimeMs > 0)
+                            ev.eventId, (long)(me.TotalTime * 1000d), DailyRace.NowUnixMs, raceRecordSetup, timed ? (int?)null : me.ArenaPoints.Total);
+                    if (timed && me.Finished && best != null && best.bestTimeMs > 0)
                     {
                         LastHadPreviousBest = true;
                         LastBestDeltaMs = (long)(me.TotalTime * 1000.0) - best.bestTimeMs;
@@ -713,19 +733,26 @@ namespace RacingGame
                     LastWasPersonalBest = me.Finished && (!LastHadPreviousBest || LastBestDeltaMs < 0);
                     if (best == null)
                     {
-                        best = new Core.Save.EventBest { eventId = ev.eventId, bestTimeMs = me.Finished ? (long)(me.TotalTime * 1000.0) : 0, stars = runStars };
+                        best = new Core.Save.EventBest { eventId = ev.eventId, bestTimeMs = timed && me.Finished ? (long)(me.TotalTime * 1000.0) : 0, stars = runStars };
                         save.Data.progress.bests.Add(best);
                     }
                     else
                     {
-                        if (me.Finished)
+                        if (timed && me.Finished)
                         {
                             long ms = (long)(me.TotalTime * 1000.0);
                             if (ms < best.bestTimeMs || best.bestTimeMs <= 0) best.bestTimeMs = ms;
                         }
                         best.stars |= runStars;
                     }
-                    if (LastWasPersonalBest || me.Finished && LastHadPreviousBest && LastBestDeltaMs == 0 && !LastBestSetupKnown)
+                    if (!timed && me.Finished)
+                    {
+                        LastHadPreviousBest = best.hasArenaScore;
+                        LastWasPersonalBest = !best.hasArenaScore || me.ArenaPoints.Total > best.arenaPoints;
+                        if (LastWasPersonalBest) best.arenaPoints = me.ArenaPoints.Total;
+                        best.hasArenaScore = true;
+                    }
+                    if (timed && (LastWasPersonalBest || me.Finished && LastHadPreviousBest && LastBestDeltaMs == 0 && !LastBestSetupKnown))
                         best.setup = raceRecordSetup?.Copy();
                     if (playerSectors != null)
                         LastTrainingSectors = best.KeepSectors(TrackHash(ev), race.laps, playerSectors.BestDurations());

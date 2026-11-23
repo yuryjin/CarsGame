@@ -5,6 +5,17 @@ const { chromium } = await import(process.env.PLAYWRIGHT_CORE || '/home/user/gst
 if (!process.env.WEBTEST_CHROME_ARGS) throw new Error('Use webtest');
 const out = process.env.OUT || '/tmp/cars-event-discovery';
 await fs.mkdir(out, { recursive: true });
+const expectedCards = [], expectedUnlocked = [];
+for (const directory of ['Assets/Data/Events', 'Assets/CarsGame/Resources/Events']) {
+  const base = new URL('../../' + directory + '/', import.meta.url);
+  for (const file of (await fs.readdir(base)).filter(name => name.endsWith('.asset'))) {
+    const asset = await fs.readFile(new URL(file, base), 'utf8');
+    const id = asset.match(/^  eventId: (\S+)$/m)?.[1];
+    assert(id, file + ' has an event ID');
+    expectedCards.push('Start_' + id);
+    if (!/^  unlockAfterEventId: +\S/m.test(asset)) expectedUnlocked.push('Start_' + id);
+  }
+}
 const tiers = await Promise.all(['easy', 'normal', 'hard'].map(async id => {
   const file = new URL(`../../Assets/Data/Difficulty/Difficulty_${id}.asset`, import.meta.url);
   const asset = await fs.readFile(file, 'utf8');
@@ -48,9 +59,9 @@ try {
       await fs.writeFile(`${out}/evidence.json`, JSON.stringify({ evidence, errors }, null, 2));
       if (['ru', 'zh'].includes(lang)) await page.screenshot({ path: `${out}/${lang}-events.png` });
       const cards = state.buttons.filter(b => b.name.startsWith('Start_'));
-      assert.equal(cards.length, 24, 'Every race, mission and arena remains available in the list');
+      assert.deepEqual(cards.map(b => b.name).sort(), [...expectedCards].sort(), 'Every authored race, mission and arena is listed');
       const available = cards.filter(b => b.interactable), locked = cards.filter(b => !b.interactable);
-      assert.equal(available.length, 10, 'Fresh players can choose all ten unlocked modes');
+      assert.deepEqual(available.map(b => b.name).sort(), [...expectedUnlocked].sort(), 'A fresh player can choose every starting event');
       assert(available.some(b => b.name === 'Start_tt1'), 'A new driver can start a solo time trial');
       assert(available.some(b => b.name === 'Start_a1'), 'The arena is available from the first launch');
       assert(available.some(b => b.name === 'Start_m2'), 'The train chase is available from the first launch');

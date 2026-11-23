@@ -19,6 +19,7 @@ namespace RacingGame
         public int SimulationOrder => 2100;
         public int LiveBombs => strikes != null ? strikes.Count : 0;
         public bool Running => race != null && race.State == RaceState.Racing;
+        public float Duration => race != null ? race.MatchDuration : 180f;
         /// <summary>The fight zone the minefield covers: a ring between the centre and the spawn circle.</summary>
         public const float MineInnerRadius = 7f, MineOuterRadius = 34f, MineSpacing = 7f;
 
@@ -153,7 +154,23 @@ namespace RacingGame
         public void SimulationStep(int tick)
         {
             if (!Running) { strikes?.Clear(); return; }
+            for (int i = 0; i < spawner.Participants.Count; i++)
+            {
+                var p = spawner.Participants[i];
+                if (p.Score == null || p.Car.Body == null || p.Health != null && p.Health.IsDead) continue;
+                Vector3 local = transform.InverseTransformPoint(p.transform.position);
+                p.Score.Step(p.Car.Body.linearVelocity.magnitude * 3.6f, Mathf.Abs(p.Car.LastCommand.Steer) > .45f,
+                    local.x * local.x + local.z * local.z <= 35f * 35f, p.Car.IsDrifting);
+            }
             strikes?.Step(tick);
+        }
+
+        internal RaceParticipant FindCar(int id)
+        {
+            if (id >= 0)
+                for (int i = 0; i < spawner.Participants.Count; i++)
+                    if (spawner.Participants[i].Car.CarId == id) return spawner.Participants[i];
+            return null;
         }
 
         private void LateUpdate()

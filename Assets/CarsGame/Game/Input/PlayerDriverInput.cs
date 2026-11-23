@@ -22,7 +22,7 @@ namespace RacingGame
         [Range(0f, 1f)] public float touchSteeringAssist = 0.35f;
 
         private InputActionMap map;
-        private InputAction throttleAction, steerAction, brakeAction, fireAction, secondaryAction, resetAction;
+        private InputAction throttleAction, steerAction, brakeAction, fireAction, secondaryAction, resetAction, rearViewAction;
         private float throttle, steer;
         private bool brake, fire, secondary, mouseAimActive;
         private readonly EdgeLatch resetLatch = new EdgeLatch();
@@ -41,6 +41,8 @@ namespace RacingGame
         public bool WeaponWheelOpen { get; private set; }
         public int WheelSelection { get; private set; }
         public int SelectionPage { get; private set; }
+        public bool RearViewHeld { get; private set; }
+        private bool rearNeedsRelease, focusLost;
 
         public bool UsingActionMap => map != null;
         /// <summary>Current throttle level (0..1 forward) even while the car ignores commands (countdown revving).</summary>
@@ -87,6 +89,7 @@ namespace RacingGame
                 fireAction = map.FindAction("Fire");
                 secondaryAction = map.FindAction("Secondary");
                 resetAction = map.FindAction("Reset");
+                rearViewAction = map.FindAction("RearView");
                 for (int i = 0; i < primaryActions.Length; i++)
                     primaryActions[i] = map.FindAction(i == 0 ? "PrimaryCannon" : i == 1 ? "PrimaryMachineGun" : "PrimarySlot" + (i + 1));
                 map.Enable();
@@ -103,6 +106,12 @@ namespace RacingGame
             ClearInput();
         }
 
+        private void OnApplicationFocus(bool focused)
+        {
+            focusLost = !focused;
+            if (!focused) ClearInput();
+        }
+
         private void OnPaused(bool paused)
         {
             // Simulation stops during a pause, but frame input continues. Discard commands
@@ -113,6 +122,7 @@ namespace RacingGame
         private void ClearInput()
         {
             if (cannon != null) cannon.ClearAimCommit();
+            RearViewHeld = false; rearNeedsRelease = true;
             throttle = steer = 0f; brake = fire = secondary = mouseAimActive = false; resetLatch.Clear(); pendingPrimary = 0;
             WeaponWheelOpen = false; WheelSelection = 0;
         }
@@ -121,6 +131,10 @@ namespace RacingGame
         {
             if (PauseController.IsPaused) { ClearInput(); return; }
             if (map != null) ReadActions(); else PollDevices();
+            bool rearPressed = rearViewAction != null ? rearViewAction.IsPressed()
+                : Keyboard.current?.vKey.isPressed == true || Gamepad.current?.rightStickButton.isPressed == true;
+            if (!rearPressed) rearNeedsRelease = false;
+            RearViewHeld = rearPressed && !rearNeedsRelease && !focusLost;
 
             ReadWeaponSelection();
             if (PlatformGlue.Save != null && PlatformGlue.Save.Loaded) autoAim = PlatformGlue.Save.Data.settings.autoAim;

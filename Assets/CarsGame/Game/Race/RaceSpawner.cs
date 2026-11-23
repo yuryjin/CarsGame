@@ -96,8 +96,11 @@ namespace RacingGame
                 var paint = go.GetComponent<CarPaint>() ?? go.AddComponent<CarPaint>();
                 participant.isPlayer = isPlayer;
                 participant.laneOffset = lane;
-                participant.Arena = Arena;
-                if (arena) go.AddComponent<ArenaBombDrop>().Initialize(Arena);
+                if (arena)
+                {
+                    participant.JoinArena(Arena);
+                    go.AddComponent<ArenaBombDrop>().Initialize(Arena);
+                }
                 participant.Site = site ? Site : null;
                 participant.Progress.enabled = !arena && !site;
                 if (participant.Health != null)
