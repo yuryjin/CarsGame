@@ -27,10 +27,11 @@ namespace RacingGame.Tests
             public void Join(uint code) { }
             public void StartMatch() { }
             public void Leave() { State = RoomState.Offline; }
-            public void ReportFinish(RaceResults result) { }
+            public RaceResults ReportedResult { get; private set; }
+            public void ReportFinish(RaceResults result) => ReportedResult = result;
         }
 
-        [UnityTest, Timeout(120000)]
+        [UnityTest, Timeout(300000)]
         public IEnumerator AFinishedHostWaitsForTheSecondDriverBeforeShowingRoomResults()
         {
             float previousClock = Time.captureDeltaTime;
@@ -44,16 +45,46 @@ namespace RacingGame.Tests
                 yield return null;
                 flow = Object.FindAnyObjectByType<GameFlow>();
                 var race = flow.GetComponent<RaceManager>();
-                GameFlow.Room = new Room { State = RoomState.Playing };
+                var room = new Room { State = RoomState.Playing };
+                GameFlow.Room = room;
                 Assert.IsTrue(flow.StartPrivateMatch(12345));
+
+                var guest = race.Participants[1];
+                var driving = guest.Car.InputSource;
+                Assert.IsInstanceOf<AiDriver>(driving);
+                var parked = guest.gameObject.AddComponent<ScriptedDriverInput>();
+                parked.Set(0f, 0f, brakeValue: true);
+                // The live room replaces this seat's grid AI with the connected driver's input.
+                guest.Car.SetInputSource(parked);
                 Object.FindAnyObjectByType<DebugBus>().Execute("autopilot", "on");
-                float deadline = Time.realtimeSinceStartup + 95f;
+                float deadline = Time.realtimeSinceStartup + 110f;
                 while (!race.HasFinished(race.Player) && Time.realtimeSinceStartup < deadline) yield return null;
                 Assert.IsTrue(race.HasFinished(race.Player));
-                Assert.IsFalse(race.HasFinished(race.Participants[1]));
+                Assert.Greater(parked.SamplesTaken, 0);
+                Assert.IsTrue(parked.LastCommand.Brake);
+                double hostTime = race.PlayerElapsedTime;
+
+                // Give the solo spectator grace period time to expire with the guest still on the grid.
+                while (race.State == RaceState.Finishing && race.RaceTime < hostTime + race.finishGraceSeconds + .5d)
+                    yield return null;
+                Assert.IsFalse(race.HasFinished(guest));
+                Assert.AreEqual(0, guest.Progress.LapsCompleted);
                 Assert.IsFalse(race.ShowResultsAfterFinish());
                 Assert.IsNull(race.PhotoFirst);
                 Assert.AreEqual(RaceState.Finishing, race.State);
+                Assert.IsNull(room.ReportedResult);
+
+                guest.Car.SetInputSource(driving);
+                deadline = Time.realtimeSinceStartup + 110f;
+                while (room.ReportedResult == null && Time.realtimeSinceStartup < deadline) yield return null;
+                Assert.NotNull(room.ReportedResult);
+                var guestResult = room.ReportedResult.Entries.Find(entry => entry.CarId == guest.Car.CarId);
+                Assert.NotNull(guestResult);
+                Assert.IsTrue(guestResult.Finished);
+                Assert.AreEqual(race.laps, guestResult.Laps);
+                Assert.Greater(guestResult.TotalTime, hostTime);
+                Assert.AreEqual(RaceState.Finished, race.State);
+                TestContext.WriteLine($"Host finished at {hostTime:F3}s. Guest finished at {guestResult.TotalTime:F3}s after {parked.SamplesTaken} stationary input samples.");
             }
             finally
             {
