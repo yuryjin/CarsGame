@@ -11,6 +11,7 @@ namespace RacingGame.Core.Sim
         public double TotalProgress;  // lap * trackLength + distance, valid when !Finished
         public int Kills;
         public int Deaths;
+        public int Points;
     }
 
     /// <summary>
@@ -63,28 +64,28 @@ namespace RacingGame.Core.Sim
 
         public static int CompareArena(RankEntry a, RankEntry b)
         {
-            int c = b.Kills.CompareTo(a.Kills);
+            int c = b.Points.CompareTo(a.Points);
             if (c != 0) return c;
-            c = a.Deaths.CompareTo(b.Deaths);
+            c = b.Kills.CompareTo(a.Kills);
             if (c != 0) return c;
-            return a.CarId.CompareTo(b.CarId);
+            return a.Deaths.CompareTo(b.Deaths);
         }
 
         /// <summary>Returns 1-based positions indexed by the entry's original index for arena mode. Allocates; tests and tools only.</summary>
-        public static int[] RankArena(List<RankEntry> entries)
+        public static int[] RankArena(List<RankEntry> entries, bool sharedPlaces = true)
         {
             var order = new List<int>(entries.Count);
             var positions = new int[entries.Count];
-            RankArena(entries, order, positions);
+            RankArena(entries, order, positions, sharedPlaces);
             return positions;
         }
 
         /// <summary>
         /// Allocation-free ranking for arena deathmatch: <paramref name="order"/> is scratch space,
         /// <paramref name="positions"/> (length ≥ entries.Count) receives 1-based positions by original index.
-        /// Insertion sort: sorted by Kills desc, Deaths asc, CarId asc.
+        /// CarId orders equal rows for display. Missions retain distinct places.
         /// </summary>
-        public static void RankArena(List<RankEntry> entries, List<int> order, int[] positions)
+        public static void RankArena(List<RankEntry> entries, List<int> order, int[] positions, bool sharedPlaces = true)
         {
             order.Clear();
             for (int i = 0; i < entries.Count; i++) order.Add(i);
@@ -92,10 +93,19 @@ namespace RacingGame.Core.Sim
             {
                 int key = order[i];
                 int j = i - 1;
-                while (j >= 0 && CompareArena(entries[order[j]], entries[key]) > 0) { order[j + 1] = order[j]; j--; }
+                while (j >= 0)
+                {
+                    var left = entries[order[j]];
+                    int c = CompareArena(left, entries[key]);
+                    if (c < 0 || c == 0 && left.CarId <= entries[key].CarId) break;
+                    order[j + 1] = order[j];
+                    j--;
+                }
                 order[j + 1] = key;
             }
-            for (int p = 0; p < order.Count; p++) positions[order[p]] = p + 1;
+            for (int p = 0; p < order.Count; p++)
+                positions[order[p]] = sharedPlaces && p > 0 && CompareArena(entries[order[p]], entries[order[p - 1]]) == 0
+                    ? positions[order[p - 1]] : p + 1;
         }
     }
 }

@@ -125,6 +125,12 @@ namespace RacingGame.Core.Save
                 cur.stars |= e.stars;
             }
             cur.MergeSectors(e.sectors);
+            if (e.eventId == "a1" && e.hasArenaScore && e.arenaPoints >= 0 && e.arenaPoints <= 5 * Sim.ArenaScore.Share
+                && (!cur.hasArenaScore || e.arenaPoints > cur.arenaPoints))
+            {
+                cur.hasArenaScore = true;
+                cur.arenaPoints = e.arenaPoints;
+            }
         }
         private static SettingsData Clone(SettingsData s) => new SettingsData
         {

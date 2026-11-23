@@ -59,6 +59,25 @@ for (const identical of [true, false]) for (const oldSuccess of [true, false]) {
     console.error('FAIL', name, String(error));
   }
 }
+const mockSdk = await fs.readFile(new URL('../../Assets/WebGLTemplates/Yandex/TemplateData/ysdk-mock.js', import.meta.url), 'utf8');
+for (const legacy of [false, true]) {
+  const data = new Map([['cars.mock.lb', JSON.stringify({ best_a1: 180000 })]]);
+  const context = { URLSearchParams, location: { search: legacy ? '?lb=legacy' : '' },
+    localStorage: { getItem: key => data.get(key), setItem: (key, value) => data.set(key, value) } };
+  context.window = context;
+  vm.runInNewContext(mockSdk, context);
+  const sdk = await context.CarsMockSdk.init();
+  const boards = legacy ? await sdk.getLeaderboards() : sdk.leaderboards;
+  const set = legacy ? boards.setLeaderboardScore : boards.setScore;
+  const get = legacy ? boards.getLeaderboardEntries : boards.getEntries;
+  assert.equal((await get('arena_points_v1')).entries.length, 0);
+  for (const score of [210, 275, 200]) await set('arena_points_v1', score);
+  assert.equal((await get('arena_points_v1')).entries[0].score, 275);
+  assert.equal((await get('best_a1')).entries[0].score, 180000);
+  for (const time of [65000, 61000, 63000]) await set('best_e1', time);
+  assert.equal((await get('best_e1')).entries[0].score, 61000);
+  results.push({ name: 'arena score and race time boards / ' + (legacy ? 'legacy' : 'v2'), passed: true });
+}
 if (process.env.OUT) {
   await fs.mkdir(process.env.OUT, { recursive: true });
   await fs.writeFile(`${process.env.OUT}/evidence.json`, JSON.stringify(results, null, 2));

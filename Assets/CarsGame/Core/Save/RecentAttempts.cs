@@ -8,6 +8,8 @@ namespace RacingGame.Core.Save
     {
         public string id, eventId;
         public long finishedAt, timeMs;
+        public bool hasArenaScore;
+        public int arenaPoints;
         public RecordSetup setup;
     }
 
@@ -15,11 +17,12 @@ namespace RacingGame.Core.Save
     {
         public const int Limit = 5;
 
-        public static void Record(ProgressData progress, string id, string eventId, long timeMs, long finishedAt, RecordSetup setup)
+        public static void Record(ProgressData progress, string id, string eventId, long timeMs, long finishedAt, RecordSetup setup, int? arenaPoints = null)
         {
             var list = progress.recentAttempts ??= new List<RaceAttempt>();
             if (list.Count > 0) finishedAt = Math.Max(finishedAt, list[0].finishedAt + 1);
-            Add(list, new RaceAttempt { id = id, eventId = eventId, timeMs = timeMs, finishedAt = finishedAt, setup = setup });
+            Add(list, new RaceAttempt { id = id, eventId = eventId, timeMs = timeMs, finishedAt = finishedAt, setup = setup,
+                hasArenaScore = arenaPoints.HasValue, arenaPoints = arenaPoints.GetValueOrDefault() });
         }
 
         public static List<RaceAttempt> Merge(List<RaceAttempt> first, List<RaceAttempt> second = null)
@@ -36,7 +39,7 @@ namespace RacingGame.Core.Save
             for (int i = index + 1; i < newestFirst.Count; i++)
             {
                 var older = newestFirst[i];
-                if (older.eventId == current.eventId && RecordSetup.Same(older.setup, current.setup)) return older;
+                if (older.eventId == current.eventId && older.hasArenaScore == current.hasArenaScore && RecordSetup.Same(older.setup, current.setup)) return older;
             }
             return null;
         }
@@ -47,6 +50,8 @@ namespace RacingGame.Core.Save
             int c = b.finishedAt.CompareTo(a.finishedAt); if (c != 0) return c;
             c = string.CompareOrdinal(a.id, b.id); if (c != 0) return c;
             c = string.CompareOrdinal(a.eventId, b.eventId); if (c != 0) return c;
+            c = b.hasArenaScore.CompareTo(a.hasArenaScore); if (c != 0) return c;
+            if (a.hasArenaScore) { c = b.arenaPoints.CompareTo(a.arenaPoints); if (c != 0) return c; }
             c = a.timeMs.CompareTo(b.timeMs); return c != 0 ? c : RecordSetup.Compare(a.setup, b.setup);
         }
 
@@ -54,6 +59,7 @@ namespace RacingGame.Core.Save
         {
             if (entry == null || string.IsNullOrEmpty(entry.id) || string.IsNullOrEmpty(entry.eventId)
                 || entry.timeMs <= 0 || entry.finishedAt < 0 || entry.finishedAt == long.MaxValue) return;
+            if (entry.hasArenaScore && (entry.eventId != "a1" || entry.arenaPoints < 0 || entry.arenaPoints > Sim.ArenaScore.Share * 5)) return;
             int duplicate = list.FindIndex(a => a.id == entry.id);
             if (duplicate >= 0)
             {
@@ -61,7 +67,7 @@ namespace RacingGame.Core.Save
                 list.RemoveAt(duplicate);
             }
             list.Add(new RaceAttempt { id = entry.id, eventId = entry.eventId, timeMs = entry.timeMs,
-                finishedAt = entry.finishedAt, setup = entry.setup?.Copy() });
+                finishedAt = entry.finishedAt, setup = entry.setup?.Copy(), hasArenaScore = entry.hasArenaScore, arenaPoints = entry.arenaPoints });
             list.Sort(Compare);
             if (list.Count > Limit) list.RemoveAt(Limit);
         }

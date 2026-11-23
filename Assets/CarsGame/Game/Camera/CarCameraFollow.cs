@@ -43,6 +43,8 @@ namespace RacingGame
         private Camera cam;
         private float initialFov;
         private CarController car;
+        private PlayerDriverInput driver;
+        private bool rear;
         private Transform carFor;
         private float roll, turn;
         private Vector3 up = Vector3.up;
@@ -74,6 +76,7 @@ namespace RacingGame
         {
             if (car != null) car.Teleported -= SnapToTarget;
             car = null;
+            driver = null; rear = false;
             carFor = null;
         }
 
@@ -85,6 +88,7 @@ namespace RacingGame
             carFor = next;
             targetRigidbody = next != null ? next.GetComponent<Rigidbody>() : null;
             car = next != null ? next.GetComponent<CarController>() : null;
+            driver = next != null ? next.GetComponent<PlayerDriverInput>() : null;
             if (car != null) car.Teleported += SnapToTarget;
             SnapToTarget();
         }
@@ -105,6 +109,8 @@ namespace RacingGame
             up = car != null ? car.GravityUp : Vector3.up;
             roll = turn = 0f;
             Vector3 forward = Heading(up);
+            rear = driver != null && driver.RearViewHeld;
+            if (rear) forward = -forward;
             var frame = Quaternion.LookRotation(forward, up);
             transform.position = target.position + frame * ChaseOffset(DynamicView, 0f);
             transform.rotation = Quaternion.LookRotation(target.position + up * lookAtHeightOffset + forward * 1.5f - transform.position, up);
@@ -119,6 +125,7 @@ namespace RacingGame
             float dt = Time.deltaTime;
             bool dynamicView = DynamicView;
             if (carFor != target) SetTarget(target);
+            if (rear != (driver != null && driver.RearViewHeld)) SnapToTarget();
 
             // The car's own "up": world up, or the wall/ceiling normal while it wall rides; eased so the view rolls over smoothly.
             up = Vector3.Slerp(up, car != null ? car.GravityUp : Vector3.up, Smooth(5f, dt)).normalized;
@@ -131,6 +138,7 @@ namespace RacingGame
             // Heading used for framing: the bonnet, pulled towards the direction of travel while sliding.
             Vector3 fwd = Heading(up);
             if (speed > 8f && Vector3.Dot(flatVel, fwd) > 0f) fwd = Vector3.Slerp(fwd, flatVel / speed, followVelocity).normalized;
+            if (rear) fwd = -fwd;
             var frame = Quaternion.LookRotation(fwd, up);
             Vector3 right = frame * Vector3.right;
 

@@ -327,7 +327,7 @@
           var last = null;
           for (var i = tl.length - 1; i >= 0 && !last; i--) { var pl = tl[i] && (tl[i].payload || tl[i].data); if (pl && pl.d) last = pl.d; }
           var name = (o.player && (o.player.name || o.player.publicName)) || (o.meta && o.meta.name) || '';
-          return JSON.stringify({ ghost: last || '', name: name });
+          return JSON.stringify({ ghost: last || '', name: name, laps: o.meta && Number.isInteger(o.meta.meta3) ? o.meta.meta3 : 0 });
         } catch (e) { return ''; }
       });
       done({ ok: true, sessions: JSON.stringify(items) });

@@ -59,6 +59,20 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void ArenaHistoryKeepsScoresSeparateFromOldDurations()
+        {
+            var progress = new ProgressData();
+            var setup = new RecordSetup { captured = true, tier = "normal", body = "classic" };
+            RecentAttempts.Record(progress, "old", "a1", 180000, 1, setup);
+            RecentAttempts.Record(progress, "first", "a1", 180001, 2, setup, 225);
+            RecentAttempts.Record(progress, "second", "a1", 180000, 3, setup, 200);
+            var history = RecentAttempts.Merge(progress.recentAttempts);
+            Assert.IsNull(RecentAttempts.PreviousComparable(history, 1));
+            Assert.AreEqual(225, RecentAttempts.PreviousComparable(history, 0).arenaPoints);
+            Assert.AreEqual(200, history[0].arenaPoints);
+        }
+
+        [Test]
         public void RecentAttemptsMergeUniqueFinishesAcrossDevicesAndSkipOtherEventsOrConditions()
         {
             var a = Record(12000, "easy"); var b = Record(10000, "hard");

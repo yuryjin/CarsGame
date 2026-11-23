@@ -225,5 +225,83 @@ namespace RacingGame.Tests
             Assert.AreEqual(0, race.Results.LapsRequired);
             Assert.IsTrue(race.Results.Player.Finished);
         }
+
+        [UnityTest, Timeout(900000)]
+        public IEnumerator ScoredMatchesKeepTheStrongerRecordAndSeparateDamageAcrossLives()
+        {
+            // Pin the field so only the specified hits affect the scored comparison.
+            int first = 0;
+            for (int match = 0; match < 2; match++)
+            {
+                if (match == 0) yield return Boot();
+                else
+                {
+                    flow.EnterMenu();
+                    flow.StartRace(ev, null);
+                    while (race.State == RaceState.Countdown) yield return null;
+                }
+                var save = PlatformGlue.Save;
+                if (match == 0)
+                {
+                    save.Data.progress.bests.RemoveAll(b => b?.eventId == "a1");
+                    save.Data.progress.bests.Add(new Core.Save.EventBest { eventId = "a1", bestTimeMs = 180000 });
+                }
+                Assert.AreEqual(180f, race.MatchDuration);
+                var player = race.Player;
+                var foe = race.Participants[0] != player ? race.Participants[0] : race.Participants[1];
+                var ally = race.Participants[2] != player && race.Participants[2] != foe ? race.Participants[2] : race.Participants[3];
+                foreach (var p in race.Participants)
+                {
+                    var input = p.gameObject.AddComponent<ScriptedDriverInput>();
+                    input.Set(0, 0, true);
+                    p.Car.SetInputSource(input);
+                    var gun = p.GetComponent<AiGunner>(); if (gun != null) gun.enabled = false;
+                    p.Car.Body.constraints = RigidbodyConstraints.FreezeAll;
+                }
+                Time.captureDeltaTime = .2f;
+                if (match == 0)
+                {
+                    while (foe.Health.IsInvulnerable) yield return null;
+                    var hit = new Core.Combat.HitInfo(player.gameObject, 10, Core.Combat.HitType.Projectile);
+                    Assert.Greater(foe.Health.ApplyHit(hit).DamageDealt, 0f);
+                    Assert.IsTrue(foe.Health.ApplyHit(new Core.Combat.HitInfo(ally.gameObject, 200, Core.Combat.HitType.Projectile)).Fatal);
+                    Assert.AreEqual(1, player.Score.Assists); Assert.AreEqual(1, ally.Kills); Assert.AreEqual(0, player.Kills);
+                    while (foe.Health.IsDead || foe.Health.IsInvulnerable) yield return null;
+                    Assert.IsTrue(foe.Health.ApplyHit(new Core.Combat.HitInfo(ally.gameObject, 200, Core.Combat.HitType.Projectile)).Fatal);
+                    Assert.AreEqual(1, player.Score.Assists); Assert.AreEqual(2, ally.Kills);
+                    int tick = SimulationDriver.Instance.Tick;
+                    int points = player.Score.Points.Total;
+                    PauseController.Set(PauseReason.User, true);
+                    for (int i = 0; i < 5; i++) yield return null;
+                    Assert.AreEqual(tick, SimulationDriver.Instance.Tick); Assert.AreEqual(points, player.Score.Points.Total);
+                    PauseController.Set(PauseReason.User, false);
+                }
+                while (race.RemainingTime > 15d) yield return null;
+                var hud = GameObject.Find("Goals")?.GetComponent<TMPro.TMP_Text>();
+                Assert.NotNull(hud);
+                Assert.IsNotEmpty(hud.text);
+                if (match == 0) StringAssert.Contains(HudScreen.GetLocalizedRacerName(ally.displayName), hud.text);
+                else StringAssert.Contains(Loc.Get("arena.tied"), hud.text);
+                while (race.State == RaceState.Racing) yield return null;
+                yield return null;
+                var result = race.Results.Player;
+                Assert.AreEqual(200, result.ArenaPoints.Survival);
+                Assert.AreEqual(result.ArenaPoints.Total, player.Score.Points.Total);
+                var best = save.Data.progress.bests.Find(b => b.eventId == "a1");
+                Assert.IsTrue(best.hasArenaScore);
+                if (match == 0)
+                {
+                    first = result.ArenaPoints.Total;
+                    Assert.AreEqual(1, result.Assists); Assert.AreEqual(20, result.ArenaPoints.Knockouts);
+                    Assert.AreEqual(first, best.arenaPoints); Assert.AreEqual(2, result.Position);
+                }
+                else
+                {
+                    Assert.Less(result.ArenaPoints.Total, first);
+                    Assert.AreEqual(1, result.Position); Assert.AreEqual(first, best.arenaPoints);
+                }
+                Debug.Log($"Arena match {match + 1}: {race.Results.RaceDuration:F2}s, score {result.ArenaPoints.Total}, place {result.Position}, record {best.arenaPoints}");
+            }
+        }
     }
 }

@@ -2023,12 +2023,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998272
-    m_Localized: 3 minutes / {n} rivals / most kills wins
+    m_Localized: 3 minutes / {n} rivals / highest score wins
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998273
     m_Localized: Accelerate up a bridge. In the jump over the centre, hold fire to
-      drop a bomb. Leave the red ring before impact. Most kills wins.
+      drop a bomb. Leave the red ring before impact.
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998274
@@ -2366,6 +2366,107 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 29718720087928836
     m_Localized: "Last practice finish \xB7 {t}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473942106112
+    m_Localized: Water convoy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077632
+    m_Localized: Escort the tanker to the Last Well
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077633
+    m_Localized: Water delivered to the settlement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077634
+    m_Localized: The tanker was destroyed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077635
+    m_Localized: "Tanker {h}%   \xB7   Well {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077636
+    m_Localized: "Ambush! Tanker {h}%   \xB7   {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077637
+    m_Localized: Look back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077638
+    m_Localized: Hold {button} to look behind while steering.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077639
+    m_Localized: '{n} pts'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077640
+    m_Localized: "Heat \xD7{n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077641
+    m_Localized: Drift boost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077642
+    m_Localized: Land a hit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077643
+    m_Localized: Ram at 70 km/h
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077644
+    m_Localized: Chain complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077645
+    m_Localized: Speed lost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077646
+    m_Localized: Tied for the lead
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077647
+    m_Localized: You lead by {n} pts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077648
+    m_Localized: "Leader {name} \xB7 gap {n} pts"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077649
+    m_Localized: "Speed {s} \xB7 hits {h} \xB7 takedowns {k} \xB7 centre {c} \xB7
+      survival {l}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077650
+    m_Localized: Assists {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077651
+    m_Localized: Points, then kills, then fewer deaths. A tie shares the place.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077652
+    m_Localized: Find a close rival
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077653
+    m_Localized: No matching rival. You can still race.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077654
+    m_Localized: "Rival {t} \xB7 Difference from your time {d}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29723557332594688
+    m_Localized: Only raiders can damage the objective
     m_Metadata:
       m_Items: []
   references:

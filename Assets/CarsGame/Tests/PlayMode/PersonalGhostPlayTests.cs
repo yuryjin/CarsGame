@@ -116,6 +116,67 @@ namespace RacingGame.Tests
             return record.ToBase64();
         }
 
+        private sealed class RivalSessions : RacingGame.Platform.Mock.StandalonePlatform, IAsyncSessions
+        {
+            public override IAsyncSessions Sessions => this;
+            public List<string> Candidates = new List<string>();
+            public Task<Result<IReadOnlyList<string>>> LoadOpponentsAsync(int count, string meta) =>
+                Task.FromResult(Result<IReadOnlyList<string>>.Success(Candidates));
+            public Task<Result> PushAsync(string meta) => Task.FromResult(Result.Success);
+            public void Commit(string payload) { }
+        }
+
+        [Serializable] private class Candidate { public string ghost, name; public int laps; }
+
+        [UnityTest, Timeout(120000)]
+        public IEnumerator ClosestRivalIsExplainedInRecordsAndSpawnsOnlyOnTheMatchingRoute()
+        {
+            yield return OpenProfile();
+            yield return Start(e1);
+            int hash = flow.GetComponent<GhostRecorder>().Record.TrackHash;
+            var source = LegacyCircuit(hash, TrackPath.Instance, e1.laps);
+            var saved = PlatformGlue.Save.Data;
+            saved.personalGhosts.KeepBest("e1", e1.laps, Retimed(source, "Personal", .25), 1);
+            saved.progress.bests.Add(new EventBest { eventId = "e1", bestTimeMs = 100000,
+                setup = new RecordSetup { captured = true, body = "classic", tier = "easy", trackHash = hash, laps = e1.laps } });
+            flow.EnterMenu();
+            var menu = flow.GetComponent<MenuScreens>();
+            var platform = PlatformRuntime.Current; var sessions = new RivalSessions();
+            var initialized = sessions.InitializeAsync(); while (!initialized.IsCompleted) yield return null;
+            PlatformRuntime.Install(sessions);
+            try
+            {
+                string Payload(string name, double scale, int laps) => JsonUtility.ToJson(new Candidate { name = name, laps = laps, ghost = Retimed(source, name, scale) });
+                sessions.Candidates.Add(Payload("Slow", .3, e1.laps));
+                sessions.Candidates.Add(Payload("Closest", .255, 0)); // A real V2 recording with no lap metadata.
+                sessions.Candidates.Add(Payload("Wrong laps", .25, e1.laps + 1));
+                source.TrackHash++;
+                sessions.Candidates.Add(Payload("Wrong track", .25, e1.laps));
+                source.TrackHash--;
+                menu.Show("leaders");
+                GameObject.Find("FindRival").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+                yield return null;
+                string title = GameObject.Find("RivalStatus").GetComponent<TMPro.TMP_Text>().text;
+                StringAssert.Contains(UiFactory.FormatMilliseconds(102000), title);
+                StringAssert.Contains("+" + UiFactory.FormatMilliseconds(2000), title);
+                GameObject.Find("StartMatchedRace").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+                Assert.AreEqual(FlowState.Racing, flow.State);
+                var visible = Object.FindObjectsByType<GhostCar>(FindObjectsSortMode.None);
+                Assert.AreEqual(2, visible.Length);
+                Assert.IsTrue(Array.Exists(visible, g => g.Record.PlayerName == "Closest"));
+                flow.EnterMenu(); yield return null;
+                sessions.Candidates.Clear();
+                menu.Show("leaders");
+                GameObject.Find("FindRival").GetComponent<UnityEngine.UI.Button>().onClick.Invoke(); yield return null;
+                Assert.AreEqual(Loc.Get("rival.empty"), GameObject.Find("RivalStatus").GetComponent<TMPro.TMP_Text>().text);
+                GameObject.Find("StartMatchedRace").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+                Assert.AreEqual(FlowState.Racing, flow.State);
+                Assert.AreEqual("Personal", Ghost().Record.PlayerName);
+                TestContext.WriteLine(title + "; empty match still started with the personal recording");
+            }
+            finally { PlatformRuntime.Install(platform); }
+        }
+
         private static GhostCar Ghost() => Object.FindAnyObjectByType<GhostCar>();
 
         private IEnumerator OpenProfile()

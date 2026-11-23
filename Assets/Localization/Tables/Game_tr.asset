@@ -2046,13 +2046,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998272
-    m_Localized: "3 dakika / {n} rakip / en \xE7ok imha kazan\u0131r"
+    m_Localized: "3 dakika / {n} rakip / en y\xFCksek puan kazan\u0131r"
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998273
     m_Localized: "K\xF6pr\xFCde h\u0131zlan. Merkezin \xFCzerinden atlarken bomba
       b\u0131rakmak i\xE7in ate\u015Fe bas. Patlamadan \xF6nce k\u0131rm\u0131z\u0131
-      \xE7emberden \xE7\u0131k. En \xE7ok imha kazan\u0131r."
+      \xE7emberden \xE7\u0131k."
     m_Metadata:
       m_Items: []
   - m_Id: 19951951810998274
@@ -2398,6 +2398,109 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 29718720087928836
     m_Localized: "Son antrenman biti\u015Fi \xB7 {t}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473942106112
+    m_Localized: Su konvoyu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077632
+    m_Localized: "Tankeri Son Kuyu\u2019ya g\xF6t\xFCr"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077633
+    m_Localized: "Su yerle\u015Fime ula\u015Ft\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077634
+    m_Localized: Tanker yok edildi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077635
+    m_Localized: "Tanker %{h}   \xB7   Kuyu {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077636
+    m_Localized: "Pusu! Tanker %{h}   \xB7   {m} m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077637
+    m_Localized: Arkaya bak
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077638
+    m_Localized: "Direksiyonu \xE7evirirken arkaya bakmak i\xE7in {button} tu\u015Funu
+      bas\u0131l\u0131 tut."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077639
+    m_Localized: '{n} puan'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077640
+    m_Localized: "Co\u015Fku \xD7{n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077641
+    m_Localized: Drift takviyesi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077642
+    m_Localized: "\u0130sabet ettir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077643
+    m_Localized: "70 km/sa ile \xE7arp"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077644
+    m_Localized: Seri tamam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077645
+    m_Localized: "H\u0131z d\xFC\u015Ft\xFC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077646
+    m_Localized: "Liderli\u011Fi payla\u015F\u0131yorsun"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077647
+    m_Localized: "{n} puanla \xF6ndesin"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077648
+    m_Localized: "Lider {name} \xB7 fark {n} puan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077649
+    m_Localized: "H\u0131z {s} \xB7 isabet {h} \xB7 imha {k} \xB7 merkez {c} \xB7
+      ya\u015Fam {l}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077650
+    m_Localized: Asist {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077651
+    m_Localized: "Puan, sonra imha ve daha az \xF6l\xFCm. E\u015Fitler s\u0131ray\u0131
+      payla\u015F\u0131r."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077652
+    m_Localized: "Yak\u0131n rakip bul"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077653
+    m_Localized: "Uygun rakip yok. Yine de yar\u0131\u015Fabilirsin."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29721473963077654
+    m_Localized: "Rakip {t} \xB7 S\xFCrene g\xF6re fark {d}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29723557332594688
+    m_Localized: "Hedefe yaln\u0131zca ak\u0131nc\u0131lar hasar verebilir"
     m_Metadata:
       m_Items: []
   references:

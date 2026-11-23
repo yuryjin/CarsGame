@@ -51,6 +51,64 @@ namespace RacingGame.Tests
         private static Button Button(string name) => System.Array.Find(Object.FindObjectsByType<Button>(), b => b.name == name);
         private static Bounds Bounds(RectTransform rect) => RectTransformUtility.CalculateRelativeRectTransformBounds(rect.root, rect);
 
+        [UnityTest, Timeout(120000)]
+        public IEnumerator RearViewPreservesSteeringAndMinesAndClearsOnPauseOrFocusLoss()
+        {
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float deadline = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null; yield return null;
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = flow.GetComponent<RaceManager>();
+            syntheticKeyboard = InputSystem.AddDevice<Keyboard>();
+            flow.StartRace(System.Array.Find(flow.events, e => e.eventId == "e1"), flow.tiers[0]);
+            while (race.State == RaceState.Countdown) yield return null;
+            var car = race.Player.Car;
+            var driver = car.GetComponent<PlayerDriverInput>();
+            var camera = Camera.main;
+            car.Weapons.secondaryType = SecondaryWeaponType.Mines; car.Weapons.RefillSecondaryAmmo();
+            var rival = System.Linq.Enumerable.First(race.Participants, p => !p.isPlayer).Car;
+            rival.inputEnabled = false; rival.Body.constraints = RigidbodyConstraints.FreezeAll;
+            rival.Teleport(car.transform.position - car.transform.forward * 18f, car.transform.rotation);
+            car.Body.linearVelocity = car.transform.forward * 11f;
+            Vector3 start = car.transform.forward;
+            float ViewDirection() => Vector3.Dot(camera.transform.forward, car.transform.forward);
+            InputSystem.QueueStateEvent(syntheticKeyboard, new KeyboardState(Key.V, Key.W, Key.D, Key.E));
+            for (int frame = 0; frame < 15; frame++) yield return null;
+            Assert.IsTrue(driver.RearViewHeld);
+            Assert.Less(ViewDirection(), -.72f);
+            Vector3 point = camera.WorldToViewportPoint(rival.transform.position + Vector3.up * .6f);
+            Assert.Greater(point.z, 0f); Assert.That(point.x, Is.InRange(0f, 1f)); Assert.That(point.y, Is.InRange(0f, 1f));
+            Assert.Greater(car.LastCommand.Steer, .8f);
+            Assert.Greater(Vector3.Angle(start, car.transform.forward), 1f);
+            Assert.IsTrue(System.Linq.Enumerable.Any(RaceDirector.Instance.LiveMineHazards, mine => mine.Owner == car.gameObject));
+            InputSystem.QueueStateEvent(syntheticKeyboard, new KeyboardState());
+            yield return null; yield return null;
+            Assert.Greater(ViewDirection(), .72f);
+            InputSystem.QueueStateEvent(syntheticKeyboard, new KeyboardState(Key.V));
+            yield return null; yield return null;
+            Assert.IsTrue(driver.RearViewHeld);
+            PauseController.Set(RacingGame.Core.Platform.PauseReason.User, true);
+            yield return null; yield return null;
+            Assert.IsFalse(driver.RearViewHeld); Assert.Greater(ViewDirection(), .72f);
+            PauseController.Set(RacingGame.Core.Platform.PauseReason.User, false);
+            yield return null; yield return null;
+            Assert.IsFalse(driver.RearViewHeld, "Holding the old press cannot re-open the rear camera after pause");
+            InputSystem.QueueStateEvent(syntheticKeyboard, new KeyboardState());
+            yield return null; yield return null;
+            InputSystem.QueueStateEvent(syntheticKeyboard, new KeyboardState(Key.V));
+            yield return null; yield return null;
+            Assert.IsTrue(driver.RearViewHeld);
+            driver.SendMessage("OnApplicationFocus", false);
+            InputSystem.QueueStateEvent(syntheticKeyboard, new KeyboardState());
+            yield return null; yield return null;
+            driver.SendMessage("OnApplicationFocus", true);
+            yield return null; yield return null;
+            Assert.IsFalse(driver.RearViewHeld); Assert.Greater(ViewDirection(), .72f);
+        }
+
         [UnityTest, Timeout(180000)]
         public IEnumerator LargerTextAndTouchTargetsCanBeChosenIndependently()
         {

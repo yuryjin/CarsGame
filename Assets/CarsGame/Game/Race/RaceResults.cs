@@ -20,6 +20,8 @@ namespace RacingGame
         public int[] KillsPerVictim;
         public int TurretPoints;
         public int Deaths;
+        public int CarId, Assists;
+        public Core.Sim.ArenaPoints ArenaPoints;
         public int RepairsUsed;
         public int DriftBoosts, Shortcuts, CeilingBoosts, BombPasses, Resets;
         public bool CleanFinalLap;

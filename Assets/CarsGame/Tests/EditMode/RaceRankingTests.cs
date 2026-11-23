@@ -65,7 +65,7 @@ namespace RacingGame.Tests
         }
 
         [Test]
-        public void ArenaRankingOrdersByKillsDeathsAndDeterministicCarId()
+        public void MissionRankingOrdersByKillsDeathsAndDeterministicCarId()
         {
             var entries = new List<RankEntry>
             {
@@ -82,7 +82,7 @@ namespace RacingGame.Tests
             // 3rd: Car 3 (2 kills, 0 deaths)
             // 4th: Car 4 (2 kills, 1 death, CarId 4 < 5)
             // 5th: Car 5 (2 kills, 1 death, CarId 5 > 4)
-            var pos = RaceRanking.RankArena(entries);
+            var pos = RaceRanking.RankArena(entries, sharedPlaces: false);
             Assert.AreEqual(5, pos[0]); // Car 5 is 5th
             Assert.AreEqual(2, pos[1]); // Car 2 is 2nd
             Assert.AreEqual(3, pos[2]); // Car 3 is 3rd

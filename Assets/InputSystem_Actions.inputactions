@@ -1147,6 +1147,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "RearView",
+                    "type": "Button",
+                    "id": "82fbd094-d45b-43d8-85dc-99ca7c4e88b4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1763,6 +1772,28 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "PrimarySlot10",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "df20678a-77fa-4639-a70f-24482383c62f",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "RearView",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e6cf2f79-4830-4ba8-a078-b22e74cebb75",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "RearView",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

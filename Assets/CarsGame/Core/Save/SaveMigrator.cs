@@ -76,6 +76,8 @@ namespace RacingGame.Core.Save
             foreach (var best in data.progress.bests)
             {
                 if (best == null) continue;
+                if (best.eventId != "a1" || best.arenaPoints < 0 || best.arenaPoints > 5 * Sim.ArenaScore.Share)
+                    best.hasArenaScore = false;
                 if (best.setup != null && !best.setup.IsKnown) best.setup = null;
                 var sectors = best.sectors;
                 best.sectors = null;

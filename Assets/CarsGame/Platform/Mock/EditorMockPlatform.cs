@@ -105,7 +105,8 @@ namespace RacingGame.Platform.Mock
         public Task<Result> SubmitAsync(string board, long score, string extraData = null)
         {
             if (!Player.IsAuthorized) return Task.FromResult(Result.Fail(ResultCategory.Unauthorized, "sign in first"));
-            if (!Boards.TryGetValue(board, out long best) || score < best) Boards[board] = score;
+            bool descending = board == Core.Sim.ArenaScore.Board || board == "daily";
+            if (!Boards.TryGetValue(board, out long best) || (descending ? score > best : score < best)) Boards[board] = score;
             return Task.FromResult(Result.Success);
         }
 

@@ -1,5 +1,6 @@
 using UnityEngine;
 using RacingGame.Core.Sim;
+using RacingGame.Core.Combat;
 
 namespace RacingGame
 {
@@ -34,7 +35,15 @@ namespace RacingGame
         public int TurretPoints { get; internal set; }
         public int Deaths { get; set; }
         public int EliminatedAtTick { get; private set; } = int.MaxValue;
-        public ArenaLayout Arena { get; set; }
+        public ArenaLayout Arena { get; private set; }
+        public ArenaScore Score { get; private set; }
+
+        internal void JoinArena(ArenaLayout arena)
+        {
+            Arena = arena;
+            Score = new ArenaScore(Mathf.RoundToInt(1f / SimulationDriver.FixedStep), Mathf.RoundToInt(arena.Duration / SimulationDriver.FixedStep));
+            if (Health != null && isActiveAndEnabled) Health.HitResolved += ArenaHit;
+        }
         /// <summary>A map other than the circuit (the boss mission): it owns respawn poses; no track auto-reset.</summary>
         public IBattleSite Site { get; set; }
         public HotBombRace HotBomb { get; internal set; }
@@ -70,6 +79,7 @@ namespace RacingGame
         private void OnEnable()
         {
             if (Health != null) Health.OnDied += OnDied;
+            if (Score != null && Health != null) Health.HitResolved += ArenaHit;
             Car.DriftBoosted += OnDriftBoost;
             Car.Teleported += OnReset;
             if (Progress != null) Progress.LapCompleted += OnLap;
@@ -78,11 +88,40 @@ namespace RacingGame
         private void OnDisable()
         {
             if (Health != null) Health.OnDied -= OnDied;
+            if (Score != null && Health != null) Health.HitResolved -= ArenaHit;
             if (Car != null) { Car.DriftBoosted -= OnDriftBoost; Car.Teleported -= OnReset; }
             if (Progress != null) Progress.LapCompleted -= OnLap;
         }
 
-        private void OnDriftBoost(int stage, float seconds) { if (Car.inputEnabled) DriftBoosts++; }
+        private void OnDriftBoost(int stage, float seconds)
+        {
+            if (!Car.inputEnabled) return;
+            DriftBoosts++;
+            if (Arena != null && Arena.Running) Score.DriftBoosted();
+        }
+
+        private void ArenaHit(HitInfo hit, HitResult result)
+        {
+            if (Arena == null || !Arena.Running || result.DamageDealt <= 0f) return;
+            int tick = SimulationDriver.Instance.Tick;
+            var source = hit.Attacker != null ? hit.Attacker.GetComponent<RaceParticipant>() : null;
+            if (source == this || source == null || source.Arena != Arena) source = null;
+            if (source != null)
+            {
+                source.Score.Hit(hit.HitType == HitType.Collision, source.Car.Body.linearVelocity.magnitude * 3.6f);
+                if (!result.Fatal) Score.DamagedBy(source.Car.CarId, tick);
+            }
+            if (!result.Fatal) return;
+            // The health component announces death before publishing the resolved fatal hit.
+            var killer = source ?? Arena.FindCar(Score.RecentAttacker(tick));
+            if (killer != null)
+            {
+                killer.KillTally.Record(Car.CarId);
+                killer.Score.Knockout(false);
+                Arena.FindCar(Score.RecentAttacker(tick, killer.Car.CarId))?.Score.Knockout(true);
+            }
+            Score.Died();
+        }
         private void OnLap(int laps, double seconds)
         {
             var ev = RaceSetup.Event;
@@ -143,7 +182,7 @@ namespace RacingGame
             if (finalLapStarted) finalLapMistake = true;
             forkTravel = 0f;
             EliminatedAtTick = SimulationDriver.Instance.Tick;
-            if (attacker != null)
+            if (Score == null && attacker != null)
             {
                 var other = attacker.GetComponent<RaceParticipant>();
                 if (other != null && other != this) other.KillTally.Record(Car != null ? Car.CarId : 0);   // RequireComponent(CarController): Car is always set

@@ -297,11 +297,36 @@ namespace RacingGame
         }
 
         // ---------- leaders: today's daily board ----------
+        private string selectedBoard;
+        private bool boardSelectorOpen;
+
+        private RaceEventDefinition BuildBoardSelector(RectTransform content)
+        {
+            var list = Events();
+            if (list.Count == 0) return null;
+            string id = selectedBoard ?? RaceSetup.Event?.eventId;
+            var selected = list.Find(e => e.eventId == id) ?? list[0];
+            var action = Item(content, "BoardSelector", 84f, false);
+            UiFactory.Button(action, "ChooseBoardEvent", Loc.Get("events.title") + " · " + Loc.Get(selected.nameKey),
+                () => { boardSelectorOpen = !boardSelectorOpen; Show("leaders"); },
+                Vector2.zero, Vector2.one, new Vector2(4f, 4f), new Vector2(-4f, -4f), 28f, UiFactory.Raised);
+            if (boardSelectorOpen)
+                foreach (var ev in list)
+                {
+                    var option = Item(content, "BoardOption_" + ev.eventId, 72f, false);
+                    UiFactory.Button(option, "BoardEvent_" + ev.eventId, Loc.Get(ev.nameKey),
+                        () => { selectedBoard = ev.eventId; boardSelectorOpen = false; Show("leaders"); },
+                        Vector2.zero, Vector2.one, new Vector2(24f, 3f), new Vector2(-24f, -3f), 25f,
+                        ev == selected ? UiFactory.Accent : UiFactory.Raised);
+                }
+            return selected;
+        }
+
         /// <summary>Today's board first, then the event board, one after the other so their rows do not interleave.</summary>
-        private async void FillBoards(RectTransform content, ILeaderboards boards)
+        private async void FillBoards(RectTransform content, ILeaderboards boards, RaceEventDefinition selected)
         {
             await FillDailyBoard(content, boards);
-            if (content != null && content.gameObject.activeInHierarchy) FillCloudBoard(content, boards);
+            if (content != null && content.gameObject.activeInHierarchy) FillCloudBoard(content, boards, selected);
         }
 
         private async System.Threading.Tasks.Task FillDailyBoard(RectTransform content, ILeaderboards boards)
