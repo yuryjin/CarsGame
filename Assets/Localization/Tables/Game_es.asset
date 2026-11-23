@@ -2129,7 +2129,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 28966960868175872
-    m_Localized: Recupera la copa robada
+    m_Localized: "Recupera la copa \xB7 1 buggy de escolta"
     m_Metadata:
       m_Items: []
   - m_Id: 28966960868175873
@@ -2189,6 +2189,26 @@ MonoBehaviour:
     m_Localized: "Adelanta a la escolta y mantente junto al \xFAltimo vag\xF3n {s}
       segundos. O toma el cauce seco, llega al desv\xEDo antes que el tren y recoge
       la copa en la estaci\xF3n."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668464279552
+    m_Localized: "Rivales \xB7 intervalo base de tiro {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668160
+    m_Localized: "Aliados \xB7 intervalo base de tiro {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668161
+    m_Localized: "Escolta \xB7 intervalo base de tiro {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668162
+    m_Localized: "Ca\xF1ones desactivados"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668163
+    m_Localized: "Premio de la carrera \xD7{m}"
     m_Metadata:
       m_Items: []
   references:

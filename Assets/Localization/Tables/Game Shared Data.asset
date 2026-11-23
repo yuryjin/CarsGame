@@ -2131,6 +2131,26 @@ MonoBehaviour:
     m_Key: train.lesson
     m_Metadata:
       m_Items: []
+  - m_Id: 29276668464279552
+    m_Key: events.rival_fire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668160
+    m_Key: mission.ally_fire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668161
+    m_Key: train.guard_fire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668162
+    m_Key: events.guns_disabled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668163
+    m_Key: events.race_reward
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

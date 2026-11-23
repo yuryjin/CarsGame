@@ -5,8 +5,8 @@ namespace RacingGame.Core.Save
 {
     /// <summary>
     /// Deterministic merge of two save blobs (local vs cloud). Monotonic fields never lose
-    /// progress: counters take the max, best times the min, unlocks the union. Settings and
-    /// the ghost follow the newer blob. Coins are never merged as a balance — earned and spent
+    /// progress: counters take the max, best times the min, unlocks the union. Settings follow
+    /// the newer blob. Personal replays keep the fastest run per route within their byte budget. Coins earned and spent
     /// are separate monotonic counters, so a device that spent coins can never resurrect them.
     /// </summary>
     public static class SaveMerge
@@ -15,7 +15,6 @@ namespace RacingGame.Core.Save
         {
             if (a == null) return b; if (b == null) return a;
             var newer = a.updatedAtUnixMs >= b.updatedAtUnixMs ? a : b;
-            var older = ReferenceEquals(newer, a) ? b : a;
 
             var m = new SaveData
             {
@@ -23,7 +22,7 @@ namespace RacingGame.Core.Save
                 updatedAtUnixMs = Math.Max(a.updatedAtUnixMs, b.updatedAtUnixMs),
                 deviceId = newer.deviceId,
                 settings = Clone(newer.settings),
-                bestGhost = string.IsNullOrEmpty(newer.bestGhost) ? older.bestGhost : newer.bestGhost,
+                personalGhosts = PersonalGhosts.Merge(a.personalGhosts, b.personalGhosts),
             };
 
             // Ledger rows merge per device, component-wise by max; totals are sums of rows.

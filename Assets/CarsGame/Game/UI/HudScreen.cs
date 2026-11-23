@@ -1279,6 +1279,7 @@ namespace RacingGame
             if (cam == null) return;
 
             var participants = race.Participants;
+            Team playerTeam = Teams.Of(playerCar.gameObject);
             int markerIdx = 0;
             Vector3 playerPos = playerCar.transform.position;
             Vector3 camPos = cam.transform.position;
@@ -1291,6 +1292,7 @@ namespace RacingGame
                 var rival = participants[i];
                 if (rival == null || rival.isPlayer || rival.Car == null || !rival.Car.isActiveAndEnabled) continue;
                 if (rival.Health != null && rival.Health.IsDead) continue;
+                if (!Teams.Hostile(playerTeam, Teams.Of(rival.gameObject))) continue;
 
                 Vector3 rivalPos = rival.Car.transform.position;
                 Vector3 toRival = rivalPos - camPos;

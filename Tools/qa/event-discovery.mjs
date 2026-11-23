@@ -5,6 +5,12 @@ const { chromium } = await import(process.env.PLAYWRIGHT_CORE || '/home/user/gst
 if (!process.env.WEBTEST_CHROME_ARGS) throw new Error('Use webtest');
 const out = process.env.OUT || '/tmp/cars-event-discovery';
 await fs.mkdir(out, { recursive: true });
+const tiers = await Promise.all(['easy', 'normal', 'hard'].map(async id => {
+  const file = new URL(`../../Assets/Data/Difficulty/Difficulty_${id}.asset`, import.meta.url);
+  const asset = await fs.readFile(file, 'utf8');
+  const number = key => Number(asset.match(new RegExp(`^  ${key}: ([\\d.]+)$`, 'm'))[1]);
+  return { id, count: number('aiCount'), interval: number('aiFireCooldown'), reward: number('rewardMultiplier') };
+}));
 const browser = await chromium.launch({ channel: 'chrome', args: [...process.env.WEBTEST_CHROME_ARGS.split(' '), '--no-proxy-server'] });
 const evidence = [], errors = [];
 try {
@@ -68,6 +74,35 @@ try {
       assert(first.y > .2 && first.y < .95, 'First playable race is visible without passing cup cards');
       assert(!cards.find(b => b.name === 'Start_e2').interactable, 'Career gate is preserved');
       assert.equal(state.coins, initial.coins); assert.equal(state.races, initial.races);
+      const numbers = new Intl.NumberFormat(lang);
+      const difficultyChecks = [];
+      let selected = state;
+      for (const index of [1, 2, 0]) {
+        const tier = tiers[index];
+        const tab = selected.buttons.find(b => b.name === 'Tier' + index);
+        assert(tab.interactable && tab.width >= 44 && tab.height >= 44, lang + ' tier touch target');
+        await page.mouse.click(box.x + tab.x * box.width, box.y + tab.y * box.height);
+        await page.waitForTimeout(300);
+        selected = await cmd('ui');
+        const tierRows = {};
+        for (const [id, count] of Object.entries({ e1: tier.count, a1: 5, m1: 5, m2: 1, e18: 5, e6: tier.count })) {
+          const button = selected.buttons.find(b => b.name === 'Start_' + id);
+          const label = name => selected.labels.find(l => l.parent === id && l.name === name);
+          const stats = label('Stats'), difficulty = label('Difficulty');
+          const prefix = `${lang} ${tier.id} ${id}`;
+          assert(stats.renderedText.includes(String(count)), prefix + ' field or escort count');
+          assert(difficulty.renderedText && !difficulty.truncated && difficulty.fontPixels >= 12 && difficulty.lines === 2, prefix + ' both lines fit');
+          const [fire, reward] = difficulty.text.split('\n');
+          assert(reward.includes('×' + numbers.format(tier.reward)), prefix + ' reward');
+          if (id === 'e18' || id === 'e6') assert(!/\d/.test(fire), prefix + ' guns are disabled');
+          else assert(fire.includes(numbers.format(id === 'm2' ? 1.6 : tier.interval)), prefix + ' base shot interval');
+          assert(button.width >= 44 && button.height >= 44, prefix + ' start touch target');
+          assert(difficulty.x * box.width + difficulty.width / 2 <= button.x * box.width - button.width / 2, prefix + ' start button clears the text');
+          tierRows[id] = { stats: stats.text, difficulty: difficulty.text, fontPixels: difficulty.fontPixels };
+        }
+        difficultyChecks.push({ tier: tier.id, rows: tierRows });
+      }
+      evidence.at(-1).difficulty = difficultyChecks;
       let target;
       for (let attempt = 0; attempt < 35; attempt++) {
         target = (await cmd('ui')).buttons.find(b => b.name === 'Start_e17');

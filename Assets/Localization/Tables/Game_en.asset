@@ -2120,7 +2120,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 28966960868175872
-    m_Localized: Recover the stolen cup
+    m_Localized: "Recover the cup \xB7 1 guard buggy"
     m_Metadata:
       m_Items: []
   - m_Id: 28966960868175873
@@ -2178,6 +2178,26 @@ MonoBehaviour:
   - m_Id: 28966960868175886
     m_Localized: Pass the guard and stay beside the rear car for {s} seconds. Or
       take the dry wash, reach the switch first and collect the cup at the station.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668464279552
+    m_Localized: "Rivals \xB7 base shot interval {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668160
+    m_Localized: "Allies \xB7 base shot interval {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668161
+    m_Localized: "Guard \xB7 base shot interval {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668162
+    m_Localized: Guns disabled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668163
+    m_Localized: "Race reward \xD7{m}"
     m_Metadata:
       m_Items: []
   references:

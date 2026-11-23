@@ -2121,7 +2121,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 28966960868175872
-    m_Localized: "Hol den gestohlenen Pokal zur\xFCck"
+    m_Localized: "Hol den Pokal zur\xFCck \xB7 1 Wachbuggy"
     m_Metadata:
       m_Items: []
   - m_Id: 28966960868175873
@@ -2181,6 +2181,26 @@ MonoBehaviour:
     m_Localized: Fahr an der Wache vorbei und bleib {s} Sekunden neben dem letzten
       Wagen. Oder nimm das trockene Flussbett, erreiche die Weiche vor dem Zug und
       hol den Pokal am Bahnhof.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668464279552
+    m_Localized: "Gegner \xB7 Basis-Schussintervall {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668160
+    m_Localized: "Verb\xFCndete \xB7 Basis-Schussintervall {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668161
+    m_Localized: "Wache \xB7 Basis-Schussintervall {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668162
+    m_Localized: "Gesch\xFCtze deaktiviert"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668163
+    m_Localized: "Rennbelohnung \xD7{m}"
     m_Metadata:
       m_Items: []
   references:

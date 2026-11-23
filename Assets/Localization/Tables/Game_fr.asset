@@ -2126,7 +2126,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 28966960868175872
-    m_Localized: "R\xE9cup\xE8re la coupe vol\xE9e"
+    m_Localized: "R\xE9cup\xE8re la coupe \xB7 1 buggy de garde"
     m_Metadata:
       m_Items: []
   - m_Id: 28966960868175873
@@ -2186,6 +2186,26 @@ MonoBehaviour:
     m_Localized: "D\xE9passe l\u2019escorte et reste \xE0 hauteur du dernier wagon
       pendant {s} secondes. Tu peux aussi couper par le lit ass\xE9ch\xE9, atteindre
       l\u2019aiguillage avant le train et r\xE9cup\xE9rer la coupe \xE0 la gare."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668464279552
+    m_Localized: "Rivaux \xB7 intervalle de tir de base {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668160
+    m_Localized: "Alli\xE9s \xB7 intervalle de tir de base {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668161
+    m_Localized: "Garde \xB7 intervalle de tir de base {s} s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668162
+    m_Localized: "Canons d\xE9sactiv\xE9s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29276668472668163
+    m_Localized: "Gain de course \xD7{m}"
     m_Metadata:
       m_Items: []
   references:

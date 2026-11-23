@@ -134,7 +134,7 @@ namespace RacingGame.Tests
             var race = Object.FindAnyObjectByType<RaceManager>();
             var touch = Object.FindAnyObjectByType<TouchControlsPresenter>();
             Assert.IsFalse(race.ShowResultsAfterFinish(), "Menus cannot grant a finish");
-            PlatformGlue.Save.Data.bestGhost = "";
+            PlatformGlue.Save.Data.personalGhosts = new RacingGame.Core.Save.PersonalGhosts();
             practice = Object.Instantiate(System.Array.Find(flow.events, e => e.eventId == "e1"));
             practice.laps = 1; practice.aiCountOverride = 1; practice.pickupCount = 0;
             touch.forceShow = true;
@@ -155,7 +155,8 @@ namespace RacingGame.Tests
             race.Player.KillTally.Record(101);
             while (race.State == RaceState.Racing && race.RaceTime < 150d) yield return null;
             Assert.AreEqual(RaceState.Finishing, race.State, "The test driver must cross the real finish line");
-            var savedGhost = RacingGame.Core.Ghost.GhostRecord.FromBase64(PlatformGlue.Save.Data.bestGhost);
+            var savedGhost = PlatformGlue.Save.Data.personalGhosts.Find(practice.eventId,
+                flow.GetComponent<GhostRecorder>().Record.TrackHash, practice.laps);
             Assert.NotNull(savedGhost, "A natural finish saves a readable replay");
             Assert.AreEqual(race.PlayerElapsedTime, savedGhost.Duration, .002d,
                 "The saved replay includes the final partial sample interval and the authoritative finish time");
