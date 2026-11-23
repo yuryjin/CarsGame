@@ -68,6 +68,7 @@ namespace RacingGame
         private ScrollRect helpScroll;
         private int layoutScreenWidth, layoutScreenHeight;
         private bool layoutTouchLarge, layoutTouchLeft, layoutCompact;
+        private float layoutTextScale = 1f;
         private TextMeshProUGUI helpText;
         private TrainHud trainHud;
         private CanvasGroup pauseControls;
@@ -782,6 +783,7 @@ namespace RacingGame
             layoutTouchLarge = PlatformGlue.Save?.Data.settings.touchLargeButtons == true;
             layoutTouchLeft = PlatformGlue.Save?.Data.settings.touchLeftHanded == true;
             layoutCompact = PlatformGlue.Save?.Data.settings.compactHud == true;
+            layoutTextScale = UiFactory.TextScale;
             ApplyReadableOverlays();
             // The first touch can change the input layout between PointerDown and PointerUp.
             // Keep this shared action stationary, with a usable target even on a small display.
@@ -862,8 +864,8 @@ namespace RacingGame
             void Font(TextMeshProUGUI text, float min, float max, float pixels)
             {
                 text.enableAutoSizing = true;
-                text.fontSizeMin = Mathf.Max(min, pixels / scale);
-                text.fontSizeMax = Mathf.Max(max, text.fontSizeMin);
+                text.fontSizeMin = Mathf.Max(min, pixels / scale) * layoutTextScale;
+                text.fontSizeMax = Mathf.Max(max * layoutTextScale, text.fontSizeMin);
             }
             Font(lapText, 20f, 28f, 12f);
             Font(positionText, 20f, 36f, 16f);
@@ -873,9 +875,9 @@ namespace RacingGame
             Font(secondaryText, 16f, 24f, 12f);
             Font(statusText, 14f, 22f, 12f);
             Font(sectorText, 20f, 30f, 12f);
-            timerText.fontSize = Mathf.Max(40f, 16f / scale);
-            speedText.fontSize = Mathf.Max(46f, 18f / scale);
-            speedUnit.fontSize = Mathf.Max(16f, 9f / scale);
+            timerText.fontSize = Mathf.Max(40f, 16f / scale) * layoutTextScale;
+            speedText.fontSize = Mathf.Max(46f, 18f / scale) * layoutTextScale;
+            speedUnit.fontSize = Mathf.Max(16f, 9f / scale) * layoutTextScale;
             // Tiny dial numerals add noise; the needle and large digital speed remain visible.
             foreach (var text in speedPanel.GetComponentsInChildren<TextMeshProUGUI>(true))
                 if (text.name.StartsWith("Scale", System.StringComparison.Ordinal)) text.gameObject.SetActive(16f * scale >= 9f);
@@ -894,7 +896,8 @@ namespace RacingGame
             float timerWidth = Mathf.Max(280f, 110f / scale), timerHeight = Mathf.Max(70f, 30f / scale);
             Place(timerPanel, new Vector2(0.5f, 1f), new Vector2(-timerWidth * 0.5f, -24f - timerHeight), new Vector2(timerWidth * 0.5f, -24f));
 
-            float width = Mathf.Max(324f, 132f / scale), healthHeight = Mathf.Max(100f, 42f / scale);
+            float width = Mathf.Max(324f, 132f / scale) * Mathf.Lerp(1f, layoutTextScale, 0.5f);
+            float healthHeight = Mathf.Max(100f, 42f / scale) * layoutTextScale;
             // Noto CJK's ascent/descent needs ~1.45 em. Reserve both complete lines:
             // a short box with Ellipsis can discard even a two-character weapon name.
             primaryNameText.fontSize = primaryNameText.fontSizeMax;
@@ -922,7 +925,7 @@ namespace RacingGame
         private void LayoutHint()
         {
             float scale = Mathf.Max(0.01f, hudRoot.lossyScale.x);
-            hintText.fontSize = Mathf.Max(24f, 12f / scale);
+            hintText.fontSize = Mathf.Max(24f, 12f / scale) * layoutTextScale;
             if (!touchLayout)
             {
                 float width = Mathf.Max(650f, Mathf.Min(340f, Screen.width * 0.48f) / scale);
@@ -959,7 +962,7 @@ namespace RacingGame
         {
             if (goalsPanel == null) return;
             float scale = Mathf.Max(0.1f, hudRoot.lossyScale.x);
-            float font = Mathf.Max(23f, 12f / scale);
+            float font = Mathf.Max(23f, 12f / scale) * layoutTextScale;
             goalsText.enableAutoSizing = false;
             goalsText.fontSize = font;
             float width = expanded ? Mathf.Min(820f, 500f * font / 23f) : touchLayout ? 64f / scale : 500f;
@@ -983,11 +986,11 @@ namespace RacingGame
             float readable = UiFactory.ReadableScale(Screen.width, Screen.height);
             // Combat confirmation must remain readable at phone resolution, independently
             // of the small targeting reticle's reference-canvas scale.
-            combatText.fontSize = Mathf.Max(22f, 14f / pixelScale);
+            combatText.fontSize = Mathf.Max(22f, 14f / pixelScale) * layoutTextScale;
             float combatHalfWidth = Mathf.Min(400f, Screen.width * 0.55f) / (2f * pixelScale);
             Place(combatText.rectTransform, new Vector2(0.5f, 0.5f),
                 new Vector2(-combatHalfWidth, 30f / pixelScale), new Vector2(combatHalfWidth, 62f / pixelScale));
-            incomingText.fontSize = Mathf.Max(23f, 13f / pixelScale);
+            incomingText.fontSize = Mathf.Max(23f, 13f / pixelScale) * layoutTextScale;
             LayoutIncomingFeedback();
             hitMarker.fontSize = Mathf.Max(64f, 28f / pixelScale);
             finishPanel.localScale = Vector3.one * (Mathf.Min(readable, (Screen.width - 32f) / 600f) / pixelScale);
@@ -1029,7 +1032,8 @@ namespace RacingGame
             if (hudRoot != null && (Mathf.Abs(hudRoot.rect.width - layoutWidth) > 1f || Screen.width != layoutScreenWidth || Screen.height != layoutScreenHeight
                 || layoutTouchLarge != (PlatformGlue.Save?.Data.settings.touchLargeButtons == true)
                 || layoutTouchLeft != (PlatformGlue.Save?.Data.settings.touchLeftHanded == true)
-                || layoutCompact != (PlatformGlue.Save?.Data.settings.compactHud == true))) ApplyLayout(touchLayout);
+                || layoutCompact != (PlatformGlue.Save?.Data.settings.compactHud == true)
+                || layoutTextScale != UiFactory.TextScale)) ApplyLayout(touchLayout);
             if (playerCar == null && race.Player != null)
             {
                 playerCar = race.Player.Car;

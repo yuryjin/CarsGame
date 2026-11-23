@@ -676,6 +676,9 @@ namespace RacingGame
                 {
                     var best = save.Data.progress.bests.Find(b => b.eventId == ev.eventId);
                     if (raceRecordSetup != null) raceRecordSetup.continued = continueUsed;
+                    if (me.Finished)
+                        Core.Save.RecentAttempts.Record(save.Data.progress, row.deviceId + "/" + row.races.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            ev.eventId, (long)(me.TotalTime * 1000d), DailyRace.NowUnixMs, raceRecordSetup);
                     if (me.Finished && best != null && best.bestTimeMs > 0)
                     {
                         LastHadPreviousBest = true;

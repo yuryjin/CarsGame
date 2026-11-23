@@ -2329,6 +2329,24 @@ MonoBehaviour:
     m_Localized: Kompakte Rennanzeige
     m_Metadata:
       m_Items: []
+  - m_Id: 29714648865779712
+    m_Localized: "Der Hangar startet Drohnen. Der M\xF6rser markiert den Boden vor
+      dem Einschlag."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Localized: "Dein Kernschaden {d}  \xB7  Stationen zerst\xF6rt {s}  \xB7  Verb\xFCndete
+      gerettet {a}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Localized: "Gro\xDFe Schrift"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Localized: "Letzte f\xFCnf Zieleinl\xE4ufe"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

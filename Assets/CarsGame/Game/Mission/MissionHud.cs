@@ -106,21 +106,13 @@ namespace RacingGame
             if (squadMap != null) { Destroy(squadMap.gameObject); squadMap = null; return; }
             if (mission.Boss == null || mission.Boss.Defeated) return;
             squadMap = UiFactory.Card(root, "SquadMap", new Vector2(.16f, .21f), new Vector2(.84f, .68f), Vector2.zero, Vector2.zero);
-            foreach (var part in mission.Boss.Parts)
+            squadMap.GetComponent<Image>().raycastTarget = true;
+            BossModuleMap.Create(squadMap, mission.Boss, mission.Boss.Parts.IndexOf(mission.SquadTarget), selected =>
             {
-                Vector3 pos = part.transform.localPosition;
-                int column = pos.x < -2f ? 0 : pos.x > 2f ? 2 : 1;
-                int row = part.Role == BossRole.Core ? 3 : pos.z > 0f ? 0 : pos.z < -6f ? 2 : 1;
-                var button = UiFactory.Button(squadMap, "Mark" + mission.Boss.Parts.IndexOf(part),
-                    Loc.Get("mission.part." + part.Role.ToString().ToLowerInvariant()), () =>
-                    {
-                        mission.MarkSquadTarget(part);
-                        ToggleSquadMap();
-                        nextSlowRefresh = 0f;
-                    }, new Vector2(column / 3f, 1f - (row + 1) / 4f), new Vector2((column + 1) / 3f, 1f - row / 4f),
-                    new Vector2(3f, 3f), new Vector2(-3f, -3f), 28f, part == mission.SquadTarget ? UiFactory.Accent : UiFactory.Raised);
-                button.interactable = part.Targetable;
-            }
+                mission.MarkSquadTarget(mission.Boss.Parts[selected]);
+                ToggleSquadMap();
+                nextSlowRefresh = 0f;
+            });
         }
 
         internal static float StatusWidthPixels(float screenWidth, float scale) => Mathf.Min(screenWidth - 24f, Mathf.Max(250f, 760f * scale));

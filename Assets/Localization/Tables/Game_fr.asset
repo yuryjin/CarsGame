@@ -2335,6 +2335,23 @@ MonoBehaviour:
     m_Localized: Interface de course compacte
     m_Metadata:
       m_Items: []
+  - m_Id: 29714648865779712
+    m_Localized: "Le hangar lance des drones. Le mortier marque le sol avant l\u2019impact."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Localized: "Tes d\xE9g\xE2ts au c\u0153ur {d}  \xB7  Stations d\xE9truites
+      {s}  \xB7  Alli\xE9s sauv\xE9s {a}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Localized: Texte agrandi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Localized: "Cinq derni\xE8res arriv\xE9es"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

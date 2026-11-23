@@ -91,6 +91,7 @@ namespace RacingGame.Tests
             b.settings.dynamicCamera = false;
             b.settings.classicCarModels = true;
             b.settings.compactHud = true;
+            b.settings.largeText = true;
             Assert.AreEqual("tr", SaveMerge.Merge(a, b).settings.lang);
             Assert.AreEqual("tr", SaveMerge.Merge(b, a).settings.lang);
             // Every settings field comes from the newer save, not just the ones the merge used to copy.
@@ -99,6 +100,7 @@ namespace RacingGame.Tests
             Assert.IsFalse(merged.settings.dynamicCamera);
             Assert.IsTrue(SaveMigrator.FromJson(SaveMigrator.ToJson(merged)).settings.classicCarModels);
             Assert.IsTrue(SaveMigrator.FromJson(SaveMigrator.ToJson(merged)).settings.compactHud);
+            Assert.IsTrue(SaveMigrator.FromJson(SaveMigrator.ToJson(merged)).settings.largeText);
             Assert.IsFalse(merged.settings.autoAim);
             Assert.IsFalse(merged.settings.qualityAuto);
             Assert.AreEqual(0, merged.settings.quality);

@@ -2336,6 +2336,23 @@ MonoBehaviour:
     m_Localized: Interfaz de carrera compacta
     m_Metadata:
       m_Items: []
+  - m_Id: 29714648865779712
+    m_Localized: El hangar lanza drones. El mortero marca el suelo antes del impacto.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Localized: "Tu da\xF1o al n\xFAcleo {d}  \xB7  Estaciones destruidas {s}  \xB7
+      Aliados salvados {a}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Localized: Texto grande
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Localized: "\xDAltimas cinco llegadas"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

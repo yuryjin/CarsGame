@@ -2333,6 +2333,23 @@ MonoBehaviour:
     m_Localized: Interface de corrida compacta
     m_Metadata:
       m_Items: []
+  - m_Id: 29714648865779712
+    m_Localized: "O hangar lan\xE7a drones. O morteiro marca o ch\xE3o antes do impacto."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Localized: "Seu dano ao n\xFAcleo {d}  \xB7  Esta\xE7\xF5es destru\xEDdas {s}
+      \xB7  Aliados salvos {a}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Localized: Texto grande
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Localized: "\xDAltimas cinco chegadas"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

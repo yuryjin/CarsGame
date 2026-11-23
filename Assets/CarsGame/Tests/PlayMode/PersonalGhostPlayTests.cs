@@ -274,6 +274,65 @@ namespace RacingGame.Tests
         }
 
         [UnityTest, Timeout(300000)]
+        public IEnumerator SixFinishesKeepTheLastFiveWithTheirActualCarAndDifficultyAfterRestartAndAbort()
+        {
+            yield return OpenProfile();
+            var actualBodies = new string[6];
+            var actualTiers = new string[6];
+            var actualTimes = new long[6];
+            var menu = Object.FindAnyObjectByType<MenuScreens>();
+            for (int i = 0; i < 6; i++)
+            {
+                if (i == 3)
+                {
+                    PlatformGlue.Save.Data.progress.cosmetics.Add("body:flea");
+                    PlatformGlue.Save.Data.progress.body = "flea";
+                    menu.Show("events");
+                    int hard = Array.FindIndex(flow.tiers, tier => tier.tierId == "hard");
+                    GameObject.Find("Tier" + hard).GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+                }
+                yield return StartFromEventList("tt1");
+                actualBodies[i] = race.Player.GetComponent<CarBody>().BodyId;
+                actualTiers[i] = race.tier.tierId;
+                yield return DriveToFinish();
+                actualTimes[i] = (long)(race.Results.Player.TotalTime * 1000d);
+                menu.GoTo("events");
+            }
+            Assert.AreNotEqual(actualBodies[2], actualBodies[3]);
+            Assert.AreNotEqual(actualTiers[2], actualTiers[3]);
+            var flush = PlatformGlue.Save.FlushAsync();
+            while (!flush.IsCompleted) yield return null;
+            flush.GetAwaiter().GetResult();
+            yield return Reload();
+            yield return StartFromEventList("tt1");
+            flow.EnterMenu();
+            yield return null;
+            menu.Show("leaders");
+            var history = PlatformGlue.Save.Data.progress.recentAttempts;
+            Assert.AreEqual(5, history.Count);
+            for (int i = 0; i < 5; i++)
+            {
+                int run = 5 - i;
+                Assert.AreEqual(actualTimes[run], history[i].timeMs);
+                Assert.AreEqual(actualBodies[run], history[i].setup.body);
+                Assert.AreEqual(actualTiers[run], history[i].setup.tier);
+                Assert.IsTrue(history[i].id.EndsWith("/" + (run + 1)));
+                var card = GameObject.Find("RecentAttempt" + i).transform;
+                string condition = card.Find("RecordSetup").GetComponent<TMPro.TMP_Text>().text;
+                StringAssert.Contains(Loc.Get("difficulty." + actualTiers[run]), condition);
+                StringAssert.Contains(Loc.Get("body." + actualBodies[run]), condition);
+                var comparable = RecentAttempts.PreviousComparable(history, i);
+                bool matches = i != 2 && i < 4;
+                Assert.AreEqual(matches, comparable != null);
+                if (matches) Assert.IsTrue(RecordSetup.Same(comparable.setup, history[i].setup));
+                string shown = card.Find("Time").GetComponent<TMPro.TMP_Text>().text;
+                StringAssert.StartsWith(UiFactory.FormatMilliseconds(actualTimes[run]), shown);
+                Assert.AreEqual(matches, shown.Contains("\n"));
+            }
+            TestContext.WriteLine("Newest first: " + string.Join(", ", history.ConvertAll(a => $"{a.id} {a.timeMs} ms {a.setup.body}/{a.setup.tier}")));
+        }
+
+        [UnityTest, Timeout(300000)]
         public IEnumerator SoloTimeTrialReplacesItsOwnGhostAndReturnsToAnArmedCareerField()
         {
             yield return OpenProfile();

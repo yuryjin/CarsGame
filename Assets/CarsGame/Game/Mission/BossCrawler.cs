@@ -160,20 +160,33 @@ namespace RacingGame
             }
         }
 
+        internal readonly struct Station
+        {
+            public readonly BossRole Role;
+            public readonly Vector3 Local;
+            public Station(BossRole role, float x, float y, float z) { Role = role; Local = new Vector3(x, y, z); }
+        }
+
+        internal static readonly Station[] Stations = {
+            new Station(BossRole.Core, 0f, 13f, -22.4f),
+            new Station(BossRole.Cannon, -8.5f, 24f, 5f), new Station(BossRole.Cannon, -8.5f, 21.2f, -15.5f),
+            new Station(BossRole.Flak, -13.4f, 15.5f, -4f),
+            new Station(BossRole.Cannon, 8.5f, 24f, 5f), new Station(BossRole.Cannon, 8.5f, 21.2f, -15.5f),
+            new Station(BossRole.Flak, 13.4f, 15.5f, -4f),
+            new Station(BossRole.Mortar, 0f, 24f, -1f), new Station(BossRole.Hangar, 0f, 21.5f, -9f)
+        };
+
         private void BuildParts(float coreHealth)
         {
             Hull = BossPart.Create(this, BossRole.Hull, transform, Vector3.zero);
-            Core = BossPart.Create(this, BossRole.Core, transform, new Vector3(0f, 13f, -22.4f));
-            Core.SetMaxHealth(coreHealth);
-            Parts.Add(Core);
-            foreach (float sx in new[] { -1f, 1f })
+            foreach (var station in Stations)
             {
-                Parts.Add(BossPart.Create(this, BossRole.Cannon, transform, new Vector3(sx * 8.5f, 24f, 5f)));
-                Parts.Add(BossPart.Create(this, BossRole.Cannon, transform, new Vector3(sx * 8.5f, 21.2f, -15.5f)));
-                Parts.Add(BossPart.Create(this, BossRole.Flak, transform, new Vector3(sx * 13.4f, 15.5f, -4f)));
+                var part = BossPart.Create(this, station.Role, transform, station.Local);
+                Parts.Add(part);
+                if (station.Role != BossRole.Core) continue;
+                Core = part;
+                Core.SetMaxHealth(coreHealth);
             }
-            Parts.Add(BossPart.Create(this, BossRole.Mortar, transform, new Vector3(0f, 24f, -1f)));
-            Parts.Add(BossPart.Create(this, BossRole.Hangar, transform, new Vector3(0f, 21.5f, -9f)));
             foreach (var p in Parts) p.Destroyed += OnPartDestroyed;
         }
 

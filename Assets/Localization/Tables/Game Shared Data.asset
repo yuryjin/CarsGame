@@ -2275,6 +2275,22 @@ MonoBehaviour:
     m_Key: settings.compact_hud
     m_Metadata:
       m_Items: []
+  - m_Id: 29714648865779712
+    m_Key: mission.module_functions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Key: mission.contribution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Key: settings.large_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Key: record.recent
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

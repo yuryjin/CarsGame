@@ -31,6 +31,10 @@ namespace RacingGame
         }
 
         public MissionStrikes Strikes { get; private set; }
+        public (float CoreDamage, int Stations, int AlliesSaved) FinalContribution { get; private set; }
+        private float playerCoreDamage;
+        private int playerStations;
+        private readonly HashSet<int> rescuedAllies = new HashSet<int>();
         public Outcome Result { get; private set; }
         public int SimulationOrder => int.MaxValue - 6000;   // after the cars, before the units and the shells
         /// <summary>(text, colour) for the HUD's centre toast.</summary>
@@ -104,6 +108,7 @@ namespace RacingGame
             BossPart.RequestDrone = LaunchDrone;
             BossPart.RequestStrike = (part, point, tick) => Strikes.Add(point, 8f, 34f * TierScale, 2.6f, Boss.gameObject, tick);
             MissionUnit.Killed += OnUnitKilled;
+            MissionUnit.Damaged += OnUnitDamaged;
 
             // Escort at the start: two tanks behind, three armoured cars on the flanks.
             for (int i = 0; i < 5; i++)
@@ -347,6 +352,7 @@ namespace RacingGame
         {
             SquadTarget = null;
             Result = outcome;
+            FinalContribution = (playerCoreDamage, playerStations, rescuedAllies.Count);
             LastVictory = outcome == Outcome.Victory;
             endTick = tick + SimulationDriver.SecondsToTicks(outcome == Outcome.Victory ? 5.5f : 4.5f);
             Strikes.Clear();
@@ -425,9 +431,27 @@ namespace RacingGame
             Say(Loc.Get(key), GoodColor);
         }
 
+        private void OnUnitDamaged(MissionUnit unit, GameObject attacker, float damage)
+        {
+            if (Result == Outcome.None && unit == Boss.Core && race.Player != null && attacker == race.Player.gameObject)
+                playerCoreDamage += damage;
+        }
+
+        private void RescueAllies(Vector3 point, float radius)
+        {
+            foreach (var teammate in race.Participants)
+            {
+                if (teammate == null || teammate.isPlayer || teammate.Health == null || teammate.Health.IsDead || teammate.Health.IsInvulnerable) continue;
+                if ((teammate.transform.position - point).sqrMagnitude <= radius * radius)
+                    rescuedAllies.Add(teammate.Car.CarId);
+            }
+        }
+
         private void OnUnitKilled(MissionUnit unit, GameObject attacker)
         {
-            if (unit.Kind == UnitKind.Plane) Strikes.CancelFrom(unit.gameObject, SimulationDriver.Instance.Tick);
+            bool personal = Result == Outcome.None && race.Player != null && attacker == race.Player.gameObject;
+            if (unit.Kind == UnitKind.Plane) Strikes.CancelFrom(unit.gameObject, SimulationDriver.Instance.Tick, personal ? RescueAllies : (Action<Vector3, float>)null);
+            if (personal && unit.Kind == UnitKind.BossPart && unit is BossPart station && station.Boss == Boss) playerStations++;
             if (attacker == null || Teams.Of(attacker) != Team.Players) return;
             var p = attacker.GetComponentInParent<RaceParticipant>();
             if (p == null) return;
@@ -528,6 +552,7 @@ namespace RacingGame
         {
             MissionUnit.Running = false;
             MissionUnit.Killed -= OnUnitKilled;
+            MissionUnit.Damaged -= OnUnitDamaged;
             BossPart.RequestDrone = null;
             BossPart.RequestStrike = null;
             if (race != null)

@@ -98,7 +98,7 @@ namespace RacingGame
         public virtual bool TakeHit(GameObject attacker, float damage, Vector3 point)
         {
             if (!Alive || damage <= 0f || !Teams.Hostile(attacker, gameObject)) return false;
-            float dealt = damage * DamageTaken;
+            float dealt = Mathf.Min(Health, damage * DamageTaken);
             if (dealt <= 0f) return false;
             Health = Mathf.Max(0f, Health - dealt);
             flashUntil = Time.time + 0.07f;

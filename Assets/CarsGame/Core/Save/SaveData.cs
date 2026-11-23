@@ -22,6 +22,7 @@ namespace RacingGame.Core.Save
         public bool dynamicCamera = true;
         public bool classicCarModels;
         public bool compactHud;
+        public bool largeText;
         /// <summary>Turret tracks rivals by itself; off = the mouse aims (desktop only, touch always auto).</summary>
         public bool autoAim = true;
         public bool touchLargeButtons;
@@ -122,6 +123,7 @@ namespace RacingGame.Core.Save
         public int buildPreset; // CarBuild; zero preserves the handling of old saves
         public List<string> unlockedEvents = new List<string>();
         public List<EventBest> bests = new List<EventBest>();
+        public List<RaceAttempt> recentAttempts = new List<RaceAttempt>();
         /// <summary>Owned cosmetics as "paint:id" / "livery:id" (free ones are implicit).</summary>
         public List<string> cosmetics = new List<string>();
         public string paint = "";
@@ -136,7 +138,7 @@ namespace RacingGame.Core.Save
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 8;
+        public const int CurrentVersion = 9;
         public int version = CurrentVersion;
         public long updatedAtUnixMs;
         public string deviceId = "";

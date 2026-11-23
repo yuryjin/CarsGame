@@ -2357,6 +2357,24 @@ MonoBehaviour:
     m_Localized: "Kompakt yar\u0131\u015F aray\xFCz\xFC"
     m_Metadata:
       m_Items: []
+  - m_Id: 29714648865779712
+    m_Localized: "Hangar dron f\u0131rlat\u0131r. Havan sald\u0131r\u0131dan \xF6nce
+      yeri i\u015Faretler."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Localized: "\xC7ekirdek hasar\u0131n {d}  \xB7  Y\u0131kt\u0131\u011F\u0131n
+      istasyon {s}  \xB7  Kurtard\u0131\u011F\u0131n m\xFCttefik {a}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Localized: "B\xFCy\xFCk yaz\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Localized: "Son be\u015F bitiri\u015F"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

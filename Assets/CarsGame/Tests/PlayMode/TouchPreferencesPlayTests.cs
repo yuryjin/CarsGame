@@ -1,5 +1,6 @@
 using System.Collections;
 using NUnit.Framework;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -49,6 +50,65 @@ namespace RacingGame.Tests
 
         private static Button Button(string name) => System.Array.Find(Object.FindObjectsByType<Button>(), b => b.name == name);
         private static Bounds Bounds(RectTransform rect) => RectTransformUtility.CalculateRelativeRectTransformBounds(rect.root, rect);
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator LargerTextAndTouchTargetsCanBeChosenIndependently()
+        {
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float until = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < until) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null; yield return null;
+            saved = JsonUtility.ToJson(PlatformGlue.Save.Data);
+            var settings = PlatformGlue.Save.Data.settings;
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = flow.GetComponent<RaceManager>();
+            Object.FindAnyObjectByType<TouchControlsPresenter>().forceShow = true;
+            float Size(string name)
+            {
+                var label = GameObject.Find(name).GetComponent<TMP_Text>();
+                label.ForceMeshUpdate();
+                Assert.IsFalse(label.isTextTruncated, name + " " + label.text);
+                Assert.Greater(label.textInfo.characterCount, 0, name);
+                return label.textInfo.characterInfo[0].pointSize * label.rectTransform.lossyScale.y;
+            }
+            foreach (string lang in new[] { "de", "fr", "uk" })
+            {
+                PlatformGlue.SetLanguageOverride(lang);
+                while (Loc.Language != lang && Time.realtimeSinceStartup < until) yield return null;
+                Assert.AreEqual(lang, Loc.Language);
+                settings.largeText = settings.touchLargeButtons = false;
+                flow.StartRace(System.Array.Find(flow.events, e => e.eventId == "e1"), flow.tiers[0]);
+                while (race.State == RaceState.Countdown) yield return null;
+                Button("LiveGoals").onClick.Invoke(); yield return null;
+                float baseAmmo = Size("Ammo"), baseGoals = Size("Goals");
+                var target = (RectTransform)Button("Left").transform;
+                var standard = target.rect.size;
+                Button("PauseButton").onClick.Invoke(); yield return null;
+                Button("PauseSettings").onClick.Invoke(); yield return null;
+                Button("LargeTextOn").onClick.Invoke(); yield return null;
+                Button("Back").onClick.Invoke(); yield return null;
+                Button("Resume").onClick.Invoke(); yield return null;
+                Assert.AreEqual(standard, target.rect.size);
+                Assert.Greater(Size("Ammo"), baseAmmo * 1.1f);
+                Assert.Greater(Size("Goals"), baseGoals * 1.2f);
+                Button("PauseButton").onClick.Invoke(); yield return null;
+                Button("PauseSettings").onClick.Invoke(); yield return null;
+                Button("LargeTextOff").onClick.Invoke(); yield return null;
+                Button("TouchLargeOn").onClick.Invoke(); yield return null;
+                Button("Back").onClick.Invoke(); yield return null;
+                Button("Resume").onClick.Invoke(); yield return null;
+                Assert.Greater(target.rect.width, standard.x * 1.2f);
+                Assert.AreEqual(baseAmmo, Size("Ammo"), 0.2f);
+                Assert.AreEqual(baseGoals, Size("Goals"), 0.2f);
+                settings.largeText = true;
+                race.QaFinishNow(); yield return null; yield return null;
+                Size("StarDesc"); Size("StarStatus"); Size("Reward");
+                for (int i = 0; i < 3; i++) Assert.IsTrue(Button("ResultAction" + i).IsInteractable());
+                flow.EnterMenu(); yield return null;
+            }
+        }
 
         [UnityTest, Timeout(30000)]
         public IEnumerator MouseAndMouseEmulatedTouchesRecoverWhenTheUiLosesPointerUp()

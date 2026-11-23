@@ -101,13 +101,15 @@ namespace RacingGame
         }
 
         /// <summary>The bomber was shot down: bombs it has not dropped yet (more than half a second out) never fall.</summary>
-        public void CancelFrom(GameObject source, int tick)
+        public void CancelFrom(GameObject source, int tick, System.Action<Vector3, float> onVisibleCancellation = null)
         {
             int margin = SimulationDriver.SecondsToTicks(0.5f);
             for (int i = live.Count - 1; i >= 0; i--)
             {
                 if (live[i].Source != source || live[i].ImpactTick - tick < margin) continue;
-                Release(live[i]);
+                var strike = live[i];
+                if (tick >= strike.RevealTick) onVisibleCancellation?.Invoke(strike.Point, strike.Radius);
+                Release(strike);
                 live.RemoveAt(i);
             }
         }

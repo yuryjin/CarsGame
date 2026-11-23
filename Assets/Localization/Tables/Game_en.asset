@@ -2325,6 +2325,24 @@ MonoBehaviour:
     m_Localized: Compact race HUD
     m_Metadata:
       m_Items: []
+  - m_Id: 29714648865779712
+    m_Localized: The hangar launches drones. The mortar marks the ground before it
+      strikes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Localized: "Your core damage {d}  \xB7  Stations destroyed {s}  \xB7  Allies
+      saved {a}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Localized: Large text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Localized: Last five finishes
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
