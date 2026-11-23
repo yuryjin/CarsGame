@@ -29,7 +29,7 @@ namespace RacingGame
         private static TextMeshProUGUI toastText;
         private static RectTransform toastPanel;
         private static float toastUntil;
-        private int tierIndex = -1;               // -1 = not chosen yet this session: derive from the save
+        private string displayedTierPreference;
         private TextMeshProUGUI rewardLabel;
         private float rewardShownAt;
         private const float RewardCountSeconds = 0.8f;
@@ -91,6 +91,11 @@ namespace RacingGame
             }
             if (transition != null) transition.alpha = Mathf.MoveTowards(transition.alpha, 1f, Time.unscaledDeltaTime * 7f);
             if (string.IsNullOrEmpty(current)) return;
+            if (current == "events" && panel != null && displayedTierPreference != PlatformGlue.Save?.Data.settings.tier)
+            {
+                Show("events");
+                return;
+            }
             if (current == "settings" && stickResponse != null) RefreshStickResponse();
             if (current == "capture-key") { CaptureDrivingKey(); return; }
             if (RefreshDailyCard()) return;
@@ -434,21 +439,19 @@ namespace RacingGame
         private int ResolveTierIndex(DifficultyTier[] tiers)
         {
             if (tiers.Length == 0) return 0;
-            if (tierIndex >= 0) return Mathf.Clamp(tierIndex, 0, tiers.Length - 1);
             var save = PlatformGlue.Save;
             string remembered = save != null ? save.Data.settings.tier : "";
             if (!string.IsNullOrEmpty(remembered))
             {
                 int found = Array.FindIndex(tiers, t => t.tierId == remembered);
-                if (found >= 0) return tierIndex = found;
+                if (found >= 0) return found;
             }
             bool newcomer = save == null || save.Data.Races == 0 || PlatformGlue.IsMobileDevice;
-            return tierIndex = newcomer ? 0 : Mathf.Min(1, tiers.Length - 1);
+            return newcomer ? 0 : Mathf.Min(1, tiers.Length - 1);
         }
 
         private void SelectTier(DifficultyTier[] tiers, int index)
         {
-            tierIndex = index;
             var save = PlatformGlue.Save;
             if (save != null && save.Data.settings.tier != tiers[index].tierId) { save.Data.settings.tier = tiers[index].tierId; save.MarkDirty(); }
             Show("events");
@@ -473,9 +476,10 @@ namespace RacingGame
         {
             var body = Header(root, "events.title");
             var tiers = Tiers();
+            int tierIndex = ResolveTierIndex(tiers);
+            displayedTierPreference = PlatformGlue.Save.Data.settings.tier;
             if (tiers.Length > 0)
             {
-                tierIndex = ResolveTierIndex(tiers);
                 for (int i = 0; i < tiers.Length; i++)
                 {
                     int index = i;
@@ -539,7 +543,7 @@ namespace RacingGame
                         : Loc.Format("events.locked_after", "name", Loc.Get(prerequisite.nameKey));
                     Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 64f : 44f), unlocked ? UiFactory.Positive : UiFactory.Muted);
                     UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—",
-                        unlocked ? () => StartMenuEvent(ev, tier) : null, Vector2.one, Vector2.one,
+                        unlocked ? () => StartMenuEvent(ev, SelectedTier() ?? tier) : null, Vector2.one, Vector2.one,
                         new Vector2(-216f, -92f), new Vector2(-24f, -20f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
                     BuildRivalPreview(content, ev);
                 }
