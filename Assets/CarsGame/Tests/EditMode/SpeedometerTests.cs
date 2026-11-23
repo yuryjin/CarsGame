@@ -58,6 +58,15 @@ namespace RacingGame.Tests
                 mesh = dial.canvasRenderer.GetMesh();
                 CollectionAssert.AreEqual(actual, mesh.vertices, "Nitro changes the accent, not the speed scale.");
                 CollectionAssert.Contains(mesh.colors32, (Color32)SpeedometerGraphic.BoostColor);
+                CollectionAssert.DoesNotContain(mesh.colors32, (Color32)SpeedometerGraphic.DraftColor);
+                foreach (float charge in new[] { .25f, .75f, .5f, 0f })
+                {
+                    dial.SetSpeed(expectedSpeed, true, charge);
+                    dial.Rebuild(CanvasUpdate.PreRender);
+                    int green = System.Array.FindAll(dial.canvasRenderer.GetMesh().colors32,
+                        c => c.Equals((Color32)SpeedometerGraphic.DraftColor)).Length;
+                    Assert.AreEqual(4 * Mathf.CeilToInt(80 * charge), green);
+                }
             }
             finally
             {

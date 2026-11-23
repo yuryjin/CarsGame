@@ -178,6 +178,33 @@ namespace RacingGame.Tests
             Assert.AreEqual(first.PlayerName, Ghost().Record.PlayerName);
         }
 
+        [UnityTest, Timeout(300000)]
+        public IEnumerator FirstTimedRunShowsTheTrainingLapAndStoresItWithoutAPreviousGhost()
+        {
+            yield return OpenProfile();
+            e1.laps = 2;
+            yield return Start(e1);
+            Assert.IsNull(Ghost());
+            yield return DriveToFinish();
+            var replay = flow.GetComponent<GhostRecorder>().Record;
+            int[] sectors = GhostSectorTimes.MeasureLaps(TrackPath.Instance, replay, e1.laps).BestDurations();
+            CollectionAssert.AreEqual(sectors, flow.LastTrainingSectors.milliseconds);
+            Assert.That(sectors, Has.All.GreaterThan(0));
+            var card = GameObject.Find("TrainingSectors");
+            Assert.IsNotNull(card);
+            int sum = sectors[0] + sectors[1] + sectors[2];
+            string heading = card.transform.Find("SectorTitle").GetComponent<TMPro.TMP_Text>().text;
+            Assert.AreEqual(Loc.Format("results.sector.training", "t", UiFactory.FormatMilliseconds(sum)), heading);
+            for (int i = 0; i < 3; i++)
+                StringAssert.EndsWith(UiFactory.FormatMilliseconds(sectors[i]), card.transform.Find("Sector" + (i + 1)).GetComponent<TMPro.TMP_Text>().text);
+            var flush = PlatformGlue.Save.FlushAsync();
+            while (!flush.IsCompleted) yield return null;
+            flush.GetAwaiter().GetResult();
+            yield return Reload();
+            Assert.AreEqual(sum, PlatformGlue.Save.Data.progress.bests.Find(b => b.eventId == e1.eventId).sectors[0].LapMilliseconds);
+            TestContext.WriteLine(heading + " = " + string.Join(" + ", sectors) + " ms");
+        }
+
         [UnityTest, Timeout(240000)]
         public IEnumerator LiveSectorLabelsMatchEveryLapAndTheResultsOnBothDirections()
         {

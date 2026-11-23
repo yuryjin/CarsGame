@@ -2253,6 +2253,30 @@ MonoBehaviour:
     m_Localized: "Top 3 in {name} or {n} more \u2605"
     m_Metadata:
       m_Items: []
+  - m_Id: 29710175632175104
+    m_Localized: Catch a rival and fire when the reticle lights up.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Localized: Enter the bend in a drift, then release the brake to boost.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Localized: Build up speed before the broken bridge and jump the gap.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Localized: Map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Localized: DRAFTING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Localized: "Training lap from best sectors \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

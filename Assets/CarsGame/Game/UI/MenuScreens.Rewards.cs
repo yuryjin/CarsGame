@@ -10,17 +10,20 @@ namespace RacingGame
     {
         private bool rewardDetailsExpanded;
 
-        private void BuildSectorComparison(RectTransform content, int[] deltas)
+        private void BuildSectorComparison(RectTransform content, int[] times, int trainingLapMs = 0)
         {
-            var row = Item(content, "SectorComparison", 114f);
-            Label(row, "SectorTitle", Loc.Get("results.sectors"), 23f, Top, Vector2.one,
+            bool training = trainingLapMs > 0;
+            var row = Item(content, training ? "TrainingSectors" : "SectorComparison", 114f);
+            string title = training ? Loc.Format("results.sector.training", "t", UiFactory.FormatMilliseconds(trainingLapMs)) : Loc.Get("results.sectors");
+            Label(row, "SectorTitle", title, 23f, Top, Vector2.one,
                 new Vector2(18f, -42f), new Vector2(-18f, -4f), UiFactory.Muted);
             var path = TrackPath.Instance;
-            for (int i = 0; i < deltas.Length; i++)
+            for (int i = 0; i < times.Length; i++)
             {
                 string name = SectorTimingText.Name(path, i);
-                string delta = SectorTimingText.Delta(deltas[i], out var color);
-                Label(row, "Sector" + (i + 1), name + "\n" + delta, 24f,
+                Color color = UiFactory.Positive;
+                string value = training ? UiFactory.FormatMilliseconds(times[i]) : SectorTimingText.Delta(times[i], out color);
+                Label(row, "Sector" + (i + 1), name + "\n" + value, 24f,
                     new Vector2(i / 3f, 0f), new Vector2((i + 1) / 3f, 1f), new Vector2(8f, 5f),
                     new Vector2(-8f, -40f), color, TextAlignmentOptions.Center);
             }

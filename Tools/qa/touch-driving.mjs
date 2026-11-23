@@ -51,7 +51,7 @@ try {
   assert(initial.touch, 'A real screen touch must enable the mobile controls');
   await fs.writeFile(`${output}/initial.json`, JSON.stringify(initial, null, 2));
   await page.screenshot({ path: `${output}/640-driving.png`, scale: 'css' });
-  for (const name of ['Left','Right','Fire','Brake','Reset','SwapWeapon','PauseButton','LiveGoals']) {
+  for (const name of ['Left','Right','Fire','Brake','Reset','SwapWeapon','PauseButton','LiveGoals','ToggleMiniMap']) {
     const b = initial.buttons.find(b => b.name === name);
     assert(b && b.width >= 42 && b.height >= 42, `${name}: target ${b?.width} × ${b?.height}; minimum 42 px`);
   }
@@ -65,7 +65,13 @@ try {
   await page.screenshot({ path: `${output}/640-goals.png`, scale: 'css' });
   await tap('LiveGoals');
   await page.waitForTimeout(2200);
+  const openMap = initial.buttons.find(b => b.name === 'ToggleMiniMap');
+  await tap('ToggleMiniMap');
   const before = await cmd('ui');
+  const foldedMap = before.buttons.find(b => b.name === 'ToggleMiniMap');
+  assert(foldedMap.interactable && foldedMap.width < openMap.width && foldedMap.height >= 43.9);
+  assert(before.labels.some(l => l.parent === 'ToggleMiniMap' && l.renderedText === 'Map'));
+  evidence.push({ phase: 'folded-map', openMap, foldedMap });
   const fire = await point('Fire', 1), right = await point('Right', 2);
   await send('touchStart', [fire, right]); await page.waitForTimeout(800);
   const held = await cmd('ui');

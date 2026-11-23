@@ -280,7 +280,16 @@ namespace RacingGame.Tests
             var tier = System.Array.Find(flow.tiers, t => t.tierId == "hard");
             flow.StartRace(ev, tier);
             while (race.State == RaceState.Countdown) yield return null;
+            var previous = progress.bests.Find(b => b.eventId == ev.eventId);
+            if (previous == null)
+            {
+                previous = new Core.Save.EventBest { eventId = ev.eventId };
+                progress.bests.Add(previous);
+            }
+            var training = previous.KeepSectors(flow.GetComponent<GhostRecorder>().Record.TrackHash,
+                race.laps, new[] { 18000, 20000, 16000 });
             race.QaFinishNow(); yield return null;
+            Assert.AreSame(training, flow.LastTrainingSectors);
             Assert.AreEqual(0, race.Results.Player.DriftBoosts);
             Assert.AreEqual(0, flow.LastStarsEarned & 2);
             int stars = flow.LastStarsEarned, reward = flow.LastTotalReward;
@@ -305,6 +314,7 @@ namespace RacingGame.Tests
                 Assert.AreSame(tier, RaceSetup.Tier);
                 Assert.AreEqual(stars, flow.LastStarsEarned);
                 Assert.AreEqual(reward, flow.LastTotalReward);
+                Assert.AreSame(training, flow.LastTrainingSectors, "Coming back from a lesson must restore the same training lap.");
                 Assert.AreEqual(credited, JsonUtility.ToJson(progress));
                 Assert.AreEqual(next, Button("ResultAction0").GetComponentInChildren<TMPro.TMP_Text>().text);
             }

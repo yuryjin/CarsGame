@@ -18,7 +18,7 @@ namespace RacingGame
     /// TODO(M7): move the layout to a prefab and route every string through localization.
     /// </summary>
     [DefaultExecutionOrder(100)]
-    public sealed class HudScreen : MonoBehaviour
+    public sealed partial class HudScreen : MonoBehaviour
     {
         public RaceManager race;
         public float hintSeconds = 30f;
@@ -150,7 +150,7 @@ namespace RacingGame
         private string reloadFormat = "{0:0}%";
         private const string TimerFormat = "{0:0}:{1:00}.{2:000}";
         private int lastSpeed = -1, lastReloadPct = -1;
-        private bool lastBoost;
+        private bool lastBoost, lastDrafting;
         private long lastTimerMs = -1;
 
         private void Awake()
@@ -296,6 +296,7 @@ namespace RacingGame
             centerPanel.gameObject.SetActive(false);
 
             BuildWeaponWheel(root);
+            BuildMiniMap(root);
             BuildFinishCard(root);
             BuildPause(root);
 
@@ -603,7 +604,7 @@ namespace RacingGame
             settingsButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("menu.settings");
             menuButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("pause.menu");
             speedUnit.text = Loc.Get("hud.speed_unit");
-            nitroText.text = Loc.Get("hud.nitro");
+            nitroText.text = Loc.Get(lastDrafting ? "hud.slipstream" : "hud.nitro");
             reloadFormat = Loc.Get("hud.reload").Replace("{p}", "{0:0}");
             lastSpeed = -1; lastReloadPct = -1; lastTimerMs = -1;
             RefreshPosition();
@@ -823,6 +824,7 @@ namespace RacingGame
                 hintText.alignment = TextAlignmentOptions.MidlineLeft;
             }
             ApplyReadableVitals();
+            LayoutMiniMap();
             LayoutGoals(goalsExpanded || (race != null && race.State == RaceState.Countdown));
             LayoutHint();
             pauseHint.gameObject.SetActive(true);
@@ -1042,10 +1044,19 @@ namespace RacingGame
             {
                 int speed = Mathf.RoundToInt(Mathf.Abs(playerCar.SpeedKmh));
                 bool boost = playerCar.IsBoosting;
+                float draft = playerCar.DraftCharge01;
+                bool drafting = draft > 0f;
                 if (speed != lastSpeed) { lastSpeed = speed; speedText.SetText("{0:0}", speed); }
-                if (boost != lastBoost) { lastBoost = boost; nitroText.gameObject.SetActive(boost); }
+                if (boost != lastBoost || drafting != lastDrafting)
+                {
+                    lastBoost = boost;
+                    lastDrafting = drafting;
+                    nitroText.text = Loc.Get(drafting ? "hud.slipstream" : "hud.nitro");
+                    nitroText.color = drafting ? SpeedometerGraphic.DraftColor : SpeedometerGraphic.BoostColor;
+                    nitroText.gameObject.SetActive(boost || drafting);
+                }
                 shownSpeed = Mathf.Lerp(shownSpeed, Mathf.Abs(playerCar.SpeedKmh), 1f - Mathf.Exp(-12f * Time.unscaledDeltaTime));
-                speedDial.SetSpeed(shownSpeed, boost);
+                speedDial.SetSpeed(shownSpeed, boost, draft);
             }
             if (Time.unscaledTime >= damageTrailUntil && hpTrail.fillAmount > hpFill.fillAmount)
                 hpTrail.fillAmount = Mathf.MoveTowards(hpTrail.fillAmount, hpFill.fillAmount, Time.unscaledDeltaTime * 0.6f);
@@ -1258,6 +1269,7 @@ namespace RacingGame
         // After CarCameraFollow.LateUpdate (execution order below), so the reticle matches this frame's camera.
         private void LateUpdate()
         {
+            UpdateMiniMap();
             if (countdownPunch > 0f)
             {
                 // Each digit lands big and settles: 1.6× → 1× over ~0.4 s.
@@ -1641,6 +1653,7 @@ namespace RacingGame
             finishPanel.gameObject.SetActive(false);
             if (visible)
             {
+                StartMiniMap();
                 RefreshModelLabel();
                 bool practice = gameFlow != null && gameFlow.IsPractice;
                 var train = TrainMission.Current;

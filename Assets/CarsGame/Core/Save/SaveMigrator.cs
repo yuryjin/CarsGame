@@ -74,7 +74,13 @@ namespace RacingGame.Core.Save
             data.progress.unlockedEvents ??= new System.Collections.Generic.List<string>();
             data.progress.bests ??= new System.Collections.Generic.List<EventBest>();
             foreach (var best in data.progress.bests)
-                if (best != null && best.setup != null && !best.setup.IsKnown) best.setup = null;
+            {
+                if (best == null) continue;
+                if (best.setup != null && !best.setup.IsKnown) best.setup = null;
+                var sectors = best.sectors;
+                best.sectors = null;
+                best.MergeSectors(sectors);
+            }
             data.progress.ledger ??= new System.Collections.Generic.List<DeviceLedger>();
             data.progress.cosmetics ??= new System.Collections.Generic.List<string>();
             data.progress.paint ??= ""; data.progress.livery ??= ""; data.progress.stripe ??= ""; data.progress.body ??= "";

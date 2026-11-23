@@ -2283,6 +2283,32 @@ MonoBehaviour:
     m_Localized: "{name} yar\u0131\u015F\u0131nda ilk 3 veya {n} \u2605 daha"
     m_Metadata:
       m_Items: []
+  - m_Id: 29710175632175104
+    m_Localized: "Bir rakibe yeti\u015F ve ni\u015Fang\xE2h yand\u0131\u011F\u0131nda
+      ate\u015F et."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Localized: "Viraja drift yaparak gir ve h\u0131zlanmak i\xE7in freni b\u0131rak."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Localized: "Y\u0131k\u0131k k\xF6pr\xFCden \xF6nce h\u0131zlan ve bo\u015Flu\u011Fu
+      a\u015F."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Localized: Harita
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Localized: HAVA AKIMI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Localized: "En iyi sekt\xF6rlerden antrenman turu \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

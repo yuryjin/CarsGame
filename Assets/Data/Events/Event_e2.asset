@@ -15,6 +15,7 @@ MonoBehaviour:
   eventId: e2
   nameKey: events.e2.name
   laps: 2
+  referenceSeconds: 135
   aiCountOverride: -1
   reversed: 1
   night: 0

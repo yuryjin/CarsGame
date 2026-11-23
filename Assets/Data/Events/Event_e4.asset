@@ -15,6 +15,7 @@ MonoBehaviour:
   eventId: e4
   nameKey: events.e4.name
   laps: 2
+  referenceSeconds: 162
   aiCountOverride: -1
   reversed: 0
   wastelandTrack: 1

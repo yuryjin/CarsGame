@@ -35,6 +35,7 @@ namespace RacingGame
         public bool LastHadPreviousBest { get; private set; }
         public bool LastWasPersonalBest { get; private set; }
         public int[] LastSectorDeltaMs { get; private set; }
+        public Core.Save.SectorBest LastTrainingSectors { get; private set; }
         private GhostSectorTimes.Run personalGhostSectors, playerSectors;
         private int shownSectorCount;
         public bool LastBestComparable { get; private set; }
@@ -201,11 +202,10 @@ namespace RacingGame
             ReturningFromPractice = IsPractice;
             ReturningFromTestDrive = IsTestDrive;
             bool resumeResult = IsPractice && practiceReturnResults != null;
+            if (!resumeResult) practiceReturnResults = null;
             Teardown();
             RestoreTestDrive();
             if (hud != null) hud.SetVisible(false);
-            if (resumeResult) LastSectorDeltaMs = practiceReturnSectors;
-            else { practiceReturnResults = null; practiceReturnSectors = null; }
             SetState(resumeResult ? FlowState.Results : FlowState.Menu);
         }
 
@@ -220,7 +220,7 @@ namespace RacingGame
             if (ev != null && !IsUnlocked(ev)) { MenuScreens.Toast(Loc.Get("events.locked")); return; }
             // A rejected request must leave the current race and any test-drive snapshot intact.
             if (IsTestDrive && ev != testDriveEvent) RestoreTestDrive();
-            if (!IsTestDrive) { practiceReturnResults = null; practiceReturnSectors = null; }
+            if (!IsTestDrive) practiceReturnResults = null;
             RaceSetup.Event = ev;
             RaceSetup.Tier = tier;
             Teardown();
@@ -312,12 +312,17 @@ namespace RacingGame
             foreach (var g in ghosts) if (g != null) Destroy(g.gameObject);
             ghosts.Clear();
             personalGhostSectors = playerSectors = null;
-            LastSectorDeltaMs = null;
+            if (practiceReturnResults == null)
+            {
+                LastSectorDeltaMs = null;
+                LastTrainingSectors = null;
+            }
             shownSectorCount = 0;
         }
 
         private async void SpawnGhosts(RaceEventDefinition ev, int generation)
         {
+            if (track != null) playerSectors = new GhostSectorTimes.Run(track, race.laps);
             var prefab = race.spawner != null ? race.spawner.raceCarPrefab : null;
             if (prefab == null) return;
             int hash = TrackHash(ev);
@@ -331,7 +336,6 @@ namespace RacingGame
             {
                 AddGhost(GhostCar.Spawn(prefab, own, GhostTint));
                 personalGhostSectors = GhostSectorTimes.MeasureLaps(track, own, race.laps);
-                if (personalGhostSectors != null) playerSectors = new GhostSectorTimes.Run(track, race.laps);
             }
 
             var sessions = PlatformGlue.Platform?.Sessions;
@@ -586,7 +590,7 @@ namespace RacingGame
             SfxPlayer.Instance.PlayUi(SfxSynth.Finish);
             var rec = recorder.Stop();
             if (rec == null || rec.Samples.Count < 10) return;
-            if (playerSectors != null && playerSectors.Finish(rec))
+            if (playerSectors != null && playerSectors.Finish(rec) && personalGhostSectors != null)
             {
                 ShowCompletedSectors();
                 LastSectorDeltaMs = new int[3];
@@ -610,6 +614,7 @@ namespace RacingGame
 
         private void ShowCompletedSectors()
         {
+            if (personalGhostSectors == null) return;
             for (; shownSectorCount < playerSectors.Count; shownSectorCount++)
                 hud?.ShowSectorDelta(track, shownSectorCount % 3,
                     playerSectors.Duration(shownSectorCount) - personalGhostSectors.Duration(shownSectorCount));
@@ -623,6 +628,7 @@ namespace RacingGame
             recorder.Stop();                                   // DNF path never reached OnParticipantFinished
             if (ContinueOpen) { ContinueOpen = false; if (overlays != null) overlays.HideContinuePrompt(); }
             var me = results.Player;
+            if (me != null && !me.Finished) playerSectors?.Advance(recorder.Record, stopped: true);
             var save = PlatformGlue.Save;
             var ev = RaceSetup.Event;
             float mult = RaceSetup.Tier != null ? RaceSetup.Tier.rewardMultiplier : 1f;
@@ -681,6 +687,8 @@ namespace RacingGame
                     }
                     if (LastWasPersonalBest || me.Finished && LastHadPreviousBest && LastBestDeltaMs == 0 && !LastBestSetupKnown)
                         best.setup = raceRecordSetup?.Copy();
+                    if (playerSectors != null)
+                        LastTrainingSectors = best.KeepSectors(TrackHash(ev), race.laps, playerSectors.BestDurations());
                     if (!daily) UnlockNext(ev, me.Finished && me.Position <= 3, previousStars, save);
                     if (daily) RecordDaily(ev, me, save, row);
                 }

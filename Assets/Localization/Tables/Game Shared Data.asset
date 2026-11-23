@@ -2203,6 +2203,30 @@ MonoBehaviour:
     m_Key: events.locked_stars
     m_Metadata:
       m_Items: []
+  - m_Id: 29710175632175104
+    m_Key: route.aim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Key: route.drift_boost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Key: route.bridge_jump
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Key: hud.mini_map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Key: hud.slipstream
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Key: results.sector.training
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

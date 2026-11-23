@@ -2256,6 +2256,31 @@ MonoBehaviour:
     m_Localized: "Top 3 in {name} oder noch {n} \u2605"
     m_Metadata:
       m_Items: []
+  - m_Id: 29710175632175104
+    m_Localized: Hol einen Gegner ein und feuere, sobald das Fadenkreuz aufleuchtet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Localized: "Drifte in die Kurve und l\xF6se die Bremse f\xFCr einen Schub."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Localized: "Beschleunige vor der kaputten Br\xFCcke und \xFCberspringe die
+      L\xFCcke."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Localized: Karte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Localized: WINDSCHATTEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Localized: "Trainingsrunde aus Bestsektoren \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

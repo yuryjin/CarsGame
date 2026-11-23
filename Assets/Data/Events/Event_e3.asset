@@ -15,6 +15,7 @@ MonoBehaviour:
   eventId: e3
   nameKey: events.e3.name
   laps: 2
+  referenceSeconds: 148
   aiCountOverride: -1
   reversed: 0
   night: 0

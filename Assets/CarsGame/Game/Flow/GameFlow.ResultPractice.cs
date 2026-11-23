@@ -3,7 +3,6 @@ namespace RacingGame
     public sealed partial class GameFlow
     {
         private RaceResults practiceReturnResults;
-        private int[] practiceReturnSectors;
 
         internal RaceResults ResultsForMenu => practiceReturnResults ?? race.Results;
         internal bool ReturningToResults => State == FlowState.Results && practiceReturnResults != null;

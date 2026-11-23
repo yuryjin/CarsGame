@@ -184,7 +184,12 @@ namespace RacingGame
         {
             if (double.IsNaN(seconds) || seconds < 0d || seconds >= long.MaxValue / 1000d) return "--:--.---";
             // Match the HUD and stored best times: complete milliseconds, with one shared carry.
-            long ms = (long)(seconds * 1000d);
+            return FormatMilliseconds((long)(seconds * 1000d));
+        }
+
+        public static string FormatMilliseconds(long ms)
+        {
+            if (ms < 0) return "--:--.---";
             return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}:{1:00}.{2:000}",
                 ms / 60000, ms / 1000 % 60, ms % 1000);
         }

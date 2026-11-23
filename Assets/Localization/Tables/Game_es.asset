@@ -2264,6 +2264,30 @@ MonoBehaviour:
     m_Localized: "Top 3 en {name} o {n} \u2605 m\xE1s"
     m_Metadata:
       m_Items: []
+  - m_Id: 29710175632175104
+    m_Localized: Alcanza a un rival y dispara cuando se ilumine la mira.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Localized: Entra derrapando en la curva y suelta el freno para acelerar.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Localized: Gana velocidad antes del puente roto y salta el hueco.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Localized: Mapa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Localized: REBUFO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Localized: "Vuelta de pr\xE1ctica con tus mejores sectores \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

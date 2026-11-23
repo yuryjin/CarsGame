@@ -2261,6 +2261,32 @@ MonoBehaviour:
     m_Localized: "Podium dans {name} ou encore {n} \u2605"
     m_Metadata:
       m_Items: []
+  - m_Id: 29710175632175104
+    m_Localized: "Rattrape un adversaire et tire quand le viseur s\u2019allume."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312448
+    m_Localized: "Entre en d\xE9rapage dans le virage et rel\xE2che le frein pour
+      acc\xE9l\xE9rer."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312449
+    m_Localized: "Prends de la vitesse avant le pont d\xE9truit pour franchir le
+      vide."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312450
+    m_Localized: Carte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312451
+    m_Localized: ASPIRATION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29710175678312452
+    m_Localized: "Tour d\u2019entra\xEEnement avec tes meilleurs secteurs \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

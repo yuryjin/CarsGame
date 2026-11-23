@@ -30,6 +30,14 @@ namespace RacingGame.Core.Save
         /// <summary>Contextual tips already shown (bit per <c>Core.Onboarding.Hint</c>).</summary>
         public int hintsSeen;
     }
+    [Serializable] public sealed class SectorBest
+    {
+        public int trackHash, laps;
+        public int[] milliseconds = new int[3];
+        public int LapMilliseconds => milliseconds[0] > 0 && milliseconds[1] > 0 && milliseconds[2] > 0
+            ? milliseconds[0] + milliseconds[1] + milliseconds[2] : 0;
+    }
+
     [Serializable] public class EventBest
     {
         public string eventId;
@@ -37,6 +45,32 @@ namespace RacingGame.Core.Save
         public int stars;
         // Missing on legacy records: never infer old conditions from today's garage selection.
         public RecordSetup setup;
+        public List<SectorBest> sectors;
+
+        public SectorBest KeepSectors(int trackHash, int laps, int[] durations)
+        {
+            if (laps < 1 || durations == null || durations.Length != 3) return null;
+            var row = sectors?.Find(s => s.trackHash == trackHash && s.laps == laps);
+            for (int i = 0; i < 3; i++)
+            {
+                int time = durations[i];
+                if (time <= 0 || time > Ghost.GhostRecord.MaxDurationMilliseconds) continue;
+                if (row == null)
+                {
+                    row = new SectorBest { trackHash = trackHash, laps = laps };
+                    (sectors ??= new List<SectorBest>()).Add(row);
+                    sectors.Sort((a, b) => a.trackHash != b.trackHash ? a.trackHash.CompareTo(b.trackHash) : a.laps.CompareTo(b.laps));
+                }
+                if (row.milliseconds[i] == 0 || time < row.milliseconds[i]) row.milliseconds[i] = time;
+            }
+            return row;
+        }
+
+        public void MergeSectors(List<SectorBest> source)
+        {
+            if (source != null) foreach (var row in source)
+                if (row != null) KeepSectors(row.trackHash, row.laps, row.milliseconds);
+        }
     }
     /// <summary>
     /// Monotonic counters written by ONE device. Every device owns its own row; totals are the
@@ -101,7 +135,7 @@ namespace RacingGame.Core.Save
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 7;
+        public const int CurrentVersion = 8;
         public int version = CurrentVersion;
         public long updatedAtUnixMs;
         public string deviceId = "";

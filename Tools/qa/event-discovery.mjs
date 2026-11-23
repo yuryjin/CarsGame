@@ -73,6 +73,15 @@ try {
       const first = cards.find(b => b.name === 'Start_e1');
       assert(first.y > .2 && first.y < .95, 'First playable race is visible without passing cup cards');
       assert(!cards.find(b => b.name === 'Start_e2').interactable, 'Career gate is preserved');
+      for (const id of ['e1', 'e2', 'e3', 'e4', 'e19', 'e20']) {
+        const hint = state.labels.find(l => l.parent === id && l.name === 'RouteHint');
+        const estimate = state.labels.find(l => l.parent === id && l.name === 'ReferenceTime');
+        const button = cards.find(b => b.name === 'Start_' + id);
+        assert(hint?.renderedText && !hint.truncated && hint.fontPixels >= 11.9, lang + ' ' + id + ' driving cue');
+        assert(estimate?.renderedText.includes('~') && !estimate.truncated && estimate.fontPixels >= 11.9, lang + ' ' + id + ' reference time');
+        assert(hint.x * box.width + hint.width / 2 <= button.x * box.width - button.width / 2);
+        assert(estimate.y * box.height - estimate.height / 2 > button.y * box.height + button.height / 2);
+      }
       assert.equal(state.coins, initial.coins); assert.equal(state.races, initial.races);
       const numbers = new Intl.NumberFormat(lang);
       const difficultyChecks = [];

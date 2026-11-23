@@ -21,6 +21,8 @@ namespace RacingGame
         [Tooltip("Localization key of the display name.")]
         public string nameKey = "events.e1.name";
         [Range(1, 20)] public int laps = 3;
+        [Tooltip("Approximate race duration in seconds on the stock Classic at Normal difficulty.")]
+        [Min(0)] public int referenceSeconds;
         [Tooltip("-1 = take the AI count from the difficulty tier.")]
         public int aiCountOverride = -1;
         public bool reversed;

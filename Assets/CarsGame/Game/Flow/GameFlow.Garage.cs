@@ -51,11 +51,7 @@ namespace RacingGame
             if ((State != FlowState.Menu && !fromResults) || IsTestDrive || !PlatformGlue.IsReady || race.spawner == null || race.spawner.raceCarPrefab == null) return false;
             if (PlatformGlue.Save.LocalVersionTooNew) return false;
             if (CarBodies.Get(bodyId).Id != bodyId) return false;
-            if (fromResults)
-            {
-                practiceReturnResults = ResultsForMenu;
-                practiceReturnSectors = LastSectorDeltaMs;
-            }
+            if (fromResults) practiceReturnResults = ResultsForMenu;
             beforeTestEvent = RaceSetup.Event;
             beforeTestTier = RaceSetup.Tier;
             beforeTestBody = race.spawner.playerBodyId;

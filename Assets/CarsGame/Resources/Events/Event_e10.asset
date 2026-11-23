@@ -16,6 +16,7 @@ MonoBehaviour:
   mode: 0
   nameKey: events.e10.name
   laps: 4
+  referenceSeconds: 242
   aiCountOverride: -1
   reversed: 1
   night: 1

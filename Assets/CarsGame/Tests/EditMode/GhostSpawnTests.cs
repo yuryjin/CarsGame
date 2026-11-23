@@ -55,6 +55,28 @@ namespace RacingGame.Tests
                     recovered.Advance(cutReplay);
                 }
                 Assert.AreEqual(0, recovered.Count, "The recovery across the first gate cannot post a HUD split.");
+
+                var varied = new GhostRecord();
+                var training = new GhostSectorTimes.Run(path, 2);
+                int ms = 0;
+                int[] pace = { 100, 200, 70, 180, 60, 150 };
+                for (int d = -3; d <= 240; d++)
+                {
+                    if (d > -3) ms += d <= 0 ? 100 : pace[(d - 1) / 40];
+                    varied.AddPose(path.Position(d), Quaternion.identity, (ms + .1) / 1000d, 0f, 0);
+                    training.Advance(varied);
+                    if (d == 100)
+                        CollectionAssert.AreEqual(new[] { 4000, 8000, 0 }, training.BestDurations(), "unfinished third sector");
+                }
+                Assert.IsTrue(training.Finish(varied));
+                CollectionAssert.AreEqual(new[] { 4000, 2400, 2800 }, training.BestDurations(), "best sectors from both laps, excluding the run-up");
+                var interruptedSample = varied.Samples[45];
+                interruptedSample.Flags = GhostRecord.TeleportFlag;
+                varied.Samples[45] = interruptedSample;
+                var stopped = new GhostSectorTimes.Run(path, 2);
+                varied.Samples.RemoveRange(103, varied.Samples.Count - 103);
+                stopped.Advance(varied, stopped: true);
+                CollectionAssert.AreEqual(new[] { 4000, 0, 0 }, stopped.BestDurations(), "a recovery inside a sector does not establish a record");
             }
             finally { Object.DestroyImmediate(root); }
         }
