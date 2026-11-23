@@ -14,12 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: RacingGame.Game::RacingGame.RaceEventDefinition
   eventId: e4
   nameKey: events.e4.name
-  laps: 5
+  laps: 2
   aiCountOverride: -1
   reversed: 0
+  wastelandTrack: 1
   night: 1
   sky: {fileID: 11400000, guid: 2b213b30ad7e811a79d58b6e9a829476, type: 2}
   damageMultiplier: 1.5
   pickupCount: 12
   unlockAfterEventId: e3
   order: 3
+  skillGoal: 4
+  skillTarget: 1
+  finishGoal: 2
+  targetSeconds: 180
