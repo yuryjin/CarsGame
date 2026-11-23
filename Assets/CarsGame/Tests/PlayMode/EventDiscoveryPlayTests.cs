@@ -152,6 +152,7 @@ namespace RacingGame.Tests
         private static void AssertAvailableFirst(GameFlow flow)
         {
             var events = flow.events.Where(e => e != null).OrderBy(e => e.order).ToArray();
+            Assert.That(events.Select(e => e.order), Is.Unique, "Each event has one stable position in the catalog");
             int lastAvailable = -1, firstLocked = int.MaxValue;
             for (int i = 0; i < events.Length; i++)
             {

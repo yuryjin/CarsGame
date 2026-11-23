@@ -24,7 +24,7 @@ MonoBehaviour:
   pickupCount: 0
   mineFieldCount: 0
   unlockAfterEventId:
-  order: 32
+  order: 34
   star1TargetPosition: 1
   star2TargetKills: 2
   star3ZeroDeaths: 1
