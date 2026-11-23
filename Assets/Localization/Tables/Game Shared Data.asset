@@ -2291,6 +2291,30 @@ MonoBehaviour:
     m_Key: record.recent
     m_Metadata:
       m_Items: []
+  - m_Id: 29718720071151616
+    m_Key: settings.reduced_flashes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928832
+    m_Key: daily.equal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928833
+    m_Key: settings.camera_distance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928834
+    m_Key: practice.yesterday
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928835
+    m_Key: practice.yesterday.note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928836
+    m_Key: practice.last_time
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

@@ -132,7 +132,7 @@ namespace RacingGame.Core.Save
             autoThrottle = s.autoThrottle, cameraShake = s.cameraShake, autoAim = s.autoAim, tier = s.tier, hintsSeen = s.hintsSeen,
             touchLargeButtons = s.touchLargeButtons, touchLeftHanded = s.touchLeftHanded,
             dynamicCamera = s.dynamicCamera, classicCarModels = s.classicCarModels, compactHud = s.compactHud,
-            largeText = s.largeText
+            largeText = s.largeText, reducedCombatFlashes = s.reducedCombatFlashes, cameraDistance = s.cameraDistance
         };
     }
 }

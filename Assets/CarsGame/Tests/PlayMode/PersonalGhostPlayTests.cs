@@ -255,6 +255,8 @@ namespace RacingGame.Tests
                 Assert.Less(Quaternion.Angle(rotation, viewer.transform.rotation), .1f);
                 yield return null; yield return null;
                 Assert.AreEqual(moment, flow.ReplayTime, .0001f);
+                StringAssert.StartsWith(UiFactory.FormatMilliseconds(Mathf.RoundToInt(moment * 1000f)),
+                    GameObject.Find("ReplayTime").GetComponent<TMPro.TMP_Text>().text);
                 Assert.Less(Vector3.Distance(position, viewer.transform.position), .001f);
             }
             toggle.onClick.Invoke();
@@ -330,6 +332,151 @@ namespace RacingGame.Tests
                 Assert.AreEqual(matches, shown.Contains("\n"));
             }
             TestContext.WriteLine("Newest first: " + string.Join(", ", history.ConvertAll(a => $"{a.id} {a.timeMs} ms {a.setup.body}/{a.setup.tier}")));
+        }
+
+        private object StartingCar()
+        {
+            var player = race.Player;
+            var cannon = player.GetComponent<CarCannon>();
+            return new
+            {
+                body = player.GetComponent<CarBody>().BodyId, tier = race.tier.tierId, bots = race.Participants.Count - 1,
+                player.Car.maxSpeed, player.Car.motorTorque, player.Car.grip, player.Health.maxHealth,
+                cannon.shellDamage, cannon.fireInterval, cannon.AmmoMax,
+                player.Weapons.LoadoutFirst, player.Weapons.LoadoutSecond, player.Weapons.secondaryType,
+                player.Weapons.SecondaryAmmoMax, player.Weapons.CompactLoadout, seed = RaceDirector.Current.raceSeed
+            };
+        }
+
+        [UnityTest, Timeout(300000)]
+        public IEnumerator DailyStartingCarsMatchAcrossTwoGaragesAndCareerRestoresEachGarage()
+        {
+            yield return OpenProfile();
+            var clock = DailyRace.UnixMsSource;
+            try
+            {
+                int day = 20000;
+                while (Core.Daily.DailyChallenge.For(day).Twist != Core.Daily.RaceTwist.Sprint) day++;
+                DailyRace.UnixMsSource = () => Core.Daily.DailyChallenge.DayStartUnixMs(day) + 30000;
+                var menu = Object.FindAnyObjectByType<MenuScreens>();
+                object dailyCar = null;
+                foreach (bool rich in new[] { false, true })
+                {
+                    var profile = new SaveData { updatedAtUnixMs = DailyRace.NowUnixMs };
+                    var garage = profile.progress;
+                    profile.Local("ghost-local").races = 3;
+                    if (rich)
+                    {
+                        garage.cosmetics.Add("body:flea"); garage.body = "flea";
+                        garage.upgrades = new[] { 2, 3, 2 }; garage.weapons = new[] { 2, 2, 2, 2 };
+                        garage.buildPreset = 2; garage.equippedPrimary = 1; garage.equippedSecondary = 1; garage.fullArsenal = true;
+                        RewardedOffers.GrantTrial(Core.Economy.UpgradeKind.Engine);
+                    }
+                    store.Write(SaveMigrator.ToJson(profile)); yield return Reload();
+                    Assert.AreEqual(garage.body, PlatformGlue.Save.Data.progress.body);
+                    menu.Show("events");
+                    int index = Array.FindIndex(flow.tiers, t => t.tierId == (rich ? "hard" : "easy"));
+                    GameObject.Find("Tier" + index).GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+                    menu.Show("main");
+                    GameObject.Find("PlayDaily").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+                    Assert.AreEqual(FlowState.Racing, flow.State);
+                    Assert.AreEqual("normal", race.tier.tierId);
+                    Assert.AreEqual("classic", race.Player.GetComponent<CarBody>().BodyId);
+                    Assert.AreEqual(rich ? "hard" : "easy", PlatformGlue.Save.Data.settings.tier);
+                    if (dailyCar == null) dailyCar = StartingCar(); else Assert.AreEqual(dailyCar, StartingCar());
+                    flow.RetryRace();
+                    Assert.AreEqual(dailyCar, StartingCar());
+                    if (rich) Assert.AreEqual((int)Core.Economy.UpgradeKind.Engine, RewardedOffers.TrialUpgrade);
+
+                    flow.EnterMenu();
+                    Assert.AreEqual(rich ? "hard" : "easy", RaceSetup.Tier.tierId);
+                    yield return StartFromEventList("e1");
+                    Assert.AreEqual(rich ? "hard" : "easy", race.tier.tierId);
+                    Assert.AreEqual(rich ? "flea" : "classic", race.Player.GetComponent<CarBody>().BodyId);
+                    Assert.AreEqual(rich ? PrimaryWeaponType.MachineGun : PrimaryWeaponType.Cannon, race.Player.Weapons.LoadoutFirst);
+                    Assert.AreEqual(!rich, race.Player.Weapons.CompactLoadout);
+                    if (rich) Assert.AreEqual(-1, RewardedOffers.TrialUpgrade);
+                    TestContext.WriteLine("career " + StartingCar());
+                    flow.EnterMenu();
+                }
+                TestContext.WriteLine("daily and both retries " + dailyCar);
+            }
+            finally { DailyRace.UnixMsSource = clock; RewardedOffers.ConsumeTrial(null); RewardedOffers.ClearLastRaceTrial(); }
+        }
+
+        private object DailyCourse()
+        {
+            var ev = flow.CurrentEvent;
+            return new
+            {
+                day = DailyRace.DayOf(ev), ev.twist, ev.laps, ev.reversed, ev.night, ev.sky, ev.damageMultiplier, ev.pickupCount,
+                actualLaps = race.laps, actualReverse = TrackPath.Instance.reversed, seed = RaceDirector.Current.raceSeed
+            };
+        }
+
+        [UnityTest, Timeout(300000)]
+        public IEnumerator YesterdayPracticeRestoresTheExactCourseAndFinishesOutsideTheDailyStandings()
+        {
+            yield return OpenProfile();
+            int day = 20000;
+            while (Core.Daily.DailyChallenge.For(day).Twist != Core.Daily.RaceTwist.Sprint) day++;
+            var clock = DailyRace.UnixMsSource;
+            var mock = (RacingGame.Platform.Mock.EditorMockPlatform)PlatformGlue.Platform;
+            bool hadScore = mock.Boards.TryGetValue(DailyRace.BoardName, out long oldScore);
+            try
+            {
+                long now = Core.Daily.DailyChallenge.DayStartUnixMs(day + 1) - 15000;
+                DailyRace.UnixMsSource = () => now;
+                var menu = Object.FindAnyObjectByType<MenuScreens>();
+                var data = PlatformGlue.Save.Data;
+                PlatformGlue.Save.Local.races = 3;
+                data.progress.daily.finishDays.Add(day);
+                data.progress.daily.claims.Add(new DailyClaim { day = day, coins = 150 });
+                long todayScore = Core.Daily.DailyChallenge.EncodeScore(day + 1, 100000);
+                mock.Boards[DailyRace.BoardName] = todayScore;
+
+                menu.Show("main");
+                GameObject.Find("PlayDaily").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+                var prior = DailyCourse();
+                Assert.AreEqual(day, DailyRace.DayOf(flow.CurrentEvent));
+                flow.EnterMenu();
+                now += 30000;
+                menu.Show("practice");
+                long coins = data.Coins; int races = data.Races;
+                GameObject.Find("PracticeYesterday").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+                Assert.AreEqual(prior, DailyCourse());
+                while (race.State == RaceState.Countdown) yield return null;
+                Object.FindAnyObjectByType<DebugBus>().Execute("autopilot", "on");
+                float timeout = Time.realtimeSinceStartup + 120f;
+                while (flow.State == FlowState.Racing && Time.realtimeSinceStartup < timeout) yield return null;
+                Assert.AreEqual(FlowState.Menu, flow.State);
+                Assert.AreEqual("practice", menu.Current);
+                Assert.AreEqual(day, flow.LastYesterdayDay);
+                Assert.Greater(flow.LastYesterdayTimeMs, 0);
+                var summary = GameObject.Find("YesterdayPractice").transform.Find("Instruction").GetComponent<TMPro.TMP_Text>();
+                StringAssert.Contains(UiFactory.FormatMilliseconds(flow.LastYesterdayTimeMs), summary.text);
+                CollectionAssert.AreEqual(new[] { day }, data.progress.daily.finishDays);
+                Assert.AreEqual(1, data.progress.daily.claims.Count);
+                Assert.AreEqual(races, data.Races); Assert.AreEqual(coins, data.Coins);
+                Assert.AreEqual(0, data.progress.bests.Count);
+                Assert.AreEqual(todayScore, mock.Boards[DailyRace.BoardName]);
+
+                menu.Show("main");
+                GameObject.Find("PlayDaily").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+                var today = Core.Daily.DailyChallenge.For(day + 1);
+                Assert.AreEqual(day + 1, DailyRace.DayOf(flow.CurrentEvent));
+                Assert.AreEqual(today.Seed, RaceDirector.Current.raceSeed);
+                Assert.AreEqual(today.Twist, flow.CurrentEvent.twist);
+                Assert.AreEqual(today.Reversed, TrackPath.Instance.reversed);
+                Assert.AreEqual(today.Laps, race.laps);
+                TestContext.WriteLine($"Yesterday {prior}, unranked finish {flow.LastYesterdayTimeMs} ms; today {DailyCourse()}; board {todayScore}, coins {coins}, races {races}");
+            }
+            finally
+            {
+                DailyRace.UnixMsSource = clock;
+                if (hadScore) mock.Boards[DailyRace.BoardName] = oldScore;
+                else mock.Boards.Remove(DailyRace.BoardName);
+            }
         }
 
         [UnityTest, Timeout(300000)]

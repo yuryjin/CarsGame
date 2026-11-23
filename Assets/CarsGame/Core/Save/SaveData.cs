@@ -23,6 +23,9 @@ namespace RacingGame.Core.Save
         public bool classicCarModels;
         public bool compactHud;
         public bool largeText;
+        public bool reducedCombatFlashes;
+        /// <summary>Chase distance preset, -1 close, 0 original and 1 far.</summary>
+        public int cameraDistance;
         /// <summary>Turret tracks rivals by itself; off = the mouse aims (desktop only, touch always auto).</summary>
         public bool autoAim = true;
         public bool touchLargeButtons;

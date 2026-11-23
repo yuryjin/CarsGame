@@ -795,8 +795,23 @@ namespace RacingGame
             }
             ToggleRow(content, "Shake", "settings.shake", save == null || save.Data.settings.cameraShake, enabled =>
             { if (save == null) return; save.Data.settings.cameraShake = enabled; save.MarkDirty(); Show("settings"); });
+            ToggleRow(content, "ReducedFlashes", "settings.reduced_flashes", save != null && save.Data.settings.reducedCombatFlashes, enabled =>
+            { if (save == null) return; save.Data.settings.reducedCombatFlashes = enabled; save.MarkDirty(); Show("settings"); });
             ToggleRow(content, "DynamicCamera", "settings.dynamic_camera", save == null || save.Data.settings.dynamicCamera, enabled =>
             { if (save == null) return; save.Data.settings.dynamicCamera = enabled; save.MarkDirty(); Show("settings"); });
+            var distances = SettingValue(content, "CameraDistance", "settings.camera_distance");
+            var values = new[] { "80%", "100%", "130%" };
+            int currentDistance = Mathf.Clamp(save?.Data.settings.cameraDistance ?? 0, -1, 1);
+            for (int i = 0; i < values.Length; i++)
+            {
+                int distance = i - 1;
+                UiFactory.Button(distances, "CameraDistance" + i, values[i], () =>
+                {
+                    if (save == null) return;
+                    save.Data.settings.cameraDistance = distance; save.MarkDirty(); Show("settings");
+                }, new Vector2(i / 3f, 0f), new Vector2((i + 1f) / 3f, 1f), new Vector2(3f, 0f), new Vector2(-3f, 0f),
+                    26f, currentDistance == distance ? UiFactory.Accent : UiFactory.Raised);
+            }
         }
 
         private static RectTransform SettingValue(Transform content, string name, string key)

@@ -201,7 +201,7 @@ namespace RacingGame
             TakenTick = SimulationDriver.Instance != null ? SimulationDriver.Instance.Tick : 0;
             if (EffectPool.Instance != null)
             {
-                EffectPool.Instance.PlayFlash(transform.position + Vector3.up * 0.9f, new Color(0.8f, 1f, 0.9f), 0.3f, 1.6f, 5f, 3f);
+                EffectPool.Instance.PlayFlash(transform.position + Vector3.up * 0.9f, new Color(0.8f, 1f, 0.9f), 0.3f, 1.6f, 5f, 3f, combat: false);
             }
             if (SfxPlayer.Instance != null)
             {

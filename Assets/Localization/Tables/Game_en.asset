@@ -2343,6 +2343,31 @@ MonoBehaviour:
     m_Localized: Last five finishes
     m_Metadata:
       m_Items: []
+  - m_Id: 29718720071151616
+    m_Localized: Dim combat flashes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928832
+    m_Localized: "Standard car and loadout \xB7 Normal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928833
+    m_Localized: Camera distance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928834
+    m_Localized: "Yesterday\u2019s daily race"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928835
+    m_Localized: "Practice yesterday\u2019s course and rules. Your daily streak and
+      leaderboard score stay intact."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928836
+    m_Localized: "Last practice finish \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

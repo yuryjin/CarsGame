@@ -184,6 +184,7 @@ namespace RacingGame
 
         private Core.Economy.BodyDef PlayerBody()
         {
+            if (DailyRace.IsDaily(RaceSetup.Event)) return Core.Economy.CarBodies.Default;
             if (!string.IsNullOrEmpty(playerBodyId)) return Core.Economy.CarBodies.Get(playerBodyId);
             var progress = PlatformGlue.Save?.Data.progress;
             return Core.Economy.CarBodies.Get(progress != null ? Core.Economy.CarBodies.Selected(progress.cosmetics, progress.body) : null);

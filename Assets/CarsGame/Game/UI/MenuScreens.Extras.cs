@@ -79,7 +79,7 @@ namespace RacingGame
             Label(card, "Eyebrow", Loc.Get("daily.title"), 24f, Top, Vector2.one, new Vector2(30f, -60f), new Vector2(-300f, -16f), DailyColor).fontStyle = FontStyles.Bold;
             string twist = TwistKey(spec.Twist) != null ? Loc.Get(TwistKey(spec.Twist)) : "";
             Label(card, "Twist", twist, 44f, Top, Vector2.one, new Vector2(30f, -122f), new Vector2(-300f, -58f)).fontStyle = FontStyles.Bold;
-            Label(card, "Laps", Loc.Format("events.laps", "n", ev.laps), 24f, Top, Vector2.one, new Vector2(30f, -160f), new Vector2(-300f, -122f), UiFactory.Muted);
+            Label(card, "Laps", Loc.Format("events.laps", "n", ev.laps) + "  ·  " + Loc.Get("daily.equal"), 24f, Top, Vector2.one, new Vector2(30f, -160f), new Vector2(-300f, -122f), UiFactory.Muted);
 
             var days = d != null ? d.finishDays : null;
             int streak = DailyChallenge.CurrentStreak(days, today);

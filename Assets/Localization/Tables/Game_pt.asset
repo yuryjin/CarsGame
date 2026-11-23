@@ -2350,6 +2350,31 @@ MonoBehaviour:
     m_Localized: "\xDAltimas cinco chegadas"
     m_Metadata:
       m_Items: []
+  - m_Id: 29718720071151616
+    m_Localized: "Suavizar clar\xF5es de combate"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928832
+    m_Localized: "Carro e armas padr\xE3o \xB7 Normal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928833
+    m_Localized: "Dist\xE2ncia da c\xE2mera"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928834
+    m_Localized: "Corrida di\xE1ria de ontem"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928835
+    m_Localized: "Treine na pista de ontem com suas regras. Sua sequ\xEAncia e pontua\xE7\xE3o
+      permanecem iguais."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928836
+    m_Localized: "\xDAltima chegada de treino \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

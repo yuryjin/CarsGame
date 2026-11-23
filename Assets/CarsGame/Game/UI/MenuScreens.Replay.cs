@@ -9,7 +9,7 @@ namespace RacingGame
     {
         private Slider replaySlider;
         private TMP_Text replayTime, replayAction;
-        private int lastReplayTenth;
+        private int lastReplayMilliseconds;
         private string replayActionKey;
 
         private void BuildReplayControls()
@@ -26,8 +26,13 @@ namespace RacingGame
             var root = UiFactory.Panel(bar, "ReplaySeek", Vector2.zero, new Vector2(1f, .5f),
                 new Vector2(12f, 8f), new Vector2(-12f, -3f), Color.clear);
             replaySlider = BuildSlider(root, flow.ReplayDuration, flow.ReplayTime, false);
-            replaySlider.onValueChanged.AddListener(flow.SeekReplay);
-            lastReplayTenth = -1;
+            replaySlider.onValueChanged.AddListener(seconds =>
+            {
+                flow.SeekReplay(seconds);
+                lastReplayMilliseconds = -1;
+                UpdateReplayControls();
+            });
+            lastReplayMilliseconds = -1;
             replayActionKey = null;
             UpdateReplayControls();
             EventSystem.current?.SetSelectedGameObject(toggle.gameObject);
@@ -37,11 +42,12 @@ namespace RacingGame
         {
             if (!flow.ViewingReplay || replaySlider == null) return;
             replaySlider.SetValueWithoutNotify(flow.ReplayTime);
-            int tenth = Mathf.FloorToInt(flow.ReplayTime * 10f);
-            if (lastReplayTenth != tenth)
+            int milliseconds = Mathf.RoundToInt(flow.ReplayTime * 1000f);
+            if (milliseconds != lastReplayMilliseconds && (flow.ReplayPaused || lastReplayMilliseconds < 0
+                || Mathf.Abs(milliseconds - lastReplayMilliseconds) >= 100))
             {
-                replayTime.text = UiFactory.FormatTime(flow.ReplayTime) + " / " + UiFactory.FormatTime(flow.ReplayDuration);
-                lastReplayTenth = tenth;
+                replayTime.text = UiFactory.FormatMilliseconds(milliseconds) + " / " + UiFactory.FormatMilliseconds(Mathf.RoundToInt(flow.ReplayDuration * 1000f));
+                lastReplayMilliseconds = milliseconds;
             }
             string action = !flow.ReplayPaused ? "replay.pause" : flow.ReplayTime >= flow.ReplayDuration ? "pause.restart" : "pause.resume";
             if (replayActionKey != action) { replayAction.text = Loc.Get(action); replayActionKey = action; }

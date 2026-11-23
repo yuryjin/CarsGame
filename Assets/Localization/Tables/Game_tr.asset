@@ -2375,6 +2375,31 @@ MonoBehaviour:
     m_Localized: "Son be\u015F bitiri\u015F"
     m_Metadata:
       m_Items: []
+  - m_Id: 29718720071151616
+    m_Localized: "\xC7at\u0131\u015Fma parlamalar\u0131n\u0131 azalt"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928832
+    m_Localized: "Standart ara\xE7 ve silahlar \xB7 Normal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928833
+    m_Localized: Kamera mesafesi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928834
+    m_Localized: "D\xFCn\xFCn g\xFCnl\xFCk yar\u0131\u015F\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928835
+    m_Localized: "D\xFCnk\xFC pistte ve kurallarla antrenman yap. G\xFCnl\xFCk serin
+      ve s\u0131ralama puan\u0131n korunur."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928836
+    m_Localized: "Son antrenman biti\u015Fi \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
