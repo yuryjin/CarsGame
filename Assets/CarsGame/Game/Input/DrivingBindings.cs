@@ -80,6 +80,10 @@ namespace RacingGame
                 case "<Keyboard>/upArrow": return "↑";
                 case "<Keyboard>/downArrow": return "↓";
             }
+            // Linux batch players have no desktop keyboard layout to query.
+            if (UnityEngine.Application.isBatchMode)
+                return InputControlPath.ToHumanReadableString(action.bindings[index].effectivePath,
+                    InputControlPath.HumanReadableStringOptions.OmitDevice | InputControlPath.HumanReadableStringOptions.UseShortNames);
             return action.GetBindingDisplayString(index);
         }
 
