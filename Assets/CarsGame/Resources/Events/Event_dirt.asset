@@ -16,7 +16,7 @@ MonoBehaviour:
   mode: 0
   nameKey: events.dirt.name
   laps: 1
-  referenceSeconds: 0
+  referenceSeconds: 78
   aiCountOverride: -1
   mountainFork: 1
   reversed: 0

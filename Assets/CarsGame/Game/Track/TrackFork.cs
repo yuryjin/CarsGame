@@ -26,7 +26,13 @@ namespace RacingGame
 
         public MountainFork Course { get; private set; }
         public bool IsDirt => Course == MountainFork.Quarry;
-        public float RoadHalfWidth => IsDirt ? 4.3f : Course == MountainFork.Rooftops ? 4.8f : HalfWidth;
+        public float RoadHalfWidth => Course switch
+        {
+            MountainFork.Quarry => 4.3f,
+            MountainFork.IceStation => 3.4f,
+            MountainFork.Rooftops => 4.8f,
+            _ => HalfWidth
+        };
         public float ApproachDistance => path.reversed ? path.Wrap(start + span) : start;
         public float MainSpan => Mathf.Abs(span);
 
@@ -61,8 +67,8 @@ namespace RacingGame
             target.y = 0f;
             float speed = car.Body.linearVelocity.magnitude;
             float facing = Vector3.SignedAngle(car.transform.forward, target, Vector3.up) - target.magnitude * curvature * .5f * Mathf.Rad2Deg;
-            float correction = IsDirt ? .28f : .6f;
-            float damping = IsDirt ? .11f : .15f;
+            float correction = RoadHalfWidth >= 3f ? .28f : .6f;
+            float damping = RoadHalfWidth >= 3f ? .11f : .15f;
             float lateral = Vector3.Dot(centre - car.transform.position, right) * correction
                 - Vector3.Dot(car.Body.linearVelocity, right) * damping;
             steer = Mathf.Clamp(car.SteerForCurvature(curvature, speed) + lateral + facing / 35f
@@ -147,11 +153,12 @@ namespace RacingGame
                 if (firstClear < 0) firstClear = i;
                 lastClear = i;
             }
+            float deckRise = IsDirt ? .45f : Course == MountainFork.IceStation ? 2.8f : 6f;
             for (int i = 0; i <= Steps; i++)
             {
                 float t = lastClear > firstClear ? Mathf.Clamp01((i - firstClear) / (float)(lastClear - firstClear)) : 0f;
                 float rise = Mathf.Sin(Mathf.PI * t);
-                points[i].y += rise * rise * (IsDirt ? .45f : 6f);
+                points[i].y += rise * rise * deckRise;
                 if (Course == MountainFork.Rooftops && i >= RoofRampStart && i <= RoofLip)
                     points[i].y += (i - RoofRampStart) * .26f;
                 if (Course == MountainFork.Rooftops && i >= RoofLanding && i <= RoofLanding + 14)
@@ -217,6 +224,7 @@ namespace RacingGame
             var renderer = terrain != null ? terrain.GetComponentInChildren<Renderer>() : null;
             var material = renderer != null ? renderer.sharedMaterial : null;
             AddMeshes(road, material, true, 0.015f, surface);
+            if (Course == MountainFork.IceStation) BuildIceStation(material, forward, surface);
             AddMeshes(skirts, material, false, 0.015f);
             AddMeshes(markings, material, false);
             AddMeshes(CircuitRoadside.ForkSigns(forward, path.halfWidth, hasRepair, exit), material, false);
@@ -387,6 +395,7 @@ namespace RacingGame
         {
             if (Course == MountainFork.Rooftops && path != null && path.RespawnGuard == RoofRespawn)
                 path.RespawnGuard = null;
+            if (iceStation == this) iceStation = null;
             if (path != null && path.Fork == this) path.Fork = null;
             foreach (var pair in originalSceneryMeshes) if (pair.Key != null) pair.Key.sharedMesh = pair.Value;
             originalSceneryMeshes.Clear();

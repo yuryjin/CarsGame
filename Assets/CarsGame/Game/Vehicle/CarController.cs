@@ -3,7 +3,7 @@ using RacingGame.Core.Sim;
 
 namespace RacingGame
 {
-    public enum GroundSurface { None, Track, Ground, Other }
+    public enum GroundSurface { None, Track, Ground, Other, Ice }
 
     /// <summary>
     /// Rigidbody car without WheelColliders: frictionless sphere "wheels" carry the body and the
@@ -418,7 +418,10 @@ namespace RacingGame
             isGrounded = Physics.Raycast(transform.position + up * 0.3f, -up, out RaycastHit hit, 0.9f, groundMask, QueryTriggerInteraction.Ignore);
             if (!isGrounded) { groundSurface = GroundSurface.None; return; }
             int layer = hit.collider.gameObject.layer;
-            groundSurface = layer == trackLayer ? GroundSurface.Track : (layer == groundLayer ? GroundSurface.Ground : GroundSurface.Other);
+            if (layer == trackLayer)
+                groundSurface = TrackFork.IceAt(hit.collider, hit.point) ? GroundSurface.Ice : GroundSurface.Track;
+            else
+                groundSurface = layer == groundLayer ? GroundSurface.Ground : GroundSurface.Other;
         }
 
         public bool TryGetTireContact(Transform wheel, out RaycastHit hit, out TireSurface surface)
@@ -512,7 +515,8 @@ namespace RacingGame
         {
             bool inWake = false;
             if (inputEnabled && (health == null || !health.IsDead) && currentSpeedKmh > 30f &&
-                progress != null && progress.isActiveAndEnabled && progress.Path != null && groundSurface == GroundSurface.Track)
+                progress != null && progress.isActiveAndEnabled && progress.Path != null &&
+                (groundSurface == GroundSurface.Track || groundSurface == GroundSurface.Ice))
             {
                 var cars = RaceDirector.Instance.Cars;
                 for (int i = 0; i < cars.Count; i++)
@@ -658,6 +662,7 @@ namespace RacingGame
             Vector3 sideVelocity = Vector3.Dot(rb.linearVelocity, transform.right) * transform.right;
             float statusGripMul = status != null ? status.GripMultiplier : 1f;
             float currentGrip = (drift.Drifting ? grip * driftGrip : isBraking ? grip * 0.4f : grip) * statusGripMul;
+            if (groundSurface == GroundSurface.Ice) currentGrip *= TrackFork.IceGrip;
             if (SimulationDriver.Instance.Tick < staggerUntilTick) currentGrip *= StaggerGrip;
             Vector3 lateralFrictionForce = -sideVelocity * (rb.mass * 8f * currentGrip);
             rb.AddForce(lateralFrictionForce * Time.fixedDeltaTime, ForceMode.Impulse);

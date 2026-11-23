@@ -259,6 +259,7 @@ namespace RacingGame
             // Boxed in (car ahead, both sides taken): match its pace instead of ramming through.
             if (boxedIn) desired = Mathf.Min(desired, trafficSpeedKmh);
             if (car.Surface == GroundSurface.Ground) desired = Mathf.Min(desired, car.offTrackMaxSpeedKmh);
+            if (car.Surface == GroundSurface.Ice) desired *= .76f;
             desired = Mathf.Min(desired, bombSpeedLimit);
             LastDesiredSpeed = desired; LastCurvature = curvature;
 
