@@ -8,6 +8,7 @@ using RacingGame.Core.Daily;
 namespace RacingGame
 {
     public enum FlowState { Menu, Racing, Results }
+    public enum FirstSessionStage { Loading, MenuReady, FirstStart, FirstResults, NextStart }
 
     /// <summary>
     /// Top-level game loop of the single scene: menu → race (event + tier from the menu) →
@@ -21,6 +22,7 @@ namespace RacingGame
         public DifficultyTier[] tiers;
 
         public FlowState State { get; private set; } = FlowState.Menu;
+        public FirstSessionStage SessionStage { get; private set; }
         public RaceEventDefinition CurrentEvent => RaceSetup.Event;
         public int LastReward { get; private set; }
         public RacePayout LastPayout { get; private set; }
@@ -116,6 +118,8 @@ namespace RacingGame
 
         private void OnEnable()
         {
+            PlatformGlue.Ready += ObserveSessionMenu;
+            StateChanged += ObserveSessionState;
             race.OnFieldSpawned += OnFieldSpawned;
             race.OnCountdownTick += OnCountdown;
             race.OnRaceStarted += OnStarted;
@@ -125,6 +129,8 @@ namespace RacingGame
 
         private void OnDisable()
         {
+            PlatformGlue.Ready -= ObserveSessionMenu;
+            StateChanged -= ObserveSessionState;
             race.OnFieldSpawned -= OnFieldSpawned;
             race.OnCountdownTick -= OnCountdown;
             race.OnRaceStarted -= OnStarted;
@@ -357,6 +363,19 @@ namespace RacingGame
 
         private void SetState(FlowState s) { State = s; StateChanged?.Invoke(s); }
 
+        private void ObserveSessionMenu()
+        {
+            if (SessionStage == FirstSessionStage.Loading && State == FlowState.Menu && PlatformGlue.IsReady)
+                SessionStage = FirstSessionStage.MenuReady;
+        }
+
+        private void ObserveSessionState(FlowState state)
+        {
+            if (state == FlowState.Menu) ObserveSessionMenu();
+            else if (state == FlowState.Results && SessionStage == FirstSessionStage.FirstStart && !IsTestDrive)
+                SessionStage = FirstSessionStage.FirstResults;
+        }
+
         // ---------- race events ----------
         private void OnFieldSpawned()
         {
@@ -534,6 +553,11 @@ namespace RacingGame
         }
         private void OnStarted()
         {
+            if (!IsTestDrive)
+            {
+                if (SessionStage == FirstSessionStage.MenuReady) SessionStage = FirstSessionStage.FirstStart;
+                else if (SessionStage == FirstSessionStage.FirstResults) SessionStage = FirstSessionStage.NextStart;
+            }
             if (playerEngine != null) playerEngine.SetRunning(true);
             foreach (var g in ghosts) if (g != null) g.Begin(race.RaceStartTime);
             if (!IsTestDrive && trainMission == null && race.Player != null) recorder.Begin(race.Player, TrackHash(RaceSetup.Event), UiFactory.Escape(PlatformGlue.Platform != null ? PlatformGlue.Platform.Player.Name : "You"));

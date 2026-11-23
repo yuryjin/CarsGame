@@ -22,6 +22,7 @@ namespace RacingGame
         public class Snapshot
         {
             public string flow, race, evt, tier, screen, lastCommand, error;
+            public int firstSessionStage;
             public int coins, lastReward, lastDailyBonus, lastTotalReward, position, lap, laps, races, liveShells;
             public int[] upgrades;
             public bool touch, autopilot, dynamicCamera, localWriteFailed, localReadFailed;
@@ -381,6 +382,7 @@ namespace RacingGame
             return new Snapshot
             {
                 flow = flow.State.ToString(), race = race != null ? race.State.ToString() : "", screen = menus != null ? menus.Current : "",
+                firstSessionStage = (int)flow.SessionStage,
                 evt = RaceSetup.Event != null ? RaceSetup.Event.eventId : "", tier = RaceSetup.Tier != null ? RaceSetup.Tier.tierId : "",
                 coins = save != null ? (int)save.Data.Coins : 0, races = save != null ? save.Data.Races : 0,
                 upgrades = save != null ? save.Data.progress.upgrades : null,
