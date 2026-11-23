@@ -1,71 +1,59 @@
-# Карточка игры в консоли Яндекс Игр (черновик)
+# Карточка «Гонки с пушкой» для Яндекс Игр
 
-Заполняется вручную в консоли разработчика. Тексты ниже — готовые к вставке.
-Версия сборки: `Builds/Yandex/CarsGame-web-<version>.zip` (uncompressed ≤ 100 МБ — с запасом).
+Локальный черновик. Тексты подходят для сборки 0.2.0 с миссией «Последний перегон».
 
-## Основное
+## Поля каталога
 
 | Поле | Значение |
-|---|---|
-| Название (ru) | Гонки с пушкой |
-| Название (en) | Cannon Racers |
-| Название (tr) | Toplu Yarış |
+| --- | --- |
+| Названия | Гонки с пушкой · Cannon Racers · Toplu Yarış |
 | Жанр | Гонки, экшен |
 | Управление | Клавиатура, геймпад, сенсорный экран |
-| Устройства | Десктоп, мобильные, планшеты |
-| **Ориентация** | **Только альбомная** (меню и HUD рассчитаны на широкий экран; в портрете HUD переносит HP/патроны под таймер, но меню остаётся альбомным) |
+| Целевые устройства | Компьютер, телефон, планшет. Альбомная ориентация |
 | Языки | ru, en, tr, uk, de, es, fr, pt, zh |
-| Монетизация | Interstitial после результатов (не чаще, чем разрешает `AdPacer`), rewarded по кнопке «Удвоить награду» |
-| Сохранения | Облачные (`player.setData`), гостевой прогресс в localStorage |
-| Лидерборды | `best_e1` … `best_e5`, тип «время», сортировка по возрастанию, единица — миллисекунды |
+| Монетизация | Межстраничная реклама после результатов с ограничением частоты. Удвоение награды по кнопке игрока |
+| Сохранения | Локальный прогресс гостя и облачное сохранение через SDK |
+| Таблицы рекордов | Идентификаторы, типы счёта и порядок сортировки перечислены в [листе приёмки](checklist.md) |
 
-## Короткое описание (до 60 символов)
+## Короткое описание
 
-- ru: Боевые гонки: обгоняй, стреляй, прокачивай машину.
-- en: Combat racing: overtake, shoot, upgrade your car.
-- tr: Savaş yarışı: geç, ateş et, aracını geliştir.
+Лимит поля — 60 символов с пробелами.
+
+| Язык | Текст |
+| --- | --- |
+| ru | Боевые гонки и погоня за поездом по двум дорогам каньона |
+| en | Combat racing and a train chase through a desert canyon |
+| tr | Çöl kanyonunda silahlı yarışlar ve tren kovalamacası |
 
 ## Полное описание
 
-**ru**
-Боевые гонки на одной трассе с пятью режимами заездов. У машины есть пушка: соперника можно
-не только обогнать, но и разбить. По трассе разбросаны аптечки, патроны и нитро.
-За места и убийства платят монетами — они идут на три линии прокачки (двигатель, броня, пушка),
-у каждой свой компромисс. Есть призраки лучших заездов, таблицы рекордов и ночные гонки.
-Управление: клавиатура, геймпад или сенсорные кнопки с автогазом.
+**Русский**
 
-**en**
-Combat racing on one circuit with five race types. Your car has a cannon: you can wreck a rival
-instead of just passing them. Health, ammo and nitro pickups are scattered around the track.
-Positions and kills pay coins for three upgrade lines (engine, armour, cannon), each with a
-trade-off. Ghosts of best laps, leaderboards and night races included.
-Keyboard, gamepad or on-screen touch controls with auto-throttle.
+Начни со «Спринта». Стреляй на ходу, финишируй в тройке и открой следующий заезд. В гараже можно потратить призовые на новый кузов.
 
-**tr**
-Tek pistte beş yarış türüyle savaş yarışı. Aracınızda top var: rakibi sadece geçmekle kalmaz,
-hurdaya da çevirebilirsiniz. Pistte can, cephane ve nitro kutuları var. Sıralama ve vuruşlar
-para kazandırır; motor, zırh ve top olmak üzere üç geliştirme hattına harcanır.
-Klavye, oyun kolu veya otomatik gazlı dokunmatik kontroller.
+Хочется погони? «Последний перегон» доступен сразу в выборе гонки. По левой дороге догони хвостовой вагон и удержись рядом, чтобы забрать кубок. Или сверни вправо в сухое русло и успей к стрелке раньше локомотива. Тогда за кубком поедешь на заброшенную станцию.
 
-## Заметки для модератора
+**English**
 
-- SDK инициализируется до старта движка; `LoadingAPI.ready()` вызывается один раз, когда меню
-  готово к вводу.
-- `GameplayAPI.start/stop` парные: старт по сигналу GO, стоп на финише и на время рекламы.
-- Реклама: interstitial только на экране результатов, rewarded — по явной кнопке игрока.
-- `game_api_pause` / `game_api_resume` ставят игру на паузу (звук и симуляция).
-- Игра полностью офлайн после загрузки, внешних запросов нет.
+Start with Sprint. Fire on the move, finish on the podium and unlock the next race. Spend your winnings on a new car body in the garage.
 
-## Медиа
+For a chase, pick The Last Run in Race Select. It's open from the start. Take the left road, catch the last car and stay alongside to claim the cup. Or turn right into the dry wash and beat the locomotive to the switch. You can then collect the cup at the abandoned station.
 
-| Файл | Размер | Содержание |
-|---|---|---|
-| Иконка | 512×512 | Машина крупно, красная, на фоне трассы |
-| Обложка | 800×470 | Кадр гонки в движении, без текста |
-| Скриншот 1 | 1920×1080 | Гонка днём: HUD, прицел, соперники |
-| Скриншот 2 | 1920×1080 | Ночная гонка (Night Brawl), фары |
-| Скриншот 3 | 1920×1080 | Экран результатов с наградой |
-| Скриншот 4 | 1920×1080 | Гараж (три линии прокачки) |
-| Скриншот 5 | 1080×1920 или 720×1280 | Мобильная раскладка с тач-кнопками |
+**Türkçe**
 
-Снимаются скриптом из `Docs/AI/qa-browser-smoke.md` (chrome-devtools, локальная сборка с мок-SDK).
+Sprint ile başla. Yarışırken ateş et, ilk üçe gir ve sonraki yarışın kilidini aç. Kazandığın parayla garajdan yeni bir araç gövdesi alabilirsin.
+
+Bir kovalamaca için yarış seçiminden Son Sefer'i aç. Bu görev en baştan oynanabilir. Sol yoldan son vagona yetiş ve kupayı almak için yanında kal. İstersen sağa dönüp kuru dere yatağından git ve makasa lokomotiften önce var. Böylece kupayı terk edilmiş istasyonda alabilirsin.
+
+## Игровые кадры для редактора
+
+Все четыре кадра сняты в локальной WebGL-сборке при 1280×720. Первые два заезда доступны с чистого профиля в разных местах меню. «Кубок наоборот» открывается после подиума в «Спринте».
+
+| Что обещает описание | Как увидеть в игре | Кадр и подтверждение |
+| --- | --- | --- |
+| Боевой заезд, стрельба на ходу | На главном экране нажать «В гонку», разогнаться и выстрелить | [Первый заезд](../../../Builds/Improvements-2026-11-22/base/first-session/first-race.png) |
+| Подиум, призовые и продолжение карьеры | Завершить «Спринт» в тройке и нажать продолжение. В сохранённой сессии новый старт — e2 | [Результат](../../../Builds/Improvements-2026-11-22/base/first-session/results.png) · [Хронология](../../../Builds/Improvements-2026-11-22/base/first-session/report.json) |
+| Покупка кузова | В гараже выбрать Arrow и купить за 800 монет | [Гараж](../../../Builds/Improvements-2026-11-22/base/first-session/garage.png) · [Покупка и восстановление](../../../Builds/Improvements-2026-11-22/base/purchase/evidence.json) |
+| Два пути к кубку в погоне | В выборе гонки открыть «Последний перегон». В первом проезде взять кубок у хвоста, во втором опередить поезд у стрелки | [Погоня](../../../Builds/TrainBoss-2026-11-21/chase.png) · [Оба проезда](../../../Builds/TrainBoss-2026-11-21/qa/browser.json) |
+
+Для иконки предусмотрен макет 512×512 с машиной крупным планом. Для обложки — кадр гонки 800×470. Частоту рекламы, вход и облачные операции на реальной площадке проверяют на том ZIP, который загружен в черновик. [Приёмка в консоли](checklist.md)
