@@ -70,8 +70,10 @@ namespace RacingGame
             target.y = 0f;
             float speed = car.Body.linearVelocity.magnitude;
             float facing = Vector3.SignedAngle(car.transform.forward, target, Vector3.up) - target.magnitude * curvature * .5f * Mathf.Rad2Deg;
-            float correction = RoadHalfWidth >= 3f ? .28f : .6f;
-            float damping = RoadHalfWidth >= 3f ? .11f : .15f;
+            // The narrow bridge can be approached from the far lane. Dampen the
+            // lane change before the car carries lateral speed onto the raised deck.
+            float correction = RoadHalfWidth >= 3f ? .28f : .22f;
+            float damping = RoadHalfWidth >= 3f ? .11f : .20f;
             float lateral = Vector3.Dot(centre - car.transform.position, right) * correction
                 - Vector3.Dot(car.Body.linearVelocity, right) * damping;
             steer = Mathf.Clamp(car.SteerForCurvature(curvature, speed) + lateral + facing / 35f
