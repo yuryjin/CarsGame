@@ -2281,6 +2281,97 @@ MonoBehaviour:
     m_Localized: "Trainingsrunde aus Bestsektoren \xB7 {t}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29712712435314688
+    m_Localized: Truppziel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091904
+    m_Localized: Heckreaktor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091905
+    m_Localized: "M\xF6rser"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091906
+    m_Localized: Drohnenhangar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091907
+    m_Localized: "Hauptgesch\xFCtz"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091908
+    m_Localized: Flak
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091909
+    m_Localized: Zeitfahren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091910
+    m_Localized: Schlag deine eigene Zeit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091911
+    m_Localized: Wiederholung ansehen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091912
+    m_Localized: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091913
+    m_Localized: Diese Aufnahme verwendet eine andere Streckenversion.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091914
+    m_Localized: Kompakte Rennanzeige
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648865779712
+    m_Localized: "Der Hangar startet Drohnen. Der M\xF6rser markiert den Boden vor
+      dem Einschlag."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Localized: "Dein Kernschaden {d}  \xB7  Stationen zerst\xF6rt {s}  \xB7  Verb\xFCndete
+      gerettet {a}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Localized: "Gro\xDFe Schrift"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Localized: "Letzte f\xFCnf Zieleinl\xE4ufe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720071151616
+    m_Localized: "Kampfblitze d\xE4mpfen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928832
+    m_Localized: "Standardauto und Waffen \xB7 Normal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928833
+    m_Localized: Kameraabstand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928834
+    m_Localized: Gestriges Tagesrennen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928835
+    m_Localized: Trainiere mit der Strecke und den Regeln von gestern. Tageserie
+      und Ranglistenpunkte bleiben erhalten.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928836
+    m_Localized: "Letztes Trainingsziel \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

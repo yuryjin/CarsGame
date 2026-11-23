@@ -48,9 +48,10 @@ try {
       await fs.writeFile(`${out}/evidence.json`, JSON.stringify({ evidence, errors }, null, 2));
       if (['ru', 'zh'].includes(lang)) await page.screenshot({ path: `${out}/${lang}-events.png` });
       const cards = state.buttons.filter(b => b.name.startsWith('Start_'));
-      assert.equal(cards.length, 23, 'Every race, mission and arena remains available in the list');
+      assert.equal(cards.length, 24, 'Every race, mission and arena remains available in the list');
       const available = cards.filter(b => b.interactable), locked = cards.filter(b => !b.interactable);
-      assert.equal(available.length, 9, 'Fresh players can choose all nine unlocked modes');
+      assert.equal(available.length, 10, 'Fresh players can choose all ten unlocked modes');
+      assert(available.some(b => b.name === 'Start_tt1'), 'A new driver can start a solo time trial');
       assert(available.some(b => b.name === 'Start_a1'), 'The arena is available from the first launch');
       assert(available.some(b => b.name === 'Start_m2'), 'The train chase is available from the first launch');
       for (const field of ['Name', 'Stats', 'Stars']) {
@@ -126,6 +127,40 @@ try {
       assert(['Countdown', 'Racing'].includes(started.race));
       assert.equal(started.races, initial.races, 'Starting an available event awards no race completion');
       evidence.at(-1).started = started;
+      if (process.env.CG_ROUTE_SHOTS === '1' && lang === 'ru') {
+        // Finish the prerequisite through the existing QA race hook so both pictured start buttons are available.
+        await cmd('goto','main'); await cmd('startRace','e1','normal');
+        for (let i=0;i<60 && (await cmd('state')).race!=='Racing';i++) await page.waitForTimeout(100);
+        await cmd('finish'); await page.waitForTimeout(3000); await cmd('goto','events');
+        await page.mouse.move(box.x + 90, box.y + 240);
+        evidence.at(-1).routes = [];
+        for (const [id, direction] of [['e1','forward'], ['e2','reverse']]) {
+          let previous = null, gain = 1, framed = false;
+          for (let attempt = 0; attempt < 50; attempt++) {
+            const ui = await cmd('ui');
+            const rows = ['Stats','RouteHint','ReferenceTime'].map(name => ui.labels.find(l=>l.parent===id && l.name===name));
+            const start = ui.buttons.find(b=>b.name==='Start_'+id);
+            assert(start?.interactable, id+' can start after the prerequisite'); rows.push(start);
+            const top = Math.min(...rows.map(t=>t.y*box.height-t.height/2));
+            const bottom = Math.max(...rows.map(t=>t.y*box.height+t.height/2));
+            if (top>=125 && bottom<=340) {
+              await page.screenshot({path:`${out}/route-${direction}.png`,scale:'css'});
+              evidence.at(-1).routes.push({direction, id, visible:rows});
+              framed = true; break;
+            }
+            const mid = (top+bottom)/2;
+            if (previous) {
+              const measured = (previous.mid-mid)/previous.wheel;
+              if (measured>.01) gain=measured;
+            }
+            const diff = mid-232.5;
+            const wheel = Math.sign(diff)*Math.max(1,Math.min(180,Math.abs(diff)/gain));
+            await page.mouse.wheel(0,wheel); await page.waitForTimeout(140);
+            previous={mid,wheel};
+          }
+          assert(framed, `Frame map, maneuver, reference time and start for ${id}`);
+        }
+      }
     } finally { await context.close(); }
   }
   assert.deepEqual(errors, []);

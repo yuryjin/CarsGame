@@ -2287,6 +2287,96 @@ MonoBehaviour:
     m_Localized: "Tour d\u2019entra\xEEnement avec tes meilleurs secteurs \xB7 {t}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29712712435314688
+    m_Localized: "Cible de l\u2019\xE9quipe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091904
+    m_Localized: "C\u0153ur de poupe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091905
+    m_Localized: Mortier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091906
+    m_Localized: "Hangar \xE0 drones"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091907
+    m_Localized: Canon principal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091908
+    m_Localized: DCA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091909
+    m_Localized: Contre-la-montre
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091910
+    m_Localized: "Am\xE9liore ton chrono"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091911
+    m_Localized: Voir la rediffusion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091912
+    m_Localized: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091913
+    m_Localized: Cet enregistrement utilise une autre version du circuit.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091914
+    m_Localized: Interface de course compacte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648865779712
+    m_Localized: "Le hangar lance des drones. Le mortier marque le sol avant l\u2019impact."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Localized: "Tes d\xE9g\xE2ts au c\u0153ur {d}  \xB7  Stations d\xE9truites
+      {s}  \xB7  Alli\xE9s sauv\xE9s {a}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Localized: Texte agrandi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Localized: "Cinq derni\xE8res arriv\xE9es"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720071151616
+    m_Localized: "Att\xE9nuer les flashs de combat"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928832
+    m_Localized: "Voiture et armes standard \xB7 Normal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928833
+    m_Localized: "Distance de la cam\xE9ra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928834
+    m_Localized: "Course quotidienne d\u2019hier"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928835
+    m_Localized: "Entra\xEEne-toi sur le circuit d\u2019hier avec ses r\xE8gles.
+      Ta s\xE9rie et ton score restent intacts."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928836
+    m_Localized: "Dernier temps en entra\xEEnement \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

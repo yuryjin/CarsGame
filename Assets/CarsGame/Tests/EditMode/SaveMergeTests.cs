@@ -90,6 +90,10 @@ namespace RacingGame.Tests
             b.settings.cameraShake = false; b.settings.autoAim = false; b.settings.qualityAuto = false; b.settings.quality = 0; b.settings.tier = "hard"; b.settings.hintsSeen = 5;
             b.settings.dynamicCamera = false;
             b.settings.classicCarModels = true;
+            b.settings.compactHud = true;
+            b.settings.largeText = true;
+            b.settings.reducedCombatFlashes = true;
+            b.settings.cameraDistance = 1;
             Assert.AreEqual("tr", SaveMerge.Merge(a, b).settings.lang);
             Assert.AreEqual("tr", SaveMerge.Merge(b, a).settings.lang);
             // Every settings field comes from the newer save, not just the ones the merge used to copy.
@@ -97,6 +101,10 @@ namespace RacingGame.Tests
             Assert.IsFalse(merged.settings.cameraShake);
             Assert.IsFalse(merged.settings.dynamicCamera);
             Assert.IsTrue(SaveMigrator.FromJson(SaveMigrator.ToJson(merged)).settings.classicCarModels);
+            Assert.IsTrue(SaveMigrator.FromJson(SaveMigrator.ToJson(merged)).settings.compactHud);
+            Assert.IsTrue(SaveMigrator.FromJson(SaveMigrator.ToJson(merged)).settings.largeText);
+            Assert.IsTrue(merged.settings.reducedCombatFlashes);
+            Assert.AreEqual(1, SaveMigrator.FromJson(SaveMigrator.ToJson(merged)).settings.cameraDistance);
             Assert.IsFalse(merged.settings.autoAim);
             Assert.IsFalse(merged.settings.qualityAuto);
             Assert.AreEqual(0, merged.settings.quality);
@@ -110,6 +118,8 @@ namespace RacingGame.Tests
             var legacy = SaveMigrator.FromJson("{\"version\":6,\"settings\":{\"cameraShake\":false}}");
             Assert.IsTrue(legacy.settings.dynamicCamera, "Old saves retain their existing camera behaviour");
             Assert.IsFalse(legacy.settings.classicCarModels);
+            Assert.IsFalse(legacy.settings.compactHud);
+            Assert.AreEqual(0, legacy.settings.cameraDistance);
             legacy.settings.dynamicCamera = false;
             var restored = SaveMigrator.FromJson(SaveMigrator.ToJson(legacy));
             Assert.IsFalse(restored.settings.dynamicCamera);

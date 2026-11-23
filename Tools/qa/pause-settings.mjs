@@ -8,9 +8,11 @@ await fs.mkdir(out, { recursive: true });
 const browser = await chromium.launch({ channel:'chrome', args:[...process.env.WEBTEST_CHROME_ARGS.split(' '),'--no-proxy-server'] });
 const evidence = [], errors = [];
 const cameraSettings=process.env.CG_CAMERA_SETTINGS==='1';
+const compactOnly=process.env.CG_COMPACT_HUD_ONLY==='1';
 const launchHelp={ru:'Идеальный старт',en:'Perfect start',tr:'Mükemmel başlangıç',zh:'完美起步',de:'Perfekter Start',es:'Salida perfecta',fr:'Départ parfait',pt:'Largada perfeita',uk:'Ідеальний старт'};
 try {
   for (const [width,height] of [[640,360],[812,375],[1280,720]]) {
+    if (compactOnly && width !== 640) continue;
     const mobile = width < 1000;
     const context = await browser.newContext({viewport:{width,height},hasTouch:mobile,isMobile:mobile});
     await context.addInitScript(() => { if(!localStorage.getItem('cars.mock.playerdata')) localStorage.setItem('cars.mock.playerdata', JSON.stringify({save:JSON.stringify({version:6,updatedAtUnixMs:Date.now(),settings:{lang:'ru',hintsSeen:65535}})})); });
@@ -86,6 +88,28 @@ try {
       if(mobile) await tap({x:.01,y:.01});
       await cmd('startRace','e1','easy');
       for(let i=0;i<80 && (await cmd('state')).race!=='Racing';i++) await page.waitForTimeout(100);
+      if ((compactOnly || process.env.CG_COMPACT_HUD === '1') && width === 640) {
+        const original = await cmd('ui');
+        const model = await reveal('RaceModelStyle'), reset = await reveal('Reset');
+        await page.screenshot({path:`${out}/road-standard.png`,scale:'css'});
+        await click('RaceModelStyle');
+        const switched = (await cmd('ui')).labels.find(l=>l.parent==='RaceModelStyle').text;
+        assert.notEqual(switched, original.labels.find(l=>l.parent==='RaceModelStyle').text);
+        await click('PauseButton'); await click('PauseSettings'); await click('CompactHudOn',true); await click('Back');
+        assert.equal((await cmd('ui')).labels.find(l=>l.parent==='RaceModelStyle').text,switched);
+        await click('RaceModelStyle');
+        assert.equal((await cmd('ui')).labels.find(l=>l.parent==='RaceModelStyle').text, original.labels.find(l=>l.parent==='RaceModelStyle').text);
+        await click('Resume');
+        const compact = await cmd('ui'), newReset = await reveal('Reset');
+        assert(!compact.buttons.some(b=>b.name==='RaceModelStyle'));
+        assert((reset.y-newReset.y)*height >= model.height, 'The width of the old reset button now shows the road for at least one button height');
+        await page.screenshot({path:`${out}/road-compact.png`,scale:'css'});
+        evidence.push({width,phase:'compact-road',model,reset,newReset,standard:original,compact});
+        await click('PauseButton'); await click('PauseSettings'); await click('CompactHudOff',true); await click('Back'); await click('Resume');
+        assert((await cmd('ui')).buttons.some(b=>b.name==='RaceModelStyle'&&b.interactable));
+        console.log('PASS standard and compact road', width);
+        if (compactOnly) continue;
+      }
       await click('PauseButton');
       const before=await cmd('ui');
       assert(before.buttons.some(b=>b.name==='Resume'&&b.interactable),'Pause must be open before measuring frozen state');

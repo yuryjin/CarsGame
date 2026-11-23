@@ -28,6 +28,15 @@ namespace RacingGame
                 UiFactory.Button(row, "Practice" + lesson, Loc.Get("practice.start"), () => flow.StartPractice(selected),
                     Vector2.zero, new Vector2(1f, 0f), new Vector2(24f, 16f), new Vector2(-24f, 84f), 27f);
             }
+            var yesterday = Item(content, "YesterdayPractice", 260f);
+            Label(yesterday, "Name", Loc.Get("practice.yesterday"), 32f, Top, Vector2.one,
+                new Vector2(24f, -66f), new Vector2(-24f, -12f)).fontStyle = FontStyles.Bold;
+            string info = Loc.Get("practice.yesterday.note");
+            if (flow.LastYesterdayDay == DailyRace.Today - 1 && flow.LastYesterdayTimeMs > 0)
+                info += "\n" + Loc.Format("practice.last_time", "t", UiFactory.FormatMilliseconds(flow.LastYesterdayTimeMs));
+            Label(yesterday, "Instruction", info, 25f, Top, Vector2.one, new Vector2(24f, -164f), new Vector2(-24f, -68f));
+            UiFactory.Button(yesterday, "PracticeYesterday", Loc.Get("practice.start"), flow.StartYesterdayPractice,
+                Vector2.zero, new Vector2(1f, 0f), new Vector2(24f, 16f), new Vector2(-24f, 84f), 27f);
         }
 
         private void BuildLoadout(Transform content)

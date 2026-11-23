@@ -81,6 +81,7 @@ namespace RacingGame.Core.Save
                 best.sectors = null;
                 best.MergeSectors(sectors);
             }
+            data.progress.recentAttempts = RecentAttempts.Merge(data.progress.recentAttempts);
             data.progress.ledger ??= new System.Collections.Generic.List<DeviceLedger>();
             data.progress.cosmetics ??= new System.Collections.Generic.List<string>();
             data.progress.paint ??= ""; data.progress.livery ??= ""; data.progress.stripe ??= ""; data.progress.body ??= "";

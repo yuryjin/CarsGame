@@ -59,6 +59,27 @@ namespace RacingGame.Tests
         }
 
         [Test]
+        public void RecentAttemptsMergeUniqueFinishesAcrossDevicesAndSkipOtherEventsOrConditions()
+        {
+            var a = Record(12000, "easy"); var b = Record(10000, "hard");
+            var easy = a.progress.bests[0].setup; var hard = b.progress.bests[0].setup;
+            for (int i = 1; i <= 6; i++)
+                RecentAttempts.Record(a.progress, "a/" + i, i == 5 ? "e2" : "e1", 12000 + i, 1000, easy);
+            RecentAttempts.Record(b.progress, "b/1", "e1", 10000, 1004, hard);
+            RecentAttempts.Record(b.progress, "a/6", "e1", 12006, 1005, easy);
+            var ab = SaveMerge.Merge(a, b).progress.recentAttempts;
+            var ba = SaveMerge.Merge(b, a).progress.recentAttempts;
+            CollectionAssert.AreEqual(ab.ConvertAll(x => x.id), ba.ConvertAll(x => x.id));
+            CollectionAssert.AreEqual(new[] { "a/6", "a/5", "b/1", "a/4", "a/3" }, ab.ConvertAll(x => x.id));
+            Assert.AreEqual("a/4", RecentAttempts.PreviousComparable(ab, 0).id);
+            Assert.IsNull(RecentAttempts.PreviousComparable(ab, 2));
+            ab[0].setup.upgrades[0] = 3;
+            Assert.AreEqual(0, easy.upgrades[0]);
+            Assert.AreEqual(0, a.progress.recentAttempts[0].setup.upgrades[0]);
+            Assert.IsEmpty(SaveMigrator.FromJson("{\"version\":8}").progress.recentAttempts);
+        }
+
+        [Test]
         public void ComparisonDetectsDrivingAndWeaponChangesAndSurvivesRoundTrip()
         {
             var data = Record(60000, "normal", 2);

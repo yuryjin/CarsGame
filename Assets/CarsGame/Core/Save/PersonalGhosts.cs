@@ -24,6 +24,8 @@ namespace RacingGame.Core.Save
             public bool Matches(string id, int hash, int count) => eventId == id && trackHash == hash && laps == count;
         }
 
+        public bool HasForEvent(string eventId, int laps) => entries.Exists(e => e.eventId == eventId && e.laps == laps);
+
         public GhostRecord Find(string eventId, int trackHash, int laps)
         {
             if (string.IsNullOrEmpty(eventId) || laps < 1) return null;

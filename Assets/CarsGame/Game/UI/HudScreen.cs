@@ -67,7 +67,8 @@ namespace RacingGame
         private RectTransform helpPanel;
         private ScrollRect helpScroll;
         private int layoutScreenWidth, layoutScreenHeight;
-        private bool layoutTouchLarge, layoutTouchLeft;
+        private bool layoutTouchLarge, layoutTouchLeft, layoutCompact;
+        private float layoutTextScale = 1f;
         private TextMeshProUGUI helpText;
         private TrainHud trainHud;
         private CanvasGroup pauseControls;
@@ -104,7 +105,7 @@ namespace RacingGame
         private sealed class ThreatMarkerWidget
         {
             public RectTransform root;
-            public TextMeshProUGUI arrow;
+            public ThreatShapeGraphic arrow;
             public TextMeshProUGUI distanceText;
         }
         private readonly ThreatMarkerWidget[] threatMarkers = new ThreatMarkerWidget[8];
@@ -667,9 +668,10 @@ namespace RacingGame
             for (int i = 0; i < threatMarkers.Length; i++)
             {
                 var markerRt = UiFactory.Panel(container, "Threat" + i, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-28f, -28f), new Vector2(28f, 28f), new Color(0.04f, 0.06f, 0.1f, 0.88f), true);
-                var arrow = UiFactory.Text(markerRt, "Arrow", "▲", 24f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-16f, 2f), new Vector2(16f, 28f), Color.red);
+                var arrow = UiFactory.Panel(markerRt, "Arrow", Vector2.one * 0.5f, Vector2.one * 0.5f,
+                    new Vector2(-16f, 3f), new Vector2(16f, 27f)).gameObject.AddComponent<ThreatShapeGraphic>();
                 var dist = UiFactory.Text(markerRt, "Dist", "", 15f, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-26f, -24f), new Vector2(26f, 4f), Color.white);
-                UiFactory.SetOutline(dist, 0.2f); UiFactory.SetOutline(arrow, 0.2f);
+                UiFactory.SetOutline(dist, 0.2f);
                 arrow.raycastTarget = false; dist.raycastTarget = false;
                 markerRt.GetComponent<Image>().raycastTarget = false;
                 threatMarkers[i] = new ThreatMarkerWidget { root = markerRt, arrow = arrow, distanceText = dist };
@@ -760,8 +762,11 @@ namespace RacingGame
             rt.offsetMin = offsetMin; rt.offsetMax = offsetMax;
         }
 
-        internal static float ModelButtonBottomPixels(float canvasScale) =>
-            Mathf.Max(24f * canvasScale, 8f) + 2f * Mathf.Max(76f * canvasScale, 44f) + 8f;
+        internal static float TopControlsBottomPixels(float canvasScale, bool compact)
+        {
+            float button = Mathf.Max(76f * canvasScale, 44f);
+            return Mathf.Max(24f * canvasScale, 8f) + button + (compact ? 0f : button + 8f);
+        }
 
         /// <summary>
         /// Keyboard/gamepad: speed bottom-left, HP and ammo bottom-right. Touch: the on-screen buttons own
@@ -777,6 +782,8 @@ namespace RacingGame
             layoutScreenWidth = Screen.width; layoutScreenHeight = Screen.height;
             layoutTouchLarge = PlatformGlue.Save?.Data.settings.touchLargeButtons == true;
             layoutTouchLeft = PlatformGlue.Save?.Data.settings.touchLeftHanded == true;
+            layoutCompact = PlatformGlue.Save?.Data.settings.compactHud == true;
+            layoutTextScale = UiFactory.TextScale;
             ApplyReadableOverlays();
             // The first touch can change the input layout between PointerDown and PointerUp.
             // Keep this shared action stationary, with a usable target even on a small display.
@@ -786,12 +793,9 @@ namespace RacingGame
             float pauseTop = Mathf.Max(24f, 8f / scale);
             Place(pauseButton, Vector2.one, new Vector2(-pauseRight - pauseEdge, -pauseTop - pauseEdge),
                 new Vector2(-pauseRight, -pauseTop));
-            float modelBottom = -ModelButtonBottomPixels(scale) / scale;
+            float modelBottom = -TopControlsBottomPixels(scale, layoutCompact) / scale;
             float modelWidth = Mathf.Max(154f, 88f / scale);
-            modelLabel.fontSizeMin = 12f / scale;
-            modelLabel.fontSizeMax = Mathf.Max(24f, 14f / scale);
-            Place(modelButton, Vector2.one, new Vector2(-pauseRight - modelWidth, modelBottom),
-                new Vector2(-pauseRight, modelBottom + pauseEdge));
+            LayoutModelSwitch(scale, modelBottom, modelWidth, pauseRight, pauseEdge);
             // Portrait phones give the canvas ~1000 reference units of width: the timer (±200 around the
             // centre) would collide with a top-right HP bar, so HP/ammo drop to a row below it.
             bool narrow = layoutWidth < 1400f;
@@ -830,14 +834,38 @@ namespace RacingGame
             pauseHint.gameObject.SetActive(true);
         }
 
+        private void LayoutModelSwitch(float scale, float bottom, float width, float margin, float height)
+        {
+            var menuRect = (RectTransform)menuButton.transform;
+            menuRect.anchorMax = new Vector2(layoutCompact ? 0.5f : 1f, 1f);
+            menuRect.offsetMax = new Vector2(layoutCompact ? -8f : -40f, -386f);
+            Transform parent = layoutCompact ? pauseControls.transform : hudRoot;
+            if (modelButton.parent != parent) modelButton.SetParent(parent, false);
+            if (layoutCompact)
+            {
+                modelLabel.fontSizeMin = 24f;
+                modelLabel.fontSizeMax = 28f;
+                modelButton.anchorMin = new Vector2(0.5f, 1f); modelButton.anchorMax = Vector2.one;
+                modelButton.offsetMin = new Vector2(8f, -466f); modelButton.offsetMax = new Vector2(-40f, -386f);
+            }
+            else
+            {
+                if (modelButton.GetSiblingIndex() > pausePanel.GetSiblingIndex())
+                    modelButton.SetSiblingIndex(pausePanel.GetSiblingIndex());
+                modelLabel.fontSizeMin = 12f / scale;
+                modelLabel.fontSizeMax = Mathf.Max(24f, 14f / scale);
+                Place(modelButton, Vector2.one, new Vector2(-margin - width, bottom), new Vector2(-margin, bottom + height));
+            }
+        }
+
         private void ApplyReadableVitals()
         {
             float scale = Mathf.Max(0.01f, hudRoot.lossyScale.x);
             void Font(TextMeshProUGUI text, float min, float max, float pixels)
             {
                 text.enableAutoSizing = true;
-                text.fontSizeMin = Mathf.Max(min, pixels / scale);
-                text.fontSizeMax = Mathf.Max(max, text.fontSizeMin);
+                text.fontSizeMin = Mathf.Max(min, pixels / scale) * layoutTextScale;
+                text.fontSizeMax = Mathf.Max(max * layoutTextScale, text.fontSizeMin);
             }
             Font(lapText, 20f, 28f, 12f);
             Font(positionText, 20f, 36f, 16f);
@@ -847,9 +875,9 @@ namespace RacingGame
             Font(secondaryText, 16f, 24f, 12f);
             Font(statusText, 14f, 22f, 12f);
             Font(sectorText, 20f, 30f, 12f);
-            timerText.fontSize = Mathf.Max(40f, 16f / scale);
-            speedText.fontSize = Mathf.Max(46f, 18f / scale);
-            speedUnit.fontSize = Mathf.Max(16f, 9f / scale);
+            timerText.fontSize = Mathf.Max(40f, 16f / scale) * layoutTextScale;
+            speedText.fontSize = Mathf.Max(46f, 18f / scale) * layoutTextScale;
+            speedUnit.fontSize = Mathf.Max(16f, 9f / scale) * layoutTextScale;
             // Tiny dial numerals add noise; the needle and large digital speed remain visible.
             foreach (var text in speedPanel.GetComponentsInChildren<TextMeshProUGUI>(true))
                 if (text.name.StartsWith("Scale", System.StringComparison.Ordinal)) text.gameObject.SetActive(16f * scale >= 9f);
@@ -868,7 +896,8 @@ namespace RacingGame
             float timerWidth = Mathf.Max(280f, 110f / scale), timerHeight = Mathf.Max(70f, 30f / scale);
             Place(timerPanel, new Vector2(0.5f, 1f), new Vector2(-timerWidth * 0.5f, -24f - timerHeight), new Vector2(timerWidth * 0.5f, -24f));
 
-            float width = Mathf.Max(324f, 132f / scale), healthHeight = Mathf.Max(100f, 42f / scale);
+            float width = Mathf.Max(324f, 132f / scale) * Mathf.Lerp(1f, layoutTextScale, 0.5f);
+            float healthHeight = Mathf.Max(100f, 42f / scale) * layoutTextScale;
             // Noto CJK's ascent/descent needs ~1.45 em. Reserve both complete lines:
             // a short box with Ellipsis can discard even a two-character weapon name.
             primaryNameText.fontSize = primaryNameText.fontSizeMax;
@@ -896,7 +925,7 @@ namespace RacingGame
         private void LayoutHint()
         {
             float scale = Mathf.Max(0.01f, hudRoot.lossyScale.x);
-            hintText.fontSize = Mathf.Max(24f, 12f / scale);
+            hintText.fontSize = Mathf.Max(24f, 12f / scale) * layoutTextScale;
             if (!touchLayout)
             {
                 float width = Mathf.Max(650f, Mathf.Min(340f, Screen.width * 0.48f) / scale);
@@ -933,7 +962,7 @@ namespace RacingGame
         {
             if (goalsPanel == null) return;
             float scale = Mathf.Max(0.1f, hudRoot.lossyScale.x);
-            float font = Mathf.Max(23f, 12f / scale);
+            float font = Mathf.Max(23f, 12f / scale) * layoutTextScale;
             goalsText.enableAutoSizing = false;
             goalsText.fontSize = font;
             float width = expanded ? Mathf.Min(820f, 500f * font / 23f) : touchLayout ? 64f / scale : 500f;
@@ -957,11 +986,11 @@ namespace RacingGame
             float readable = UiFactory.ReadableScale(Screen.width, Screen.height);
             // Combat confirmation must remain readable at phone resolution, independently
             // of the small targeting reticle's reference-canvas scale.
-            combatText.fontSize = Mathf.Max(22f, 14f / pixelScale);
+            combatText.fontSize = Mathf.Max(22f, 14f / pixelScale) * layoutTextScale;
             float combatHalfWidth = Mathf.Min(400f, Screen.width * 0.55f) / (2f * pixelScale);
             Place(combatText.rectTransform, new Vector2(0.5f, 0.5f),
                 new Vector2(-combatHalfWidth, 30f / pixelScale), new Vector2(combatHalfWidth, 62f / pixelScale));
-            incomingText.fontSize = Mathf.Max(23f, 13f / pixelScale);
+            incomingText.fontSize = Mathf.Max(23f, 13f / pixelScale) * layoutTextScale;
             LayoutIncomingFeedback();
             hitMarker.fontSize = Mathf.Max(64f, 28f / pixelScale);
             finishPanel.localScale = Vector3.one * (Mathf.Min(readable, (Screen.width - 32f) / 600f) / pixelScale);
@@ -1002,7 +1031,9 @@ namespace RacingGame
             UpdateFinishCard();
             if (hudRoot != null && (Mathf.Abs(hudRoot.rect.width - layoutWidth) > 1f || Screen.width != layoutScreenWidth || Screen.height != layoutScreenHeight
                 || layoutTouchLarge != (PlatformGlue.Save?.Data.settings.touchLargeButtons == true)
-                || layoutTouchLeft != (PlatformGlue.Save?.Data.settings.touchLeftHanded == true))) ApplyLayout(touchLayout);
+                || layoutTouchLeft != (PlatformGlue.Save?.Data.settings.touchLeftHanded == true)
+                || layoutCompact != (PlatformGlue.Save?.Data.settings.compactHud == true)
+                || layoutTextScale != UiFactory.TextScale)) ApplyLayout(touchLayout);
             if (playerCar == null && race.Player != null)
             {
                 playerCar = race.Player.Car;
@@ -1217,6 +1248,7 @@ namespace RacingGame
             if (ev != null && ev.eventId == TrainMission.EventId) return Loc.Format("train.lesson", "s", TrainMission.HoldSeconds);
             if (ev != null && ev.mode == EventMode.Arena) return Loc.Get("arena.lesson");
             if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.HotBomb) return Loc.Get("lesson.bomb");
+            if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.TimeTrial) return Loc.Get("time_trial.rules");
             if (ev != null && ev.twist == RacingGame.Core.Daily.RaceTwist.MinesOnly) return Loc.Get(touch ? "lesson.mines.touch" : "lesson.mines.keys");
             if (ev != null && ev.spaceTrack) return Loc.Get("lesson.space");
             if (ev != null && ev.abyssTrack) return Loc.Get("lesson.abyss");
@@ -1315,6 +1347,7 @@ namespace RacingGame
             Vector3 playerPos = playerCar.transform.position;
             Vector3 camPos = cam.transform.position;
             Vector3 camFwd = cam.transform.forward;
+            float markerScale = Mathf.Max(1f, 0.6f / Mathf.Max(0.1f, hudRoot.lossyScale.x));
 
             float maxRange = (RaceSetup.Event != null && RaceSetup.Event.mode == EventMode.Arena) ? 90f : threatMaxRange;
 
@@ -1332,18 +1365,14 @@ namespace RacingGame
 
                 Vector3 vp = cam.WorldToViewportPoint(rivalPos + Vector3.up * 0.5f);
                 bool behind = vp.z < 0f || Vector3.Dot(camFwd, toRival) < 0f;
-                if (behind)
-                {
-                    vp.x = 1f - vp.x;
-                    vp.y = 1f - vp.y;
-                }
-
                 Vector2 fromCenter = new Vector2(vp.x - 0.5f, vp.y - 0.5f);
+                if (behind) fromCenter = new Vector2(Vector3.Dot(cam.transform.right, toRival), -Mathf.Abs(Vector3.Dot(camFwd, toRival))).normalized;
                 bool isOffScreen = behind || vp.x < 0.08f || vp.x > 0.92f || vp.y < 0.08f || vp.y > 0.92f;
                 bool isBehindPlayer = Vector3.Dot(playerCar.transform.forward, rivalPos - playerPos) < 0.1f;
+                bool aimingAtMe = rival.TryGetComponent<AiGunner>(out var gunner) && gunner.AimTarget == playerCar;
 
                 // Only show threat marker when rival is off-screen, behind the player, or very close threat
-                if (!isOffScreen && !isBehindPlayer && dist > 25f) continue;
+                if (!aimingAtMe && !isOffScreen && !isBehindPlayer && dist > 25f) continue;
 
                 if (fromCenter.sqrMagnitude < 0.0001f) fromCenter = new Vector2(0f, -0.5f);
 
@@ -1356,9 +1385,6 @@ namespace RacingGame
 
                 Vector2 canvasPos = new Vector2((edgeVp.x - 0.5f) * hudRoot.rect.width, (edgeVp.y - 0.5f) * hudRoot.rect.height);
 
-                Vector3 rivalFwd = rival.Car.transform.forward;
-                Vector3 toPlayer = playerPos - rivalPos;
-                bool aimingAtMe = Vector3.Dot(rivalFwd, toPlayer.normalized) > 0.65f && dist < 45f;
                 bool highThreat = aimingAtMe || (dist < 20f) || (isBehindPlayer && dist < 30f);
                 bool medThreat = dist < 45f;
 
@@ -1372,21 +1398,14 @@ namespace RacingGame
 
                 float angle = Mathf.Atan2(fromCenter.y, fromCenter.x) * Mathf.Rad2Deg - 90f;
                 tm.arrow.rectTransform.localEulerAngles = new Vector3(0f, 0f, angle);
-                tm.arrow.color = markerColor;
+                tm.arrow.Show(highThreat ? 2 : medThreat ? 1 : 0, markerColor);
 
                 int dMeters = Mathf.RoundToInt(dist);
                 tm.distanceText.SetText("{0:0}m", dMeters);
                 tm.distanceText.color = highThreat ? new Color(1f, 0.95f, 0.9f) : UiFactory.Muted;
 
-                if (highThreat)
-                {
-                    float pulse = 0.9f + 0.15f * Mathf.Sin(Time.unscaledTime * 12f);
-                    tm.root.localScale = new Vector3(pulse, pulse, 1f);
-                }
-                else
-                {
-                    tm.root.localScale = Vector3.one;
-                }
+                float pulse = highThreat ? 0.9f + 0.15f * Mathf.Sin(Time.unscaledTime * 12f) : 1f;
+                tm.root.localScale = Vector3.one * (markerScale * pulse);
             }
 
             for (int i = markerIdx; i < threatMarkers.Length; i++)

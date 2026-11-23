@@ -33,6 +33,98 @@ namespace RacingGame.Tests
         [UnityTest, Timeout(120000)]
         public IEnumerator RaceRivalShowsAThreatArrowAndReticleLock() => CheckCar("e1", Team.None);
 
+        [UnityTest, Timeout(120000)]
+        public IEnumerator AimingRearRivalShowsTwoArrowsBesideAnOrdinaryRival()
+        {
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float deadline = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null;
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = flow.GetComponent<RaceManager>();
+            flow.StartRace(flow.events.Single(e => e.eventId == "e1"), flow.tiers.Single(t => t.tierId == "normal"));
+            while (race.State == RaceState.Countdown) yield return null;
+            var player = race.Player.Car;
+            var rivals = race.Participants.Where(p => !p.isPlayer).Select(p => p.Car).ToArray();
+            var gunner = rivals[0].GetComponent<AiGunner>();
+            gunner.suppressed = true;
+            foreach (var p in race.Participants)
+            {
+                p.Car.inputEnabled = false;
+                p.Car.Body.constraints = RigidbodyConstraints.FreezeAll;
+                if (!p.isPlayer) p.Car.Teleport(player.transform.position + player.transform.right * 110f, player.transform.rotation);
+            }
+            Vector3 origin = player.transform.position, forward = player.transform.forward, right = player.transform.right;
+            rivals[0].Teleport(origin - forward * 36f, player.transform.rotation);
+            rivals[1].Teleport(origin + right * 56f, Quaternion.LookRotation(right));
+            var markers = GameObject.Find("ThreatMarkers").transform;
+            ThreatShapeGraphic Shape(int metres) => markers.Cast<Transform>()
+                .Single(t => t.gameObject.activeInHierarchy && t.Find("Dist").GetComponent<TMP_Text>().text == metres + "m")
+                .Find("Arrow").GetComponent<ThreatShapeGraphic>();
+            for (int frame = 0; frame < 12; frame++) yield return null;
+            Assert.AreEqual(1, Shape(36).Level);
+            Assert.AreEqual(0, Shape(56).Level);
+            gunner.startGraceSeconds = 0;
+            gunner.telegraphSeconds = 5f;
+            gunner.coneFromAggression = false;
+            gunner.coneDegrees = 30f;
+            int tick = SimulationDriver.Instance.Tick;
+            for (int frame = 0; frame < 450 && gunner.AimTarget != player; frame++)
+            {
+                gunner.suppressed = false;
+                gunner.WantsFire(++tick);
+                yield return null;
+            }
+            Assert.AreSame(player, gunner.AimTarget, "The opponent's own targeting must commit to the player");
+            for (int frame = 0; frame < 65; frame++) yield return null;
+            var rear = Shape(36);
+            Assert.AreEqual(2, rear.Level, "Aiming raises the same contact above the proximity marker");
+            Assert.AreEqual(0, Shape(56).Level);
+            Assert.Less((rear.rectTransform.localRotation * Vector3.up).y, -0.8f);
+            Assert.Less(((RectTransform)rear.transform.parent).anchoredPosition.y, 0);
+            string shot = System.Environment.GetEnvironmentVariable("CG_THREAT_SHOT");
+            if (!string.IsNullOrEmpty(shot)) CaptureGrayscale(markers.GetComponentInParent<Canvas>(), shot);
+        }
+
+        private static void CaptureGrayscale(Canvas canvas, string file)
+        {
+            var camera = Camera.main;
+            int width = Screen.width, height = Screen.height;
+            var target = new RenderTexture(width, height, 24);
+            var image = new Texture2D(width, height, TextureFormat.RGB24, false);
+            var before = camera.targetTexture;
+            var active = RenderTexture.active;
+            var mode = canvas.renderMode;
+            var previousCamera = canvas.worldCamera;
+            float plane = canvas.planeDistance;
+            try
+            {
+                camera.targetTexture = target;
+                canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                canvas.worldCamera = camera; canvas.planeDistance = 1f;
+                Canvas.ForceUpdateCanvases();
+                camera.Render();
+                RenderTexture.active = target;
+                image.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+                var pixels = image.GetPixels32();
+                for (int i = 0; i < pixels.Length; i++)
+                {
+                    var c = pixels[i];
+                    byte shade = (byte)((299 * c.r + 587 * c.g + 114 * c.b + 500) / 1000);
+                    pixels[i] = new Color32(shade, shade, shade, 255);
+                }
+                image.SetPixels32(pixels); image.Apply();
+                System.IO.File.WriteAllBytes(file, image.EncodeToPNG());
+            }
+            finally
+            {
+                camera.targetTexture = before; RenderTexture.active = active;
+                canvas.renderMode = mode; canvas.worldCamera = previousCamera; canvas.planeDistance = plane;
+                target.Release(); Object.DestroyImmediate(target); Object.DestroyImmediate(image);
+            }
+        }
+
         private IEnumerator CheckCar(string eventId, Team team)
         {
             yield return SceneManager.LoadSceneAsync("SampleScene");

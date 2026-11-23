@@ -15,6 +15,7 @@ namespace RacingGame
         public static readonly Color Accent = new Color(1f, 0.8f, 0.25f);
         public static readonly Color Positive = new Color(0.25f, 0.9f, 0.7f);
         private static readonly Dictionary<(Material font, float outline), Material> textMaterials = new Dictionary<(Material, float), Material>();
+        public static float TextScale => PlatformGlue.Save?.Data.settings.largeText == true ? 1.25f : 1f;
 
         /// <summary>Use shared immutable outline styles instead of TMP's per-label material instances.</summary>
         public static void SetOutline(TMP_Text text, float width)

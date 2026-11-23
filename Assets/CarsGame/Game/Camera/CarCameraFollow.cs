@@ -50,6 +50,17 @@ namespace RacingGame
         public float CurrentRoll => roll;
         private static bool DynamicView => PlatformGlue.Save == null || PlatformGlue.Save.Data.settings.dynamicCamera;
 
+        private Vector3 ChaseOffset(bool dynamicView, float speedNorm)
+        {
+            var chase = offset;
+            chase.z += dynamicView ? Mathf.Lerp(.4f, -distanceAtTopSpeed, speedNorm) : -.5f;
+            int distance = PlatformGlue.Save?.Data.settings.cameraDistance ?? 0;
+            float scale = distance < 0 ? 0.8f : distance > 0 ? 1.3f : 1f;
+            chase.y = lookAtHeightOffset + (chase.y - lookAtHeightOffset) * scale;
+            chase.z *= scale;
+            return chase;
+        }
+
         private void Awake()
         {
             cam = GetComponent<Camera>();
@@ -95,9 +106,7 @@ namespace RacingGame
             roll = turn = 0f;
             Vector3 forward = Heading(up);
             var frame = Quaternion.LookRotation(forward, up);
-            Vector3 restOffset = offset;
-            restOffset.z += DynamicView ? .4f : -.5f;
-            transform.position = target.position + frame * restOffset;
+            transform.position = target.position + frame * ChaseOffset(DynamicView, 0f);
             transform.rotation = Quaternion.LookRotation(target.position + up * lookAtHeightOffset + forward * 1.5f - transform.position, up);
             if (cam != null) cam.fieldOfView = !DynamicView ? steadyFov : car != null ? fovAtRest : initialFov;
         }
@@ -132,8 +141,7 @@ namespace RacingGame
             float targetRoll = Mathf.Clamp(-speed * yawRate * rollPerAccel, -maxRoll, maxRoll);          // v·ω = lateral accel
             roll = dynamicView ? Mathf.Lerp(roll, targetRoll, Smooth(3f, dt)) : 0f;
 
-            Vector3 localOffset = offset;
-            localOffset.z = dynamicView ? Mathf.Lerp(offset.z + 0.4f, offset.z - distanceAtTopSpeed, speedNorm) : offset.z - .5f;
+            Vector3 localOffset = ChaseOffset(dynamicView, speedNorm);
             if (dynamicView && car != null && car.IsBoosting) localOffset.y -= 0.2f;
             Vector3 desiredPosition = target.position + frame * localOffset - right * (turn * shiftAgainstTurn);
             transform.position = Vector3.Lerp(transform.position, desiredPosition, Smooth(positionSmoothSpeed, dt));

@@ -2288,6 +2288,96 @@ MonoBehaviour:
     m_Localized: "Vuelta de pr\xE1ctica con tus mejores sectores \xB7 {t}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29712712435314688
+    m_Localized: Objetivo del equipo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091904
+    m_Localized: "N\xFAcleo de popa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091905
+    m_Localized: Mortero
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091906
+    m_Localized: Hangar de drones
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091907
+    m_Localized: "Ca\xF1\xF3n principal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091908
+    m_Localized: "Antia\xE9rea"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091909
+    m_Localized: Contrarreloj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091910
+    m_Localized: Mejora tu tiempo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091911
+    m_Localized: "Ver repetici\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091912
+    m_Localized: Pausar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091913
+    m_Localized: "La grabaci\xF3n usa otra versi\xF3n de la pista."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091914
+    m_Localized: Interfaz de carrera compacta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648865779712
+    m_Localized: El hangar lanza drones. El mortero marca el suelo antes del impacto.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Localized: "Tu da\xF1o al n\xFAcleo {d}  \xB7  Estaciones destruidas {s}  \xB7
+      Aliados salvados {a}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Localized: Texto grande
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Localized: "\xDAltimas cinco llegadas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720071151616
+    m_Localized: Atenuar destellos de combate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928832
+    m_Localized: "Auto y armas est\xE1ndar \xB7 Normal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928833
+    m_Localized: "Distancia de la c\xE1mara"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928834
+    m_Localized: Carrera diaria de ayer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928835
+    m_Localized: "Entrena en el circuito de ayer con sus reglas. Conservas tu racha
+      y puntuaci\xF3n."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928836
+    m_Localized: "\xDAltima llegada de pr\xE1ctica \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

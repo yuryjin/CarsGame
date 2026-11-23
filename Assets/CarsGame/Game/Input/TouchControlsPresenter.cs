@@ -36,7 +36,8 @@ namespace RacingGame
         private PerfectStart launch;
         private RectTransform resetButton, brakeButton, leftButton, rightButton;
         private float targetScale = -1f;
-        private bool targetLarge, targetLeft;
+        private float targetTextScale;
+        private bool targetLarge, targetLeft, targetCompact;
         private string secondaryKey = "touch.secondary";
 
         private void Awake()
@@ -139,9 +140,12 @@ namespace RacingGame
             var settings = PlatformGlue.Save?.Data.settings;
             bool large = settings != null && settings.touchLargeButtons;
             bool left = settings != null && settings.touchLeftHanded;
-            if (Mathf.Approximately(scale, targetScale) && targetLarge == large && targetLeft == left) return;
+            bool compact = settings != null && settings.compactHud;
+            float textScale = UiFactory.TextScale;
+            if (Mathf.Approximately(scale, targetScale) && targetLarge == large && targetLeft == left && targetCompact == compact && targetTextScale == textScale) return;
             targetScale = scale;
-            targetLarge = large; targetLeft = left;
+            targetTextScale = textScale;
+            targetLarge = large; targetLeft = left; targetCompact = compact;
             float size = large ? 1.25f : 1f;
             float Scaled(float value) => 40f + (value - 40f) * size;
             void Place(RectTransform control, Vector2 anchor, Vector2 lo, Vector2 hi)
@@ -169,12 +173,14 @@ namespace RacingGame
             Action((RectTransform)swapButton.transform, 40f, 260f, 280f, 370f);
             float edge = 44f / scale;
             float reset = Mathf.Max(100f, edge);
-            float resetTop = (HudScreen.ModelButtonBottomPixels(scale) + 8f) / scale;
+            float resetTop = (HudScreen.TopControlsBottomPixels(scale, compact) + 8f) / scale;
             float resetWidth = Mathf.Max(reset, 84f / scale);
             Place(resetButton, Vector2.one, new Vector2(-40f - resetWidth, -resetTop - reset), new Vector2(-40f, -resetTop));
             var resetLabel = resetButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
             resetLabel.fontSizeMin = 12f / scale;
-            resetLabel.fontSizeMax = Mathf.Max(26f, 14f / scale);
+            resetLabel.fontSizeMax = Mathf.Max(26f, 14f / scale) * textScale;
+            fireLabel.fontSizeMax = secondaryLabel.fontSizeMax = 34f * textScale;
+            brakeButton.GetComponentInChildren<TMPro.TextMeshProUGUI>().fontSizeMax = 34f * textScale;
             void MinimumHeight(RectTransform control)
             {
                 var hi = control.offsetMax;
@@ -188,13 +194,14 @@ namespace RacingGame
             var launchRect = (RectTransform)launchLabel.transform.parent;
             launchRect.offsetMax = new Vector2(200f, 40f + Mathf.Max(150f, 64f / scale));
             launchLabel.enableWordWrapping = true;
-            launchLabel.fontSizeMin = launchLabel.fontSizeMax = Mathf.Max(30f, 14f / scale);
+            launchLabel.fontSizeMin = Mathf.Max(30f, 14f / scale);
+            launchLabel.fontSizeMax = launchLabel.fontSizeMin * textScale;
             var swapLabel = swapButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
             swapLabel.rectTransform.offsetMin = new Vector2(8f, 8f);
             swapLabel.rectTransform.offsetMax = new Vector2(-8f, -8f);
             swapLabel.enableWordWrapping = false;
-            swapLabel.fontSizeMax = Mathf.Max(26f, 12f / scale);
-            swapLabel.fontSizeMin = swapLabel.fontSizeMax;
+            swapLabel.fontSizeMin = Mathf.Max(26f, 12f / scale);
+            swapLabel.fontSizeMax = swapLabel.fontSizeMin * textScale;
         }
 
         private static TMPro.TextMeshProUGUI Button(Transform parent, string name, string label, string controlPath, Vector2 anchor, Vector2 offsetMin, Vector2 offsetMax)

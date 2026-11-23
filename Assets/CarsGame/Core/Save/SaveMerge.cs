@@ -55,6 +55,7 @@ namespace RacingGame.Core.Save
             m.progress.livery = newer.progress.livery ?? "";
             m.progress.body = newer.progress.body ?? "";
             m.progress.stripe = newer.progress.stripe ?? "";
+            m.progress.recentAttempts = RecentAttempts.Merge(a.progress.recentAttempts, b.progress.recentAttempts);
             m.progress.daily = MergeDaily(a.progress.daily, b.progress.daily);
 
             var unlocked = new HashSet<string>(a.progress.unlockedEvents ?? new List<string>());
@@ -130,7 +131,8 @@ namespace RacingGame.Core.Save
             lang = s.lang, sfx = s.sfx, music = s.music, musicChosen = s.musicChosen, quality = s.quality, qualityAuto = s.qualityAuto,
             autoThrottle = s.autoThrottle, cameraShake = s.cameraShake, autoAim = s.autoAim, tier = s.tier, hintsSeen = s.hintsSeen,
             touchLargeButtons = s.touchLargeButtons, touchLeftHanded = s.touchLeftHanded,
-            dynamicCamera = s.dynamicCamera, classicCarModels = s.classicCarModels
+            dynamicCamera = s.dynamicCamera, classicCarModels = s.classicCarModels, compactHud = s.compactHud,
+            largeText = s.largeText, reducedCombatFlashes = s.reducedCombatFlashes, cameraDistance = s.cameraDistance
         };
     }
 }

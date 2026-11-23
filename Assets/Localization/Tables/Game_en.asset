@@ -2277,6 +2277,97 @@ MonoBehaviour:
     m_Localized: "Training lap from best sectors \xB7 {t}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29712712435314688
+    m_Localized: Squad target
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091904
+    m_Localized: Stern core
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091905
+    m_Localized: Mortar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091906
+    m_Localized: Drone hangar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091907
+    m_Localized: Main gun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091908
+    m_Localized: Flak gun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091909
+    m_Localized: Time trial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091910
+    m_Localized: Beat your own time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091911
+    m_Localized: Watch replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091912
+    m_Localized: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091913
+    m_Localized: This recording uses a different track layout.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091914
+    m_Localized: Compact race HUD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648865779712
+    m_Localized: The hangar launches drones. The mortar marks the ground before it
+      strikes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Localized: "Your core damage {d}  \xB7  Stations destroyed {s}  \xB7  Allies
+      saved {a}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Localized: Large text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Localized: Last five finishes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720071151616
+    m_Localized: Dim combat flashes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928832
+    m_Localized: "Standard car and loadout \xB7 Normal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928833
+    m_Localized: Camera distance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928834
+    m_Localized: "Yesterday\u2019s daily race"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928835
+    m_Localized: "Practice yesterday\u2019s course and rules. Your daily streak and
+      leaderboard score stay intact."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928836
+    m_Localized: "Last practice finish \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

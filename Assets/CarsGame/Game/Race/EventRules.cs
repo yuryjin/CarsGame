@@ -22,7 +22,7 @@ namespace RacingGame
             foreach (var p in race.Participants)
             {
                 if (p == null) continue;
-                if (twist == RaceTwist.HotBomb)
+                if (twist == RaceTwist.HotBomb || twist == RaceTwist.TimeTrial)
                 {
                     if (p.Car.Cannon != null) p.Car.Cannon.locked = true;
                     p.Weapons.secondaryType = SecondaryWeaponType.None;

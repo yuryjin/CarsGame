@@ -2285,6 +2285,96 @@ MonoBehaviour:
     m_Localized: "Volta de treino com os melhores setores \xB7 {t}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29712712435314688
+    m_Localized: Alvo da equipe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091904
+    m_Localized: "N\xFAcleo da popa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091905
+    m_Localized: Morteiro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091906
+    m_Localized: Hangar de drones
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091907
+    m_Localized: "Canh\xE3o principal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091908
+    m_Localized: "Antia\xE9rea"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091909
+    m_Localized: "Contra o rel\xF3gio"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091910
+    m_Localized: Melhore seu tempo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091911
+    m_Localized: Ver replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091912
+    m_Localized: Pausar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091913
+    m_Localized: "Esta grava\xE7\xE3o usa outra vers\xE3o da pista."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091914
+    m_Localized: Interface de corrida compacta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648865779712
+    m_Localized: "O hangar lan\xE7a drones. O morteiro marca o ch\xE3o antes do impacto."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751232
+    m_Localized: "Seu dano ao n\xFAcleo {d}  \xB7  Esta\xE7\xF5es destru\xEDdas {s}
+      \xB7  Aliados salvos {a}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751233
+    m_Localized: Texto grande
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29714648886751234
+    m_Localized: "\xDAltimas cinco chegadas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720071151616
+    m_Localized: "Suavizar clar\xF5es de combate"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928832
+    m_Localized: "Carro e armas padr\xE3o \xB7 Normal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928833
+    m_Localized: "Dist\xE2ncia da c\xE2mera"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928834
+    m_Localized: "Corrida di\xE1ria de ontem"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928835
+    m_Localized: "Treine na pista de ontem com suas regras. Sua sequ\xEAncia e pontua\xE7\xE3o
+      permanecem iguais."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29718720087928836
+    m_Localized: "\xDAltima chegada de treino \xB7 {t}"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -82,16 +82,18 @@ namespace RacingGame
         }
 
         /// <summary>Play a flash. duration in seconds, radius in metres.</summary>
-        public void PlayFlash(Vector3 position, Color color, float duration, float maxRadius, float lightRange = 6f, float lightIntensity = 4f)
+        public void PlayFlash(Vector3 position, Color color, float duration, float maxRadius, float lightRange = 6f, float lightIntensity = 4f, bool combat = true)
         {
             if (flashes.Count == 0) return;
             var f = flashes[nextIndex];
             nextIndex = (nextIndex + 1) % flashes.Count;
 
-            f.Time = 0f; f.Duration = Mathf.Max(0.05f, duration); f.MaxRadius = maxRadius; f.Color = color; f.StartIntensity = lightIntensity;
+            float intensity = combat && PlatformGlue.Save?.Data.settings.reducedCombatFlashes == true ? 0.38f : 1f;
+            f.Time = 0f; f.Duration = Mathf.Max(0.05f, duration); f.MaxRadius = maxRadius;
+            f.Color = color * intensity; f.StartIntensity = lightIntensity * intensity;
             f.Transform.position = position;
             f.Transform.localScale = Vector3.one * 0.3f;
-            if (f.Light != null) { f.Light.color = color; f.Light.range = lightRange; f.Light.intensity = lightIntensity; }
+            if (f.Light != null) { f.Light.color = color; f.Light.range = lightRange; f.Light.intensity = f.StartIntensity; }
             f.Active = true;
             f.Transform.gameObject.SetActive(true);
             ApplyColor(f, 1f);

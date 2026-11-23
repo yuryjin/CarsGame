@@ -53,6 +53,7 @@ namespace RacingGame
         private int burstTicksRemaining;
         private int pendingBurstShots = 1;
         private bool aimHeld;
+        private BossPart orderedAim;
         private int enabledTick = -1;
         private RaceDirector director;
         private CarController lateralTarget;
@@ -88,6 +89,22 @@ namespace RacingGame
             if (health != null && health.IsDead) { burstTicksRemaining = 0; ReleaseAim(); return false; }
 
             if (suppressed) { burstTicksRemaining = 0; ReleaseAim(); return false; }
+            if (enabledTick < 0) enabledTick = tick;
+            if (startGraceSeconds > 0f && tick - enabledTick < SimulationDriver.SecondsToTicks(startGraceSeconds)) return false;
+            var mission = MissionDirector.Current;
+            var order = mission != null ? mission.SquadTarget : null;
+            if (order != null && !cannon.locked && Teams.Of(gameObject) == Team.Players && CanAimAtOrder(order))
+            {
+                burstTicksRemaining = 0;
+                CancelAim();
+                orderedAim = order;
+                Vector3 aim = cannon.SolveAimPoint(order);
+                cannon.CommitAim(aim);
+                if (tick < nextShotTick || !cannon.IsReady || !cannon.IsAlignedWith(aim)) return false;
+                ScheduleUnitShot(tick);
+                return true;
+            }
+            if (orderedAim != null) ReleaseAim();
             if (burstTicksRemaining > 0)
             {
                 // The rest of the burst stays on the frozen point, even if the target has left the cone.
@@ -97,8 +114,6 @@ namespace RacingGame
             // The tick after the last shot: the shell already left along the committed barrel.
             if (aimHeld && AimTarget == null) ReleaseAim();
 
-            if (enabledTick < 0) enabledTick = tick;
-            if (startGraceSeconds > 0f && tick - enabledTick < SimulationDriver.SecondsToTicks(startGraceSeconds)) return false;
             // Keep sampling across the cooldown so a lane change is measured over ~0.2 s, not since the last shot.
             if (tick % 10 == 0 && AimTarget == null) SampleLateral(tick);
             if (tick < nextShotTick || !cannon.IsReady || cannon.locked) { CancelAim(); return false; }
@@ -193,11 +208,31 @@ namespace RacingGame
             if (unit == null) return false;
             cannon.CommitAim(cannon.SolveAimPoint(unit));
             aimHeld = true;
+            ScheduleUnitShot(tick);
+            return true;
+        }
+
+        private void ScheduleUnitShot(int tick)
+        {
             if (director == null) director = RaceDirector.Current ?? RaceDirector.Instance;
             float randScale = director != null && director.Rng != null ? director.Rng.Range(RngStreams.Stream.Ai, 0.8f, 1.2f) : 1f;
             nextShotTick = tick + SimulationDriver.SecondsToTicks(fireCooldown * 0.8f * randScale);
             ShotsRequested++;
-            return true;
+        }
+
+        private bool CanAimAtOrder(BossPart part)
+        {
+            Vector3 origin = cannon.muzzle != null ? cannon.muzzle.position : transform.position;
+            Vector3 to = part.AimPointFrom(origin) - origin;
+            float distance = to.magnitude;
+            if (!part.Targetable || !Teams.Hostile(gameObject, part.gameObject) || distance < minRange * .5f || distance > maxRange + part.Radius) return false;
+            Vector3 local = transform.InverseTransformDirection(to);
+            float yaw = Mathf.Abs(Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg);
+            float pitch = Mathf.Abs(Mathf.Atan2(local.y, Mathf.Sqrt(local.x * local.x + local.z * local.z)) * Mathf.Rad2Deg);
+            if (yaw > cannon.turretYawLimit || pitch > cannon.barrelPitchLimit) return false;
+            // A station behind the hull or another vehicle cannot receive squad fire through it.
+            return !Physics.Raycast(origin, to / distance, out var hit, distance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)
+                || hit.collider.GetComponentInParent<MissionUnit>() == part;
         }
 
         private void CancelAim() { AimTarget = null; fireAtTick = -1; }
@@ -205,6 +240,7 @@ namespace RacingGame
         private void ReleaseAim()
         {
             CancelAim();
+            orderedAim = null;
             aimHeld = false;
             if (cannon != null) cannon.ClearAimCommit();
         }

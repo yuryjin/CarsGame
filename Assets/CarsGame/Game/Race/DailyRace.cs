@@ -40,6 +40,21 @@ namespace RacingGame
         {
             int day = Today;
             if (cached != null && cachedDay == day) return cached;
+            cached = BuildEvent(day, authored);
+            cachedDay = day;
+            return cached;
+        }
+
+        // The practice button owns its event until it returns to the menu.
+        public static RaceEventDefinition YesterdayEvent(RaceEventDefinition[] authored)
+        {
+            var ev = BuildEvent(Today - 1, authored);
+            ev.nameKey = "practice.yesterday";
+            return ev;
+        }
+
+        private static RaceEventDefinition BuildEvent(int day, RaceEventDefinition[] authored)
+        {
             var spec = DailyChallenge.For(day);
             var ev = ScriptableObject.CreateInstance<RaceEventDefinition>();
             ev.name = "Daily_" + day;
@@ -56,7 +71,6 @@ namespace RacingGame
             ev.twist = spec.Twist;
             ev.unlockAfterEventId = "";
             ev.order = -1;
-            cached = ev; cachedDay = day;
             return ev;
         }
 

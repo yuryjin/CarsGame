@@ -37,8 +37,7 @@ namespace RacingGame
             ghost.Record = record;
             ghost.sourcePrefab = carPrefab;
             ghost.RefreshModel();
-            record.EvaluatePose(0f, out var p, out var rotation);
-            go.transform.SetPositionAndRotation(p, rotation);
+            ghost.Seek(0f);
             return ghost;
         }
 
@@ -48,12 +47,17 @@ namespace RacingGame
         /// <summary>Start aligned to the race start (late-loaded ghosts join at the right elapsed time).</summary>
         public void Begin(double raceStartClock) { startClock = raceStartClock; running = true; }
 
+        public void Seek(float seconds)
+        {
+            if (Record.EvaluatePose(seconds, out var p, out var rotation))
+                transform.SetPositionAndRotation(p, rotation);
+        }
+
         private void Update()
         {
             if (!running || Record == null) return;
             float t = (float)(RaceClock.Now - startClock);
-            if (!Record.EvaluatePose(t, out var p, out var rotation)) return;
-            transform.SetPositionAndRotation(p, rotation);
+            Seek(t);
             if (t > Record.Duration + 5f) { running = false; gameObject.SetActive(false); }
         }
     }
