@@ -23,7 +23,9 @@ namespace RacingGame.Tests
                     results.Entries.Add(new RaceResultEntry { Name = "Driver " + i, Position = i, IsPlayer = i == 3, Finished = true, TotalTime = 140 + i, BestLap = 45 });
                 typeof(RaceManager).GetProperty("Results").SetValue(race, results);
                 const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
-                typeof(MenuScreens).GetField("flow", flags).SetValue(menu, owner.GetComponent<GameFlow>());
+                var flow = owner.GetComponent<GameFlow>();
+                typeof(GameFlow).GetField("race", flags).SetValue(flow, race);
+                typeof(MenuScreens).GetField("flow", flags).SetValue(menu, flow);
                 typeof(MenuScreens).GetField("race", flags).SetValue(menu, race);
                 typeof(MenuScreens).GetMethod("BuildResults", flags).Invoke(menu, new object[] { (RectTransform)root.transform });
                 Canvas.ForceUpdateCanvases();
