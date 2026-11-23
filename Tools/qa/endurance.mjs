@@ -245,7 +245,9 @@ try {
       const classic = garage.labels.find(l => l.parent === 'Body_classic' && l.name === 'Name');
       assert(classic?.text && garage.labels.some(l => l.name === 'PreviewName' && l.text === classic.text), 'Previewing the equipped Classic');
       const { timeOrigin, wasmBytes } = await page.evaluate(() => ({
-        timeOrigin: performance.timeOrigin, wasmBytes: window.CarsPlatform.heapBytes?.() ?? null }));
+        timeOrigin: performance.timeOrigin,
+        // Unity 6's optimized loader exports the uint32 view of the same linear memory.
+        wasmBytes: window.CarsPlatform.heapBytes?.() ?? window.unityInstance?.Module?.HEAPU32?.buffer?.byteLength ?? null }));
       assert.equal(timeOrigin, report.lab.timeOrigin, 'The same tab document survived the full series');
       const row = { cycle: round, at: new Date().toISOString(), raceSeconds: run.result.raceSeconds,
         ...run.frameWindow, wasmBytes: Number.isFinite(wasmBytes) && wasmBytes > 0 ? wasmBytes : null,
