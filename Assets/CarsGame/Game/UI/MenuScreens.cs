@@ -530,7 +530,7 @@ namespace RacingGame
                     string starDisplay = s1 + " " + StarGoalText.Description(ev, 0) + "\n" + s2 + " " + StarGoalText.Description(ev, 1) + "\n" + s3 + " " + StarGoalText.Description(ev, 2);
                     float starOffset = (circuit ? -92f : 0f) - ruleSpace;
                     Label(row, "Stars", starDisplay, 22f, Top, Vector2.one, new Vector2(144f, -302f + starOffset), new Vector2(-236f, -178f + starOffset));
-                    if (circuit) BuildCircuitPreview(row, ev, ev.reversed ? reverse : forward, path.startLineDistance, ruleSpace);
+                    if (circuit) BuildCircuitPreview(row, ev, forward, reverse, path.startLineDistance, ruleSpace);
                     var prerequisite = unlocked ? null : list.Find(e => e.eventId == ev.unlockAfterEventId);
                     string status = unlocked ? EventBestText(ev, best)
                         : prerequisite == null ? Loc.Get("events.locked")
@@ -544,8 +544,9 @@ namespace RacingGame
             }
         }
 
-        private static void BuildCircuitPreview(RectTransform row, RaceEventDefinition ev, TrackSpline spline, float grid, float ruleSpace)
+        private static void BuildCircuitPreview(RectTransform row, RaceEventDefinition ev, TrackSpline forward, TrackSpline reverse, float grid, float ruleSpace)
         {
+            var spline = ev.reversed ? reverse : forward;
             if (ev.wastelandTrack)
             {
                 var layout = new WastelandLayout();
@@ -558,7 +559,7 @@ namespace RacingGame
             }
             if ((ev.wastelandTrack || ev.starRingTrack) && ev.reversed) spline = spline.Reversed();
             var map = UiFactory.Panel(row, "RouteMap", Top, Top, new Vector2(12f, -208f), new Vector2(134f, -65f));
-            map.gameObject.AddComponent<CircuitMapGraphic>().SetRoute(spline, grid);
+            map.gameObject.AddComponent<CircuitMapGraphic>().SetPreview(spline, grid, TrackFork.AppliesTo(ev) ? forward : null, ev.mountainFork);
             string hint = ev.fixedRivalPace ? "route.fixed_pace" : ev.twist == Core.Daily.RaceTwist.HotBomb ? "bomb.pass"
                 : ev.twist == Core.Daily.RaceTwist.MinesOnly ? "lesson.mines"
                 : ev.mountainFork == MountainFork.Rooftops ? "route.roofs"

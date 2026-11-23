@@ -16,7 +16,7 @@ MonoBehaviour:
   mode: 0
   nameKey: events.roofs.name
   laps: 1
-  referenceSeconds: 50
+  referenceSeconds: 60
   aiCountOverride: -1
   mountainFork: 3
   reversed: 0

@@ -85,13 +85,14 @@ namespace RacingGame.Tests
                     if (car.Surface == GroundSurface.Ground && path.OnFork(car.transform.position)) dirtTicks++;
                     int passed = racer.Progress.GatesPassedThisLap;
                     if (passed != previousGate) { gateChanges++; previousGate = passed; }
-                    if (branch && tick % 12 == 0 && start >= 0 && end < 0)
+                    if (branch && tick % 12 == 0 && start >= 0 && d < exit + 80f)
                     {
                         float branchD = fork.Project(car.transform.position, out float error);
                         if (!string.IsNullOrEmpty(traceDirectory))
                             curve.AppendLine(System.FormattableString.Invariant($"{SimulationDriver.Instance.Tick - runStart},{d:F2},{branchD:F2},{Mathf.Sqrt(error):F2},{car.SpeedKmh:F2},{car.Surface}"));
                         if (trace.Count == 12) trace.Dequeue();
-                        trace.Enqueue($"{d:F1}/{branchD:F1} err={Mathf.Sqrt(error):F1} v={car.SpeedKmh:F1} y={car.transform.position.y:F1} {car.Surface}");
+                        float lateral = path.Spline.LateralOffset(car.transform.position, d);
+                        trace.Enqueue($"{d:F1} lateral={lateral:F1} v={car.SpeedKmh:F1} y={car.transform.position.y:F1} {car.Surface} steer={car.LastCommand.Steer:F2}");
                     }
                     Assert.AreEqual(0, racer.AutoResets, $"{bodyId} branch={branch} d={d:F1}, {string.Join(" | ", trace)}");
                     yield return null;

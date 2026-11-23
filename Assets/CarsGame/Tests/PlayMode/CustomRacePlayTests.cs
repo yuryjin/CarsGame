@@ -17,6 +17,35 @@ namespace RacingGame.Tests
         private static void Choice(string row, string direction) =>
             GameObject.Find(row).transform.Find(direction).GetComponent<Button>().onClick.Invoke();
 
+        [UnityTest, Timeout(180000)]
+        public IEnumerator TheSelectedMountainSideRoadReachesTheCustomRace()
+        {
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            while (!PlatformGlue.IsReady) yield return null;
+            yield return null; yield return null;
+            var flow = Object.FindAnyObjectByType<GameFlow>();
+            try
+            {
+                var course = flow.events.First(e => e != null && e.mountainFork == MountainFork.Quarry);
+                Assert.IsTrue(Loc.TryGet(course.nameKey, out var courseName));
+                Object.FindAnyObjectByType<MenuScreens>().Show("events");
+                GameObject.Find("ConfigureCustom").GetComponent<Button>().onClick.Invoke();
+                string expected = Loc.Get("format.custom.course") + " · " + courseName;
+                for (int i = 0; i < flow.events.Length; i++)
+                {
+                    var caption = GameObject.Find("Course").transform.Find("Value").GetComponent<TMP_Text>().text;
+                    if (caption == expected) break;
+                    Choice("Course", "Next");
+                }
+                Assert.AreEqual(expected, GameObject.Find("Course").transform.Find("Value").GetComponent<TMP_Text>().text);
+                GameObject.Find("StartCustom").GetComponent<Button>().onClick.Invoke();
+                Assert.IsTrue(flow.CurrentEvent.IsCustom);
+                Assert.AreEqual(course.mountainFork, flow.CurrentEvent.mountainFork);
+                Assert.AreEqual(course.mountainFork, TrackPath.Instance.Fork.Course);
+            }
+            finally { flow.EnterMenu(); }
+        }
+
         [UnityTest, Timeout(300000)]
         public IEnumerator TwoCustomFieldsUseTheirOwnRulesAndKeepTheCareerRecord()
         {

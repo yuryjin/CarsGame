@@ -94,6 +94,11 @@ namespace RacingGame.Tests
                 yield return new WaitForFixedUpdate();
                 yield return new WaitForFixedUpdate();
                 Assert.AreEqual(0,p.AutoResets, "Only the host can reset a car reported off the road");
+                var received = p.Car.transform.position;
+                p.Car.ResetCar();
+                Assert.AreEqual(received, p.Car.transform.position);
+                Assert.IsTrue(p.Car.ReadRoomInput(100).ResetEdge);
+                Assert.IsFalse(p.Car.ReadRoomInput(101).ResetEdge);
             }
             finally { flow.EnterMenu(); GameFlow.Room = saved; }
         }

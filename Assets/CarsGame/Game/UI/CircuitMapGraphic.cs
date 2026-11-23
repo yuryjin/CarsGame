@@ -7,28 +7,53 @@ namespace RacingGame
     [RequireComponent(typeof(CanvasRenderer))]
     public sealed class CircuitMapGraphic : MaskableGraphic
     {
-        private readonly Vector2[] road = new Vector2[72];
-        private Vector2[] branch;
+        private const int BranchSamples = 17;
+        private readonly Vector3[] road = new Vector3[72];
+        private Vector3[] branch;
         private Vector2 minimum, maximum, start, heading;
         private bool configured;
 
         public void SetRoute(TrackSpline spline, float startDistance, TrackFork fork = null)
         {
+            if (fork == null) branch = null;
+            else
+            {
+                branch ??= new Vector3[BranchSamples];
+                for (int i = 0; i < branch.Length; i++) branch[i] = fork.Position(i / (float)(branch.Length - 1));
+            }
+            SetMainRoad(spline, startDistance);
+        }
+
+        internal void SetPreview(TrackSpline spline, float startDistance, TrackSpline mountainForward, MountainFork course)
+        {
+            if (mountainForward == null) branch = null;
+            else
+            {
+                branch ??= new Vector3[BranchSamples];
+                TrackFork.SampleCenterline(mountainForward, course, branch);
+            }
+            SetMainRoad(spline, startDistance);
+        }
+
+        private void SetMainRoad(TrackSpline spline, float startDistance)
+        {
             raycastTarget = false;
             for (int i = 0; i < road.Length; i++)
             {
-                road[i] = TopDown(spline.Position(spline.Length * i / road.Length));
-                minimum = i == 0 ? road[i] : Vector2.Min(minimum, road[i]);
-                maximum = i == 0 ? road[i] : Vector2.Max(maximum, road[i]);
+                road[i] = spline.Position(spline.Length * i / road.Length);
+                var point = TopDown(road[i]);
+                minimum = i == 0 ? point : Vector2.Min(minimum, point);
+                maximum = i == 0 ? point : Vector2.Max(maximum, point);
             }
+            if (branch != null)
+                foreach (var sample in branch)
+                {
+                    var point = TopDown(sample);
+                    minimum = Vector2.Min(minimum, point);
+                    maximum = Vector2.Max(maximum, point);
+                }
             start = TopDown(spline.Position(startDistance));
             heading = TopDown(spline.Tangent(startDistance)).normalized;
-            if (fork != null)
-            {
-                branch ??= new Vector2[17];
-                for (int i = 0; i < branch.Length; i++) branch[i] = TopDown(fork.Position(i / (float)(branch.Length - 1)));
-            }
-            else branch = null;
             configured = true;
             SetVerticesDirty();
         }
@@ -52,13 +77,13 @@ namespace RacingGame
             return origin + TopDown(world) * scale;
         }
 
-        private static void DrawPath(VertexHelper mesh, Vector2[] points, Vector2 origin, float scale, Color tint, bool closed)
+        private static void DrawPath(VertexHelper mesh, Vector3[] points, Vector2 origin, float scale, Color tint, bool closed)
         {
             int segments = closed ? points.Length : points.Length - 1;
             for (int i = 0; i < segments; i++)
             {
-                Vector2 a = origin + points[i] * scale;
-                Vector2 b = origin + points[(i + 1) % points.Length] * scale;
+                Vector2 a = origin + TopDown(points[i]) * scale;
+                Vector2 b = origin + TopDown(points[(i + 1) % points.Length]) * scale;
                 Vector2 side = Vector2.Perpendicular(b - a).normalized * 2f;
                 int index = mesh.currentVertCount;
                 mesh.AddVert(a + side, tint, Vector2.zero);

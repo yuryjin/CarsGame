@@ -107,7 +107,7 @@ namespace RacingGame
             {
                 stuckReset = true;
                 player.Car.ResetCar();
-                if (player.Health != null) player.Health.SetInvulnerable(1.5f);
+                if (!GameFlow.RoomReplica && player.Health != null) player.Health.SetInvulnerable(1.5f);
             }
 
             grassTime = player.Car.Surface == GroundSurface.Ground ? grassTime + dt : 0f;

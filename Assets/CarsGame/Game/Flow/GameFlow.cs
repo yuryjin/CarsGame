@@ -316,7 +316,7 @@ namespace RacingGame
                 abyssTrack = AbyssTrack.Create(track);
                 if (ev.spaceTrack) spaceTrack = SpaceTrack.Create(track, abyssTrack);
             }
-            if (onCircuit && track != null && abyssTrack == null && starRing == null && wasteland == null)
+            if (track != null && TrackFork.AppliesTo(ev))
             {
                 trackFork = TrackFork.Create(track, !viewing && pickups != null && (ev == null || ev.pickupCount > 0),
                     ev != null ? ev.mountainFork : MountainFork.Bridge);

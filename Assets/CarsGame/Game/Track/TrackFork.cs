@@ -115,32 +115,43 @@ namespace RacingGame
             return path.Wrap(start + span * fraction);
         }
 
-        private void Build(TrackSpline forward, bool hasRepair)
+        internal static bool AppliesTo(RaceEventDefinition ev) =>
+            ev == null || ev.mode == EventMode.Race && !ev.abyssTrack && !ev.spaceTrack && !ev.starRingTrack && !ev.wastelandTrack;
+
+        /// <summary>Sample the authored mountain branch before elevation. Menu cards only need its horizontal path.</summary>
+        internal static float SampleCenterline(TrackSpline forward, MountainFork course, Vector3[] output, Collider surface = null)
         {
-            float exit = IsDirt ? 310f : Exit;
+            bool quarry = course == MountainFork.Quarry;
+            float exit = quarry ? 310f : Exit;
             Vector3 a = forward.Position(Entry) + forward.Right(Entry) * 2.2f;
             Vector3 d = forward.Position(exit) + forward.Right(exit) * 2.2f;
             // Authored spline points are painted dashes, 1.5 cm above the road.
             // Anchor the physical deck to the road collider rather than that visual height.
-            var surface = GameObject.Find("RaceTrack/Track_Road")?.GetComponent<Collider>();
             if (surface != null)
             {
                 if (surface.Raycast(new Ray(a + Vector3.up, Vector3.down), out var entryHit, 2f)) a.y = entryHit.point.y;
                 if (surface.Raycast(new Ray(d + Vector3.up, Vector3.down), out var exitHit, 2f)) d.y = exitHit.point.y;
             }
-            Vector3 b = a + forward.Tangent(Entry) * (IsDirt ? 40f : 50f);
-            Vector3 c = d - forward.Tangent(exit) * (IsDirt ? 32f : 50f);
+            Vector3 b = a + forward.Tangent(Entry) * (quarry ? 40f : 50f);
+            Vector3 c = d - forward.Tangent(exit) * (quarry ? 32f : 50f);
+            for (int i = 0; i < output.Length; i++)
+            {
+                float t = i / (float)(output.Length - 1), u = 1f - t;
+                output[i] = u * u * u * a + 3f * u * u * t * b + 3f * u * t * t * c + t * t * t * d;
+            }
+            return exit;
+        }
+
+        private void Build(TrackSpline forward, bool hasRepair)
+        {
+            var surface = GameObject.Find("RaceTrack/Track_Road")?.GetComponent<Collider>();
+            float exit = SampleCenterline(forward, Course, points, surface);
             int hint = -1;
-            start = path.Spline.Project(a, ref hint, 0);
+            start = path.Spline.Project(points[0], ref hint, 0);
             hint = -1;
-            span = path.SignedDelta(start, path.Spline.Project(d, ref hint, 0));
+            span = path.SignedDelta(start, path.Spline.Project(points[Steps], ref hint, 0));
             hint = -1;
             RepairDistance = path.Spline.Project(forward.Position((Entry + exit) * 0.5f), ref hint, 0);
-            for (int i = 0; i <= Steps; i++)
-            {
-                float t = i / (float)Steps, u = 1f - t;
-                points[i] = u * u * u * a + 3f * u * u * t * b + 3f * u * t * t * c + t * t * t * d;
-            }
             // A raised deck edge is itself an obstacle even without its visual skirt.
             // Keep both merges flush until the whole branch clears the main road,
             // then form the flyover between those points with zero grade at each end.

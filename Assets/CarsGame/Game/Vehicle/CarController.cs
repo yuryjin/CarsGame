@@ -80,6 +80,7 @@ namespace RacingGame
         // destroying its colliders and accumulates across races; keep one shared instance.
         private static PhysicsMaterial frictionlessBodyMaterial;
         private ICarInputSource inputSource;
+        private bool roomResetRequested;
         private CarCannon cannon;
         internal ArenaBombDrop ArenaBomb { get; set; }
         private CarWeapons weapons;
@@ -235,6 +236,8 @@ namespace RacingGame
         public DriveCommand ReadRoomInput(int tick)
         {
             lastCommand = inputSource != null ? inputSource.Sample(tick) : DriveCommand.None(tick);
+            lastCommand.ResetEdge |= roomResetRequested;
+            roomResetRequested = false;
             return lastCommand;
         }
 
@@ -719,8 +722,11 @@ namespace RacingGame
         /// <summary>Put the car at a pose with zero velocity and neutral steering.</summary>
         public void Teleport(Vector3 position, Quaternion rotation)
         {
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+            if (!rb.isKinematic)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
             currentSteerAngle = 0f;
             drift.Cancel();
             draftCharge = 0f;
@@ -736,6 +742,11 @@ namespace RacingGame
         /// <summary>Back onto the track: the respawn provider decides where, else the last grounded pose.</summary>
         public void ResetCar()
         {
+            if (GameFlow.RoomReplica)
+            {
+                if (TryGetComponent<RaceParticipant>(out var participant) && participant.isPlayer) roomResetRequested = true;
+                return;
+            }
             if (status == null) status = GetComponent<CarStatus>();
             if (status != null) status.ClearAllStatuses();
 
