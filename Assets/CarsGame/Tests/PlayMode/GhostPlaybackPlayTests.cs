@@ -128,6 +128,19 @@ namespace RacingGame.Tests
         }
 
         [UnityTest, Timeout(180000)]
+        public IEnumerator ASubmillisecondFinishRemovesTheLaterPhysicsSample()
+        {
+            yield return BootFrozenPlayer();
+            var recorder = flow.GetComponent<GhostRecorder>();
+            recorder.Begin(player, 123, "Close finish");
+            recorder.Record.AddPose(Vector3.right, Quaternion.identity, .1002d, 0f, 0);
+            var record = recorder.Stop(.0996d);
+            Assert.AreEqual(2, record.Samples.Count);
+            Assert.AreEqual(99, record.DurationMilliseconds);
+            Assert.AreEqual(player.transform.position, record.Samples[1].Position);
+        }
+
+        [UnityTest, Timeout(180000)]
         public IEnumerator ReachingTheSampleLimitDiscardsTheIncompleteReplay()
         {
             yield return BootFrozenPlayer();

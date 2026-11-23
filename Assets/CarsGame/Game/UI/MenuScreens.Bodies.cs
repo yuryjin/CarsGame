@@ -43,7 +43,16 @@ namespace RacingGame
             Label(badge, "Achievement", skill + " · " + status, 25f, Vector2.zero, Vector2.one,
                 new Vector2(16f, 6f), new Vector2(-16f, -6f), mastery >= Core.Save.BodyMastery.BadgeAt ? UiFactory.Positive : UiFactory.Muted);
 
-            foreach (var def in CarBodies.OfClass(tab)) BodyRow(content, def, progress.cosmetics, def.Id == equipped, save.Data.Coins);
+            foreach (var def in CarBodies.OfClass(tab))
+            {
+                BodyRow(content, def, progress.cosmetics, def.Id == equipped, save.Data.Coins);
+                if ((def.Id == "sidewinder" || def.Id == "raider") && !CarBodies.Owns(progress.cosmetics, def.Id))
+                {
+                    var hint = Item(content, "Challenge_" + def.Id, 104f, false);
+                    Label(hint, "Goal", Loc.Get("body.challenge." + def.Id), 24f, Vector2.zero, Vector2.one,
+                        new Vector2(16f, 4f), new Vector2(-16f, -4f), UiFactory.Accent);
+                }
+            }
         }
 
         private void BodyRow(Transform content, BodyDef def, IList<string> owned, bool equipped, long coins)

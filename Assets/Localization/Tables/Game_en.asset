@@ -2805,6 +2805,176 @@ MonoBehaviour:
     m_Localized: '{n} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 29745034027151360
+    m_Localized: Last hits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122880
+    m_Localized: Final hit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122881
+    m_Localized: Enemy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122882
+    m_Localized: Knockout circuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122883
+    m_Localized: Each leader lap eliminates last place. In a simultaneous crossing,
+      the lower starting number stays.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122884
+    m_Localized: "Out \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317184
+    m_Localized: Unlock Sidewinder by finishing a race after taking a shortcut in
+      a buggy.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317185
+    m_Localized: Unlock Raider by finishing a race after ramming a car with an armored
+      body.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317186
+    m_Localized: "Challenge complete \xB7 {name} unlocked"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317187
+    m_Localized: Measure acceleration, braking and slalom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317188
+    m_Localized: "Automatic test \xB7 0\u201345 km/h and full braking"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317189
+    m_Localized: "Drive through each pair of posts \xB7 {n}/{all}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317190
+    m_Localized: "Gate missed \xB7 repeat the test"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317191
+    m_Localized: Measurement saved in the garage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317192
+    m_Localized: "0\u201345 {acc} \xB7 braking {m} m \xB7 slalom {slalom}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317193
+    m_Localized: Meet {name}, the orange car on the grid.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317194
+    m_Localized: "Grand final rematch \xB7 {name} is back."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317195
+    m_Localized: "Rival \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317196
+    m_Localized: You finished ahead of {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317197
+    m_Localized: '{name} finished ahead of you'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317198
+    m_Localized: "Duel with {name} \xB7 both drivers must finish"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317199
+    m_Localized: "You #{you} \xB7 {name} #{rival}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317200
+    m_Localized: Canyon rivals
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317201
+    m_Localized: "Reach the podium twice, then finish ahead of Rex. Reward \xB7 {reward}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511488
+    m_Localized: Unlock stage 6 to enter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511489
+    m_Localized: "Head-to-head \xB7 wins {wins} / losses {losses}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511490
+    m_Localized: Getaway
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511491
+    m_Localized: Escape across the finish. A pursuer within 7 m for 0.6 s catches
+      you. The bridge is a shortcut.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511492
+    m_Localized: You got away
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511493
+    m_Localized: You were intercepted
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511494
+    m_Localized: Two-car relay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511495
+    m_Localized: Choose two cars. Switch at the green arch halfway round the lap.
+      The Dune buggy is available on loan.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511496
+    m_Localized: First leg
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511497
+    m_Localized: Second leg
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511498
+    m_Localized: Custom race
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511499
+    m_Localized: Course
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511500
+    m_Localized: Rule
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511501
+    m_Localized: Standard rules
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511502
+    m_Localized: Hot Bomb needs a rival. Add at least one or choose another rule.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511503
+    m_Localized: Select an unlocked circuit and one of the listed rules.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511504
+    m_Localized: This exhibition has its own standings. Career records and rewards
+      stay in career events.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

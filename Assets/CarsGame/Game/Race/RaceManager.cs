@@ -40,6 +40,7 @@ namespace RacingGame
         public double RaceTime => State >= RaceState.Racing ? RaceClock.Now - RaceStartTime : 0d;
         public int CountdownValue { get; private set; }
         public RaceResults Results { get; private set; }
+        internal RelayRace Relay { get; set; }
         public IReadOnlyList<RaceParticipant> Participants => participants;
         public RaceParticipant Player => spawner != null ? spawner.Player : null;
 
@@ -64,6 +65,24 @@ namespace RacingGame
         private double allAiFinishedAt = -1;
         private float rankTimer, bandTimer;
 
+        public int EliminationStage { get; private set; }
+        public RaceParticipant LatestElimination { get; private set; }
+        private int nextElimination;
+        public event Action<RaceParticipant> OnStageEliminated;
+
+        public const double CloseFinishThreshold = .125;
+        public RaceParticipant PhotoFirst { get; private set; }
+        public RaceParticipant PhotoSecond { get; private set; }
+        public double PhotoGap { get; private set; }
+        private double photoEndsAt;
+        private readonly List<RaceParticipant> pendingFinishes = new List<RaceParticipant>(8);
+        private void ResetPhoto()
+        {
+            PhotoFirst = null; PhotoSecond = null; PhotoGap = 0d; photoEndsAt = 0d;
+            pendingFinishes.Clear();
+            EliminationStage = nextElimination = 0; LatestElimination = null;
+        }
+
         public int PositionOf(RaceParticipant p) => positions.TryGetValue(p, out int pos) ? pos : participants.Count;
 
         internal RaceParticipant ArenaLeader(out bool shared, out int runnerUpPoints)
@@ -81,7 +100,7 @@ namespace RacingGame
         }
 
         /// <summary>Wrecked for good (one-life race): classified DNF and no longer awaited at the finish.</summary>
-        public static bool IsOut(RaceParticipant p) => p != null && p.Health != null && p.Health.IsDead && !p.Health.respawnOnDeath;
+        public static bool IsOut(RaceParticipant p) => p != null && (p.RetiredOnStage != 0 || (p.Health != null && p.Health.IsDead && !p.Health.respawnOnDeath));
         // Finished or out. A wrecked player is never "done" here: the flow either revives them (rewarded
         // continue) or ends the race with EndForPlayerOut.
         private int DoneCount()
@@ -152,6 +171,7 @@ namespace RacingGame
             }
             participants.Clear();
             participants.AddRange(spawner.Participants);
+            ResetPhoto();
             finishTimes.Clear();
             finishEntries.Clear();
             positions.Clear();
@@ -180,6 +200,7 @@ namespace RacingGame
             DetachLapHandlers();
             authoredConstraints.Clear();
             if (spawner != null) spawner.Clear();
+            ResetPhoto();
             participants.Clear(); finishTimes.Clear(); finishEntries.Clear(); positions.Clear();
             Results = null;
             State = RaceState.Idle;
@@ -187,6 +208,8 @@ namespace RacingGame
 
         private void Update()
         {
+            if (nextElimination > EliminationStage) RetireLastRacer();
+            if (pendingFinishes.Count > 0) FlushFinishes();
             switch (State)
             {
                 case RaceState.Countdown: UpdateCountdown(); break;
@@ -251,14 +274,96 @@ namespace RacingGame
         {
             if (State == RaceState.Finished || State == RaceState.Idle) return;
             if (RaceSetup.Event != null && RaceSetup.Event.IsPractice) return;
-            if (lap >= laps && !finishTimes.ContainsKey(p)) Finish(p);
+            if (RaceSetup.Event != null && RaceSetup.Event.format == CircuitFormat.Relay && p.isPlayer && (Relay == null || !Relay.Exchanged))
+            {
+                EndRace();
+                return;
+            }
+            if (RaceSetup.Event != null && RaceSetup.Event.format == CircuitFormat.Elimination)
+            {
+                if (!IsOut(p)) nextElimination = Mathf.Max(nextElimination, lap);
+                return;
+            }
+            if (RaceSetup.Event != null && RaceSetup.Event.format == CircuitFormat.Pursuit && !p.isPlayer) return;
+            if (lap < laps || finishTimes.ContainsKey(p)) return;
+            finishTimes[p] = Math.Max(0d, p.Progress.LastCrossingTime - RaceStartTime);
+            pendingFinishes.Add(p);
+        }
+
+        private void RetireLastRacer()
+        {
+            EliminationStage = nextElimination;
+            Rank();
+            RaceParticipant last = null, remaining = null;
+            int active = 0;
+            foreach (var p in participants)
+            {
+                if (IsOut(p)) continue;
+                active++;
+                bool sameCrossing = last != null && p.Progress.LapsCompleted == EliminationStage && last.Progress.LapsCompleted == EliminationStage
+                    && p.Progress.LastCrossingTick == last.Progress.LastCrossingTick;
+                if (last == null || (sameCrossing ? p.Car.CarId > last.Car.CarId : PositionOf(p) > PositionOf(last))) { remaining = last; last = p; }
+                else remaining = p;
+            }
+            if (last == null) return;
+            if (active > 1)
+            {
+                LatestElimination = last;
+                last.RetireOnStage(EliminationStage);
+                OnStageEliminated?.Invoke(last);
+            }
+            else remaining = last;
+            if (active <= 2 && remaining != null)
+            {
+                finishTimes[remaining] = RaceTime;
+                Rank();
+                Finish(remaining);
+            }
+            else Rank();
+            if (active <= 2 || last.isPlayer) EndRace();
+        }
+
+        internal void EndPursuit(RaceParticipant catcher)
+        {
+            if (State != RaceState.Racing || catcher == null || RaceSetup.Event == null || RaceSetup.Event.format != CircuitFormat.Pursuit) return;
+            finishTimes[catcher] = RaceTime;
+            Rank(); Finish(catcher); EndRace();
+        }
+
+        private void FlushFinishes()
+        {
+            // All car controllers have stepped before Update. Rank using both crossing times even
+            // when the winner was simulated second and RaceClock had one value for the entire frame.
+            pendingFinishes.Sort((a, b) => finishTimes[a].CompareTo(finishTimes[b]));
+            Rank();
+            foreach (var p in pendingFinishes) Finish(p);
+            pendingFinishes.Clear();
+            if (RaceSetup.Event != null && RaceSetup.Event.format == CircuitFormat.Pursuit) { EndRace(); return; }
+            if (Player != null && PhotoFirst == null && finishTimes.TryGetValue(Player, out double playerTime))
+            {
+                double best = CloseFinishThreshold;
+                RaceParticipant rival = null;
+                foreach (var other in participants)
+                {
+                    if (other == Player || !finishTimes.TryGetValue(other, out double time)) continue;
+                    double gap = Math.Abs(time - playerTime);
+                    if (gap > best) continue;
+                    best = gap; rival = other;
+                }
+                if (rival != null)
+                {
+                    PhotoFirst = PositionOf(Player) < PositionOf(rival) ? Player : rival;
+                    PhotoSecond = PhotoFirst == Player ? rival : Player;
+                    PhotoGap = best;
+                    photoEndsAt = RaceClock.Now + 1.6d;
+                }
+            }
+            if (DoneCount() >= participants.Count && PhotoFirst == null) EndRace();
         }
 
         private void Finish(RaceParticipant p)
         {
             if (State == RaceState.Finished) return;
-            finishTimes[p] = RaceClock.Now - RaceStartTime;
-            Rank();                                  // placement is final before anyone reads PositionOf
             var entry = new RaceResultEntry();
             ReadResult(p, entry);
             entry.KillsPerVictim = p.KillTally.ToPerVictimCounts();
@@ -275,8 +380,6 @@ namespace RacingGame
                 var ai = p.GetComponent<AiDriver>();
                 if (ai != null) ai.speedMultiplier = 0.85f;      // finished AI cruise out of the way
             }
-            Rank();
-            if (DoneCount() >= participants.Count) EndRace();
         }
 
         /// <summary>
@@ -288,12 +391,21 @@ namespace RacingGame
             if (!DebugBus.CheatsAllowed) return;
             if (State != RaceState.Racing && State != RaceState.Finishing) return;
             var player = Player;
-            if (player != null && !finishTimes.ContainsKey(player)) Finish(player);
+            if (player != null && !finishTimes.ContainsKey(player))
+            {
+                finishTimes[player] = RaceClock.Now - RaceStartTime;
+                Rank(); Finish(player);
+            }
             EndRace();
         }
 
         private void UpdateRacing()
         {
+            if (PhotoFirst != null)
+            {
+                if (RaceClock.Now >= photoEndsAt) EndRace();
+                return;
+            }
             rankTimer += Time.unscaledDeltaTime;
             if (rankTimer >= 0.1f) { rankTimer = 0f; Rank(); }
 
@@ -334,7 +446,8 @@ namespace RacingGame
                     CarId = p.Car != null ? p.Car.CarId : i,
                     Finished = finished,
                     FinishTime = t,
-                    TotalProgress = p.Progress != null ? p.Progress.TotalProgress : 0d,
+                    TotalProgress = p.RetiredOnStage != 0 && p.Progress != null ? -2d * p.Progress.Path.Length + p.RetiredOnStage
+                        : p.Progress != null ? p.Progress.TotalProgress : 0d,
                     Kills = p.Kills,
                     Points = p.Score?.Points.Total ?? 0,
                     Deaths = p.Deaths
@@ -381,7 +494,7 @@ namespace RacingGame
         public void ReadResult(RaceParticipant p, RaceResultEntry entry)
         {
             finishEntries.TryGetValue(p, out var finishedEntry);
-            entry.Name = p.displayName; entry.IsPlayer = p.isPlayer;
+            entry.Name = p.displayName; entry.RivalId = p.rivalId; entry.IsPlayer = p.isPlayer;
             entry.CarId = p.Car.CarId;
             entry.ArenaPoints = p.Score?.Points ?? default;
             entry.Assists = p.Score?.Assists ?? 0;
@@ -400,6 +513,7 @@ namespace RacingGame
             entry.Shortcuts = finishedEntry != null ? finishedEntry.Shortcuts : p.Shortcuts;
             entry.CeilingBoosts = finishedEntry != null ? finishedEntry.CeilingBoosts : p.CeilingBoosts;
             entry.BombPasses = finishedEntry != null ? finishedEntry.BombPasses : p.BombPasses;
+            entry.Rams = finishedEntry != null ? finishedEntry.Rams : p.Rams;
             entry.Resets = finishedEntry != null ? finishedEntry.Resets : p.Resets;
             entry.CleanFinalLap = finishedEntry != null ? finishedEntry.CleanFinalLap : p.CleanFinalLap;
             entry.Survived = entry.Deaths == 0;

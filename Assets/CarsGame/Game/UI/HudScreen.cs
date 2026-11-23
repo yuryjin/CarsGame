@@ -149,6 +149,9 @@ namespace RacingGame
         private RectTransform finishPanel;
         private TextMeshProUGUI finishTitle, finishSummary;
         private Button finishResultsButton;
+        private RawImage finishPhoto;
+        private Texture2D finishTexture;
+        private RaceParticipant picturedFirst;
         private CarController playerCar;
         private CarHealth playerHealth;
         private float hintUntil;
@@ -174,6 +177,7 @@ namespace RacingGame
             race.OnRaceStarted += OnStarted;
             race.OnRaceFinished += OnFinished;
             race.OnPositionsChanged += RefreshPosition;
+            race.OnStageEliminated += OnStageEliminated;
             PauseController.PausedChanged += OnPaused;
             TouchControlsPresenter.ShownChanged += OnTouchShown;
             if (touchLayout != TouchControlsPresenter.IsShown) OnTouchShown(TouchControlsPresenter.IsShown);
@@ -193,6 +197,7 @@ namespace RacingGame
                 race.OnRaceStarted -= OnStarted;
                 race.OnRaceFinished -= OnFinished;
                 race.OnPositionsChanged -= RefreshPosition;
+                race.OnStageEliminated -= OnStageEliminated;
             }
             PauseController.PausedChanged -= OnPaused;
             TouchControlsPresenter.ShownChanged -= OnTouchShown;
@@ -310,6 +315,7 @@ namespace RacingGame
             BuildWeaponWheel(root);
             BuildMiniMap(root);
             BuildFinishCard(root);
+            BuildDeathReport(root);
             BuildPause(root);
 
             hintUntil = Time.unscaledTime + hintSeconds;
@@ -381,7 +387,60 @@ namespace RacingGame
                 new Vector2(0f, 1f), Vector2.one, new Vector2(24f, -158f), new Vector2(-24f, -96f));
             finishResultsButton = UiFactory.Button(finishPanel, "FinishResults", "", () => race.ShowResultsAfterFinish(),
                 Vector2.zero, new Vector2(1f, 0f), new Vector2(36f, 26f), new Vector2(-36f, 102f), 30f);
+            var image = new GameObject("FinishPhoto", typeof(RectTransform), typeof(RawImage));
+            image.transform.SetParent(finishPanel, false);
+            finishPhoto = image.GetComponent<RawImage>();
+            finishPhoto.raycastTarget = false;
+            var frame = finishPhoto.rectTransform;
+            frame.anchorMin = new Vector2(0, 1); frame.anchorMax = Vector2.one;
+            frame.offsetMin = new Vector2(18, -226); frame.offsetMax = new Vector2(-18, -65);
+            image.SetActive(false);
             finishPanel.gameObject.SetActive(false);
+        }
+
+        private void CaptureFinishPhoto()
+        {
+            var cam = Camera.main;
+            if (cam == null || SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) return;
+            const int width = 640, height = 192;
+            if (finishTexture == null) finishTexture = new Texture2D(width, height, TextureFormat.RGB24, false);
+            var target = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.ARGB32);
+            var oldTarget = cam.targetTexture; var active = RenderTexture.active;
+            var original = new Pose(cam.transform.position, cam.transform.rotation);
+            float oldFov = cam.fieldOfView, oldAspect = cam.aspect;
+            float viewAspect = cam.pixelWidth / (float)Mathf.Max(1, cam.pixelHeight);
+            bool automaticAspect = Mathf.Abs(oldAspect - viewAspect) < .001f;
+            var ghosts = new List<Renderer>();
+            foreach (var ghost in FindObjectsByType<GhostCar>())
+                if (ghost.TryGetComponent<Renderer>(out var renderer) && !renderer.forceRenderingOff)
+                {
+                    ghosts.Add(renderer); renderer.forceRenderingOff = true;
+                }
+            try
+            {
+                var first = race.PhotoFirst; var second = race.PhotoSecond;
+                var path = first.Progress.Path;
+                Vector3 centre = (first.Car.Body.position + second.Car.Body.position) * .5f + Vector3.up * .55f;
+                Vector3 forward = path.Spline.Tangent(path.startLineDistance);
+                Vector3 outside = Vector3.Cross(Vector3.up, forward).normalized;
+                cam.transform.position = centre + outside * 10f + Vector3.up * 6f + forward * 7f;
+                cam.transform.LookAt(centre, Vector3.up);
+                cam.targetTexture = target; cam.aspect = width / (float)height; cam.fieldOfView = 28f;
+                cam.Render();
+                RenderTexture.active = target;
+                finishTexture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+                finishTexture.Apply(false);
+                finishPhoto.texture = finishTexture;
+            }
+            finally
+            {
+                RenderTexture.active = active; cam.targetTexture = oldTarget;
+                cam.fieldOfView = oldFov;
+                if (automaticAspect) cam.ResetAspect(); else cam.aspect = oldAspect;
+                cam.transform.SetPositionAndRotation(original.position, original.rotation);
+                foreach (var ghost in ghosts) if (ghost != null) ghost.forceRenderingOff = false;
+                RenderTexture.ReleaseTemporary(target);
+            }
         }
 
         private void UpdateFinishCard()
@@ -389,11 +448,28 @@ namespace RacingGame
             bool visible = race.CanShowResults && !PauseController.IsPaused;
             bool wasVisible = finishPanel.gameObject.activeSelf;
             finishPanel.gameObject.SetActive(visible);
-            if (!visible || wasVisible) return;
+            if (!visible) { picturedFirst = null; return; }
+            if (wasVisible && picturedFirst == race.PhotoFirst) return;
+            picturedFirst = race.PhotoFirst;
+            bool photo = picturedFirst != null;
+            finishPanel.offsetMin = photo ? new Vector2(-300f, -202f) : new Vector2(-300f, -140f);
+            finishPanel.offsetMax = -finishPanel.offsetMin;
+            finishPhoto.gameObject.SetActive(photo);
+            finishTitle.rectTransform.offsetMin = new Vector2(24f, photo ? -61f : -90f);
+            finishTitle.rectTransform.offsetMax = new Vector2(-24f, photo ? -5f : -20f);
+            finishSummary.rectTransform.offsetMin = new Vector2(18f, photo ? -309f : -158f);
+            finishSummary.rectTransform.offsetMax = new Vector2(-18f, photo ? -226f : -96f);
             centerText.text = "";
             finishTitle.text = Loc.Get("hud.finish");
             finishSummary.text = Loc.Format("hud.position", "pos", race.PositionOf(race.Player), "n", race.Participants.Count)
                 + " · " + UiFactory.FormatTime(race.PlayerElapsedTime);
+            if (photo)
+            {
+                CaptureFinishPhoto();
+                var second = race.PhotoSecond;
+                finishSummary.text = race.PositionOf(picturedFirst) + ". " + UiFactory.Escape(picturedFirst.displayName)
+                    + "\n" + race.PositionOf(second) + ". " + UiFactory.Escape(second.displayName) + "   +" + UiFactory.FormatTime(race.PhotoGap);
+            }
             finishResultsButton.GetComponentInChildren<TextMeshProUGUI>().text = Loc.Get("results.title");
             EventSystem.current?.SetSelectedGameObject(finishResultsButton.gameObject);
         }
@@ -609,6 +685,7 @@ namespace RacingGame
 
         private void ApplyStaticTexts()
         {
+            RefreshDeathReport();
             ApplyLayout(touchLayout);
             RefreshModelLabel();
             pauseText.text = Loc.Get("pause.title"); pauseHint.text = Loc.Get("experience.help");
@@ -1062,7 +1139,11 @@ namespace RacingGame
             if (playerCar == null && race.Player != null)
             {
                 playerCar = race.Player.Car;
-                if (playerHealth != null) playerHealth.OnHealthChanged -= OnHealth;
+                if (playerHealth != null)
+                {
+                    playerHealth.OnHealthChanged -= OnHealth;
+                    playerHealth.OnRespawned -= ResetDeathReport;
+                }
                 if (playerCannon != null) playerCannon.AmmoChanged -= OnAmmo;
                 if (playerWeapons != null) { playerWeapons.PrimarySwitched -= OnPrimarySwitched; playerWeapons.PrimarySwitchDenied -= OnPrimarySwitchDenied; }
                 playerHealth = race.Player.Health;
@@ -1082,7 +1163,11 @@ namespace RacingGame
 
                 RaceDirector.Instance.OnKillRegistered -= OnKillRegistered;
                 RaceDirector.Instance.OnKillRegistered += OnKillRegistered;
-                if (playerHealth != null) playerHealth.OnHealthChanged += OnHealth;
+                if (playerHealth != null)
+                {
+                    playerHealth.OnHealthChanged += OnHealth;
+                    playerHealth.OnRespawned += ResetDeathReport;
+                }
                 OnHealth(playerHealth != null ? playerHealth.Health : 100f, playerHealth != null ? playerHealth.maxHealth : 100f);
                 RefreshPosition();
             }
@@ -1501,6 +1586,7 @@ namespace RacingGame
             }
             else
             {
+                RememberHit(hit, result);
                 incomingSource = hit.Attacker != null ? hit.Attacker.transform.position : hit.Point;
                 incomingUntil = Time.time + 0.85f;
                 var attacker = hit.Attacker != null ? hit.Attacker.GetComponent<RaceParticipant>() : null;
@@ -1695,6 +1781,13 @@ namespace RacingGame
             hpText.text = current <= 0f ? Loc.Get("hud.wrecked") : Loc.Format("hud.hp", "hp", Mathf.CeilToInt(current));
         }
 
+        private void OnStageEliminated(RaceParticipant p)
+        {
+            int grid = 1;
+            foreach (var participant in race.Participants) { if (participant == p) break; grid++; }
+            ShowEvent(Loc.Format("format.eliminated", "name", "#" + grid + " " + UiFactory.Escape(GetLocalizedRacerName(p.displayName, p.isPlayer))), UiFactory.Accent);
+        }
+
         private void RefreshPosition()
         {
             if (race.Player == null) return;
@@ -1761,6 +1854,7 @@ namespace RacingGame
             finishPanel.gameObject.SetActive(false);
             if (visible)
             {
+                ResetDeathReport();
                 StartMiniMap();
                 RefreshModelLabel();
                 bool practice = gameFlow != null && gameFlow.IsPractice;
@@ -1881,7 +1975,11 @@ namespace RacingGame
 
         private void OnDestroy()
         {
-            if (playerHealth != null) playerHealth.OnHealthChanged -= OnHealth;
+            if (playerHealth != null)
+            {
+                playerHealth.OnHealthChanged -= OnHealth;
+                playerHealth.OnRespawned -= ResetDeathReport;
+            }
             if (playerCannon != null) playerCannon.AmmoChanged -= OnAmmo;
             if (playerWeapons != null) { playerWeapons.PrimarySwitched -= OnPrimarySwitched; playerWeapons.PrimarySwitchDenied -= OnPrimarySwitchDenied; }
             var director = RaceDirector.Current;
@@ -1890,6 +1988,7 @@ namespace RacingGame
                 director.OnKillRegistered -= OnKillRegistered;
             }
             if (healthFillSprite != null) Destroy(healthFillSprite);
+            if (finishTexture != null) Destroy(finishTexture);
         }
     }
 

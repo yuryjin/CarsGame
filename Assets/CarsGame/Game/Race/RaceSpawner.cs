@@ -71,7 +71,8 @@ namespace RacingGame
             }
             int total = aiCount + 1;
             bool introTarget = RaceSetup.IsIntroRace && total > 1 && !site;
-            int playerSlot = RaceSetup.Event != null && RaceSetup.Event.eventId == "e1" ? Mathf.Min(1, total - 1)
+            bool pursuit = RaceSetup.Event != null && RaceSetup.Event.format == CircuitFormat.Pursuit;
+            int playerSlot = pursuit ? 0 : RaceSetup.Event != null && RaceSetup.Event.eventId == "e1" ? Mathf.Min(1, total - 1)
                 : playerGridSlot < 0 ? total - 1 : Mathf.Clamp(playerGridSlot, 0, total - 1);
             int aiIndex = 0;
             for (int slot = 0; slot < total; slot++)
@@ -81,6 +82,11 @@ namespace RacingGame
                 if (arena) Arena.GetSpawnPose(slot, total, out pos, out rot);
                 else if (site) Site.GetSpawnPose(slot, total, out pos, out rot);
                 else grid.GetSlot(slot, track, out pos, out rot, out lane);
+                if (pursuit && !isPlayer)
+                {
+                    track.Pose(track.Wrap(track.startLineDistance - grid.poleSetback - 40f - slot * 7f), lane, out pos, out rot);
+                    pos += Vector3.up * grid.dropHeight;
+                }
                 if (introTarget && slot == 0)
                 {
                     // The first rival starts in the player's lane, just ahead of the line of fire.
@@ -90,6 +96,7 @@ namespace RacingGame
                 }
                 var go = Instantiate(raceCarPrefab, pos, rot);
                 go.name = isPlayer ? "Player_Car" : $"AI_Car_{aiIndex + 1}";
+                if (isPlayer && RaceSetup.Event != null && RaceSetup.Event.format == CircuitFormat.Relay) CarBody.PrepareRelay(go);
                 CarBody.Apply(go, isPlayer ? PlayerBody() : RivalBody(aiIndex));   // before drivers and upgrades, which build on it
                 var car = go.GetComponent<CarController>();
                 var participant = go.GetComponent<RaceParticipant>() ?? go.AddComponent<RaceParticipant>();
@@ -128,17 +135,25 @@ namespace RacingGame
                 {
                     participant.displayName = aiNames.Length > 0 ? aiNames[aiIndex % aiNames.Length] : $"AI {aiIndex + 1}";
                     paint.SetColor(paints.Length > 0 ? paints[aiIndex % paints.Length] : Color.gray);
-                    var profile = profiles != null && profiles.Length > 0 ? profiles[aiIndex % profiles.Length] : null;
+                    var profile = ProfileFor(aiIndex);
                     if (profile != null)
                     {
                         if (!string.IsNullOrEmpty(profile.rivalName))
                             participant.displayName = profile.rivalName;
+                        if (!string.IsNullOrEmpty(profile.rivalId))
+                        {
+                            int ordinal = 1;
+                            string candidate = profile.rivalId;
+                            while (participants.Exists(other => other.rivalId == candidate)) candidate = profile.rivalId + "#" + ++ordinal;
+                            participant.rivalId = candidate;
+                        }
                         paint.SetColor(profile.paint);
                         profile.Equip(participant.Weapons);
                     }
                     participant.displayName = UniqueRivalName(participant.displayName);
                     var gunner = go.GetComponent<AiGunner>() ?? go.AddComponent<AiGunner>();
                     gunner.Initialize(profile, aiFireCooldown);
+                    if (pursuit) gunner.enabled = false;
                     gunner.startGraceSeconds = RaceSetup.Event != null && RaceSetup.Event.eventId == "e1" ? 30f : 3f;
                     if (site) car.SetInputSource(Site.CreateBotDriver(go, profile));
                     else if (arena)
@@ -188,15 +203,26 @@ namespace RacingGame
         private Core.Economy.BodyDef PlayerBody()
         {
             if (DailyRace.IsDaily(RaceSetup.Event)) return Core.Economy.CarBodies.Default;
+            if (RaceSetup.Event != null && RaceSetup.Event.format == CircuitFormat.Relay) return Core.Economy.CarBodies.Get(RelayRace.First(RaceSetup.Event));
             if (!string.IsNullOrEmpty(playerBodyId)) return Core.Economy.CarBodies.Get(playerBodyId);
             var progress = PlatformGlue.Save?.Data.progress;
             return Core.Economy.CarBodies.Get(progress != null ? Core.Economy.CarBodies.Selected(progress.cosmetics, progress.body) : null);
         }
 
+        private AiDriverProfile ProfileFor(int aiIndex)
+        {
+            var featured = RaceSetup.Event != null ? RaceSetup.Event.featuredRival : null;
+            if (featured != null && aiIndex == 0) return featured;
+            if (profiles == null || profiles.Length == 0) return null;
+            int slot = aiIndex % profiles.Length;
+            if (featured != null && slot > 0 && slot == System.Array.IndexOf(profiles, featured)) return profiles[0];
+            return profiles[slot];
+        }
+
         private Core.Economy.BodyDef RivalBody(int aiIndex)
         {
             if (!aiBodyVariety) return Core.Economy.CarBodies.Default;
-            var profile = profiles != null && profiles.Length > 0 ? profiles[aiIndex % profiles.Length] : null;
+            var profile = ProfileFor(aiIndex);
             string eventId = RaceSetup.Event != null ? RaceSetup.Event.eventId : "";
             int seed = 17;
             foreach (char ch in eventId) seed = seed * 31 + ch;   // stable across runs, unlike string.GetHashCode

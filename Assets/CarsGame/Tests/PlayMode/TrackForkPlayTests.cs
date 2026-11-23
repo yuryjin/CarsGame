@@ -306,16 +306,19 @@ namespace RacingGame.Tests
         }
 
         // Shared physical driver for the ordinary bridge and the repeatable shortcut lesson.
-        internal static IEnumerator DriveBranch(RaceManager race, TrackFork fork, ScriptedDriverInput input, bool reverse)
+        internal static IEnumerator DriveBranch(RaceManager race, TrackFork fork, ScriptedDriverInput input, bool reverse, bool rollIn = false)
         {
             var car = race.Player.Car;
             var path = race.Player.Progress.Path;
             float first = reverse ? 1f : 0f;
             Vector3 facing = fork.Position(reverse ? 0.98f : 0.02f) - fork.Position(first);
             facing.y = 0f;
-            car.Teleport(fork.Position(first) + Vector3.up * 0.5f, Quaternion.LookRotation(facing));
-            input.Set(0f, 0f);
-            for (int i = 0; i < 25; i++) yield return null;
+            if (!rollIn)
+            {
+                car.Teleport(fork.Position(first) + Vector3.up * 0.5f, Quaternion.LookRotation(facing));
+                input.Set(0f, 0f);
+                for (int i = 0; i < 25; i++) yield return null;
+            }
             int farthest = 0;
             int ticks = 0;
             for (; ticks < 1500 && farthest < 198; ticks++)
@@ -345,7 +348,9 @@ namespace RacingGame.Tests
                 float lateral = Vector3.Dot(p1 - car.transform.position, right) * 0.6f - Vector3.Dot(car.Body.linearVelocity, right) * 0.15f;
                 float correction = angle - target.magnitude * curvature * 0.5f * Mathf.Rad2Deg;
                 float steer = Mathf.Clamp(feed + lateral + correction / 35f - (car.Body.angularVelocity.y - speed * curvature) * 0.7f, -1f, 1f);
-                float desired = Mathf.Min(45f, car.MaxSpeedForCurvature(curvature) * 3.6f * 0.85f);
+                float desired = Mathf.Min(rollIn ? 37f : 45f, car.MaxSpeedForCurvature(curvature) * 3.6f * (rollIn ? .76f : .85f));
+                if (rollIn && ticks % 125 == 0)
+                    Debug.Log($"[GetawayBridge] tick={ticks} sample={best} speed={car.SpeedKmh:F1}km/h error={Mathf.Sqrt(error):F2} state={race.State}");
                 input.Set(car.SpeedKmh < desired ? 1f : -0.4f, steer);
                 yield return null;
                 Assert.AreEqual(0, race.Player.AutoResets, $"bridge recovery at sample={best} tick={ticks} error={Mathf.Sqrt(error):F2}");

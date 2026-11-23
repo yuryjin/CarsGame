@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Event_e1
   m_EditorClassIdentifier: RacingGame.Game::RacingGame.RaceEventDefinition
   eventId: e1
+  featuredRival: {fileID: 11400000, guid: 930748c3952cb6345a44345b411334b2, type: 2}
   nameKey: events.e1.name
   laps: 2
   referenceSeconds: 106

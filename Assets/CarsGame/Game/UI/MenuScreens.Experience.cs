@@ -156,6 +156,38 @@ namespace RacingGame
             return true;
         }
 
+        private static string RivalRecord(string id)
+        {
+            var score = Core.Save.RivalScore.Total(PlatformGlue.Save.Data.progress, id);
+            return Loc.Format("duel.record", "wins", score.wins, "losses", score.losses);
+        }
+
+        private void BuildRivalPreview(Transform content, RaceEventDefinition ev)
+        {
+            var rival = ev != null ? ev.featuredRival : null;
+            if (rival == null) return;
+            var row = Item(content, "Rival_" + ev.eventId, 145f);
+            string key = ev.eventId == "e1" ? "duel.first" : ev.eventId == "e15" ? "duel.final" : "duel.rival";
+            Label(row, "Intro", Loc.Format(key, "name", UiFactory.Escape(rival.rivalName)) + "\n" + RivalRecord(rival.rivalId), 26f, Vector2.zero, Vector2.one,
+                new Vector2(18f, 6f), new Vector2(-18f, -6f), UiFactory.Accent);
+        }
+
+        private void ShowFeaturedDuel(Transform content, RaceResults results)
+        {
+            var profile = flow.CurrentEvent != null ? flow.CurrentEvent.featuredRival : null;
+            if (profile == null || string.IsNullOrEmpty(profile.rivalId)) return;
+            var rival = results.Entries.Find(entry => entry.RivalId == profile.rivalId);
+            if (rival == null || results.Player == null) return;
+            var row = Item(content, "FeaturedDuel", 178f);
+            string outcome = !rival.Finished || !results.Player.Finished ? "duel.unclassified"
+                : results.Player.Position < rival.Position ? "duel.won" : "duel.lost";
+            string text = Loc.Format(outcome, "name", UiFactory.Escape(profile.rivalName));
+            if (rival.Finished && results.Player.Finished)
+                text += "\n" + Loc.Format("duel.places", "you", results.Player.Position, "name", UiFactory.Escape(profile.rivalName), "rival", rival.Position);
+            text += "\n" + RivalRecord(profile.rivalId);
+            Label(row, "Outcome", text, 27f, Vector2.zero, Vector2.one, new Vector2(18f, 6f), new Vector2(-18f, -6f));
+        }
+
         private RaceEventDefinition CupNext(RaceCup cup)
         {
             var list = Events();
@@ -179,8 +211,32 @@ namespace RacingGame
             return unlockStep ?? missingStar;
         }
 
+        private void BuildChapter(Transform content)
+        {
+            var p = PlatformGlue.Save.Data.progress;
+            int step = RaceCups.ChapterStep(p);
+            bool complete = step == RaceCups.ChapterEvents.Length;
+            var ev = Array.Find(flow.events, x => x != null && x.eventId == RaceCups.ChapterEvents[Math.Min(step, 2)]);
+            if (ev == null) return;
+            var row = Item(content, "CanyonChapter", Narrow ? 300f : 253f);
+            Label(row, "Title", Loc.Get("chapter.title") + " · " + step + "/3", 30f, Top, Vector2.one,
+                new Vector2(20f, -55f), new Vector2(-20f, -8f), UiFactory.Accent);
+            string reward = Loc.Get(RaceCups.ChapterReward.Replace(':', '.'));
+            string stages = string.Join(" › ", Array.ConvertAll(RaceCups.ChapterEvents, id =>
+            {
+                var member = Array.Find(flow.events, e => e != null && e.eventId == id);
+                return member == null ? id : Loc.Get(member.nameKey);
+            }));
+            Label(row, "Route", stages + "\n" + Loc.Format("chapter.route", "reward", reward), 23f,
+                Vector2.zero, Vector2.one, new Vector2(20f, 84f), new Vector2(-20f, -60f));
+            UiFactory.Button(row, "ChapterStart", complete ? Loc.Get("cup.complete") : flow.IsUnlocked(ev) ? Loc.Get(ev.nameKey) + "  ›" : Loc.Get("chapter.entry"),
+                !complete && flow.IsUnlocked(ev) ? () => flow.StartRace(ev, SelectedTier()) : (Action)null,
+                Vector2.zero, new Vector2(1f, 0f), new Vector2(15f, 8f), new Vector2(-15f, 78f), 25f, complete ? UiFactory.Positive : UiFactory.Raised);
+        }
+
         private void BuildCups(Transform content)
         {
+            BuildChapter(content);
             Section(content, "CupsTitle", Loc.Get("cup.title"));
             foreach (var cup in RaceCups.All)
             {

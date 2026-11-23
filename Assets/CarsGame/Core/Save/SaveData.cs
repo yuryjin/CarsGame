@@ -108,6 +108,7 @@ namespace RacingGame.Core.Save
         public int deaths;
         public double distanceKm;
         public int[] mastery = new int[4];
+        public List<RivalScore> duels = new List<RivalScore>();
         public List<BodyFinishCount> bodyFinishes = new List<BodyFinishCount>();
     }
 
@@ -133,7 +134,9 @@ namespace RacingGame.Core.Save
 
     [Serializable] public class ProgressData
     {
+        public bool canyonChapterWon;
         public string bodyGoal = "";
+        public List<BodyMeasurement> measurements = new List<BodyMeasurement>();
         public FinishGap closestFinish;
         public List<WeaponPin> weaponPins = new List<WeaponPin>();
         public GarageSet[] garageSets = new GarageSet[GarageSet.Slots];
@@ -170,7 +173,7 @@ namespace RacingGame.Core.Save
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 15;
+        public const int CurrentVersion = 18;
         public int version = CurrentVersion;
         public long updatedAtUnixMs;
         public string deviceId = "";

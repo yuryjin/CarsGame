@@ -50,6 +50,8 @@ namespace RacingGame.Core.Save
             var owned = new HashSet<string>(a.progress.cosmetics ?? new List<string>());
             foreach (var c in b.progress.cosmetics ?? new List<string>()) owned.Add(c);
             m.progress.cosmetics = new List<string>(owned);
+            m.progress.canyonChapterWon = a.progress.canyonChapterWon || b.progress.canyonChapterWon;
+            Economy.RaceCups.FinishChapter(m.progress, "", false);
             WeeklyGoals.MergeInto(m.progress, a.progress.weekly, b.progress.weekly);
             m.progress.cosmetics.Sort(StringComparer.Ordinal);
             m.progress.paint = newer.progress.paint ?? "";
@@ -59,6 +61,7 @@ namespace RacingGame.Core.Save
             m.progress.ResolveBodyGoal();
             m.progress.stripe = newer.progress.stripe ?? "";
             m.progress.recentAttempts = RecentAttempts.Merge(a.progress.recentAttempts, b.progress.recentAttempts);
+            m.progress.measurements = BodyMeasurement.Merge(a.progress.measurements, b.progress.measurements);
             m.progress.weaponPins = WeaponPin.Merge(a.progress.weaponPins, b.progress.weaponPins);
             m.progress.garageSets = GarageSet.Merge(a.progress.garageSets, b.progress.garageSets);
             m.progress.closestFinish = DriverProfile.Closest(a.progress.closestFinish, b.progress.closestFinish);
@@ -109,10 +112,17 @@ namespace RacingGame.Core.Save
             cur.deaths = Math.Max(cur.deaths, r.deaths);
             cur.distanceKm = Math.Max(cur.distanceKm, r.distanceKm);
             cur.mastery = BodyMastery.Merge(cur.mastery, r.mastery);
+            cur.duels = RivalScore.Merge(cur.duels, r.duels);
             cur.bodyFinishes = DriverProfile.MergeCounts(cur.bodyFinishes, r.bodyFinishes);
         }
 
-        private static DeviceLedger Copy(DeviceLedger r) => new DeviceLedger { deviceId = r.deviceId ?? "", coinsEarned = r.coinsEarned, coinsSpent = r.coinsSpent, races = r.races, wins = r.wins, kills = r.kills, deaths = r.deaths, distanceKm = r.distanceKm, mastery = BodyMastery.Merge(r.mastery, null), bodyFinishes = DriverProfile.MergeCounts(r.bodyFinishes, null) };
+        private static DeviceLedger Copy(DeviceLedger r) => new DeviceLedger
+        {
+            deviceId = r.deviceId ?? "", coinsEarned = r.coinsEarned, coinsSpent = r.coinsSpent,
+            races = r.races, wins = r.wins, kills = r.kills, deaths = r.deaths, distanceKm = r.distanceKm,
+            mastery = BodyMastery.Merge(r.mastery, null), bodyFinishes = DriverProfile.MergeCounts(r.bodyFinishes, null),
+            duels = RivalScore.Merge(r.duels, null)
+        };
 
         private static int At(int[] arr, int i) => arr != null && i < arr.Length ? arr[i] : 0;
         private static void Best(Dictionary<string, EventBest> d, EventBest e)

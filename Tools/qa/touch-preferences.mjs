@@ -50,13 +50,24 @@ try {
         await send('touchStart', [await point(name)]); await page.waitForTimeout(80);
         await send('touchEnd', []); await page.waitForTimeout(300);
       };
-      const toggle = async name => {
+      const toggle = async (key, prefix, value) => {
+        const name = prefix + (value ? 'On' : 'Off');
         for (let n = 0; n < 40; n++) {
           const b = (await cmd('ui')).buttons.find(b => b.name === name);
           assert(b, name);
-          const top = width < 1000 ? 72 : 110;
-          if (b.y * height - b.height / 2 > top && b.y * height + b.height / 2 < height - 10) return tap(name);
-          const delta = b.y * height - (top + height - 10) / 2;
+          // Unity includes masked buttons in the UI dump. The settings frame has its own
+          // header, bottom margin and footer, so the canvas edges are outside the scroll view.
+          const centre = b.y * height;
+          if (centre - b.height / 2 > height * .28 && centre + b.height / 2 < height * .78) {
+            await tap(name);
+            await page.waitForFunction(({ key, value }) => {
+              const cloud = JSON.parse(localStorage.getItem('cars.mock.playerdata') || '{}');
+              return JSON.parse(cloud.save || '{}').settings?.[key] === value;
+            }, { key, value }, { timeout: 15000 });
+            evidence.push({ width, height, phase: 'saved-setting', key, value, x: b.x * width, y: centre });
+            return;
+          }
+          const delta = centre - height * .53;
           await page.mouse.move(width * .7, height * .65);
           await page.mouse.wheel(0, Math.sign(delta) * Math.min(100, Math.max(25, Math.abs(delta))));
           await page.waitForTimeout(120);
@@ -66,8 +77,8 @@ try {
       let previous = { large: false, left: false }, normalWidth;
       for (const prefs of [{ large:false,left:false }, { large:true,left:false }, { large:true,left:true }, { large:false,left:true }]) {
         await cmd('goto', 'settings');
-        if (prefs.large !== previous.large) await toggle('TouchLarge' + (prefs.large ? 'On' : 'Off'));
-        if (prefs.left !== previous.left) await toggle('TouchLeft' + (prefs.left ? 'On' : 'Off'));
+        if (prefs.large !== previous.large) await toggle('touchLargeButtons', 'TouchLarge', prefs.large);
+        if (prefs.left !== previous.left) await toggle('touchLeftHanded', 'TouchLeft', prefs.left);
         previous = prefs;
         await cmd('startRace', 'e1', 'easy');
         await send('touchStart', [{ x:width/2, y:height/2, id:1 }]); await send('touchEnd', []);

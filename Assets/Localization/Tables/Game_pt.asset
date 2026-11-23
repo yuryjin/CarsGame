@@ -2811,6 +2811,177 @@ MonoBehaviour:
     m_Localized: '{n} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 29745034027151360
+    m_Localized: "\xDAltimos impactos"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122880
+    m_Localized: Golpe final
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122881
+    m_Localized: Inimigo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122882
+    m_Localized: "Corrida eliminat\xF3ria"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122883
+    m_Localized: "A cada volta do l\xEDder, o \xFAltimo sai. Se cruzarem juntos,
+      fica o menor n\xFAmero de largada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122884
+    m_Localized: "Eliminado \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317184
+    m_Localized: "Desbloqueie Sidewinder ao terminar uma corrida ap\xF3s um atalho
+      de buggy."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317185
+    m_Localized: "Desbloqueie Raider ao terminar uma corrida ap\xF3s atingir um rival
+      com um blindado."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317186
+    m_Localized: "Desafio conclu\xEDdo \xB7 {name} desbloqueado"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317187
+    m_Localized: "Medir acelera\xE7\xE3o, frenagem e slalom"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317188
+    m_Localized: "Teste autom\xE1tico \xB7 0\u201345 km/h e frenagem total"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317189
+    m_Localized: "Passe entre os postes \xB7 {n}/{all}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317190
+    m_Localized: "Tentativa interrompida \xB7 repita"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317191
+    m_Localized: "Medi\xE7\xE3o salva na garagem"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317192
+    m_Localized: "0\u201345 {acc} \xB7 frenagem {m} m \xB7 slalom {slalom}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317193
+    m_Localized: "Conhe\xE7a {name}, o carro laranja no grid."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317194
+    m_Localized: "Revanche na final \xB7 {name} voltou."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317195
+    m_Localized: "Rival \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317196
+    m_Localized: "Voc\xEA terminou \xE0 frente de {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317197
+    m_Localized: "{name} terminou \xE0 sua frente"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317198
+    m_Localized: "Duelo com {name} \xB7 ambos precisam terminar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317199
+    m_Localized: "Voc\xEA #{you} \xB7 {name} #{rival}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317200
+    m_Localized: "Rivais do c\xE2nion"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317201
+    m_Localized: "Chegue duas vezes ao p\xF3dio, depois termine \xE0 frente de Rex.
+      Pr\xEAmio \xB7 {reward}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511488
+    m_Localized: Desbloqueie a etapa 6 para entrar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511489
+    m_Localized: "Confrontos \xB7 vit\xF3rias {wins} / derrotas {losses}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511490
+    m_Localized: Em fuga
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511491
+    m_Localized: "Foge at\xE9 \xE0 meta. Se um perseguidor ficar a 7 m por 0,6 s,
+      apanha-te. A ponte encurta o caminho."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511492
+    m_Localized: Conseguiste escapar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511493
+    m_Localized: Foste intercetado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511494
+    m_Localized: Estafeta de dois carros
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511495
+    m_Localized: Escolhe dois carros. Troca no arco verde a meio da volta. Podes
+      pedir o buggy Dune emprestado.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511496
+    m_Localized: Primeira etapa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511497
+    m_Localized: Segunda etapa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511498
+    m_Localized: Corrida personalizada
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511499
+    m_Localized: Pista
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511500
+    m_Localized: Regra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511501
+    m_Localized: Regras normais
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511502
+    m_Localized: A bomba precisa de um rival. Adiciona um ou escolhe outra regra.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511503
+    m_Localized: "Escolhe uma pista dispon\xEDvel e uma regra da lista."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511504
+    m_Localized: "Esta corrida livre tem classifica\xE7\xE3o pr\xF3pria. Os recordes
+      e pr\xE9mios de carreira s\xE3o dos eventos."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

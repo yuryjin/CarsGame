@@ -7,13 +7,16 @@ namespace RacingGame
 
     /// <summary>Mission events supply their own map and finish conditions.</summary>
     public enum EventMode { Race, Arena, Mission }
+    public enum CircuitFormat { Standard, Elimination, Pursuit, Relay }
 
     /// <summary>One entry of the race-select screen. Rules vary per event so the single track stays fresh.</summary>
     [CreateAssetMenu(menuName = "Racing/Race Event", fileName = "Event")]
     public sealed class RaceEventDefinition : ScriptableObject
     {
+        public AiDriverProfile featuredRival;
         // Runtime-only lesson configuration; authored campaign events always retain their race rules.
         public bool IsPractice { get; internal set; }
+        public bool IsCustom { get; internal set; }
         public string eventId = "e1";
         public EventMode mode;
         [Tooltip("Match duration in seconds for Arena mode.")]
@@ -25,6 +28,9 @@ namespace RacingGame
         [Min(0)] public int referenceSeconds;
         [Tooltip("-1 = take the AI count from the difficulty tier.")]
         public int aiCountOverride = -1;
+        public CircuitFormat format;
+        public string RelayFirst { get; internal set; }
+        public string RelaySecond { get; internal set; }
         public bool reversed;
         [Tooltip("Road over an abyss: broken barriers on lap 1, no barriers on lap 2, narrow road on lap 3.")]
         public bool abyssTrack;

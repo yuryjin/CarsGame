@@ -5,7 +5,7 @@ using RacingGame.Core.Platform;
 
 namespace RacingGame
 {
-    public enum PracticeLesson { None, Drift, Shortcut, WallRide, Aim, Launch, CannonTarget, BeamShield, PursuitMine }
+    public enum PracticeLesson { None, Drift, Shortcut, WallRide, Aim, Launch, CannonTarget, BeamShield, PursuitMine, BodyMeasure }
 
     public sealed partial class GameFlow
     {
@@ -14,6 +14,8 @@ namespace RacingGame
         public bool ReturningFromTestDrive { get; private set; }
         public bool ReturningFromPractice { get; private set; }
         public PracticeLesson CurrentPractice { get; private set; }
+        public BodyMeasurementCourse CurrentMeasurement { get; private set; }
+        public bool IsBodyMeasurement => CurrentPractice == PracticeLesson.BodyMeasure;
         public bool IsGarageDrill => CurrentPractice >= PracticeLesson.CannonTarget && CurrentPractice <= PracticeLesson.PursuitMine;
         public bool IsPractice => IsTestDrive && CurrentPractice != PracticeLesson.None;
         public bool PracticeCompleted { get; private set; }
@@ -36,6 +38,8 @@ namespace RacingGame
         private RaceDirector practiceDirector;
 
         public bool StartTestDrive(string bodyId) => StartDrive(bodyId, PracticeLesson.None);
+
+        public bool StartBodyMeasurement(string bodyId) => StartDrive(bodyId, PracticeLesson.BodyMeasure);
 
         public bool StartPractice(PracticeLesson lesson)
         {
@@ -64,7 +68,7 @@ namespace RacingGame
             testDriveEvent.nameKey = lesson == PracticeLesson.None ? "garage.test_drive" : PracticeTitleKey(lesson);
             testDriveEvent.laps = lesson == PracticeLesson.None ? 1 : 20;
             testDriveEvent.aiCountOverride = lesson == PracticeLesson.None || lesson == PracticeLesson.Aim || IsGarageDrill ? 1 : 0;
-            testDriveEvent.pickupCount = IsGarageDrill ? 0 : 9;
+            testDriveEvent.pickupCount = IsGarageDrill || IsBodyMeasurement ? 0 : 9;
             testDriveEvent.mineFieldCount = 0;
             if (lesson == PracticeLesson.WallRide)
             {
@@ -110,6 +114,7 @@ namespace RacingGame
                 if (practiceDirector != null) practiceDirector.ShellHit += OnPracticeHit;
             }
             if (IsGarageDrill) ConfigureGarageDrill();
+            if (IsBodyMeasurement) race.OnRaceStarted += BeginBodyMeasurement;
             testDriveCanvas = UiFactory.CreateOverlayCanvas("TestDrive", 35);
             testDriveCanvas.transform.SetParent(transform, false);
             var back = UiFactory.Button(testDriveCanvas.transform, "ReturnToGarage", Loc.Get("garage.test_return"), EnterMenu,
@@ -122,7 +127,7 @@ namespace RacingGame
                     new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, 26f, UiFactory.Raised);
                 practiceRetryLabel = retry.GetComponentInChildren<TextMeshProUGUI>();
             }
-            if (IsGarageDrill)
+            if (IsGarageDrill || IsBodyMeasurement)
                 UiFactory.Button(back.transform, "RepeatDrill", Loc.Get("drill.repeat"), RetryRace,
                     new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, -76f), new Vector2(0f, -6f), 24f, UiFactory.Raised);
             shownTestSecond = -1;
@@ -204,12 +209,14 @@ namespace RacingGame
             }
             int? launchOffset = launchTraining != null ? launchTraining.TrainingOffsetMs : null;
             if (launchOffset.HasValue) PracticeCompleted = launchTraining.Awarded;
-            int seconds = IsPractice ? (PracticeCompleted || launchOffset.HasValue ? 1 : 0) : Mathf.CeilToInt(TestDriveRemaining);
+            int seconds = IsBodyMeasurement && CurrentMeasurement != null ? (int)CurrentMeasurement.Phase * 10 + CurrentMeasurement.NextGate
+                : IsPractice ? (PracticeCompleted || launchOffset.HasValue ? 1 : 0) : Mathf.CeilToInt(TestDriveRemaining);
             if (Loc.Ready && testDriveTimer != null && (seconds != shownTestSecond || shownTestLanguage != Loc.Language))
             {
                 shownTestSecond = seconds;
                 shownTestLanguage = Loc.Language;
-                if (IsPractice)
+                if (IsBodyMeasurement) testDriveTimer.text = MeasurementInstruction() + "\n" + Loc.Get("garage.test_return");
+                else if (IsPractice)
                 {
                     string status = Loc.Get(PracticeTitleKey(CurrentPractice));
                     if (launchOffset.HasValue)
@@ -226,11 +233,31 @@ namespace RacingGame
             if (!IsPractice && (race.State == RaceState.Racing || race.State == RaceState.Finishing) && seconds <= 0) EnterMenu();
         }
 
+        private void BeginBodyMeasurement()
+        {
+            var course = new GameObject("BodyMeasurementCourse");
+            course.transform.SetParent(transform, false);
+            CurrentMeasurement = course.AddComponent<BodyMeasurementCourse>();
+            CurrentMeasurement.Begin(race.Player, TrackPath.Instance, PlatformGlue.Save.Data.progress);
+        }
+
+        private string MeasurementInstruction()
+        {
+            var course = CurrentMeasurement;
+            if (course == null || course.Phase < MeasurementPhase.Slalom) return Loc.Get("measure.auto");
+            if (course.Phase == MeasurementPhase.Missed) return Loc.Get("measure.missed");
+            if (course.Phase == MeasurementPhase.Finished) return Loc.Get("measure.saved");
+            return Loc.Format("measure.gates", "n", course.NextGate, "all", BodyMeasurementCourse.Gates);
+        }
+
         private void RestoreTestDrive()
         {
             if (!IsTestDrive) return;
             if (practiceDirector != null) practiceDirector.ShellHit -= OnPracticeHit;
             RestoreGarageDrill();
+            race.OnRaceStarted -= BeginBodyMeasurement;
+            if (CurrentMeasurement != null) { CurrentMeasurement.gameObject.SetActive(false); Destroy(CurrentMeasurement.gameObject); }
+            CurrentMeasurement = null;
             practiceDirector = null;
             PlatformGlue.Platform?.SetGameplayActive(false);
             RaceSetup.Event = beforeTestEvent;

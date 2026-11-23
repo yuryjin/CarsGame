@@ -10,11 +10,17 @@ namespace RacingGame
     {
         public RivalRole role;
         public string rivalName = "";
+        public string rivalId = "";
+        public bool signaturePrimary;
+        public PrimaryWeaponType signatureWeapon;
+        [Min(0f)] public float signatureMinRange = 6f;
+        [Min(1f)] public float signatureMaxRange = 45f;
         public Color paint = Color.gray;
 
         public void Equip(CarWeapons weapons)
         {
-            weapons.SetPrimaryType(role == RivalRole.Shooter ? PrimaryWeaponType.MachineGun : PrimaryWeaponType.Cannon);
+            weapons.SetPrimaryType(signaturePrimary && PrimaryWeaponCatalog.IsValid(signatureWeapon) ? signatureWeapon
+                : role == RivalRole.Shooter ? PrimaryWeaponType.MachineGun : PrimaryWeaponType.Cannon);
             weapons.secondaryType = role == RivalRole.Defender ? SecondaryWeaponType.Mines : SecondaryWeaponType.None;
             weapons.secondaryAmmoMax = role == RivalRole.Defender ? 3 : 0;
             weapons.RefillSecondaryAmmo();

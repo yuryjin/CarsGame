@@ -12,6 +12,7 @@ namespace RacingGame
     public sealed class RaceParticipant : MonoBehaviour, IRespawnPoseProvider
     {
         public string displayName = "Car";
+        public string rivalId;
         public bool isPlayer;
         [Tooltip("Lateral offset used for respawn so cars do not reappear on the centre line every time.")]
         public float laneOffset;
@@ -44,6 +45,16 @@ namespace RacingGame
             Score = new ArenaScore(Mathf.RoundToInt(1f / SimulationDriver.FixedStep), Mathf.RoundToInt(arena.Duration / SimulationDriver.FixedStep));
             if (Health != null && isActiveAndEnabled) Health.HitResolved += ArenaHit;
         }
+
+        public int RetiredOnStage { get; private set; }
+
+        internal void RetireOnStage(int stage)
+        {
+            RetiredOnStage = stage;
+            EliminatedAtTick = SimulationDriver.Instance.Tick;
+            Car.inputEnabled = false;
+            gameObject.SetActive(false);
+        }
         /// <summary>A map other than the circuit (the boss mission): it owns respawn poses; no track auto-reset.</summary>
         public IBattleSite Site { get; set; }
         public HotBombRace HotBomb { get; internal set; }
@@ -57,6 +68,7 @@ namespace RacingGame
         public int CeilingBoosts { get; internal set; }
         public int BombPasses { get; internal set; }
         public int Resets { get; private set; }
+        public int Rams { get; private set; }
         public bool CleanFinalLap => finalLapStarted && !finalLapMistake;
         private bool finalLapStarted, finalLapMistake, wasOnFork;
         private float forkTravel;
@@ -166,7 +178,14 @@ namespace RacingGame
             }
         }
 
-        private void OnCollisionEnter(Collision collision) => PassBomb(collision);
+        private void OnCollisionEnter(Collision collision)
+        {
+            PassBomb(collision);
+            if (!Car.inputEnabled || collision.rigidbody == null || collision.contactCount == 0 || collision.relativeVelocity.sqrMagnitude < 36f) return;
+            var rival = collision.rigidbody.GetComponent<RaceParticipant>();
+            var towardRival = rival == null ? Vector3.zero : (rival.Car.Body.worldCenterOfMass - Car.Body.worldCenterOfMass).normalized;
+            if (Vector3.Dot(transform.forward, towardRival) > .6f && Vector3.Dot(Car.Body.linearVelocity, towardRival) > 2f) Rams++;
+        }
         private void OnCollisionStay(Collision collision) => PassBomb(collision);
 
         private void PassBomb(Collision collision)
