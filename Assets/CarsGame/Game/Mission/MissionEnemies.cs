@@ -191,7 +191,9 @@ namespace RacingGame
                 Vector3 to = aim - pos; to.y = 0f;
                 float dist = to.magnitude;
                 facing = Mathf.MoveTowardsAngle(facing, Mathf.Atan2(to.x, to.z) * Mathf.Rad2Deg, 220f * dt);
-                bool inRange = dist < (rocket ? 55f : 38f);
+                bool atWell = assault && AssaultTarget is SettlementObjective objective && objective.FixedInPlace;
+                float range = atWell ? (rocket ? 30f : 17f) : (rocket ? 55f : 38f);
+                bool inRange = dist < range;
                 if (!inRange && tick >= aimUntil)
                 {
                     walking = true;

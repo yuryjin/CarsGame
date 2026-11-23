@@ -2603,6 +2603,154 @@ MonoBehaviour:
     m_Key: hud.rival_gap
     m_Metadata:
       m_Items: []
+  - m_Id: 29732681093033984
+    m_Key: arena.rock_cover
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754240
+    m_Key: arena.clear_strip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754241
+    m_Key: arena.leave_garage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754242
+    m_Key: events.m4.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754243
+    m_Key: events.m4.name.goal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754244
+    m_Key: events.m4.name.win
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754245
+    m_Key: events.m4.name.loss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754246
+    m_Key: settlement.wave_west
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754247
+    m_Key: settlement.wave_east
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754248
+    m_Key: mastery.buggy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754249
+    m_Key: mastery.sport
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754250
+    m_Key: mastery.armored
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754251
+    m_Key: mastery.tank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754252
+    m_Key: mastery.badge
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754253
+    m_Key: driver.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754254
+    m_Key: driver.favorite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754255
+    m_Key: driver.cup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754256
+    m_Key: driver.closest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754257
+    m_Key: driver.empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754258
+    m_Key: sets.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754259
+    m_Key: sets.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754260
+    m_Key: sets.save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754261
+    m_Key: arsenal.compare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754262
+    m_Key: arsenal.thermal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754263
+    m_Key: drill.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754264
+    m_Key: practice.cannontarget
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754265
+    m_Key: practice.beamshield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754266
+    m_Key: practice.pursuitmine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754267
+    m_Key: drill.repeat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754268
+    m_Key: arsenal.pinned
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754269
+    m_Key: arsenal.pin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754270
+    m_Key: arsenal.unpin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754271
+    m_Key: garage.savings_pick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754272
+    m_Key: garage.savings_clear
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754273
+    m_Key: garage.savings_left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754274
+    m_Key: garage.savings_ready
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754275
+    m_Key: hud.effect_seconds
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

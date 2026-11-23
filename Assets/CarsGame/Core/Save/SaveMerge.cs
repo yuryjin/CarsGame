@@ -55,8 +55,13 @@ namespace RacingGame.Core.Save
             m.progress.paint = newer.progress.paint ?? "";
             m.progress.livery = newer.progress.livery ?? "";
             m.progress.body = newer.progress.body ?? "";
+            m.progress.bodyGoal = newer.progress.bodyGoal ?? "";
+            m.progress.ResolveBodyGoal();
             m.progress.stripe = newer.progress.stripe ?? "";
             m.progress.recentAttempts = RecentAttempts.Merge(a.progress.recentAttempts, b.progress.recentAttempts);
+            m.progress.weaponPins = WeaponPin.Merge(a.progress.weaponPins, b.progress.weaponPins);
+            m.progress.garageSets = GarageSet.Merge(a.progress.garageSets, b.progress.garageSets);
+            m.progress.closestFinish = DriverProfile.Closest(a.progress.closestFinish, b.progress.closestFinish);
             m.progress.daily = MergeDaily(a.progress.daily, b.progress.daily);
 
             var unlocked = new HashSet<string>(a.progress.unlockedEvents ?? new List<string>());
@@ -103,9 +108,11 @@ namespace RacingGame.Core.Save
             cur.kills = Math.Max(cur.kills, r.kills);
             cur.deaths = Math.Max(cur.deaths, r.deaths);
             cur.distanceKm = Math.Max(cur.distanceKm, r.distanceKm);
+            cur.mastery = BodyMastery.Merge(cur.mastery, r.mastery);
+            cur.bodyFinishes = DriverProfile.MergeCounts(cur.bodyFinishes, r.bodyFinishes);
         }
 
-        private static DeviceLedger Copy(DeviceLedger r) => new DeviceLedger { deviceId = r.deviceId ?? "", coinsEarned = r.coinsEarned, coinsSpent = r.coinsSpent, races = r.races, wins = r.wins, kills = r.kills, deaths = r.deaths, distanceKm = r.distanceKm };
+        private static DeviceLedger Copy(DeviceLedger r) => new DeviceLedger { deviceId = r.deviceId ?? "", coinsEarned = r.coinsEarned, coinsSpent = r.coinsSpent, races = r.races, wins = r.wins, kills = r.kills, deaths = r.deaths, distanceKm = r.distanceKm, mastery = BodyMastery.Merge(r.mastery, null), bodyFinishes = DriverProfile.MergeCounts(r.bodyFinishes, null) };
 
         private static int At(int[] arr, int i) => arr != null && i < arr.Length ? arr[i] : 0;
         private static void Best(Dictionary<string, EventBest> d, EventBest e)

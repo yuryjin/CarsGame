@@ -209,7 +209,7 @@ namespace RacingGame
         // ---------- transitions ----------
         public void EnterMenu()
         {
-            ReturningFromPractice = IsPractice || yesterdayPractice != null;
+            ReturningFromPractice = IsPractice && !IsGarageDrill || yesterdayPractice != null;
             ReturningFromTestDrive = IsTestDrive;
             bool resumeResult = IsPractice && practiceReturnResults != null;
             if (!resumeResult) practiceReturnResults = null;
@@ -303,6 +303,7 @@ namespace RacingGame
         private void ConfigureCircuit(RaceEventDefinition ev, bool viewing)
         {
             bool onCircuit = ev == null || ev.mode == EventMode.Race;
+            var preset = sky != null ? sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night) : null;
             var signMaterial = onCircuit && track != null && !IsTestDrive ? AbyssTrack.SceneryMaterial() : null;
             if (track != null) { track.reversed = ev != null && ev.reversed; track.Build(); }
             if (ev != null && ev.wastelandTrack && track != null) wasteland = WastelandTrack.Create(track);
@@ -316,9 +317,12 @@ namespace RacingGame
             {
                 trackFork = TrackFork.Create(track, !viewing && pickups != null && (ev == null || ev.pickupCount > 0));
                 if (!viewing && !IsTestDrive && trackFork != null) trackFork.gameObject.AddComponent<GrandstandReaction>().Watch(race, track);
+                if (!viewing && trackFork != null) trackFork.gameObject.AddComponent<DriftTireMarks>().Follow(race);
+                if (trackFork != null && preset != null && preset.lampsOn && signMaterial != null)
+                    trackFork.gameObject.AddComponent<CornerReflectors>().Build(track, signMaterial);
             }
             if (signMaterial != null) brakingBoards = BrakingBoards.Create(track, signMaterial);
-            if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
+            if (sky != null) sky.Apply(preset);
         }
 
         // Arena: the fight zone; a race: slalom gates on the straights. Seeded from the race, so the daily race matches for everyone.
@@ -725,7 +729,24 @@ namespace RacingGame
                 row.coinsEarned += LastReward;
                 row.races++;
                 row.kills += me.Kills; row.deaths += me.Deaths;
-                if (me.Finished && me.Position == 1) row.wins++;
+                var actualBody = race.Player != null ? race.Player.GetComponent<CarBody>() : null;
+                if (actualBody != null) Core.Save.BodyMastery.Record(row, actualBody.Class, me.Shortcuts, me.DriftBoosts, me.Kills, me.BombPasses);
+                if (me.Finished)
+                {
+                    if (actualBody != null) Core.Save.DriverProfile.Finish(row, actualBody.BodyId);
+                    if (ev != null && ev.mode == EventMode.Race && me.TotalTime > 0)
+                    {
+                        var progress = save.Data.progress;
+                        foreach (var rival in results.Entries)
+                            if (!rival.IsPlayer && rival.Finished && rival.TotalTime > 0)
+                                progress.closestFinish = Core.Save.DriverProfile.Closest(progress.closestFinish, new Core.Save.FinishGap
+                                {
+                                    eventId = ev.eventId, rival = rival.Name,
+                                    driverMs = (long)System.Math.Round(me.TotalTime * 1000), rivalMs = (long)System.Math.Round(rival.TotalTime * 1000)
+                                });
+                    }
+                    if (me.Position == 1) row.wins++;
+                }
                 if (ev != null)
                 {
                     var best = save.Data.progress.bests.Find(b => b.eventId == ev.eventId);

@@ -126,5 +126,86 @@ namespace RacingGame.Tests
                 }
             }
         }
+        [UnityTest, Timeout(240000)]
+        public IEnumerator WellWavesAdvanceFromOppositeSidesAndRetryRestoresTheSettlement()
+        {
+            Object.FindAnyObjectByType<MenuScreens>().Show("events");
+            GameObject.Find("Start_m4").GetComponent<Button>().onClick.Invoke();
+            foreach (bool defend in new[] { true, false })
+            {
+                while (race.State == RaceState.Countdown) yield return null;
+                var mission = SettlementMission.Current;
+                var well = mission.Objective;
+                var car = race.Player.Car;
+                var input = car.gameObject.AddComponent<ScriptedDriverInput>();
+                car.SetInputSource(input);
+                Assert.AreEqual(1, mission.Wave);
+                Assert.AreEqual(well.MaxHealth, well.Health);
+                Assert.IsTrue(mission.WarningActive);
+                Assert.IsEmpty(mission.Attackers);
+                Assert.Less(mission.WaveOrigin.x, well.transform.position.x);
+                input.Set(0f, 0f, true);
+                if (!defend)
+                {
+                    mission.Map.GroundPose(well.transform.position + Vector3.forward * 91f, Vector3.forward, out var away, out var facing);
+                    car.Teleport(away, facing);
+                }
+                bool eastWarning = false, rocket = false, backing = false;
+                int stopped = 0, reverseTicks = 0;
+                for (int tick = 0; tick < 4800 && flow.State == FlowState.Racing; tick++)
+                {
+                    if (mission.Wave == 2 && mission.WarningActive)
+                    {
+                        Assert.Greater(mission.WaveOrigin.x, well.transform.position.x);
+                        eastWarning = true;
+                    }
+                    var foe = Nearby(mission, car.transform.position);
+                    if (defend)
+                    {
+                        foreach (var enemy in mission.Attackers) if (enemy != null && enemy.Kind == UnitKind.RocketTrooper) rocket = true;
+                        Vector3 at = foe != null ? foe.transform.position : mission.WaveOrigin;
+                        Vector3 relative = car.transform.position - well.transform.position;
+                        if (relative.x * (at.x - well.transform.position.x) < 0f && Mathf.Abs(relative.z) < 10f)
+                            at = well.transform.position + Vector3.forward * 17f;
+                        Vector3 aim = at - car.transform.position;
+                        aim.y = 0f;
+                        float angle = Vector3.SignedAngle(car.transform.forward, aim, Vector3.up);
+                        if (foe != null && aim.magnitude < 16f && Mathf.Abs(angle) > 52f) backing = true;
+                        if (Mathf.Abs(angle) < 14f || aim.magnitude > 29f) backing = false;
+                        if (Mathf.Abs(car.SpeedKmh) < 3f && foe != null) stopped++; else stopped = 0;
+                        if (stopped >= 34) { reverseTicks = 65; stopped = 0; }
+                        if (reverseTicks > 0)
+                        {
+                            reverseTicks--;
+                            input.Set(-1f, -.75f);
+                        }
+                        else if (backing)
+                        {
+                            float steer = Mathf.Clamp(angle / 23f, -1f, 1f);
+                            bool rollingForward = Vector3.Dot(car.Body.linearVelocity, car.transform.forward) > 0f;
+                            input.Set(-1f, rollingForward ? steer : -steer);
+                        }
+                        else Pursue(car, input, at, foe != null && aim.magnitude < 61f && Mathf.Abs(angle) < 13f);
+                        if (tick % 180 == 0) Debug.Log($"[WellDrive] tick={tick} wave={mission.Wave} speed={car.SpeedKmh:F0} at={relative} hp={well.Health:F0} kills={race.Player.Kills} range={aim.magnitude:F0} yaw={angle:F0} shots={RaceDirector.Current.ShotsFired}");
+                    }
+                    if (!defend && tick % 600 == 0) Debug.Log($"[WellIdle] frame={tick} sim={SimulationDriver.Instance.Tick} running={MissionUnit.Running} attackers={mission.Attackers.Count} hp={well.Health:F0}");
+                    yield return null;
+                }
+                Debug.Log($"[LastWell] defend={defend} wave={mission.Wave} hp={well.Health:F0} kills={race.Player.Kills} eastWarning={eastWarning}");
+                Assert.AreEqual(FlowState.Results, flow.State);
+                Assert.AreEqual(defend, race.Results.Player.Finished);
+                Assert.AreEqual(Loc.Get("events.m4.name." + (defend ? "win" : "loss")), GameObject.Find("Summary").transform.Find("Detail").GetComponent<TMP_Text>().text);
+                if (defend) { Assert.IsTrue(eastWarning && rocket); Assert.AreEqual(5, race.Player.Kills); }
+                else Assert.IsFalse(well.Alive);
+                if (defend)
+                {
+                    var buttons = GameObject.Find("Actions").GetComponentsInChildren<Button>();
+                    var retry = System.Array.Find(buttons, b => b.GetComponentInChildren<TMP_Text>().text.Contains(Loc.Get("results.retry")));
+                    Assert.NotNull(retry);
+                    retry.onClick.Invoke();
+                    yield return null;
+                }
+            }
+        }
     }
 }

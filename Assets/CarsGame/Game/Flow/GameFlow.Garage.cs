@@ -5,7 +5,7 @@ using RacingGame.Core.Platform;
 
 namespace RacingGame
 {
-    public enum PracticeLesson { None, Drift, Shortcut, WallRide, Aim, Launch }
+    public enum PracticeLesson { None, Drift, Shortcut, WallRide, Aim, Launch, CannonTarget, BeamShield, PursuitMine }
 
     public sealed partial class GameFlow
     {
@@ -14,6 +14,7 @@ namespace RacingGame
         public bool ReturningFromTestDrive { get; private set; }
         public bool ReturningFromPractice { get; private set; }
         public PracticeLesson CurrentPractice { get; private set; }
+        public bool IsGarageDrill => CurrentPractice >= PracticeLesson.CannonTarget && CurrentPractice <= PracticeLesson.PursuitMine;
         public bool IsPractice => IsTestDrive && CurrentPractice != PracticeLesson.None;
         public bool PracticeCompleted { get; private set; }
         public float TestDriveRemaining => Mathf.Max(0f, TestDriveSeconds - (float)race.RaceTime);
@@ -62,8 +63,8 @@ namespace RacingGame
             testDriveEvent.eventId = lesson == PracticeLesson.None ? "garage_test" : "practice_" + lesson.ToString().ToLowerInvariant();
             testDriveEvent.nameKey = lesson == PracticeLesson.None ? "garage.test_drive" : PracticeTitleKey(lesson);
             testDriveEvent.laps = lesson == PracticeLesson.None ? 1 : 20;
-            testDriveEvent.aiCountOverride = lesson == PracticeLesson.None || lesson == PracticeLesson.Aim ? 1 : 0;
-            testDriveEvent.pickupCount = 9;
+            testDriveEvent.aiCountOverride = lesson == PracticeLesson.None || lesson == PracticeLesson.Aim || IsGarageDrill ? 1 : 0;
+            testDriveEvent.pickupCount = IsGarageDrill ? 0 : 9;
             testDriveEvent.mineFieldCount = 0;
             if (lesson == PracticeLesson.WallRide)
             {
@@ -108,6 +109,7 @@ namespace RacingGame
                 practiceDirector = RaceDirector.Current;
                 if (practiceDirector != null) practiceDirector.ShellHit += OnPracticeHit;
             }
+            if (IsGarageDrill) ConfigureGarageDrill();
             testDriveCanvas = UiFactory.CreateOverlayCanvas("TestDrive", 35);
             testDriveCanvas.transform.SetParent(transform, false);
             var back = UiFactory.Button(testDriveCanvas.transform, "ReturnToGarage", Loc.Get("garage.test_return"), EnterMenu,
@@ -120,6 +122,9 @@ namespace RacingGame
                     new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, 26f, UiFactory.Raised);
                 practiceRetryLabel = retry.GetComponentInChildren<TextMeshProUGUI>();
             }
+            if (IsGarageDrill)
+                UiFactory.Button(back.transform, "RepeatDrill", Loc.Get("drill.repeat"), RetryRace,
+                    new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, -76f), new Vector2(0f, -6f), 24f, UiFactory.Raised);
             shownTestSecond = -1;
             testDrivePixelScale = -1f;
             return true;
@@ -211,7 +216,7 @@ namespace RacingGame
                         status = Loc.Format(PracticeCompleted ? "practice.launch.hit" : "practice.launch.miss", "ms",
                             launchOffset.Value.ToString("+0;-0;0", System.Globalization.CultureInfo.InvariantCulture));
                     else if (launchTraining == null) status += "  " + seconds + "/1";
-                    testDriveTimer.text = status + "\n" + Loc.Get(practiceReturnResults != null ? "practice.return_results" : "practice.return");
+                    testDriveTimer.text = status + "\n" + Loc.Get(IsGarageDrill ? "garage.test_return" : practiceReturnResults != null ? "practice.return_results" : "practice.return");
                     if (practiceRetryLabel != null) practiceRetryLabel.text = Loc.Get("results.retry");
                     testDriveTimer.color = UiFactory.Ink;
                     testDriveTimer.transform.parent.GetComponent<UnityEngine.UI.Image>().color = PracticeCompleted ? UiFactory.Positive : UiFactory.Accent;
@@ -225,6 +230,7 @@ namespace RacingGame
         {
             if (!IsTestDrive) return;
             if (practiceDirector != null) practiceDirector.ShellHit -= OnPracticeHit;
+            RestoreGarageDrill();
             practiceDirector = null;
             PlatformGlue.Platform?.SetGameplayActive(false);
             RaceSetup.Event = beforeTestEvent;

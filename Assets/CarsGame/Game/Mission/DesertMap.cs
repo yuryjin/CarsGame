@@ -329,6 +329,7 @@ namespace RacingGame
                 r.sharedMaterial = material != null ? material : MissionArt.Solid;
                 r.shadowCastingMode = name == "Terrain" ? UnityEngine.Rendering.ShadowCastingMode.Off : UnityEngine.Rendering.ShadowCastingMode.On;
                 if (collider) go.AddComponent<MeshCollider>().sharedMesh = mesh;
+                if (name == "Terrain") go.AddComponent<TireAudioSurface>().surface = TireSurface.Sand;
             }
         }
 

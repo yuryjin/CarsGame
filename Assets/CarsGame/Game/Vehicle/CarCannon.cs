@@ -58,7 +58,8 @@ namespace RacingGame
         private Vector3 barrelRestPosition;
         private Quaternion turretRestRotation, barrelRestRotation;
         private float turretYaw, barrelPitch;
-        private CarController turretTarget;
+        private CarController turretTarget, preferredTarget;
+        private bool targetSelectionChanged;
         private MissionUnit turretUnit;
         private SpaceTurret turretHazard;
         private bool aimCommitted, aimAllowsHoming;
@@ -81,6 +82,20 @@ namespace RacingGame
         public float BarrelPitch => barrelPitch;
         /// <summary>The rival the turret is tracking, else null.</summary>
         public CarController TurretTarget => turretTarget;
+
+        public void PreferTouchTarget(CarController rival)
+        {
+            if (rival == null || rival == car || !Teams.Hostile(gameObject, rival.gameObject)) return;
+            preferredTarget = rival;
+            targetSelectionChanged = true;
+        }
+
+        internal CarController FindRival(Vector3 origin, float arc, float min, float max, float lead = 0f, bool closestToAxis = false)
+        {
+            var found = TargetFinder.Find(car, origin, transform.forward, arc, min, max, lead, closestToAxis, preferredTarget);
+            if (found != preferredTarget) preferredTarget = null;
+            return found;
+        }
         /// <summary>The mission unit the turret is tracking when no car is in its sector, else null.</summary>
         public MissionUnit TurretUnit => turretUnit;
         /// <summary>True while an AI gunner or mouse holds the barrel on a world point.</summary>
@@ -236,7 +251,7 @@ namespace RacingGame
             specialAttack?.UpdateVisual();
         }
 
-        private void OnDisable() { wantsFire = false; specialAttack?.Cancel(); }
+        private void OnDisable() { wantsFire = false; preferredTarget = null; targetSelectionChanged = false; specialAttack?.Cancel(); }
 
         /// <summary>Level input: true while the fire button is held. Set by the car every tick.</summary>
         public void SetWantsFire(bool value)
@@ -269,12 +284,13 @@ namespace RacingGame
             else
             {
                 if (!enabled) { turretTarget = null; turretUnit = null; turretHazard = null; }
-                else if ((tick + (car != null ? car.CarId : 0)) % 5 == 0)   // re-acquire 10×/s, staggered per car
+                else if (targetSelectionChanged || (tick + (car != null ? car.CarId : 0)) % 5 == 0)   // re-acquire 10×/s, staggered per car
                 {
                     // From the muzzle, not the roof pivot: the pivot sits inside the hull, so a linecast from it
                     // hits the car or the road and the turret never acquires.
                     Vector3 origin = muzzle != null ? muzzle.position : turret.position;
-                    turretTarget = TargetFinder.Find(car, origin, transform.forward, turretYawLimit, turretMinRange, turretMaxRange, shellSpeed, closestToAxis: true);
+                    targetSelectionChanged = false;
+                    turretTarget = FindRival(origin, turretYawLimit, turretMinRange, turretMaxRange, shellSpeed, closestToAxis: true);
                     turretUnit = turretTarget == null ? TargetFinder.FindUnit(car, origin, transform.forward, turretYawLimit, turretMinRange, turretMaxRange, closestToAxis: true) : null;
                     turretHazard = turretTarget == null && turretUnit == null
                         ? TargetFinder.FindTurret(origin, transform.forward, turretYawLimit, turretMinRange, turretMaxRange) : null;
@@ -360,7 +376,7 @@ namespace RacingGame
             var director = RaceDirector.Current ?? RaceDirector.Instance;
             if (director != null)
             {
-                var homingTarget = shot.Homing && (!aimCommitted || aimAllowsHoming) ? TargetFinder.Find(car, muzzlePos, direction, aimCommitted ? 5f : 35f, 1f, 80f) : null;
+                var homingTarget = shot.Homing && (!aimCommitted || aimAllowsHoming) ? TargetFinder.Find(car, muzzlePos, direction, aimCommitted ? 5f : 35f, 1f, 80f, preferred: preferredTarget) : null;
                 for (int pellet = 0; pellet < shot.Pellets; pellet++)
                 {
                     float angle = shot.Pellets == 1 ? 0f : Mathf.Lerp(-shot.Spread * 0.5f, shot.Spread * 0.5f, pellet / (float)(shot.Pellets - 1));

@@ -91,6 +91,7 @@ namespace RacingGame.Core.Save
             data.progress.daily ??= new DailyData();
             data.progress.daily.finishDays ??= new System.Collections.Generic.List<int>();
             data.progress.daily.claims ??= new System.Collections.Generic.List<DailyClaim>();
+            data.progress.ResolveBodyGoal();
             data.version = SaveData.CurrentVersion;
             return data;
         }

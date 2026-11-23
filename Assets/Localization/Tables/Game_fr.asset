@@ -2666,6 +2666,154 @@ MonoBehaviour:
     m_Localized: '{name}  {s} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 29732681093033984
+    m_Localized: "Impulsion ! Abritez-vous derri\xE8re un rocher"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754240
+    m_Localized: "Raid a\xE9rien ! Quittez la bande hachur\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754241
+    m_Localized: "Le toit s\u2019effondre ! Sortez"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754242
+    m_Localized: "D\xE9fense du Dernier Puits"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754243
+    m_Localized: "Repoussez deux vagues et prot\xE9gez le puits"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754244
+    m_Localized: "Deux vagues repouss\xE9es. Le puits est sauv\xE9."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754245
+    m_Localized: "Le puits a \xE9t\xE9 d\xE9truit"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754246
+    m_Localized: "Vague 1 \xE0 l\u2019ouest   \xB7   Puits {h}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754247
+    m_Localized: "Vague 2 \xE0 l\u2019est   \xB7   Puits {h}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754248
+    m_Localized: "Buggy \xB7 Prends un raccourci"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754249
+    m_Localized: "Sport \xB7 D\xE9clenche un boost de drift"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754250
+    m_Localized: "Blind\xE9 \xB7 \xC9limine un adversaire"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754251
+    m_Localized: "Tank \xB7 Passe la bombe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754252
+    m_Localized: "Insigne de ma\xEEtrise obtenu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754253
+    m_Localized: Profil du pilote
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754254
+    m_Localized: "Carrosserie avec le plus d\u2019arriv\xE9es"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754255
+    m_Localized: "Coupe remport\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754256
+    m_Localized: "Arriv\xE9e la plus serr\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754257
+    m_Localized: "Aucun r\xE9sultat enregistr\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754258
+    m_Localized: "\xC9quipements enregistr\xE9s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754259
+    m_Localized: "Nommer l\u2019\xE9quipement"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754260
+    m_Localized: "Enregistrer l\u2019\xE9quipement"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754261
+    m_Localized: Comparer les armes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754262
+    m_Localized: "Chaleur par tir {shot} \xB7 refroidissement {cool}/s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754263
+    m_Localized: Exercices de tir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754264
+    m_Localized: Touche la voiture en mouvement au canon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754265
+    m_Localized: Brise le bouclier avec un rayon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754266
+    m_Localized: "Pi\xE8ge le poursuivant avec une mine"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754267
+    m_Localized: "Recommencer l\u2019exercice"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754268
+    m_Localized: Favoris
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754269
+    m_Localized: Ajouter aux favoris
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754270
+    m_Localized: Retirer des favoris
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754271
+    m_Localized: "\xC9conomiser pour {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754272
+    m_Localized: "Retirer l\u2019objectif {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754273
+    m_Localized: "{name} \xB7 encore {n} pi\xE8ces"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754274
+    m_Localized: Tu peux acheter {name}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754275
+    m_Localized: '{n} s'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

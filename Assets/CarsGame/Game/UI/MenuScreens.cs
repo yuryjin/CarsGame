@@ -236,6 +236,7 @@ namespace RacingGame
                 case "capture-key": BuildKeyCapture(frame); break;
                 case "practice": BuildPractice(frame); break;
                 case "leaders": BuildLeaders(frame); break;
+                case "driver": BuildDriverProfile(frame); break;
                 case "results": BuildResults(frame); break;
             }
             if (UiFactory.TextScale > 1f)
@@ -375,11 +376,11 @@ namespace RacingGame
                 Narrow ? Vector2.zero : new Vector2(.5f, 0f), Narrow ? new Vector2(1f, .5f) : Vector2.one,
                 Narrow ? Vector2.zero : new Vector2(7f, 0f), Narrow ? new Vector2(0f, -5f) : Vector2.zero, 28f, UiFactory.Raised);
 
-            var links = Narrow ? Item(content, "Links", 180f, false)
+            var links = Narrow ? Item(content, "Links", 270f, false)
                 : UiFactory.Panel(row, "Links", new Vector2(0.58f, 0f), Vector2.one, new Vector2(12f, 0f), Vector2.zero);
-            var destinations = new[] { ("garage", "menu.garage"), ("practice", "practice.title"), ("leaders", "menu.leaderboard"), ("settings", "menu.settings") };
+            var destinations = new[] { ("garage", "menu.garage"), ("practice", "practice.title"), ("leaders", "menu.leaderboard"), ("settings", "menu.settings"), ("driver", "driver.title") };
             int columns = Narrow ? 2 : 1;
-            int rows = destinations.Length / columns;
+            int rows = (destinations.Length + columns - 1) / columns;
             for (int i = 0; i < destinations.Length; i++)
             {
                 var (target, key) = destinations[i];
@@ -577,7 +578,10 @@ namespace RacingGame
             }
             var save = PlatformGlue.Save;
 
+            BuildBodySavings(content);
             BuildLoadout(content);
+            BuildGarageSets(content);
+            BuildWeaponDrills(content);
             BuildBodies(content);
             Section(content, "BuildsTitle", Loc.Get("garage.builds"));
             foreach (var build in new[] { CarBuild.Balanced, CarBuild.Speed, CarBuild.Survival, CarBuild.Firepower })
@@ -1153,6 +1157,7 @@ namespace RacingGame
             var content = UiFactory.Scroll(overview, "ResultsScroll", new Vector2(0f, 104f), Vector2.zero);
             int reward = flow.LastTotalReward;
             var summary = Item(content, "Summary", 216f);
+            ShowSavingsProgress(content);
             summary.GetComponent<Image>().color = new Color(0.12f, 0.16f, 0.22f);
             UiFactory.Panel(summary, "GoldRule", Top, Vector2.one, new Vector2(28f, -4f), new Vector2(-28f, -1f), UiFactory.Accent, false);
             var medal = UiFactory.Panel(summary, "Medal", Vector2.zero, new Vector2(0f, 1f), new Vector2(24f, 24f), new Vector2(194f, -24f), new Color(1f, 0.8f, 0.25f, 0.08f));

@@ -213,18 +213,15 @@ namespace RacingGame
             return currentSlot;
         }
 
+        public static (float perShot, float cooling) HeatProfile(PrimaryWeaponType type, float machineGunFactor)
+        {
+            float factor = type == PrimaryWeaponType.MachineGun ? machineGunFactor : 1f;
+            return (PrimaryWeaponCatalog.Get(type).Heat * factor, 20f / factor);
+        }
+
         private void ApplyHeatProfile()
         {
-            if (primaryType == PrimaryWeaponType.MachineGun)
-            {
-                heatPerShot = 2.5f * machineGunHeatFactor;
-                heatCooldownRate = 20f / machineGunHeatFactor;
-            }
-            else // Cannon
-            {
-                heatPerShot = PrimaryWeaponCatalog.Get(primaryType).Heat;
-                heatCooldownRate = 20f;
-            }
+            (heatPerShot, heatCooldownRate) = HeatProfile(primaryType, machineGunHeatFactor);
             overheatThreshold = 100f;
             overheatRecoveryThreshold = 40f;
         }

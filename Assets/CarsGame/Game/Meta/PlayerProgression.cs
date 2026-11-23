@@ -20,10 +20,13 @@ namespace RacingGame
             if (health != null) health.SetMaxHealth(health.maxHealth * fx.MaxHealthFactor * tuning.MaxHealthFactor, true);
             if (cannon != null)
             {
-                cannon.shellDamage *= fx.DamageFactor * tuning.DamageFactor;
-                cannon.fireInterval *= fx.FireIntervalFactor * tuning.FireIntervalFactor;
+                var factors = GunFactors(fx, tuning);
+                cannon.shellDamage *= factors.damage; cannon.fireInterval *= factors.interval;
             }
         }
+
+        public static (float damage, float interval) GunFactors(UpgradeCatalog.Effects upgrade, UpgradeCatalog.Effects build) =>
+            (upgrade.DamageFactor * build.DamageFactor, upgrade.FireIntervalFactor * build.FireIntervalFactor);
 
         public static void SelectBuild(Core.Save.ProgressData progress, CarBuild build)
         {
@@ -51,6 +54,13 @@ namespace RacingGame
         public static WeaponKind KindOf(SecondaryWeaponType type) => type == SecondaryWeaponType.Mines ? WeaponKind.Mines
             : type == SecondaryWeaponType.FreezeLauncher ? WeaponKind.FreezeLauncher : WeaponKind.RemoteCharge;
 
+        public static SecondaryWeaponType OwnedSecondary(int[] levels, int slot)
+        {
+            if (slot <= 0 || slot > (int)SecondaryWeaponType.RemoteCharge) return SecondaryWeaponType.None;
+            var type = (SecondaryWeaponType)slot;
+            return WeaponCatalog.Level(levels, (int)KindOf(type)) > 0 ? type : SecondaryWeaponType.None;
+        }
+
         public static void ApplyWeapons(CarWeapons weapons, int[] weaponLevels, int equippedSecondary, int equippedPrimary = 0)
         {
             if (weapons == null) return;
@@ -62,8 +72,7 @@ namespace RacingGame
             if (primaryType == PrimaryWeaponType.MachineGun && mgLevel == 0) primaryType = PrimaryWeaponType.Cannon;
             weapons.SetPrimaryType(primaryType);
 
-            var secondaryType = (SecondaryWeaponType)Mathf.Clamp(equippedSecondary, 0, (int)SecondaryWeaponType.RemoteCharge);
-            if (secondaryType != SecondaryWeaponType.None && WeaponCatalog.Level(weaponLevels, (int)KindOf(secondaryType)) == 0) secondaryType = SecondaryWeaponType.None;
+            var secondaryType = OwnedSecondary(weaponLevels, equippedSecondary);
             weapons.secondaryType = secondaryType;
 
             if (secondaryType == SecondaryWeaponType.Mines)

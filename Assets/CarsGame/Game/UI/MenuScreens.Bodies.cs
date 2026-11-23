@@ -36,6 +36,13 @@ namespace RacingGame
             var style = Item(content, "BodyStyle", Narrow ? 110f : 84f, false);
             Label(style, "Text", Loc.Get(CarBodies.ClassKey(tab) + ".desc"), 23f, Vector2.zero, Vector2.one, new Vector2(8f, 0f), new Vector2(-8f, 0f), UiFactory.Muted);
 
+            long mastery = Core.Save.BodyMastery.Count(progress, tab);
+            var badge = Item(content, "ClassMastery", 92f);
+            string skill = Loc.Get("mastery." + tab.ToString().ToLowerInvariant());
+            string status = mastery >= Core.Save.BodyMastery.BadgeAt ? Loc.Get("mastery.badge") : mastery + "/" + Core.Save.BodyMastery.BadgeAt;
+            Label(badge, "Achievement", skill + " · " + status, 25f, Vector2.zero, Vector2.one,
+                new Vector2(16f, 6f), new Vector2(-16f, -6f), mastery >= Core.Save.BodyMastery.BadgeAt ? UiFactory.Positive : UiFactory.Muted);
+
             foreach (var def in CarBodies.OfClass(tab)) BodyRow(content, def, progress.cosmetics, def.Id == equipped, save.Data.Coins);
         }
 

@@ -325,6 +325,122 @@ namespace RacingGame.Tests
             Assert.IsFalse(player.Health.IsDead, "Resume as soon as a lane clears.");
         }
 
+        [UnityTest, Timeout(240000)]
+        public IEnumerator RockShieldsThePulseAndOnlyTheMarkedAirLaneTakesTheFlyover()
+        {
+            yield return Boot();
+            var arena = race.spawner.Arena;
+            var cars = race.Participants;
+            RaceDirector.Instance.Field.Clear();
+            foreach (var p in cars)
+            {
+                p.Car.inputEnabled = false;
+                p.Car.Body.constraints = RigidbodyConstraints.FreezeAll;
+            }
+            var open = cars[0]; var cover = cars[1]; var outer = cars[2];
+            Vector3 At(float x, float z) => arena.transform.TransformPoint(new Vector3(x, .6f, z));
+            open.Car.Teleport(At(0,96), Quaternion.identity);
+            cover.Car.Teleport(At(-3,96), Quaternion.identity);
+            float openHp = open.Health.Health, coverHp = cover.Health.Health;
+            var sectors = arena.transform.Find("PulseSectors");
+            var ring = arena.transform.Find("PulseFront");
+            Time.captureDeltaTime = .1f;
+            while (!sectors.gameObject.activeSelf && race.RaceTime < 30) yield return null;
+            Assert.IsTrue(sectors.gameObject.activeSelf);
+            Assert.IsFalse(ring.gameObject.activeSelf);
+            cover.Car.Teleport(At(48f, Mathf.Sqrt(96f * 96f - 48f * 48f)), Quaternion.identity);
+            Assert.IsTrue(arena.Threatens(open.transform.position));
+            Assert.IsFalse(arena.Threatens(cover.transform.position));
+            while (sectors.gameObject.activeSelf) yield return null;
+            Assert.Less(open.Health.Health, openHp);
+            Assert.AreEqual(coverHp, cover.Health.Health);
+            var strip = arena.transform.Find("AirRaidStrip");
+            while (!strip.gameObject.activeSelf && race.RaceTime < 65) yield return null;
+            Assert.IsTrue(strip.gameObject.activeSelf);
+            open.Car.Teleport(At(0,-84), Quaternion.identity);
+            cover.Car.Teleport(At(-10,-84), Quaternion.identity);
+            outer.Car.Teleport(At(-55,-94), Quaternion.Euler(0,90,0));
+            foreach (var p in new[] { cover, outer })
+            {
+                var drive = p.gameObject.AddComponent<ScriptedDriverInput>();
+                drive.Set(1f,0f);
+                p.Car.SetInputSource(drive);
+                p.Car.Body.constraints = RigidbodyConstraints.None;
+                p.Car.inputEnabled = true;
+            }
+            openHp = open.Health.Health; coverHp = cover.Health.Health;
+            float outerHp = outer.Health.Health;
+            float planeX = -1000f;
+            var plane = arena.transform.Find("BomberFormation").GetChild(0);
+            while (strip.gameObject.activeSelf)
+            {
+                var alongEdge = outer.GetComponent<ScriptedDriverInput>();
+                alongEdge.Set(outer.Car.SpeedKmh < 22f ? .35f : 0f, 0f, outer.Car.SpeedKmh > 26f);
+                if (arena.transform.InverseTransformPoint(cover.transform.position).z > -69f)
+                    cover.GetComponent<ScriptedDriverInput>().Set(0f,0f,true);
+                if (planeX < -500 && open.Health.Health < openHp)
+                {
+                    var position = arena.transform.InverseTransformPoint(plane.position);
+                    Assert.That(position.z, Is.EqualTo(-84f).Within(.1f));
+                    planeX = position.x;
+                }
+                yield return null;
+            }
+            Assert.That(planeX, Is.InRange(-4f,4f), "Plane above the marked impact");
+            Assert.Less(open.Health.Health, openHp);
+            Assert.AreEqual(coverHp, cover.Health.Health, "Drove out before the flyover");
+            Assert.Greater(arena.transform.InverseTransformPoint(cover.transform.position).z, -76f);
+            Assert.AreEqual(outerHp, outer.Health.Health, "Drove outside the boundary");
+            Assert.Greater(arena.transform.InverseTransformPoint(outer.transform.position).x, -45f);
+            Debug.Log($"Canyon pulse hit the open car only; bomber x={planeX:F1} at impact; two moving cars escaped");
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator GarageLetsThePlayerDriveThroughAndRestoresTheRoofOnRetry()
+        {
+            yield return Boot();
+            for (int round = 0; round < 2; round++)
+            {
+                if (round == 1)
+                {
+                    flow.EnterMenu(); flow.StartRace(ev, null);
+                    while (race.State == RaceState.Countdown) yield return null;
+                }
+                var arena = race.spawner.Arena;
+                var car = race.Player;
+                RaceDirector.Instance.Field.Clear();
+                var parked = race.Participants[0] != car ? race.Participants[0] : race.Participants[1];
+                foreach (var p in race.Participants)
+                    if (p != car) { p.Car.inputEnabled = false; p.Car.Body.constraints = RigidbodyConstraints.FreezeAll; }
+                var roof = arena.transform.Find("GarageRoof");
+                var bands = arena.transform.Find("GarageExitBands");
+                Assert.IsFalse(bands.gameObject.activeSelf);
+                Assert.Greater(roof.localPosition.y, 5f);
+                while (parked.Health.IsInvulnerable) yield return null;
+                var drive = car.gameObject.AddComponent<ScriptedDriverInput>();
+                drive.Set(1f,0f);
+                car.Car.SetInputSource(drive);
+                car.Car.Teleport(arena.transform.TransformPoint(new Vector3(93f,.6f,60f)), Quaternion.identity);
+                float carHp = car.Health.Health, parkedHp = parked.Health.Health;
+                int until = SimulationDriver.Instance.Tick + 500;
+                while (!bands.gameObject.activeSelf && SimulationDriver.Instance.Tick < until) yield return null;
+                Assert.IsTrue(bands.gameObject.activeSelf);
+                int signalled = SimulationDriver.Instance.Tick;
+                parked.Car.Teleport(arena.transform.TransformPoint(new Vector3(99f,.6f,77f)), Quaternion.identity);
+                while (bands.gameObject.activeSelf && SimulationDriver.Instance.Tick < until)
+                {
+                    if (arena.transform.InverseTransformPoint(car.transform.position).z > 88f) drive.Set(0f,0f,true);
+                    yield return null;
+                }
+                Assert.IsFalse(bands.gameObject.activeSelf);
+                Assert.That((SimulationDriver.Instance.Tick - signalled) * SimulationDriver.FixedStep, Is.EqualTo(3.5f).Within(.05f));
+                Assert.Less(roof.localPosition.y, 2f);
+                Assert.Greater(arena.transform.InverseTransformPoint(car.transform.position).z, 86f);
+                Assert.AreEqual(carHp, car.Health.Health);
+                Assert.Less(parked.Health.Health, parkedHp);
+            }
+        }
+
         [UnityTest, Timeout(900000)]
         public IEnumerator ScoredMatchesKeepTheStrongerRecordAndSeparateDamageAcrossLives()
         {

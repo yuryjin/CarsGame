@@ -175,6 +175,7 @@ namespace RacingGame.Core.Save
         public void MarkDirty()
         {
             if (LocalVersionTooNew) return;
+            Data.progress.ResolveBodyGoal();
             Data.updatedAtUnixMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             localDirty = true;
             if (!LocalWriteFailed || clock() >= nextLocalRetryAt) RetryLocalWrite();

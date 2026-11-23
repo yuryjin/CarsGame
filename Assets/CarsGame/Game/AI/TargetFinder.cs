@@ -27,7 +27,7 @@ namespace RacingGame
 
         /// <param name="leadShellSpeed">When &gt; 0, test the cone against where the target will be when a shell of this speed arrives.</param>
         /// <param name="closestToAxis">Rank by angle off <paramref name="forward"/> instead of distance (a turret keeps the car dead ahead).</param>
-        public static CarController Find(CarController self, Vector3 origin, Vector3 forward, float coneDegrees, float minRange, float maxRange, float leadShellSpeed = 0f, bool closestToAxis = false)
+        public static CarController Find(CarController self, Vector3 origin, Vector3 forward, float coneDegrees, float minRange, float maxRange, float leadShellSpeed = 0f, bool closestToAxis = false, CarController preferred = null)
         {
             var director = RaceDirector.Current ?? Object.FindAnyObjectByType<RaceDirector>();
             if (director == null) return null;
@@ -58,8 +58,9 @@ namespace RacingGame
                 else dot = Vector3.Dot(to / dist, forward);
                 if (dot < cosCone) continue;
                 float score = closestToAxis ? -dot : dist;
-                if (score >= bestScore) continue;
+                if (score >= bestScore && other != preferred) continue;
                 if (mask != 0 && Physics.Linecast(origin, aim, mask, QueryTriggerInteraction.Ignore)) continue;
+                if (other == preferred) return other;
                 bestScore = score; best = other;
             }
             return best;

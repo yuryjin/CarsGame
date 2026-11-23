@@ -2693,6 +2693,154 @@ MonoBehaviour:
     m_Localized: '{name}  {s} sn'
     m_Metadata:
       m_Items: []
+  - m_Id: 29732681093033984
+    m_Localized: "Darbe geliyor! Kayan\u0131n arkas\u0131na ge\xE7"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754240
+    m_Localized: "Hava sald\u0131r\u0131s\u0131! \xC7izgili \u015Feritten \xE7\u0131k"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754241
+    m_Localized: "\xC7at\u0131 \xE7\xF6k\xFCyor! D\u0131\u015Far\u0131 \xE7\u0131k"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754242
+    m_Localized: "Son Kuyu savunmas\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754243
+    m_Localized: "Kuyu y\u0131k\u0131lmadan iki dalgay\u0131 p\xFCsk\xFCrt"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754244
+    m_Localized: "\u0130ki dalga p\xFCsk\xFCrt\xFCld\xFC. Kuyu g\xFCvende."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754245
+    m_Localized: "Kuyu y\u0131k\u0131ld\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754246
+    m_Localized: "1. dalga bat\u0131dan   \xB7   Kuyu %{h}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754247
+    m_Localized: "2. dalga do\u011Fudan   \xB7   Kuyu %{h}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754248
+    m_Localized: "Buggy \xB7 K\u0131sayoldan ge\xE7"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754249
+    m_Localized: "Spor \xB7 Drift takviyesi kullan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754250
+    m_Localized: "Z\u0131rhl\u0131 \xB7 Rakip ele"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754251
+    m_Localized: "Tank \xB7 S\u0131cak bombay\u0131 aktar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754252
+    m_Localized: "Ustal\u0131k rozeti kazan\u0131ld\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754253
+    m_Localized: "S\xFCr\xFCc\xFC profili"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754254
+    m_Localized: "En \xE7ok fini\u015F yap\u0131lan kasa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754255
+    m_Localized: "Kazan\u0131lan kupa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754256
+    m_Localized: "En yak\u0131n fini\u015F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754257
+    m_Localized: "Hen\xFCz kay\u0131tl\u0131 sonu\xE7 yok"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754258
+    m_Localized: "Kay\u0131tl\u0131 donan\u0131mlar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754259
+    m_Localized: "Donan\u0131ma ad ver"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754260
+    m_Localized: "Mevcut donan\u0131m\u0131 kaydet"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754261
+    m_Localized: "Silahlar\u0131 kar\u015F\u0131la\u015Ft\u0131r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754262
+    m_Localized: "At\u0131\u015F \u0131s\u0131s\u0131 {shot} \xB7 so\u011Fuma {cool}/sn"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754263
+    m_Localized: Silah talimleri
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754264
+    m_Localized: "Hareketli arac\u0131 topla vur"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754265
+    m_Localized: "Kalkan\u0131 \u0131\u015F\u0131nla k\u0131r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754266
+    m_Localized: "Takip\xE7iyi may\u0131nla yakala"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754267
+    m_Localized: Talimi tekrarla
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754268
+    m_Localized: Favoriler
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754269
+    m_Localized: Favorilere ekle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754270
+    m_Localized: "Favoriden \xE7\u0131kar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754271
+    m_Localized: "{name} i\xE7in biriktir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754272
+    m_Localized: "{name} hedefini kald\u0131r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754273
+    m_Localized: "{name} i\xE7in {n} jeton kald\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754274
+    m_Localized: "Art\u0131k {name} alabilirsin"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754275
+    m_Localized: '{n} sn'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

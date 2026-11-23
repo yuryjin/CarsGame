@@ -2660,6 +2660,154 @@ MonoBehaviour:
     m_Localized: '{name}  {s} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 29732681093033984
+    m_Localized: Impuls! Hinter einem Felsen in Deckung!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754240
+    m_Localized: Luftangriff! Raus aus dem markierten Streifen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754241
+    m_Localized: "Das Dach st\xFCrzt ein! Fahr raus"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754242
+    m_Localized: Verteidigung des Letzten Brunnens
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754243
+    m_Localized: "Wehre beide Wellen ab und sch\xFCtze den Brunnen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754244
+    m_Localized: Beide Wellen abgewehrt. Der Brunnen ist sicher.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754245
+    m_Localized: "Der Brunnen wurde zerst\xF6rt"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754246
+    m_Localized: "Welle 1 aus Westen   \xB7   Brunnen {h}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754247
+    m_Localized: "Welle 2 aus Osten   \xB7   Brunnen {h}%"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754248
+    m_Localized: "Buggy \xB7 Nimm eine Abk\xFCrzung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754249
+    m_Localized: "Sport \xB7 L\xF6se einen Driftboost aus"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754250
+    m_Localized: "Panzerwagen \xB7 Schalte einen Gegner aus"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754251
+    m_Localized: "Panzer \xB7 Gib die hei\xDFe Bombe weiter"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754252
+    m_Localized: Meisterzeichen verdient
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754253
+    m_Localized: Fahrerprofil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754254
+    m_Localized: "Karosserie mit den meisten Zieleinl\xE4ufen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754255
+    m_Localized: Gewonnener Pokal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754256
+    m_Localized: Knappster Zieleinlauf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754257
+    m_Localized: Noch kein Ergebnis
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754258
+    m_Localized: Gespeicherte Sets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754259
+    m_Localized: Set benennen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754260
+    m_Localized: Aktuelles Set speichern
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754261
+    m_Localized: Waffen vergleichen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754262
+    m_Localized: "Hitze pro Schuss {shot} \xB7 K\xFChlung {cool}/s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754263
+    m_Localized: "Waffen\xFCbungen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754264
+    m_Localized: Triff das fahrende Auto mit der Kanone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754265
+    m_Localized: Brich den Schild mit einem Strahl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754266
+    m_Localized: Triff den Verfolger mit einer Mine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754267
+    m_Localized: "\xDCbung wiederholen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754268
+    m_Localized: Favoriten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754269
+    m_Localized: Merken
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754270
+    m_Localized: Entfernen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754271
+    m_Localized: "F\xFCr {name} sparen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754272
+    m_Localized: Sparziel {name} entfernen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754273
+    m_Localized: "{name} \xB7 noch {n} M\xFCnzen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754274
+    m_Localized: '{name} ist jetzt bezahlbar'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29732681151754275
+    m_Localized: '{n} s'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
