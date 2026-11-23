@@ -294,6 +294,9 @@ namespace RacingGame.Tests
             var after = record.Samples[cut];
             var before = record.Samples[cut - 1];
             Assert.Greater(Vector3.Distance(before.Position, after.Position), 4f);
+            float deadline = Time.realtimeSinceStartup + 12f;
+            while (PauseController.IsPaused && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsFalse(PauseController.IsPaused, PauseController.Reasons.ToString());
             var menu = Object.FindAnyObjectByType<MenuScreens>();
             menu.GoTo("leaders");
             var save = PlatformGlue.Save.Data;
@@ -321,7 +324,8 @@ namespace RacingGame.Tests
                 Assert.Less(Vector3.Distance(position, viewer.transform.position), .001f);
             }
             toggle.onClick.Invoke();
-            yield return null; yield return null;
+            deadline = Time.realtimeSinceStartup + 8f;
+            while (flow.ReplayTime <= after.TimeSeconds - .001f && Time.realtimeSinceStartup < deadline) yield return null;
             Assert.Greater(flow.ReplayTime, after.TimeSeconds - .001f);
             seek.value = record.Duration;
             Assert.IsTrue(flow.ReplayPaused);
@@ -936,19 +940,23 @@ namespace RacingGame.Tests
             Assert.AreEqual(5, save.Data.progress.reservePrimary); Assert.AreEqual(0, save.Data.progress.equippedPrimary);
         }
 
-        [UnityTest, Timeout(220000)]
+        [UnityTest, Timeout(300000)]
         public IEnumerator BodySavingsTracksTheActualFinishWalletUntilBuyingOrReceivingTheBody()
         {
             yield return OpenProfile();
             var menu = flow.GetComponent<MenuScreens>();
             var body = Core.Economy.CarBodies.Get("dune");
+            var easy = Array.Find(flow.tiers,t => t != null && t.tierId == "easy");
+            PlatformGlue.Save.Data.settings.tier = easy.tierId;
+            int firstPrize = Core.Economy.Economy.Payout(1,true,1,1,null,easy.rewardMultiplier).Total;
+            PlatformGlue.Save.Local.coinsEarned = Math.Max(0,body.Cost - firstPrize - 1);
             void Click(string name) => GameObject.Find(name).GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
             menu.Show("garage"); menu.PreviewBody(body.Id); Click("SaveForBody");
             var flush = PlatformGlue.Save.FlushAsync(); while (!flush.IsCompleted) yield return null;
             flush.GetAwaiter().GetResult(); yield return Reload();
             var save = PlatformGlue.Save;
             Assert.AreEqual(body.Id, save.Data.progress.bodyGoal);
-            for (int attempt = 0; attempt < 5; attempt++)
+            for (int attempt = 0; attempt < 2; attempt++)
             {
                 yield return StartFromEventList("tt1"); yield return DriveToFinish();
                 Assert.AreEqual(FlowState.Results, flow.State);

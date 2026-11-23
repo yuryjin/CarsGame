@@ -151,6 +151,8 @@ namespace RacingGame.Tests
                     car.Teleport(away, facing);
                 }
                 bool eastWarning = false, rocket = false, backing = false;
+                Vector3 crossingLane = Vector3.zero;
+                bool onSecondFlank = false;
                 int stopped = 0, reverseTicks = 0;
                 for (int tick = 0; tick < 4800 && flow.State == FlowState.Racing; tick++)
                 {
@@ -165,8 +167,27 @@ namespace RacingGame.Tests
                         foreach (var enemy in mission.Attackers) if (enemy != null && enemy.Kind == UnitKind.RocketTrooper) rocket = true;
                         Vector3 at = foe != null ? foe.transform.position : mission.WaveOrigin;
                         Vector3 relative = car.transform.position - well.transform.position;
-                        if (relative.x * (at.x - well.transform.position.x) < 0f && Mathf.Abs(relative.z) < 10f)
-                            at = well.transform.position + Vector3.forward * 17f;
+                        if (mission.Wave == 2 && !onSecondFlank)
+                        {
+                            Vector3 flank = (mission.WaveOrigin - well.transform.position).normalized;
+                            if (crossingLane == Vector3.zero)
+                            {
+                                crossingLane = Vector3.Cross(Vector3.up,flank);
+                                if (Vector3.Dot(relative,crossingLane) < 0f) crossingLane = -crossingLane;
+                            }
+                            float across = Vector3.Dot(relative,flank);
+                            onSecondFlank = across >= 19f;
+                            if (!onSecondFlank) at = well.transform.position + crossingLane * 29f +
+                                flank * (Vector3.Dot(relative,crossingLane) < 21f && across < 0f ? Mathf.Min(-16f,across) : 31f);
+                        }
+                        bool shoot = false;
+                        if (foe != null)
+                        {
+                            Vector3 target = car.Cannon.SolveAimPoint(foe);
+                            car.Cannon.CommitAim(target,allowHoming:true,yawLimit:90f);
+                            shoot = Vector3.Distance(car.transform.position,target) < 67f && car.Cannon.IsAlignedWith(target);
+                        }
+                        else car.Cannon.ClearAimCommit();
                         Vector3 aim = at - car.transform.position;
                         aim.y = 0f;
                         float angle = Vector3.SignedAngle(car.transform.forward, aim, Vector3.up);
@@ -177,15 +198,15 @@ namespace RacingGame.Tests
                         if (reverseTicks > 0)
                         {
                             reverseTicks--;
-                            input.Set(-1f, -.75f);
+                            input.Set(-1f, -.75f, false, shoot);
                         }
                         else if (backing)
                         {
                             float steer = Mathf.Clamp(angle / 23f, -1f, 1f);
                             bool rollingForward = Vector3.Dot(car.Body.linearVelocity, car.transform.forward) > 0f;
-                            input.Set(-1f, rollingForward ? steer : -steer);
+                            input.Set(-1f, rollingForward ? steer : -steer, false, shoot);
                         }
-                        else Pursue(car, input, at, foe != null && aim.magnitude < 61f && Mathf.Abs(angle) < 13f);
+                        else Pursue(car, input, at, shoot);
                         if (tick % 180 == 0) Debug.Log($"[WellDrive] tick={tick} wave={mission.Wave} speed={car.SpeedKmh:F0} at={relative} hp={well.Health:F0} kills={race.Player.Kills} range={aim.magnitude:F0} yaw={angle:F0} shots={RaceDirector.Current.ShotsFired}");
                     }
                     if (!defend && tick % 600 == 0) Debug.Log($"[WellIdle] frame={tick} sim={SimulationDriver.Instance.Tick} running={MissionUnit.Running} attackers={mission.Attackers.Count} hp={well.Health:F0}");
