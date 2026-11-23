@@ -112,11 +112,15 @@ namespace RacingGame
             return main;
         }
 
-        public bool OnFork(Vector3 position)
+        public bool OnFork(Vector3 position) => OnFork(position, out _);
+
+        public bool OnFork(Vector3 position, out float forwardFraction)
         {
+            forwardFraction = 0f;
             if (Fork == null) return false;
-            Fork.Project(position, out float error);
-            return error < (TrackFork.HalfWidth + 1f) * (TrackFork.HalfWidth + 1f);
+            Fork.Project(position, out float error, out float fraction);
+            forwardFraction = reversed ? 1f - fraction : fraction;
+            return error < (Fork.RoadHalfWidth + 1f) * (Fork.RoadHalfWidth + 1f);
         }
         public Vector3 Position(float d) => Spline.Position(d);
         public Vector3 Tangent(float d) => Spline.Tangent(d);

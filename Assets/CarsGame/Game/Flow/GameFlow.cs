@@ -316,7 +316,8 @@ namespace RacingGame
             }
             if (onCircuit && track != null && abyssTrack == null && starRing == null && wasteland == null)
             {
-                trackFork = TrackFork.Create(track, !viewing && pickups != null && (ev == null || ev.pickupCount > 0));
+                trackFork = TrackFork.Create(track, !viewing && pickups != null && (ev == null || ev.pickupCount > 0),
+                    ev != null ? ev.mountainFork : MountainFork.Bridge);
                 if (!viewing && trackFork != null && ev != null && ev.format == CircuitFormat.Relay) trackFork.gameObject.AddComponent<RelayRace>().Build(race, track, hud, signMaterial, ev);
                 if (!viewing && trackFork != null && ev != null && ev.format == CircuitFormat.Pursuit) trackFork.gameObject.AddComponent<PursuitRace>().Follow(race);
                 if (!viewing && !IsTestDrive && trackFork != null) trackFork.gameObject.AddComponent<GrandstandReaction>().Watch(race, track);
