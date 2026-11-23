@@ -35,7 +35,8 @@ namespace RacingGame
         public bool LastHadPreviousBest { get; private set; }
         public bool LastWasPersonalBest { get; private set; }
         public int[] LastSectorDeltaMs { get; private set; }
-        private int[] personalGhostSectors;
+        private GhostSectorTimes.Run personalGhostSectors, playerSectors;
+        private int shownSectorCount;
         public bool LastBestComparable { get; private set; }
         public bool LastBestSetupKnown { get; private set; }
         private Core.Save.RecordSetup raceRecordSetup;
@@ -187,6 +188,11 @@ namespace RacingGame
                 }
             }
             TickTestDrive();
+            if (playerSectors != null && recorder.Recording)
+            {
+                playerSectors.Advance(recorder.Record);
+                ShowCompletedSectors();
+            }
         }
 
         // ---------- transitions ----------
@@ -305,7 +311,9 @@ namespace RacingGame
         {
             foreach (var g in ghosts) if (g != null) Destroy(g.gameObject);
             ghosts.Clear();
-            personalGhostSectors = LastSectorDeltaMs = null;
+            personalGhostSectors = playerSectors = null;
+            LastSectorDeltaMs = null;
+            shownSectorCount = 0;
         }
 
         private async void SpawnGhosts(RaceEventDefinition ev, int generation)
@@ -322,7 +330,8 @@ namespace RacingGame
             if (own != null)
             {
                 AddGhost(GhostCar.Spawn(prefab, own, GhostTint));
-                personalGhostSectors = GhostSectorTimes.Measure(track, own, race.laps);
+                personalGhostSectors = GhostSectorTimes.MeasureLaps(track, own, race.laps);
+                if (personalGhostSectors != null) playerSectors = new GhostSectorTimes.Run(track, race.laps);
             }
 
             var sessions = PlatformGlue.Platform?.Sessions;
@@ -576,14 +585,12 @@ namespace RacingGame
             SfxPlayer.Instance.PlayUi(SfxSynth.Finish);
             var rec = recorder.Stop();
             if (rec == null || rec.Samples.Count < 10) return;
-            if (personalGhostSectors != null)
+            if (playerSectors != null && playerSectors.Finish(rec))
             {
-                var times = GhostSectorTimes.Measure(track, rec, race.laps);
-                if (times != null)
-                {
-                    for (int i = 0; i < times.Length; i++) times[i] -= personalGhostSectors[i];
-                    LastSectorDeltaMs = times;
-                }
+                ShowCompletedSectors();
+                LastSectorDeltaMs = new int[3];
+                for (int i = 0; i < playerSectors.Count; i++)
+                    LastSectorDeltaMs[i % 3] += playerSectors.Duration(i) - personalGhostSectors.Duration(i);
             }
             string encoded = rec.ToBase64();
             if (string.IsNullOrEmpty(encoded)) return; // An incomplete or oversized replay cannot replace a valid best.
@@ -598,6 +605,13 @@ namespace RacingGame
                 sessions.Commit(encoded);
                 _ = sessions.PushAsync("{\"meta1\":" + EventMeta(RaceSetup.Event) + ",\"meta2\":" + rec.DurationMilliseconds + "}");
             }
+        }
+
+        private void ShowCompletedSectors()
+        {
+            for (; shownSectorCount < playerSectors.Count; shownSectorCount++)
+                hud?.ShowSectorDelta(track, shownSectorCount % 3,
+                    playerSectors.Duration(shownSectorCount) - personalGhostSectors.Duration(shownSectorCount));
         }
 
         private void OnFinished(RaceResults results)

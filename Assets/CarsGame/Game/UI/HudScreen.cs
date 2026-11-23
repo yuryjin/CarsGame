@@ -25,6 +25,9 @@ namespace RacingGame
         private GameFlow gameFlow;
 
         private TextMeshProUGUI speedText, lapText, positionText, timerText, centerText, hintText, hpText, pauseText, pauseHint, ammoText, hitMarker;
+        private RectTransform sectorPanel;
+        private TextMeshProUGUI sectorText;
+        private double sectorUntil;
         private CarCannon playerCannon;
         private ArenaBombDrop playerBomb;
         private bool bombWasReady;
@@ -279,6 +282,11 @@ namespace RacingGame
             // Top-centre: timer
             timerPanel = UiFactory.Card(root, "TimerPanel", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-140f, -94f), new Vector2(140f, -24f), HudPanelAlpha);
             timerText = UiFactory.Text(timerPanel, "Timer", "0:00.000", 40f, TextAlignmentOptions.Center, Vector2.zero, Vector2.one, new Vector2(16f, 10f), new Vector2(-16f, -10f));
+            sectorPanel = UiFactory.Card(timerPanel, "SectorSplit", Vector2.zero, Vector2.right,
+                new Vector2(-14f, -65f), new Vector2(14f, -5f), HudPanelAlpha);
+            sectorText = UiFactory.Text(sectorPanel, "SectorDelta", "", 30f, TextAlignmentOptions.Center,
+                Vector2.zero, Vector2.one, new Vector2(5f, 2f), new Vector2(-5f, -2f));
+            sectorPanel.gameObject.SetActive(false);
 
             // Centre: countdown / wrong way / messages
             centerPanel = UiFactory.Card(root, "CenterPanel", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-120f, -100f), new Vector2(120f, 100f));
@@ -836,6 +844,7 @@ namespace RacingGame
             Font(primaryNameText, 36f, 36f, 14f);
             Font(secondaryText, 16f, 24f, 12f);
             Font(statusText, 14f, 22f, 12f);
+            Font(sectorText, 20f, 30f, 12f);
             timerText.fontSize = Mathf.Max(40f, 16f / scale);
             speedText.fontSize = Mathf.Max(46f, 18f / scale);
             speedUnit.fontSize = Mathf.Max(16f, 9f / scale);
@@ -1133,6 +1142,7 @@ namespace RacingGame
 
             if (hitMarker.gameObject.activeSelf && Time.unscaledTime > hitMarkerUntil) hitMarker.gameObject.SetActive(false);
             if (race.State >= RaceState.Racing) SetTimer(race.IsArenaMode ? race.RemainingTime : race.PlayerElapsedTime);
+            if (sectorPanel.gameObject.activeSelf && RaceClock.Now >= sectorUntil) sectorPanel.gameObject.SetActive(false);
 
             bool hintVisible = Time.unscaledTime <= hintUntil && !(touchLayout && (goalsExpanded || race.State == RaceState.Countdown))
                 && race.State >= RaceState.Countdown && race.State <= RaceState.Finishing;
@@ -1152,6 +1162,15 @@ namespace RacingGame
                 killFeedBuffer.Update(Time.deltaTime);
                 UpdateKillFeedDisplay();
             }
+        }
+
+        internal void ShowSectorDelta(TrackPath track, int sector, int milliseconds)
+        {
+            string delta = SectorTimingText.Delta(milliseconds, out var color);
+            sectorText.text = SectorTimingText.Name(track, sector) + "  " + delta;
+            sectorText.color = color;
+            sectorUntil = RaceClock.Now + 3d;
+            sectorPanel.gameObject.SetActive(true);
         }
 
         private void SetTimer(double seconds)
@@ -1636,6 +1655,7 @@ namespace RacingGame
                 hintPanel.gameObject.SetActive(train == null); playerCar = null;
             }
             if (eventPanel != null) eventPanel.gameObject.SetActive(false);
+            sectorPanel.gameObject.SetActive(false);
             incomingUntil = hitMarkerUntil = nextGoalRefresh = 0f;
             combatText.text = "";
             incomingArrow.gameObject.SetActive(false); incomingText.gameObject.SetActive(false);
