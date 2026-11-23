@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using RacingGame.Core.Economy;
+using RacingGame.Core.Platform;
 
 namespace RacingGame
 {
@@ -25,6 +26,7 @@ namespace RacingGame
         private TextMeshProUGUI testDriveTimer;
         private TextMeshProUGUI practiceRetryLabel;
         private PerfectStart launchTraining;
+        private Pose? maneuverApproach;
         private int shownTestSecond = -1;
         private string shownTestLanguage;
         private float testDrivePixelScale = -1f;
@@ -80,6 +82,18 @@ namespace RacingGame
             StartRace(testDriveEvent, practiceTier != null ? practiceTier : beforeTestTier);
             if (!IsTestDrive) return false;
 
+            if (lesson == PracticeLesson.Drift || lesson == PracticeLesson.Shortcut || lesson == PracticeLesson.WallRide)
+            {
+                var car = race.Player.Car;
+                if (lesson != PracticeLesson.Drift)
+                {
+                    float entry = lesson == PracticeLesson.Shortcut ? TrackFork.Entry : starRing.Layout.TunnelStart;
+                    track.Pose(track.Wrap(entry - 30f), 0f, out var position, out var rotation);
+                    car.Teleport(position + Vector3.up * race.spawner.grid.dropHeight, rotation);
+                }
+                maneuverApproach = new Pose(car.transform.position, car.transform.rotation);
+            }
+
             // A moving target lets the player try their weapons without being shot during the comparison.
             foreach (var p in race.Participants)
             {
@@ -103,9 +117,9 @@ namespace RacingGame
             var back = UiFactory.Button(testDriveCanvas.transform, "ReturnToGarage", Loc.Get("garage.test_return"), EnterMenu,
                 new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(-300f, -178f), new Vector2(300f, -110f), 26f);
             testDriveTimer = back.GetComponentInChildren<TextMeshProUGUI>();
-            if (lesson == PracticeLesson.Launch)
+            if (lesson == PracticeLesson.Launch || maneuverApproach.HasValue)
             {
-                launchTraining = GetComponent<PerfectStart>();
+                if (lesson == PracticeLesson.Launch) launchTraining = GetComponent<PerfectStart>();
                 var retry = UiFactory.Button(testDriveCanvas.transform, "PracticeRetry", Loc.Get("results.retry"), RetryRace,
                     new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero, 26f, UiFactory.Raised);
                 practiceRetryLabel = retry.GetComponentInChildren<TextMeshProUGUI>();
@@ -113,6 +127,22 @@ namespace RacingGame
             shownTestSecond = -1;
             testDrivePixelScale = -1f;
             return true;
+        }
+
+        private void RetryManeuver(Pose approach)
+        {
+            PauseController.Set(PauseReason.User | PauseReason.Menu, false);
+            race.AbortRace();
+            RaceDirector.Current?.ResetRace();
+            PracticeCompleted = false;
+            shownTestSecond = -1;
+            race.StartRace();
+            if (race.Player == null) { EnterMenu(); return; }
+            race.Player.Car.Teleport(approach.position, approach.rotation);
+            if (pickups != null) pickups.Spawn(testDriveEvent.pickupCount);
+            if (starRing != null) starRing.Follow(race);
+            if (hud != null) hud.SetVisible(true);
+            race.StartPracticeImmediately();
         }
 
         private void OnPracticeHit(GameObject shooter, GameObject victim)
@@ -207,6 +237,7 @@ namespace RacingGame
             if (testDriveCanvas != null) { testDriveCanvas.gameObject.SetActive(false); Destroy(testDriveCanvas.gameObject); }
             testDriveCanvas = null; testDriveTimer = null;
             practiceRetryLabel = null; launchTraining = null;
+            maneuverApproach = null;
             Destroy(testDriveEvent);
             testDriveEvent = null; beforeTestEvent = null; beforeTestTier = null;
             CurrentPractice = PracticeLesson.None;

@@ -195,6 +195,11 @@ namespace RacingGame
 
         private readonly Dictionary<RaceParticipant, Action<int, double>> lapHandlers = new Dictionary<RaceParticipant, Action<int, double>>();
 
+        internal void StartPracticeImmediately()
+        {
+            if (State == RaceState.Countdown && RaceSetup.Event != null && RaceSetup.Event.IsPractice) Go();
+        }
+
         private void Go()
         {
             RaceStartTime = RaceClock.Now;

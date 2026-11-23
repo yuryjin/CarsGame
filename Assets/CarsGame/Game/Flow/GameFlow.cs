@@ -367,6 +367,7 @@ namespace RacingGame
 
         public void RetryRace()
         {
+            if (maneuverApproach.HasValue) { RetryManeuver(maneuverApproach.Value); return; }
             if (IsTestDrive)
             {
                 string body = race.spawner.playerBodyId;
