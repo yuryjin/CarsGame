@@ -26,6 +26,8 @@ MonoBehaviour:
   order: 9
   star1TargetPosition: 3
   star2TargetKills: 2
+  skillGoal: 2
+  skillTarget: 1
   star3ZeroDeaths: 1
   finishGoal: 0
   targetSeconds: 210
