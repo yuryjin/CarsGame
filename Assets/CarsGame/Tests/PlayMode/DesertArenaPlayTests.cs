@@ -226,6 +226,105 @@ namespace RacingGame.Tests
             Assert.IsTrue(race.Results.Player.Finished);
         }
 
+        [UnityTest, Timeout(180000)]
+        public IEnumerator SideEntryAndPursuerDriveTheOuterRoadBackToTheBridge()
+        {
+            yield return Boot();
+            var arena = race.spawner.Arena;
+            var road = ArenaLayout.OuterRoad;
+            var player = race.Player;
+            var rival = race.Participants[0] == player ? race.Participants[1] : race.Participants[0];
+            var input = player.gameObject.AddComponent<ScriptedDriverInput>();
+            player.Car.SetInputSource(input);
+            foreach (var p in race.Participants)
+            {
+                if (p != player) p.Health.SetInvulnerable(150f);
+                var gunner = p.GetComponent<AiGunner>();
+                if (gunner != null) gunner.suppressed = true;
+            }
+            while (player.Health.IsInvulnerable) yield return null;
+            player.Car.Teleport(arena.transform.TransformPoint(road[0] + new Vector3(9, .7f, 3)), Quaternion.Euler(0, -32, 0));
+            rival.Car.Teleport(arena.transform.TransformPoint(road[0] + new Vector3(-3, .7f, -5)), Quaternion.Euler(0, 18, 0));
+            int pNode = 1, rNode = 1;
+            float minAfterTurn = float.MaxValue;
+            for (int frame = 0; frame < 5500 && (pNode < road.Count || rNode < road.Count); frame++)
+            {
+                Vector3 a = arena.transform.InverseTransformPoint(player.transform.position);
+                Vector3 b = arena.transform.InverseTransformPoint(rival.transform.position);
+                if (pNode < road.Count)
+                {
+                    var direction = player.transform.InverseTransformDirection(arena.transform.TransformPoint(road[pNode]) - player.transform.position);
+                    float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+                    input.Set(1f, Mathf.Clamp(angle / 32f - .18f * player.Car.Body.angularVelocity.y, -1f, 1f), player.Car.SpeedKmh > 85f);
+                    if ((a - road[pNode]).sqrMagnitude < 12f * 12f) pNode++;
+                    if (pNode > 6 && pNode < road.Count - 4) minAfterTurn = Mathf.Min(minAfterTurn, Mathf.Abs(player.Car.SpeedKmh));
+                }
+                else input.Set(0, 0, true);
+                if (rNode < road.Count && (b - road[rNode]).sqrMagnitude < 17f * 17f) rNode++;
+                yield return null;
+            }
+            Assert.AreEqual(road.Count, pNode, "Side-entry driver stopped near node " + pNode);
+            Assert.AreEqual(road.Count, rNode, $"Pursuer stopped near node {rNode} at {arena.transform.InverseTransformPoint(rival.transform.position)}, speed {rival.Car.SpeedKmh:F1}, deaths {rival.Deaths}");
+            Assert.Greater(minAfterTurn, 15f, "The outer bends should let a driver stay in motion.");
+            Debug.Log($"Outer road: both cars reached all {road.Count - 1} gates, minimum player speed on the arc {minAfterTurn:F1} km/h");
+        }
+
+        [UnityTest, Timeout(90000)]
+        public IEnumerator RollingRespawnsUseBothEntrancesAndAvoidAnOccupiedLane()
+        {
+            yield return Boot();
+            var arena = race.spawner.Arena;
+            var player = race.Player;
+            var input = player.gameObject.AddComponent<ScriptedDriverInput>();
+            player.Car.SetInputSource(input);
+            for (int i = 0; i < race.Participants.Count; i++)
+            {
+                var p = race.Participants[i];
+                if (p == player) continue;
+                p.Car.Teleport(arena.transform.TransformPoint(new Vector3(30 + i * 5, .6f, 36)), Quaternion.identity);
+                p.Car.Body.constraints = RigidbodyConstraints.FreezeAll;
+            }
+            var starts = new System.Collections.Generic.HashSet<int>();
+            for (int i = 0; i < 3; i++)
+            {
+                player.Health.Detonate(null);
+                int expected = (player.Car.CarId + player.Deaths) % 2;
+                arena.GetSpawnPose(expected, 2, out var entrance, out var rotation);
+                if (i == 2)
+                {
+                    var blocker = race.Participants[0] == player ? race.Participants[1] : race.Participants[0];
+                    blocker.Car.Teleport(entrance + rotation * Vector3.forward * 4, rotation);
+                }
+                player.Health.ReviveNow();
+                var start = player.Car.Body.position;
+                Assert.That(Vector3.Dot(player.Car.Body.linearVelocity, player.Car.Body.rotation * Vector3.forward), Is.EqualTo(12.5f).Within(.02f));
+                if (i < 2) { Assert.Less(Vector3.Distance(start, entrance), 1f); starts.Add(expected); }
+                else Assert.Greater(Vector3.Distance(start, entrance), 20f);
+                input.Set(1f, .3f);
+                for (int n = 0; n < 28; n++) yield return null;
+                Assert.IsTrue(player.Car.IsGrounded);
+                Assert.Greater(Vector3.Distance(start, player.Car.Body.position), 3f);
+                Assert.Greater(player.Car.LastCommand.Steer, 0f);
+            }
+            Assert.AreEqual(2, starts.Count);
+            player.Health.Detonate(null);
+            int slot = 0;
+            RaceParticipant lastBlocker = null;
+            foreach (var p in race.Participants)
+            {
+                if (p == player) continue;
+                arena.GetSpawnPose(slot++, 2, out var gate, out var heading);
+                p.Car.Teleport(gate + heading * Vector3.forward * 4f, heading);
+                lastBlocker = p;
+                if (slot == 2) break;
+            }
+            player.Health.ReviveNow();
+            Assert.IsTrue(player.Health.IsDead, "Wait while both entry lanes are occupied.");
+            lastBlocker.Car.Teleport(arena.transform.TransformPoint(Vector3.right * 40f + Vector3.up), Quaternion.identity);
+            for (int n = 0; n < 50 && player.Health.IsDead; n++) yield return null;
+            Assert.IsFalse(player.Health.IsDead, "Resume as soon as a lane clears.");
+        }
+
         [UnityTest, Timeout(900000)]
         public IEnumerator ScoredMatchesKeepTheStrongerRecordAndSeparateDamageAcrossLives()
         {

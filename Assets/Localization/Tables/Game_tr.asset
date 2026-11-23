@@ -411,7 +411,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860361
-    m_Localized: "Hedef kilitli \u2014 ate\u015F: Ctrl veya sol t\u0131k"
+    m_Localized: "Hedef kilitli \u2014 ate\u015F: {bind.fire} veya sol t\u0131k"
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860362
@@ -1311,7 +1311,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697473
-    m_Localized: "Tak\u0131ld\u0131n m\u0131? R tu\u015Funa bas"
+    m_Localized: "Tak\u0131ld\u0131n m\u0131? {bind.reset} tu\u015Funa bas"
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697474
@@ -1514,8 +1514,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488779
-    m_Localized: "Gaz: W/yukar\u0131. D\xF6n: A/D veya oklar. Ate\u015F: Ctrl / sol
-      fare. \xD6ndeki rakibi yakala ve vur."
+    m_Localized: "Gaz: {bind.gas}. D\xF6n: {bind.steer}. Ate\u015F: {bind.fire} /
+      sol fare. \xD6ndeki rakibi yakala ve vur."
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488780
@@ -1524,8 +1524,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488781
-    m_Localized: "40 km/sa \xFCzerinde d\xF6n ve Bo\u015Fluk'a bas. \u015Earj biriktir,
-      h\u0131zlanmak i\xE7in Bo\u015Fluk'u b\u0131rak."
+    m_Localized: "40 km/sa \xFCzerinde d\xF6n ve {bind.brake} tu\u015Funa bas. \u015Earj
+      biriktir, h\u0131zlanmak i\xE7in tu\u015Fu b\u0131rak."
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488782
@@ -1721,8 +1721,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820457320448
-    m_Localized: "Gaz: W / yukar\u0131. Geri: S / a\u015Fa\u011F\u0131. D\xF6n\xFC\u015F:
-      A/D veya oklar. Fren: Bo\u015Fluk. Piste d\xF6n: R."
+    m_Localized: "Gaz: {bind.gas}. Geri: {bind.reverse}. D\xF6n\xFC\u015F: {bind.steer}.
+      Fren: {bind.brake}. Piste d\xF6n: {bind.reset}."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097664
@@ -1732,14 +1732,14 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097665
-    m_Localized: "Ate\u015F: Ctrl / sol fare. \u0130ki silah aras\u0131nda ge\xE7i\u015F:
-      Q / fare tekerle\u011Fi veya 1 ve 2."
+    m_Localized: "Ate\u015F: {bind.fire} / sol fare. \u0130ki silah aras\u0131nda
+      ge\xE7i\u015F: Q / fare tekerle\u011Fi veya {bind.one} ve {bind.two}."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097666
-    m_Localized: "Ate\u015F: Ctrl / sol fare. Q bas\u0131l\u0131yken fareyi hareket
-      ettirerek silah se\xE7; Q b\u0131rak\u0131nca ku\u015Fan. Q bas\u0131l\u0131yken
-      Tab / tekerlek sayfay\u0131, 1\u20130 yuvay\u0131 se\xE7er."
+    m_Localized: "Ate\u015F: {bind.fire} / sol fare. Q bas\u0131l\u0131yken fareyi
+      hareket ettirerek silah se\xE7; Q b\u0131rak\u0131nca ku\u015Fan. Q bas\u0131l\u0131yken
+      Tab / tekerlek sayfay\u0131, {bind.slots} yuvay\u0131 se\xE7er."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097667
@@ -1749,7 +1749,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097668
-    m_Localized: "{action}: E / Shift / sa\u011F fare / LB. Cephane ve haz\u0131r
+    m_Localized: "{action}: {bind.secondary} / sa\u011F fare / LB. Cephane ve haz\u0131r
       olma durumu ekranda g\xF6sterilir."
     m_Metadata:
       m_Items: []
@@ -1775,7 +1775,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 18240820478291969
     m_Localized: "Sadece may\u0131nlar. \xD6ne ge\xE7 ve arkana may\u0131n b\u0131rakmak
-      i\xE7in E / Shift / sa\u011F fareye bas."
+      i\xE7in {bind.secondary} / sa\u011F fareye bas."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820478291970
@@ -2501,6 +2501,196 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 29723557332594688
     m_Localized: "Hedefe yaln\u0131zca ak\u0131nc\u0131lar hasar verebilir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860491366400
+    m_Localized: "Dokunmatik d\xFC\u011Fme konumlar\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337920
+    m_Localized: "D\xFC\u011Fmeleri ta\u015F\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337921
+    m_Localized: "D\xFC\u011Fmeleri parmaklar\u0131n\u0131n rahat\xE7a ula\u015Faca\u011F\u0131
+      yere s\xFCr\xFCkle."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337922
+    m_Localized: "Konumlar\u0131 s\u0131f\u0131rla"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337923
+    m_Localized: "W/yukar\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337924
+    m_Localized: "S/a\u015Fa\u011F\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337925
+    m_Localized: A/D veya oklar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337926
+    m_Localized: "Bo\u015Fluk"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337927
+    m_Localized: Ctrl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337928
+    m_Localized: E / Shift
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337929
+    m_Localized: R
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337930
+    m_Localized: 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337931
+    m_Localized: 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337932
+    m_Localized: "1\u20130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337933
+    m_Localized: V
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337934
+    m_Localized: Klavye kontrolleri
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337935
+    m_Localized: Gaz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337936
+    m_Localized: Geri
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337937
+    m_Localized: "Sola d\xF6n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337938
+    m_Localized: "Sa\u011Fa d\xF6n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337939
+    m_Localized: "\u0130kincil silah"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337940
+    m_Localized: "Silah se\xE7imi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337941
+    m_Localized: "Silah yuvas\u0131 {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532224
+    m_Localized: "{action} i\xE7in bir tu\u015Fa bas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532225
+    m_Localized: "{button}, {action} i\xE7in kullan\u0131l\u0131yor. Ba\u015Fka tu\u015F
+      se\xE7."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532226
+    m_Localized: "\u0130ptal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532227
+    m_Localized: "Varsay\u0131lan tu\u015Flara d\xF6n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532228
+    m_Localized: "\xC7ubuk \xF6l\xFC b\xF6lgesi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532229
+    m_Localized: "\xC7ubuk hassasiyeti"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532230
+    m_Localized: Direksiyon tepkisi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532231
+    m_Localized: "S\u0131f\u0131rla"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532232
+    m_Localized: "Arkada\u015F meydan okuma kodu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532233
+    m_Localized: Kodumu al
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532234
+    m_Localized: "Kodla yar\u0131\u015F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532235
+    m_Localized: "Kod ge\xE7ersiz veya eksik."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532236
+    m_Localized: "Bu kod s\xFCr\xFCm\xFC desteklenmiyor."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532237
+    m_Localized: "Bu pist veya gerekli donan\u0131m kullan\u0131lam\u0131yor."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532238
+    m_Localized: "Hedef s\xFCre \xB7 {t}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532239
+    m_Localized: "Haftan\u0131n hedefleri"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532240
+    m_Localized: "Bir pist yar\u0131\u015F\u0131n\u0131 bitir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532241
+    m_Localized: "Pist yar\u0131\u015F\u0131n\u0131 ilk \xFC\xE7te bitir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532242
+    m_Localized: "Bir arena sava\u015F\u0131n\u0131 bitir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532243
+    m_Localized: "Arena sava\u015F\u0131n\u0131 bir elemeyle bitir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532244
+    m_Localized: "Bir g\xF6revi tamamla"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532245
+    m_Localized: "Bir g\xF6revi enkaza d\xF6nmeden bitir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532246
+    m_Localized: "\xDC\xE7 hedefin \xF6d\xFCl\xFC \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532247
+    m_Localized: '{name}  {s} sn'
     m_Metadata:
       m_Items: []
   references:

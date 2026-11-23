@@ -414,7 +414,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860361
-    m_Localized: 'Objetivo fijado: dispara con Ctrl o clic izq.'
+    m_Localized: 'Objetivo fijado: dispara con {bind.fire} o clic izq.'
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860362
@@ -1312,7 +1312,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697473
-    m_Localized: "\xBFAtascado? Pulsa R"
+    m_Localized: "\xBFAtascado? Pulsa {bind.reset}"
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697474
@@ -1510,8 +1510,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488779
-    m_Localized: 'Gas: W/arriba. Gira: A/D o flechas. Dispara: Ctrl / clic izquierdo.
-      Alcanza y acierta al rival.'
+    m_Localized: 'Gas: {bind.gas}. Gira: {bind.steer}. Dispara: {bind.fire} / clic
+      izquierdo. Alcanza y acierta al rival.'
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488780
@@ -1520,8 +1520,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488781
-    m_Localized: "A m\xE1s de 40 km/h: gira y pulsa Espacio. Acumula carga y suelta
-      para acelerar."
+    m_Localized: "A m\xE1s de 40 km/h: gira y pulsa {bind.brake}. Acumula carga y
+      suelta para acelerar."
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488782
@@ -1708,8 +1708,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820457320448
-    m_Localized: "Gas: W / arriba. Marcha atr\xE1s: S / abajo. Gira: A/D o flechas.
-      Freno: Espacio. Volver a la pista: R."
+    m_Localized: "Gas: {bind.gas}. Marcha atr\xE1s: {bind.reverse}. Gira: {bind.steer}.
+      Freno: {bind.brake}. Volver a la pista: {bind.reset}."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097664
@@ -1718,14 +1718,14 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097665
-    m_Localized: 'Dispara: Ctrl / clic izquierdo. Cambia entre tus dos armas: Q /
-      rueda o teclas 1 y 2.'
+    m_Localized: 'Dispara: {bind.fire} / clic izquierdo. Cambia entre tus dos armas:
+      Q / rueda o teclas {bind.one} y {bind.two}.'
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097666
-    m_Localized: "Dispara: Ctrl / clic izquierdo. Mant\xE9n Q y mueve el rat\xF3n
+    m_Localized: "Dispara: {bind.fire} / clic izquierdo. Mant\xE9n Q y mueve el rat\xF3n
       para elegir; suelta Q para equipar. Con Q pulsada: Tab / rueda cambia de p\xE1gina;
-      1\u20130 elige casilla."
+      {bind.slots} elige casilla."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097667
@@ -1734,8 +1734,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097668
-    m_Localized: "{action}: E / May\xFAs / clic derecho / LB. La munici\xF3n y disponibilidad
-      aparecen en pantalla."
+    m_Localized: "{action}: {bind.secondary} / clic derecho / LB. La munici\xF3n
+      y disponibilidad aparecen en pantalla."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097669
@@ -1759,8 +1759,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820478291969
-    m_Localized: "Solo minas. Adel\xE1ntate y pulsa E / May\xFAs / clic derecho para
-      dejar una mina detr\xE1s."
+    m_Localized: "Solo minas. Adel\xE1ntate y pulsa {bind.secondary} / clic derecho
+      para dejar una mina detr\xE1s."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820478291970
@@ -2476,6 +2476,194 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 29723557332594688
     m_Localized: "Solo los saqueadores pueden da\xF1ar el objetivo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860491366400
+    m_Localized: "Posici\xF3n de botones t\xE1ctiles"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337920
+    m_Localized: Mover botones
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337921
+    m_Localized: Arrastra los botones hasta donde lleguen tus dedos.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337922
+    m_Localized: Restablecer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337923
+    m_Localized: W/arriba
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337924
+    m_Localized: S/abajo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337925
+    m_Localized: A/D o flechas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337926
+    m_Localized: Espacio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337927
+    m_Localized: Ctrl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337928
+    m_Localized: "E / May\xFAs"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337929
+    m_Localized: R
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337930
+    m_Localized: 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337931
+    m_Localized: 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337932
+    m_Localized: "1\u20130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337933
+    m_Localized: V
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337934
+    m_Localized: Controles de teclado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337935
+    m_Localized: Acelerar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337936
+    m_Localized: "Marcha atr\xE1s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337937
+    m_Localized: Girar a la izquierda
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337938
+    m_Localized: Girar a la derecha
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337939
+    m_Localized: Arma secundaria
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337940
+    m_Localized: "Selecci\xF3n de arma"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337941
+    m_Localized: Arma {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532224
+    m_Localized: Pulsa una tecla para {action}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532225
+    m_Localized: '{button} ya controla {action}. Elige otra tecla.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532226
+    m_Localized: Cancelar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532227
+    m_Localized: Restablecer las teclas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532228
+    m_Localized: Zona muerta del mando
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532229
+    m_Localized: Sensibilidad del mando
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532230
+    m_Localized: "Respuesta de direcci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532231
+    m_Localized: Restablecer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532232
+    m_Localized: "C\xF3digo de desaf\xEDo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532233
+    m_Localized: "Obtener mi c\xF3digo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532234
+    m_Localized: "Correr con c\xF3digo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532235
+    m_Localized: "C\xF3digo inv\xE1lido o incompleto."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532236
+    m_Localized: "Esta versi\xF3n del c\xF3digo no es compatible."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532237
+    m_Localized: "El circuito o el equipo requerido no est\xE1 disponible."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532238
+    m_Localized: "Tiempo objetivo \xB7 {t}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532239
+    m_Localized: Objetivos semanales
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532240
+    m_Localized: Termina una carrera de circuito
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532241
+    m_Localized: Sube al podio en un circuito
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532242
+    m_Localized: Termina un combate de arena
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532243
+    m_Localized: Termina un combate de arena con una baja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532244
+    m_Localized: "Completa una misi\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532245
+    m_Localized: "Completa una misi\xF3n sin perder el auto"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532246
+    m_Localized: "Premio por los tres \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532247
+    m_Localized: '{name}  {s} s'
     m_Metadata:
       m_Items: []
   references:

@@ -27,7 +27,7 @@ namespace RacingGame.Tests
             finally { Object.Destroy(cameraObject); }
         }
 
-        private static void Capture(Camera camera, string output)
+        internal static void Capture(Camera camera, string output)
         {
 #if UNITY_EDITOR
             bool previousAsync = UnityEditor.ShaderUtil.allowAsyncCompilation;

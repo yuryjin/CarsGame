@@ -34,6 +34,8 @@ namespace RacingGame
         /// <summary>(lapNumber, lapTimeSeconds)</summary>
         public event Action<int, double> LapCompleted;
 
+        private double[] gateTimes;
+        private int[] gateLaps;
         private int hint = -1;
         private float wrongWayTime;
 
@@ -66,6 +68,12 @@ namespace RacingGame
             hint = -1;
             Distance = Path.Project(transform.position, ref hint);
             Counter.Begin(Distance);
+            if (gateLaps == null || gateLaps.Length != Counter.GateCount)
+            {
+                gateTimes = new double[Counter.GateCount];
+                gateLaps = new int[Counter.GateCount];
+            }
+            else Array.Clear(gateLaps, 0, gateLaps.Length);
             CurrentLapStart = RaceClock.Now;
             BestLapTime = double.PositiveInfinity;
             LastLapTime = 0d;
@@ -82,13 +90,35 @@ namespace RacingGame
             if (!enabled || Path == null || Counter == null) return;
 
             Distance = Path.Project(transform.position, ref hint);
+            int gate = Counter.NextGate;
             float delta = Counter.Step(Distance);
+            if (gateLaps != null && gate != Counter.NextGate)
+            {
+                gateLaps[gate] = Counter.LapsCompleted + 1;
+                gateTimes[gate] = RaceClock.Now;
+            }
             SpeedAlongTrack = delta / SimulationDriver.FixedStep;
 
             if (Counter.LapJustCompleted) CompleteLap();
 
             if (SpeedAlongTrack < -2f) wrongWayTime += SimulationDriver.FixedStep; else wrongWayTime = 0f;
             WrongWay = wrongWayTime >= wrongWaySeconds;
+        }
+
+        /// <summary>Rival minus car time at the last common forward gate of the current lap.</summary>
+        public bool TryGapTo(RaceProgress rival, out double seconds)
+        {
+            seconds = 0d;
+            if (rival == null || gateLaps == null || rival.gateLaps == null || LapsCompleted != rival.LapsCompleted
+                || Path != rival.Path || gateLaps.Length != rival.gateLaps.Length) return false;
+            int lap = LapsCompleted + 1;
+            for (int gate = gateLaps.Length - 1; gate >= 0; gate--)
+            {
+                if (gateLaps[gate] != lap || rival.gateLaps[gate] != lap) continue;
+                seconds = rival.gateTimes[gate] - gateTimes[gate];
+                return true;
+            }
+            return false;
         }
 
         private void CompleteLap()

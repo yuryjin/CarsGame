@@ -144,6 +144,7 @@ namespace RacingGame
             Teardown();
             RestoreDailyTier();
             RestoreYesterdayPractice();
+            RestoreFriendChallenge();
             RestoreTestDrive();
         }
 
@@ -184,7 +185,7 @@ namespace RacingGame
         {
             bool pausePressed = pauseAction != null ? pauseAction.WasPressedThisFrame()
                 : (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame);
-            if (State == FlowState.Racing && race.State >= RaceState.Countdown && race.State < RaceState.Finished)
+            if (State == FlowState.Racing && race.State >= RaceState.Countdown && race.State < RaceState.Finished && !(menus != null && menus.HandlingDrivingKey))
             {
                 if (pausePressed)
                 {
@@ -215,6 +216,7 @@ namespace RacingGame
             Teardown();
             RestoreDailyTier();
             RestoreYesterdayPractice();
+            RestoreFriendChallenge();
             RestoreTestDrive();
             if (hud != null) hud.SetVisible(false);
             SetState(resumeResult ? FlowState.Results : FlowState.Menu);
@@ -233,6 +235,11 @@ namespace RacingGame
             if (IsTestDrive && ev != testDriveEvent) RestoreTestDrive();
             if (!IsTestDrive) practiceReturnResults = null;
             if (yesterdayPractice != null && ev != yesterdayPractice) RestoreYesterdayPractice();
+            if (friendChallenge != null && ev != friendEvent)
+            {
+                if (tier == RaceSetup.Tier && tierBeforeChallenge != null) tier = tierBeforeChallenge;
+                RestoreFriendChallenge();
+            }
             bool standardEquipment = DailyRace.IsDaily(ev);
             if (standardEquipment)
             {
@@ -245,7 +252,7 @@ namespace RacingGame
             Teardown();
             int generation = raceGeneration;
             var tierSave = PlatformGlue.Save;   // remember the difficulty actually raced (direct PLAY, Next and Retry too)
-            if (!IsTestDrive && !standardEquipment && tier != null && tierSave != null && tierSave.Data.settings.tier != tier.tierId) { tierSave.Data.settings.tier = tier.tierId; tierSave.MarkDirty(); }
+            if (!IsTestDrive && friendChallenge == null && !standardEquipment && tier != null && tierSave != null && tierSave.Data.settings.tier != tier.tierId) { tierSave.Data.settings.tier = tier.tierId; tierSave.MarkDirty(); }
 
             // Event rules
             race.tier = tier;
@@ -306,7 +313,10 @@ namespace RacingGame
                 if (ev.spaceTrack) spaceTrack = SpaceTrack.Create(track, abyssTrack);
             }
             if (onCircuit && track != null && abyssTrack == null && starRing == null && wasteland == null)
+            {
                 trackFork = TrackFork.Create(track, !viewing && pickups != null && (ev == null || ev.pickupCount > 0));
+                if (!viewing && !IsTestDrive && trackFork != null) trackFork.gameObject.AddComponent<GrandstandReaction>().Watch(race, track);
+            }
             if (signMaterial != null) brakingBoards = BrakingBoards.Create(track, signMaterial);
             if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
         }
@@ -457,14 +467,14 @@ namespace RacingGame
             if (save != null)
             {
                 bool standardEquipment = DailyRace.IsDaily(RaceSetup.Event);
-                var equipment = standardEquipment ? new Core.Save.ProgressData() : save.Data.progress;
-                if (standardEquipment) RewardedOffers.ClearLastRaceTrial();
+                var equipment = standardEquipment ? new Core.Save.ProgressData() : friendChallenge != null ? ChallengeEquipment() : save.Data.progress;
+                if (standardEquipment || friendChallenge != null) RewardedOffers.ClearLastRaceTrial();
                 // Selecting the primary resets its base stats, so upgrades and tuning follow it.
                 PlayerProgression.ApplyWeapons(player.Weapons, equipment.weapons, equipment.equippedSecondary, equipment.equippedPrimary);
                 player.Weapons.ConfigureLoadout(!equipment.fullArsenal,
                     (PrimaryWeaponType)equipment.equippedPrimary, (PrimaryWeaponType)equipment.reservePrimary);
                 // A rewarded "try it for one race" level rides on top of the saved levels and is used up here.
-                var appliedUpgrades = IsTestDrive || standardEquipment ? equipment.upgrades : RewardedOffers.ConsumeTrial(equipment.upgrades);
+                var appliedUpgrades = IsTestDrive || standardEquipment || friendChallenge != null ? equipment.upgrades : RewardedOffers.ConsumeTrial(equipment.upgrades);
                 PlayerProgression.ApplyTo(playerCar, player.Health, playerCar.GetComponent<CarCannon>(), appliedUpgrades,
                     (Core.Economy.CarBuild)equipment.buildPreset);
                 if (!IsTestDrive)
@@ -633,6 +643,7 @@ namespace RacingGame
                 else if (SessionStage == FirstSessionStage.FirstResults) SessionStage = FirstSessionStage.NextStart;
             }
             if (playerEngine != null) playerEngine.SetRunning(true);
+            if (friendChallenge != null) hud?.ShowHint(Loc.Format("challenge.target", "t", UiFactory.FormatMilliseconds(FriendTargetMs)), 8f);
             foreach (var g in ghosts) if (g != null) g.Begin(race.RaceStartTime);
             if (!IsTestDrive && yesterdayPractice == null && trainMission == null && settlementMission == null && race.Player != null)
                 recorder.Begin(race.Player, TrackHash(RaceSetup.Event), UiFactory.Escape(PlatformGlue.Platform != null ? PlatformGlue.Platform.Player.Name : "You"));
@@ -758,6 +769,9 @@ namespace RacingGame
                         LastTrainingSectors = best.KeepSectors(TrackHash(ev), race.laps, playerSectors.BestDurations());
                     if (!daily) UnlockNext(ev, me.Finished && me.Position <= 3, previousStars, save);
                     if (daily) RecordDaily(ev, me, save, row);
+                    var discipline = ev.mode == EventMode.Race ? Core.Save.WeeklyDiscipline.Circuit
+                        : ev.mode == EventMode.Arena ? Core.Save.WeeklyDiscipline.Arena : Core.Save.WeeklyDiscipline.Mission;
+                    Core.Save.WeeklyGoals.Record(save.Data.progress, DailyRace.NowUnixMs, discipline, me.Finished, me.Position, me.Kills, me.Deaths);
                 }
                 Core.Economy.RaceCups.GrantCompleted(save.Data.progress);
                 save.MarkDirty();

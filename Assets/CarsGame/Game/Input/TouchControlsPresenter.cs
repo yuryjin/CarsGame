@@ -11,7 +11,7 @@ namespace RacingGame
     /// Layout: steer pair bottom-left, Fire (big) + Brake bottom-right — one-hand playable with
     /// auto-throttle.
     /// </summary>
-    public sealed class TouchControlsPresenter : MonoBehaviour
+    public sealed partial class TouchControlsPresenter : MonoBehaviour
     {
         public RaceManager race;
         public bool forceShow;
@@ -49,6 +49,7 @@ namespace RacingGame
 
         private void OnDisable()
         {
+            CloseLayoutEditor();
             Loc.LanguageChanged -= OnLanguageChanged;
             if (hooked != null) { hooked.autoThrottle = PlatformGlue.Save?.Data.settings.autoThrottle ?? previousAutoThrottle; hooked.autoSecondary = previousAutoSecondary; hooked = null; }
             if (canvas != null) canvas.gameObject.SetActive(false);
@@ -60,12 +61,14 @@ namespace RacingGame
         private void OnLanguageChanged()
         {
             if (!built) return;
+            CloseLayoutEditor();
             canvas.gameObject.SetActive(false); Destroy(canvas.gameObject); canvas = null; built = false; shown = false;
             Publish(false);
         }
 
         private void Update()
         {
+            if (editing) { ApplyTouchTargets(); return; }
             var flow = GetComponent<GameFlow>();
             bool inRace = flow == null || flow.State == FlowState.Racing;
             if (!forceShow && inRace && Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame) keyboardChosen = true;
@@ -133,6 +136,9 @@ namespace RacingGame
                 Vector2.zero, Vector2.zero, Vector2.one).transform.parent;
             launchLabel = Button(root, "Launch", Loc.Get("touch.launch"), "<Gamepad>/rightTrigger",
                 new Vector2(0.5f, 0f), new Vector2(-200f, 40f), new Vector2(200f, 190f));
+            movable = new[] { leftButton, rightButton, brakeButton, (RectTransform)fireLabel.transform.parent,
+                (RectTransform)secondaryLabel.transform.parent, (RectTransform)swapButton.transform,
+                resetButton, rearButton, (RectTransform)launchLabel.transform.parent };
             targetScale = -1f;
         }
 
@@ -144,8 +150,11 @@ namespace RacingGame
             bool left = settings != null && settings.touchLeftHanded;
             bool compact = settings != null && settings.compactHud;
             float textScale = UiFactory.TextScale;
-            if (Mathf.Approximately(scale, targetScale) && targetLarge == large && targetLeft == left && targetCompact == compact && targetTextScale == textScale) return;
+            if (Mathf.Approximately(scale, targetScale) && targetLarge == large && targetLeft == left && targetCompact == compact && targetTextScale == textScale
+                && savedArea == Screen.safeArea && ReferenceEquals(shownPositions, settings?.touchPositions)) return;
             targetScale = scale;
+            savedArea = Screen.safeArea;
+            shownPositions = settings?.touchPositions;
             targetTextScale = textScale;
             targetLarge = large; targetLeft = left; targetCompact = compact;
             float size = large ? 1.25f : 1f;
@@ -210,6 +219,7 @@ namespace RacingGame
             swapLabel.enableWordWrapping = false;
             swapLabel.fontSizeMin = Mathf.Max(26f, 12f / scale);
             swapLabel.fontSizeMax = swapLabel.fontSizeMin * textScale;
+            RestorePositions();
         }
 
         private static TMPro.TextMeshProUGUI Button(Transform parent, string name, string label, string controlPath, Vector2 anchor, Vector2 offsetMin, Vector2 offsetMax)

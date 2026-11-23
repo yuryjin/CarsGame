@@ -113,7 +113,7 @@ namespace RacingGame
             if (!Ready || string.IsNullOrEmpty(key)) return false;
             var entry = loadedTable?.GetEntry(key);
             if (entry == null) return false;
-            value = entry.GetLocalizedString();
+            value = DrivingBindings.Hint(entry.GetLocalizedString());
             return true;
         }
 

@@ -175,6 +175,20 @@ def render_loop(bpm, bars, progression, style):
     return np.stack([left, right], axis=1)
 
 
+def render_final_lap():
+    """Two bars of dry auxiliary percussion; the player matches the current race tempo."""
+    beat = 60 / 140
+    drum = np.zeros(round(SR * beat * 8))
+    for step in range(32):
+        t = step * beat / 4
+        if step % 4 in (0, 3):
+            place(drum, t, tone(lambda f, x: np.sin(2 * np.pi * f * x),
+                                46 if step % 4 == 0 else 53, .15, .003, .045, .65))
+        if step % 4 == 2:
+            place(drum, t, hat(.24))
+    return np.stack([drum, np.roll(drum, 25)], axis=1)
+
+
 def render_sting(chords, bpm, fall=False):
     beat = 60 / bpm
     total = len(chords) * beat + 2.2
@@ -223,6 +237,7 @@ def main():
     write_mp3(os.path.join(out_dir, "race_a.mp3"), render_loop(140, 16, race_a, "race"))
     write_mp3(os.path.join(out_dir, "race_b.mp3"), render_loop(150, 16, race_b, "race"))
     write_mp3(os.path.join(out_dir, "win.mp3"), render_sting([[60, 64, 67], [62, 65, 69], [64, 67, 71], [65, 69, 72, 76]], 180))
+    write_mp3(os.path.join(out_dir, "final_lap.mp3"), render_final_lap())
     write_mp3(os.path.join(out_dir, "lose.mp3"), render_sting([[64, 67, 71], [62, 65, 69], [60, 63, 67], [57, 60, 63]], 110, fall=True))
 
 

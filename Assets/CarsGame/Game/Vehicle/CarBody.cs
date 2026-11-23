@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using RacingGame.Core.Economy;
+using RacingGame.Core.Combat;
 using Slot = RacingGame.BodyMesh.Slot;
 
 namespace RacingGame
@@ -27,6 +28,16 @@ namespace RacingGame
         private CarController car;
         private Transform classicHull, newHull;
         private bool initialized;
+        private CarHealth wearHealth;
+        public int DamageStage { get; private set; }
+        private float impactSide, impactEnd;
+        private readonly Dictionary<Transform, HullPose> originalHull = new Dictionary<Transform, HullPose>();
+        private readonly struct HullPose
+        {
+            public readonly Vector3 Position, Scale;
+            public readonly Quaternion Rotation;
+            public HullPose(Transform hull) { Position = hull.localPosition; Scale = hull.localScale; Rotation = hull.localRotation; }
+        }
 
         public static CarBody Apply(GameObject go, in BodyDef def)
         {
@@ -46,6 +57,11 @@ namespace RacingGame
             if (!def.IsStandard) ApplyPhysics(go, def);
             var model = CarBodyModels.Get(def);
             body.ApplyVisuals(model, def);
+            if (body.wearHealth == null && go.TryGetComponent(out body.wearHealth))
+            {
+                body.wearHealth.HitResolved += body.OnBodyHit;
+                body.wearHealth.OnRespawned += body.ClearWear;
+            }
             body.SetModelStyle(PlatformGlue.ClassicCarModels);
             if (def.IsStandard) return body;
 
@@ -213,10 +229,50 @@ namespace RacingGame
             classicHull.gameObject.SetActive(showClassic);
             if (newHull != null) newHull.gameObject.SetActive(!showClassic);
             (showClassic ? classicHull : newHull).SetAsFirstSibling();
+            ApplyWear(showClassic ? classicHull : newHull);
             SetWheelStyle(showClassic);
             GetComponent<CarPaint>()?.Refresh();
             GetComponent<CarLivery>()?.RefreshBody();
             GetComponent<CarHealth>()?.RefreshBodyRenderers();
+        }
+
+        private void OnBodyHit(HitInfo hit, HitResult result)
+        {
+            if (hit.HitType != HitType.Collision || result.DamageDealt <= 0f || hit.Damage < 8f || DamageStage == 2) return;
+            Vector3 contact = transform.InverseTransformPoint(hit.Point);
+            impactSide = Mathf.Clamp(contact.x, -1f, 1f);
+            impactEnd = Mathf.Clamp(contact.z, -1f, 1f);
+            DamageStage++;
+            ApplyWear(classicHull); ApplyWear(newHull);
+        }
+
+        private void ApplyWear(Transform hull)
+        {
+            if (hull == null) return;
+            if (!originalHull.TryGetValue(hull, out var pose))
+            {
+                if (DamageStage == 0) return;
+                pose = new HullPose(hull);
+                originalHull.Add(hull, pose);
+            }
+            float damage = DamageStage * .5f;
+            hull.localScale = Vector3.Scale(pose.Scale, new Vector3(1f - .09f * damage, 1f - .21f * damage, 1f - .14f * damage));
+            hull.localPosition = pose.Position + new Vector3(-impactSide * .11f, 0f, -impactEnd * .17f) * damage;
+            hull.localRotation = pose.Rotation * Quaternion.Euler(impactEnd * 7f * damage, 0f, -impactSide * 9f * damage);
+        }
+
+        private void ClearWear()
+        {
+            DamageStage = 0;
+            ApplyWear(classicHull); ApplyWear(newHull);
+            originalHull.Clear();
+        }
+
+        private void OnDestroy()
+        {
+            if (wearHealth == null) return;
+            wearHealth.HitResolved -= OnBodyHit;
+            wearHealth.OnRespawned -= ClearWear;
         }
 
         private void SetWheelStyle(bool classic)

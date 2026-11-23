@@ -27,6 +27,8 @@ namespace RacingGame
         [System.Runtime.InteropServices.DllImport("__Internal")] private static extern void CarsMusic_SetPaused(int paused);
         [System.Runtime.InteropServices.DllImport("__Internal")] private static extern void CarsMusic_Duck(float depth, float attack, float hold, float release);
 
+        [System.Runtime.InteropServices.DllImport("__Internal")] private static extern void CarsMusic_FinalLap(string url, int active, float tempo);
+        public void SetFinalLap(bool active, float tempo) => CarsMusic_FinalLap(MusicFiles.Url("final_lap"), active ? 1 : 0, tempo);
         public void Play(string track, bool loop, float fadeSeconds) => CarsMusic_Play(MusicFiles.Url(track), loop ? 1 : 0, fadeSeconds);
         public void Stop(float fadeSeconds) => CarsMusic_Stop(fadeSeconds);
         public void Sting(string track, float volume) => CarsMusic_Sting(MusicFiles.Url(track), volume);
@@ -52,7 +54,9 @@ namespace RacingGame
         }
 
         private readonly Channel[] music = new Channel[2];
-        private Channel sting;
+        private Channel sting, finalLap;
+        private bool wantsFinalLap;
+        private float finalTempo;
         private int current = -1;
         private string wanted;
         private bool wantedLoop;
@@ -66,6 +70,7 @@ namespace RacingGame
         {
             for (int i = 0; i < music.Length; i++) music[i] = MakeChannel("Music_" + i);
             sting = MakeChannel("MusicSting");
+            finalLap = MakeChannel("FinalLapPercussion");
         }
 
         private Channel MakeChannel(string name)
@@ -119,6 +124,20 @@ namespace RacingGame
             if (paused) sting.source.Pause();
         }
 
+        public void SetFinalLap(bool active, float tempo)
+        {
+            wantsFinalLap = active; finalTempo = tempo;
+            if (!active) { finalLap.source.Stop(); finalLap.gain = finalLap.target = 0f; return; }
+            if (!clips.TryGetValue("final_lap", out var clip)) { Preload("final_lap"); return; }
+            finalLap.source.clip = clip;
+            finalLap.source.loop = true;
+            finalLap.source.pitch = tempo;
+            finalLap.source.Play();
+            // Align the extra percussion to the race loop where the platform has a playback clock.
+            if (current >= 0) finalLap.source.time = music[current].source.time * tempo % clip.length;
+            Fade(finalLap, .33f, .16f);
+        }
+
         public void Preload(string track)
         {
             if (clips.ContainsKey(track) || !loading.Add(track)) return;
@@ -139,6 +158,7 @@ namespace RacingGame
                 clips[track] = clip;
             }
             if (wanted == track) StartWanted(clips[track]);
+            if (track == "final_lap" && wantsFinalLap) SetFinalLap(true, finalTempo);
         }
 
         public void SetVolume(float value) => volume = value;
@@ -170,7 +190,7 @@ namespace RacingGame
             ch.rate = Mathf.Abs(to - ch.gain) / Mathf.Max(0.01f, seconds);
         }
 
-        private IEnumerable<Channel> AllChannels() { yield return music[0]; yield return music[1]; yield return sting; }
+        private IEnumerable<Channel> AllChannels() { yield return music[0]; yield return music[1]; yield return sting; yield return finalLap; }
 
         private void Update()
         {

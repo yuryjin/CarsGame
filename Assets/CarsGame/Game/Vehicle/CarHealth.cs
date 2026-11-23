@@ -299,6 +299,14 @@ namespace RacingGame
 
         private void Respawn()
         {
+            var arena = GetComponent<RaceParticipant>()?.Arena;
+            Vector3 entrance = default;
+            Quaternion heading = Quaternion.identity;
+            if (arena != null && !arena.TryGetRecoveryPose(controller, out entrance, out heading))
+            {
+                respawnAtTick = NowTick + SimulationDriver.SecondsToTicks(.25f);
+                return;
+            }
             IsDead = false;
             respawnAtTick = int.MaxValue;
             LastAttacker = null;
@@ -313,7 +321,12 @@ namespace RacingGame
                 rb.angularVelocity = Vector3.zero;
             }
 
-            if (controller != null) controller.ResetCar();
+            if (arena != null)
+            {
+                controller.Teleport(entrance, heading);
+                rb.linearVelocity = heading * Vector3.forward * 12.5f;
+            }
+            else if (controller != null) controller.ResetCar();
             if (status != null) status.ClearAllStatuses();
 
             TintWreck(false);

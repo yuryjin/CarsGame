@@ -21,6 +21,14 @@ namespace RacingGame.World.Gen
         public const float ClearCorridor = 12f;      // nothing generated closer than this to the centre line (barriers sit at ~6 m)
         public const float GrandstandLateral = 16f;  // front edge of the stand, metres right of the centre line
 
+        public static GrandstandPlacement GrandstandAt(TrackSpline spline, float startLineDistance)
+        {
+            float d = startLineDistance + 6f;
+            Vector3 pos = spline.Position(d) + spline.Right(d) * GrandstandLateral;
+            pos.y = 0f;
+            return new GrandstandPlacement { Position = pos, Forward = -spline.Right(d), Length = 44f };
+        }
+
         public static PropLayout Build(TrackSpline spline, IList<Vector3> authoredTrees, float startLineDistance, int seed, float groveRingMin = 55f, float groveRingMax = 240f, int newTreeCap = 90)
         {
             var layout = new PropLayout();
@@ -30,10 +38,7 @@ namespace RacingGame.World.Gen
 
             // 0. Grandstand along the start straight, right side: the left side is only ~25 m from the returning back section.
             float standD = startLineDistance + 6f;
-            {
-                Vector3 pos = spline.Position(standD) + spline.Right(standD) * GrandstandLateral; pos.y = 0f;
-                layout.Grandstand = new GrandstandPlacement { Position = pos, Forward = -spline.Right(standD), Length = 44f };
-            }
+            layout.Grandstand = GrandstandAt(spline, startLineDistance);
             bool InStand(Vector3 p)
             {
                 Vector3 rel = p - layout.Grandstand.Position; rel.y = 0f;

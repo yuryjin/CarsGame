@@ -94,6 +94,9 @@ namespace RacingGame.Tests
             b.settings.largeText = true;
             b.settings.reducedCombatFlashes = true;
             b.settings.cameraDistance = 1;
+            b.settings.touchPositions = new[] { new TouchPosition { button = "Fire", leftHanded = true, x = .3f, y = .4f } };
+            b.settings.drivingKeyBindings = "custom keyboard";
+            b.settings.stickDeadzone = .25f; b.settings.stickSensitivity = 1.25f;
             Assert.AreEqual("tr", SaveMerge.Merge(a, b).settings.lang);
             Assert.AreEqual("tr", SaveMerge.Merge(b, a).settings.lang);
             // Every settings field comes from the newer save, not just the ones the merge used to copy.
@@ -105,6 +108,12 @@ namespace RacingGame.Tests
             Assert.IsTrue(SaveMigrator.FromJson(SaveMigrator.ToJson(merged)).settings.largeText);
             Assert.IsTrue(merged.settings.reducedCombatFlashes);
             Assert.AreEqual(1, SaveMigrator.FromJson(SaveMigrator.ToJson(merged)).settings.cameraDistance);
+            Assert.AreEqual(.4f, merged.settings.touchPositions[0].y);
+            Assert.AreEqual("custom keyboard", SaveMigrator.FromJson(SaveMigrator.ToJson(merged)).settings.drivingKeyBindings);
+            Assert.AreEqual(.25f, merged.settings.stickDeadzone);
+            Assert.AreEqual(1.25f, SaveMigrator.FromJson(SaveMigrator.ToJson(merged)).settings.stickSensitivity);
+            b.settings.touchPositions[0].y = .8f;
+            Assert.AreEqual(.4f, merged.settings.touchPositions[0].y);
             Assert.IsFalse(merged.settings.autoAim);
             Assert.IsFalse(merged.settings.qualityAuto);
             Assert.AreEqual(0, merged.settings.quality);

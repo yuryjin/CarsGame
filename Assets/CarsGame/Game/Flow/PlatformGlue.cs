@@ -57,6 +57,7 @@ namespace RacingGame
         private void OnEnable()
         {
             race.OnRaceStarted += OnRaceStarted;
+            Save.Changed += OnSaveChanged;
             PauseController.PausedChanged += OnPausedChanged;
             if (Platform != null) { Platform.PauseChanged += OnPlatformPause; Platform.IdentityChanged += OnIdentityChanged; }
             _ = LoadSaveAsync();
@@ -65,6 +66,7 @@ namespace RacingGame
         private void OnDisable()
         {
             race.OnRaceStarted -= OnRaceStarted;
+            if (Save != null) Save.Changed -= OnSaveChanged;
             PauseController.PausedChanged -= OnPausedChanged;
             if (Platform != null) { Platform.PauseChanged -= OnPlatformPause; Platform.IdentityChanged -= OnIdentityChanged; }
             Platform?.SetGameplayActive(false);
@@ -79,6 +81,7 @@ namespace RacingGame
                 while (!p.IsInitialized && Time.realtimeSinceStartup < until && Application.isPlaying) await Task.Yield();
             }
             if (!Save.Loaded) await Save.LoadAsync();
+            DrivingBindings.Load(Save.Data.settings.drivingKeyBindings, force: true);
             Loc.Initialize(p != null ? p.LanguageCode : "", Save.Data.settings.lang);
             SfxPlayer.Instance.volume = Save.Data.settings.sfx * 0.8f;   // music has its own setting (MusicPlayer)
             ApplyQuality();
@@ -109,6 +112,8 @@ namespace RacingGame
                 await p.Leaderboards.SubmitAsync("best_" + b.eventId, b.bestTimeMs);
             }
         }
+
+        private static void OnSaveChanged(SaveData data) => DrivingBindings.Load(data.settings.drivingKeyBindings);
 
         // Sign-in swapped the account: no cloud write until the new account's save is fetched and merged.
         private void OnIdentityChanged() { Save?.OnIdentityChanged(); }

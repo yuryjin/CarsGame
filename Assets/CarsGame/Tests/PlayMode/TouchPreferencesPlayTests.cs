@@ -51,6 +51,97 @@ namespace RacingGame.Tests
         private static Button Button(string name) => System.Array.Find(Object.FindObjectsByType<Button>(), b => b.name == name);
         private static Bounds Bounds(RectTransform rect) => RectTransformUtility.CalculateRelativeRectTransformBounds(rect.root, rect);
 
+        [UnityTest, Timeout(240000)]
+        public IEnumerator DraggedControlsSurviveRestartOnBothHandsAndResetToTheirPreset()
+        {
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            IEnumerator Boot()
+            {
+                yield return SceneManager.LoadSceneAsync("SampleScene");
+                float until = Time.realtimeSinceStartup + 60f;
+                while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < until) yield return null;
+                Assert.IsTrue(PlatformGlue.IsReady);
+                yield return null; yield return null;
+                flow = Object.FindAnyObjectByType<GameFlow>();
+                Object.FindAnyObjectByType<TouchControlsPresenter>().forceShow = true;
+            }
+            IEnumerator Frames(int count) { for (int i = 0; i < count; i++) yield return null; }
+            void Finger(int id, UnityEngine.InputSystem.TouchPhase phase, Vector2 position) =>
+                InputSystem.QueueStateEvent(syntheticTouch, new TouchState { touchId = id, phase = phase, position = position });
+            Vector2 Center(string name)
+            {
+                var rect = (RectTransform)GameObject.Find(name).transform;
+                return RectTransformUtility.WorldToScreenPoint(null, rect.TransformPoint(rect.rect.center));
+            }
+            IEnumerator Settings(bool left)
+            {
+                Button("PauseButton").onClick.Invoke(); yield return null;
+                Button("PauseSettings").onClick.Invoke(); yield return null;
+                Button(left ? "TouchLeftOn" : "TouchLeftOff").onClick.Invoke(); yield return null;
+                Button("EditTouchLayout").onClick.Invoke(); yield return Frames(3);
+            }
+            IEnumerator Resume()
+            {
+                Button("FinishTouchLayout").onClick.Invoke(); yield return null;
+                Button("Back").onClick.Invoke(); yield return null;
+                Button("Resume").onClick.Invoke(); yield return Frames(4);
+            }
+            IEnumerator DriveWithBothFingers()
+            {
+                Vector2 turn = Center("Right"), fire = Center("Fire");
+                Finger(1, UnityEngine.InputSystem.TouchPhase.Began, turn);
+                Finger(2, UnityEngine.InputSystem.TouchPhase.Began, fire); yield return Frames(8);
+                var command = flow.GetComponent<RaceManager>().Player.Car.LastCommand;
+                Assert.Greater(command.Steer, .3f); Assert.IsTrue(command.Fire);
+                Finger(1, UnityEngine.InputSystem.TouchPhase.Ended, turn);
+                Finger(2, UnityEngine.InputSystem.TouchPhase.Ended, fire); yield return Frames(5);
+            }
+            yield return Boot();
+            syntheticTouch = InputSystem.AddDevice<Touchscreen>();
+            saved = JsonUtility.ToJson(PlatformGlue.Save.Data);
+            PlatformGlue.Save.Data.settings.touchPositions = null;
+            var safe = Screen.safeArea;
+            var custom = new[] { Rect.NormalizedToPoint(safe, new Vector2(.68f, .41f)),
+                Rect.NormalizedToPoint(safe, new Vector2(.32f, .41f)) };
+            var preset = new Vector2[2];
+            for (int session = 0; session < 2; session++)
+            {
+                if (session > 0)
+                {
+                    var flush = PlatformGlue.Save.FlushAsync();
+                    while (!flush.IsCompleted) yield return null;
+                    Assert.IsFalse(flush.IsFaulted);
+                    typeof(PlatformGlue).GetProperty(nameof(PlatformGlue.Save)).SetValue(null, null);
+                    yield return Boot();
+                }
+                var race = flow.GetComponent<RaceManager>();
+                flow.StartRace(System.Array.Find(flow.events, e => e.eventId == "e1"), flow.tiers[0]);
+                while (race.State == RaceState.Countdown) yield return null;
+                for (int hand = 0; hand < 2; hand++)
+                {
+                    yield return Settings(hand == 1);
+                    if (session == 0)
+                    {
+                        preset[hand] = Center("Fire");
+                        Finger(1, UnityEngine.InputSystem.TouchPhase.Began, preset[hand]); yield return Frames(3);
+                        Finger(1, UnityEngine.InputSystem.TouchPhase.Moved, custom[hand]); yield return Frames(3);
+                        Finger(1, UnityEngine.InputSystem.TouchPhase.Ended, custom[hand]); yield return Frames(3);
+                        Assert.Less(Vector2.Distance(custom[hand], Center("Fire")), 4f);
+                    }
+                    else
+                    {
+                        Assert.Less(Vector2.Distance(custom[hand], Center("Fire")), 4f, "Stored position after restart");
+                        Button("ResetTouchLayout").onClick.Invoke(); yield return Frames(3);
+                        Assert.Less(Vector2.Distance(preset[hand], Center("Fire")), 4f, "Restore this hand's preset");
+                    }
+                    yield return Resume();
+                    Assert.Less(Vector2.Distance(session == 0 ? custom[hand] : preset[hand], Center("Fire")), 4f);
+                    yield return DriveWithBothFingers();
+                }
+                flow.EnterMenu(); yield return Frames(4);
+            }
+        }
+
         [UnityTest, Timeout(120000)]
         public IEnumerator RearViewPreservesSteeringAndMinesAndClearsOnPauseOrFocusLoss()
         {

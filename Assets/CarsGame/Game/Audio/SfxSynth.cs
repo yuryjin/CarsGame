@@ -1,4 +1,5 @@
 using UnityEngine;
+using RacingGame.Core.Economy;
 
 namespace RacingGame
 {
@@ -11,13 +12,21 @@ namespace RacingGame
     public static class SfxSynth
     {
         private const int Rate = 22050;
-        private static AudioClip engine, shot, hit, lapDing, beep, go, finish, wreck, trainWhistle;
+        private static AudioClip engine, shot, hit, lapDing, beep, go, finish, wreck, trainWhistle, crawlerTracks;
 
         public static AudioClip Engine => engine ??= Loop("sfx_engine", 1f, t =>
         {
             float f = 55f;
             float v = Mathf.Sin(2f * Mathf.PI * f * t) * 0.5f + Saw(f * 2f, t) * 0.25f + Saw(f * 3.01f, t) * 0.12f;
             return v * 0.5f;
+        });
+
+        public static AudioClip CrawlerTracks => crawlerTracks ??= Loop("sfx_crawler_tracks", 1f, t =>
+        {
+            float beat = (t * 11f) % 1f;
+            float rumble = .34f * Mathf.Sin(2f * Mathf.PI * 43f * t) + .17f * Mathf.Sin(2f * Mathf.PI * 74f * t);
+            float clank = Mathf.Exp(-beat * 11f) * (.29f * Mathf.Sin(2f * Mathf.PI * 335f * t) + .16f * Noise());
+            return rumble * (.83f + .17f * Mathf.Cos(2f * Mathf.PI * beat)) + clank;
         });
 
         public static AudioClip Shot => SfxLibrary.Get("fire_cannon") ?? SynthShot;
@@ -62,7 +71,26 @@ namespace RacingGame
         });
 
         // ---------- player car loops (built on first race, not at menu load) ----------
-        private static AudioClip engineRich, screech, wind, nitroHiss;
+        private static AudioClip engineRich, screech, wind, nitroHiss, buggyMotor, armoredMotor, tankMotor;
+
+        public static AudioClip EngineFor(BodyClass body)
+        {
+            switch (body)
+            {
+                case BodyClass.Buggy:
+                    return buggyMotor ??= Loop("motor_buggy", 1f, t =>
+                        .33f * Saw(92f, t) + .19f * Mathf.Sin(2f * Mathf.PI * 276f * t) + .09f * Saw(184f, t));
+                case BodyClass.Armored:
+                    return armoredMotor ??= Loop("motor_armored", 1f, t =>
+                        .39f * Mathf.Sin(2f * Mathf.PI * 46f * t) + .19f * Saw(92f, t)
+                        + .13f * Mathf.Sin(2f * Mathf.PI * 138f * t) * (.5f + .5f * Mathf.Cos(2f * Mathf.PI * 23f * t)));
+                case BodyClass.Tank:
+                    return tankMotor ??= Loop("motor_tank", 1f, t =>
+                        (.41f * Mathf.Sin(2f * Mathf.PI * 34f * t) + .26f * Saw(68f, t))
+                        * (.74f + .26f * Mathf.Cos(2f * Mathf.PI * 8f * t)));
+                default: return EngineRich;
+            }
+        }
 
         /// <summary>55 Hz firing note with six harmonics, a slightly detuned second voice and exhaust pulses.</summary>
         public static AudioClip EngineRich => SfxLibrary.Get("engine_loop") ?? SynthEngineRich;

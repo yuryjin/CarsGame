@@ -3,6 +3,14 @@ using System.Collections.Generic;
 
 namespace RacingGame.Core.Save
 {
+    [Serializable] public struct TouchPosition
+    {
+        public string button;
+        public bool leftHanded;
+        // Centre within the current safe area, in normalized screen coordinates.
+        public float x, y;
+    }
+
     /// <summary>
     /// Player settings. <c>qualityAuto</c> stays true until the player picks a graphics level, so
     /// phones get the Mobile tier and desktops the PC one without a stored choice getting in the way.
@@ -30,6 +38,11 @@ namespace RacingGame.Core.Save
         public bool autoAim = true;
         public bool touchLargeButtons;
         public bool touchLeftHanded;
+        public TouchPosition[] touchPositions;
+        public string drivingKeyBindings;
+        public float stickDeadzone;
+        /// <summary>Zero selects the original gamepad response, including its device-specific deadzone.</summary>
+        public float stickSensitivity;
         /// <summary>Last difficulty the player raced ("" = pick by experience).</summary>
         public string tier = "";
         /// <summary>Contextual tips already shown (bit per <c>Core.Onboarding.Hint</c>).</summary>
@@ -129,6 +142,7 @@ namespace RacingGame.Core.Save
         public List<string> unlockedEvents = new List<string>();
         public List<EventBest> bests = new List<EventBest>();
         public List<RaceAttempt> recentAttempts = new List<RaceAttempt>();
+        public List<WeeklyGoalState> weekly = new List<WeeklyGoalState>();
         /// <summary>Owned cosmetics as "paint:id" / "livery:id" (free ones are implicit).</summary>
         public List<string> cosmetics = new List<string>();
         public string paint = "";

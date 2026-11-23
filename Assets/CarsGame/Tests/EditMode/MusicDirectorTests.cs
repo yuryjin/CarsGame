@@ -15,6 +15,7 @@ namespace RacingGame.Tests
             public void Play(string track, bool loop, float fadeSeconds) => Log.Add("play " + track);
             public void Stop(float fadeSeconds) => Log.Add("stop");
             public void Sting(string track, float volume) => Log.Add("sting " + track);
+            public void SetFinalLap(bool active, float tempo) => Log.Add(active ? "layer on" : "layer off");
             public void Preload(string track) => Log.Add("preload " + track);
             public void SetVolume(float volume) => Volume = volume;
             public void SetPaused(bool paused) => Paused = paused;
@@ -127,6 +128,21 @@ namespace RacingGame.Tests
             Assert.AreEqual(1f, MusicDirector.MusicLevel(new SettingsData { sfx = 0f, music = 1f }));
             Assert.AreEqual(0f, MusicDirector.MusicLevel(new SettingsData { sfx = 1f, music = 0f }));
             Assert.AreEqual(0f, MusicDirector.MusicLevel(null));
+        }
+
+        [Test]
+        public void LastLapPercussionFollowsGapPauseAndFinish()
+        {
+            var (d, o) = Make();
+            d.OnState(FlowState.Racing, 0f); d.OnRaceStarted();
+            d.SetFinalLapGap(false, 2f); d.SetFinalLapGap(true, 40f);
+            Assert.IsFalse(o.Log.Contains("layer on"));
+            d.SetFinalLapGap(true, 10f); d.SetFinalLapGap(true, 18f);
+            d.SetPauseReasons(PauseReason.User); d.SetPauseReasons(PauseReason.None);
+            d.SetFinalLapGap(true, 23f); d.SetFinalLapGap(true, 13f); d.OnPlayerFinished(1);
+            d.SetFinalLapGap(true, 2f);
+            CollectionAssert.AreEqual(new[] { "layer on", "layer off", "layer on", "layer off", "layer on", "layer off" },
+                o.Log.FindAll(x => x.StartsWith("layer")));
         }
 
         [TestCase(0f)]

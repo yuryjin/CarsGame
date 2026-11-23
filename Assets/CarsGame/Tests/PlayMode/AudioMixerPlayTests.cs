@@ -59,6 +59,7 @@ namespace RacingGame.Tests
             public void Stop(float fadeSeconds) { }
             public void Sting(string track, float volume) { }
             public void Preload(string track) { }
+            public void SetFinalLap(bool active, float tempo) { }
             public void SetVolume(float volume) { }
             public void SetPaused(bool paused) { }
             public void Duck(float depth, float attack, float hold, float release) { Ducks++; }

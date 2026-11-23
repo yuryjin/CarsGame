@@ -16,6 +16,7 @@ namespace RacingGame
         private bool crossing, approaching;
         private int nextBridgeTick;
         private int bridgeArm;
+        private int outerNode = -1;
 
         private void Awake()
         {
@@ -25,7 +26,7 @@ namespace RacingGame
 
         private void OnEnable() { if (car != null) car.Teleported += OnTeleported; }
         private void OnDisable() { if (car != null) car.Teleported -= OnTeleported; }
-        private void OnTeleported() { stuckTime = 0f; crossing = approaching = false; }
+        private void OnTeleported() { stuckTime = 0f; crossing = approaching = false; outerNode = -1; }
 
         public void Initialize(ArenaLayout layout, AiDriverProfile driverProfile)
         {
@@ -48,8 +49,22 @@ namespace RacingGame
             var target = TargetFinder.Find(car, transform.position + Vector3.up * 0.5f,
                 transform.forward, 180f, 0.1f, ArenaLayout.HalfSize * 3f);
             Vector3 aim = !nearWall && target != null ? target.transform.position : arena.transform.position;
+            var road = ArenaLayout.OuterRoad;
+            if (outerNode < 0 && !crossing && target != null && localPosition.y < 3f
+                && (localPosition - road[0]).sqrMagnitude < 22f * 22f
+                && (arena.transform.InverseTransformPoint(target.transform.position) - road[1]).sqrMagnitude < 30f * 30f)
+            {
+                outerNode = 1;
+                approaching = false;
+            }
+            if (outerNode >= 0)
+            {
+                if ((localPosition - road[outerNode]).sqrMagnitude < 12f * 12f) outerNode++;
+                if (outerNode < road.Count) aim = arena.transform.TransformPoint(road[outerNode]);
+                else { outerNode = -1; approaching = true; bridgeArm = 0; }
+            }
             // Alternate bridge runs and low-ground combat. The lane stays fixed throughout a jump.
-            if (arena.Running && !approaching && !crossing && tick >= nextBridgeTick)
+            if (arena.Running && outerNode < 0 && !approaching && !crossing && tick >= nextBridgeTick)
             {
                 approaching = true;
                 bridgeArm = Mathf.RoundToInt(Mathf.Atan2(localPosition.x, localPosition.z) * Mathf.Rad2Deg / 60f);

@@ -24,7 +24,7 @@ namespace RacingGame
             new GameObject("MusicPlayer").AddComponent<MusicPlayer>().Attach(flow);
         }
 
-        private void Attach(GameFlow gameFlow)
+        public void Attach(GameFlow gameFlow)
         {
             Current = this;
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -71,6 +71,16 @@ namespace RacingGame
             // Polled (a float compare) so the settings screen needs no call into the music code.
             director.SetLevel(save != null && save.Loaded ? MusicDirector.MusicLevel(save.Data.settings) : 0f);
             director.SetPauseReasons(PauseController.Reasons);  // reasons can change without a pause flip
+            var player = race != null ? race.Player : null;
+            var progress = player != null ? player.Progress : null;
+            bool finalLap = progress != null && race.State == RaceState.Racing && !race.IsArenaMode && !race.IsMissionMode
+                && progress.LapsCompleted == race.laps - 1;
+            float gap = float.PositiveInfinity;
+            if (finalLap)
+                foreach (var other in race.Participants)
+                    if (other != player && other.Progress != null && !race.HasFinished(other) && !RaceManager.IsOut(other))
+                        gap = Mathf.Min(gap, Mathf.Abs(other.Progress.TotalProgress - progress.TotalProgress));
+            director.SetFinalLapGap(finalLap, gap);
             director.Tick(Time.unscaledTime);
         }
     }

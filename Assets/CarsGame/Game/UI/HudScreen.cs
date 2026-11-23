@@ -51,7 +51,12 @@ namespace RacingGame
         private Sprite healthFillSprite;
         private RectTransform speedPanel, healthPanel, hintPanel, ammoPanel, secondaryPanel, statusPanel, eventPanel, centerPanel, pauseButton, racePanel, timerPanel;
         private TextMeshProUGUI secondaryText, statusText;
-        private TextMeshProUGUI primaryNameText;
+        private TextMeshProUGUI primaryNameText, gapText;
+        private RectTransform gapPanel;
+        private float nextGapRefresh;
+        private RaceParticipant lastAhead, lastBehind;
+        private double lastAheadGap, lastBehindGap;
+        private string gapLanguage;
         private string lastStatusStr;
         private bool lastStatusShield, lastStatusFrozen, lastStatusJammed, lastStatusPunctured, lastStatusSlowed;
         private int lastSecondaryAmmo = -1;
@@ -275,6 +280,11 @@ namespace RacingGame
             UiFactory.Panel(racePanel, "Accent", Vector2.zero, new Vector2(0f, 1f), new Vector2(0f, 18f), new Vector2(3f, -18f), UiFactory.Accent, false);
             lapText = UiFactory.Text(racePanel, "Lap", "LAP 1/3", 36f, TextAlignmentOptions.MidlineLeft, new Vector2(0f, 1f), Vector2.one, new Vector2(18f, -70f), new Vector2(-18f, -12f));
             positionText = UiFactory.Text(racePanel, "Position", "P1/4", 36f, TextAlignmentOptions.MidlineLeft, new Vector2(0f, 1f), Vector2.one, new Vector2(18f, -138f), new Vector2(-18f, -80f));
+            gapPanel = UiFactory.Card(racePanel, "IntervalPanel", Vector2.zero, new Vector2(1f, 0f), Vector2.zero, Vector2.zero, HudPanelAlpha);
+            gapText = UiFactory.Text(gapPanel, "RivalGaps", "", 22f, TextAlignmentOptions.MidlineLeft,
+                Vector2.zero, Vector2.one, new Vector2(5f, 0f), new Vector2(-3f, 0f), Color.white);
+            gapText.raycastTarget = false;
+            gapPanel.gameObject.SetActive(false);
             lapText.fontSize = 28f; lapText.color = UiFactory.Muted;
             positionText.fontStyle = FontStyles.Bold;
             lapText.enableAutoSizing = positionText.enableAutoSizing = true;
@@ -463,7 +473,7 @@ namespace RacingGame
         {
             helpText.text = touchLayout ? Loc.Format("help.drive.touch", "button", Loc.Get("touch.reset")) : Loc.Get("help.drive.keys");
             if (!touchLayout) helpText.text += "\n\n" + Loc.Get("help.drive.gamepad");
-            helpText.text += "\n\n" + Loc.Format("help.rear_view", "button", touchLayout ? Loc.Get("touch.rear_view") : "V / R3");
+            helpText.text += "\n\n" + Loc.Format("help.rear_view", "button", touchLayout ? Loc.Get("touch.rear_view") : DrivingBindings.Hint("{bind.rear}") + " / R3");
             helpText.text += "\n\n" + Loc.Get("help.launch");
             string context = ControlsHint(touchLayout);
             string drift = Loc.Get(touchLayout ? "lesson.drift.touch" : "lesson.drift.keys");
@@ -870,6 +880,9 @@ namespace RacingGame
                 text.fontSizeMax = Mathf.Max(max * layoutTextScale, text.fontSizeMin);
             }
             Font(lapText, 20f, 28f, 12f);
+            Font(gapText, 14f, 22f, 11f);
+            gapText.overflowMode = TextOverflowModes.Ellipsis;
+            gapText.textWrappingMode = TextWrappingModes.NoWrap;
             Font(positionText, 20f, 36f, 16f);
             Font(hpText, 16f, 26f, 12f);
             Font(ammoText, 18f, 30f, 12f);
@@ -895,6 +908,9 @@ namespace RacingGame
             lapText.rectTransform.offsetMin = new Vector2(18f, -12f - lapHeight);
             positionText.rectTransform.offsetMax = new Vector2(-18f, -22f - lapHeight);
             positionText.rectTransform.offsetMin = new Vector2(18f, -22f - lapHeight - positionHeight);
+            float gapHeight = Mathf.Max(75f, 36f / scale) * layoutTextScale;
+            gapPanel.offsetMin = new Vector2(0f, -gapHeight - 2f / scale);
+            gapPanel.offsetMax = new Vector2(0f, -2f / scale);
             float timerWidth = Mathf.Max(280f, 110f / scale), timerHeight = Mathf.Max(70f, 30f / scale);
             Place(timerPanel, new Vector2(0.5f, 1f), new Vector2(-timerWidth * 0.5f, -24f - timerHeight), new Vector2(timerWidth * 0.5f, -24f));
 
@@ -1033,6 +1049,11 @@ namespace RacingGame
             if (race == null) return;
             UpdateCombatAndGoals();
             UpdateFinishCard();
+            if (Time.unscaledTime >= nextGapRefresh)
+            {
+                nextGapRefresh = Time.unscaledTime + .15f;
+                RefreshGaps();
+            }
             if (hudRoot != null && (Mathf.Abs(hudRoot.rect.width - layoutWidth) > 1f || Screen.width != layoutScreenWidth || Screen.height != layoutScreenHeight
                 || layoutTouchLarge != (PlatformGlue.Save?.Data.settings.touchLargeButtons == true)
                 || layoutTouchLeft != (PlatformGlue.Save?.Data.settings.touchLeftHanded == true)
@@ -1676,6 +1697,35 @@ namespace RacingGame
             int lap = Mathf.Clamp(progress.LapsCompleted + 1, 1, race.laps);
             lapText.text = race.IsArenaMode ? Loc.Get("arena.title") : Loc.Format("hud.lap", "cur", lap, "total", race.laps);
             positionText.text = Loc.Format("hud.position", "pos", race.PositionOf(race.Player), "n", race.Participants.Count);
+        }
+
+        private void RefreshGaps()
+        {
+            var player = race.Player;
+            RaceParticipant ahead = null, behind = null;
+            double aheadGap = 0d, behindGap = 0d;
+            if (player != null && race.State == RaceState.Racing && !race.IsArenaMode && !race.IsMissionMode)
+            {
+                int place = race.PositionOf(player);
+                ahead = race.AtPosition(place - 1); behind = race.AtPosition(place + 1);
+                if (ahead == null || RaceManager.IsOut(ahead) || !player.Progress.TryGapTo(ahead.Progress, out aheadGap)) ahead = null;
+                if (behind == null || RaceManager.IsOut(behind) || !player.Progress.TryGapTo(behind.Progress, out behindGap)) behind = null;
+            }
+            if (ahead == lastAhead && behind == lastBehind && aheadGap == lastAheadGap &&
+                behindGap == lastBehindGap && gapLanguage == Loc.Language) return;
+            lastAhead = ahead; lastBehind = behind;
+            lastAheadGap = aheadGap; lastBehindGap = behindGap; gapLanguage = Loc.Language;
+            string text = ahead == null ? "" : GapLine(ahead, aheadGap);
+            if (behind != null) text += (ahead == null ? "" : "\n") + GapLine(behind, behindGap);
+            gapText.text = text;
+            gapPanel.gameObject.SetActive(text.Length > 0);
+        }
+
+        private static string GapLine(RaceParticipant rival, double gap)
+        {
+            string name = UiFactory.Escape(GetLocalizedRacerName(rival.displayName, rival.isPlayer));
+            var culture = System.Globalization.CultureInfo.GetCultureInfo(Loc.Language);
+            return Loc.Format("hud.rival_gap", "name", name, "s", gap.ToString("+0.0;-0.0;0.0", culture));
         }
 
         private static readonly Color[] CountdownColors = { new Color(0.45f, 1f, 0.5f), new Color(1f, 0.9f, 0.3f), new Color(1f, 0.62f, 0.2f), new Color(1f, 0.32f, 0.25f) };

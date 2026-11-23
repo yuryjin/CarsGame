@@ -410,7 +410,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860361
-    m_Localized: "Cible verrouill\xE9e : tir avec Ctrl ou clic gauche"
+    m_Localized: "Cible verrouill\xE9e : tir avec {bind.fire} ou clic gauche"
     m_Metadata:
       m_Items: []
   - m_Id: 7347528277860362
@@ -1308,7 +1308,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697473
-    m_Localized: "Bloqu\xE9 ? Appuie sur R"
+    m_Localized: "Bloqu\xE9 ? Appuie sur {bind.reset}"
     m_Metadata:
       m_Items: []
   - m_Id: 8017799678697474
@@ -1506,8 +1506,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488779
-    m_Localized: "Gaz : W/haut. Direction : A/D ou fl\xE8ches. Tir : Ctrl / clic
-      gauche. Rattrape et touche le rival."
+    m_Localized: 'Gaz : {bind.gas}. Direction : {bind.steer}. Tir : {bind.fire} /
+      clic gauche. Rattrape et touche le rival.'
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488780
@@ -1516,8 +1516,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488781
-    m_Localized: "Au-dessus de 40 km/h : tourne et appuie sur Espace. Charge puis
-      rel\xE2che pour acc\xE9l\xE9rer."
+    m_Localized: "Au-dessus de 40 km/h : tourne et appuie sur {bind.brake}. Charge
+      puis rel\xE2che pour acc\xE9l\xE9rer."
     m_Metadata:
       m_Items: []
   - m_Id: 18165466451488782
@@ -1704,8 +1704,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820457320448
-    m_Localized: "Gaz : W / haut. Reculer : S / bas. Direction : A/D ou fl\xE8ches.
-      Frein : Espace. Retour en piste : R."
+    m_Localized: 'Gaz : {bind.gas}. Reculer : {bind.reverse}. Direction : {bind.steer}.
+      Frein : {bind.brake}. Retour en piste : {bind.reset}.'
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097664
@@ -1714,14 +1714,14 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097665
-    m_Localized: 'Tir : Ctrl / clic gauche. Change entre tes deux armes : Q / molette
-      ou touches 1 et 2.'
+    m_Localized: 'Tir : {bind.fire} / clic gauche. Change entre tes deux armes :
+      Q / molette ou touches {bind.one} et {bind.two}.'
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097666
-    m_Localized: "Tir : Ctrl / clic gauche. Maintiens Q et d\xE9place la souris pour
-      choisir; rel\xE2che Q pour \xE9quiper. Avec Q maintenu : Tab / molette change
-      de page, 1\u20130 choisit une case."
+    m_Localized: "Tir : {bind.fire} / clic gauche. Maintiens Q et d\xE9place la souris
+      pour choisir; rel\xE2che Q pour \xE9quiper. Avec Q maintenu : Tab / molette
+      change de page, {bind.slots} choisit une case."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097667
@@ -1730,8 +1730,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097668
-    m_Localized: "{action} : E / Maj / clic droit / LB. Les munitions et la disponibilit\xE9
-      sont affich\xE9es \xE0 l\u2019\xE9cran."
+    m_Localized: "{action} : {bind.secondary} / clic droit / LB. Les munitions et
+      la disponibilit\xE9 sont affich\xE9es \xE0 l\u2019\xE9cran."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820474097669
@@ -1755,8 +1755,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 18240820478291969
-    m_Localized: "Seulement des mines. Prends de l\u2019avance puis appuie sur E
-      / Maj / clic droit pour poser une mine derri\xE8re toi."
+    m_Localized: "Seulement des mines. Prends de l\u2019avance puis appuie sur {bind.secondary}
+      / clic droit pour poser une mine derri\xE8re toi."
     m_Metadata:
       m_Items: []
   - m_Id: 18240820478291970
@@ -2476,6 +2476,194 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 29723557332594688
     m_Localized: "Seuls les pillards peuvent endommager l\u2019objectif"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860491366400
+    m_Localized: Position des boutons tactiles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337920
+    m_Localized: "D\xE9placer les boutons"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337921
+    m_Localized: "Fais glisser les boutons \xE0 port\xE9e de tes doigts."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337922
+    m_Localized: "Par d\xE9faut"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337923
+    m_Localized: W/haut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337924
+    m_Localized: S/bas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337925
+    m_Localized: "A/D ou fl\xE8ches"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337926
+    m_Localized: Espace
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337927
+    m_Localized: Ctrl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337928
+    m_Localized: E / Maj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337929
+    m_Localized: R
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337930
+    m_Localized: 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337931
+    m_Localized: 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337932
+    m_Localized: "1\u20130"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337933
+    m_Localized: V
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337934
+    m_Localized: Commandes au clavier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337935
+    m_Localized: "Acc\xE9l\xE9rer"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337936
+    m_Localized: Reculer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337937
+    m_Localized: "Tourner \xE0 gauche"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337938
+    m_Localized: "Tourner \xE0 droite"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337939
+    m_Localized: Arme secondaire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337940
+    m_Localized: "Choix de l\u2019arme"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860512337941
+    m_Localized: Emplacement {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532224
+    m_Localized: Appuie sur une touche pour {action}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532225
+    m_Localized: "{button} sert d\xE9j\xE0 \xE0 {action}. Choisis une autre touche."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532226
+    m_Localized: Annuler
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532227
+    m_Localized: "R\xE9tablir les touches par d\xE9faut"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532228
+    m_Localized: Zone morte du stick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532229
+    m_Localized: "Sensibilit\xE9 du stick"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532230
+    m_Localized: "R\xE9ponse de direction"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532231
+    m_Localized: "R\xE9initialiser"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532232
+    m_Localized: "Code de d\xE9fi entre amis"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532233
+    m_Localized: Obtenir mon code
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532234
+    m_Localized: Courir avec ce code
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532235
+    m_Localized: Code invalide ou incomplet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532236
+    m_Localized: Cette version du code est incompatible.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532237
+    m_Localized: "Le circuit ou l\u2019\xE9quipement requis est indisponible."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532238
+    m_Localized: "Temps cible \xB7 {t}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532239
+    m_Localized: Objectifs de la semaine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532240
+    m_Localized: Termine une course sur circuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532241
+    m_Localized: Monte sur le podium en circuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532242
+    m_Localized: "Termine un combat en ar\xE8ne"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532243
+    m_Localized: "Termine un combat en ar\xE8ne avec une \xE9limination"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532244
+    m_Localized: Termine une mission
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532245
+    m_Localized: "Termine une mission sans \xEAtre d\xE9truit"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532246
+    m_Localized: "R\xE9compense des trois \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29727860516532247
+    m_Localized: '{name}  {s} s'
     m_Metadata:
       m_Items: []
   references:
