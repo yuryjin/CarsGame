@@ -66,10 +66,11 @@ namespace RacingGame.Tests
                 int dirtTicks = 0, previousGate = racer.Progress.GatesPassedThisLap, gateChanges = 0;
                 bool inForkControls = false;
                 float lastD = racer.Progress.Distance;
+                float maxExitLateral = 0f, maxExitD = 0f;
                 car.Teleported += () => Debug.Log($"[QuarryRecovery] {bodyId} branch={branch} distance={lastD:F1} ticks={SimulationDriver.Instance.Tick - runStart} stuck={ai.StuckTime:F1}");
                 var trace = new System.Collections.Generic.Queue<string>(12);
                 string traceDirectory = System.Environment.GetEnvironmentVariable("CG_QUARRY_TRACE");
-                var curve = new System.Text.StringBuilder("tick,mainMetres,forkMetres,offset,speedKmh,surface\n");
+                var curve = new System.Text.StringBuilder("tick,mainMetres,forkMetres,offset,speedKmh,surface,mainLateral,height,steer,grounded\n");
                 for (int tick = 0; tick < 9000 && racer.Progress.LapsCompleted == 0; tick++)
                 {
                     float d = racer.Progress.Distance; lastD = d;
@@ -85,28 +86,49 @@ namespace RacingGame.Tests
                     if (car.Surface == GroundSurface.Ground && path.OnFork(car.transform.position)) dirtTicks++;
                     int passed = racer.Progress.GatesPassedThisLap;
                     if (passed != previousGate) { gateChanges++; previousGate = passed; }
-                    if (branch && tick % 12 == 0 && start >= 0 && d < exit + 80f)
+                    if (branch && d >= exit && d < exit + 80f)
+                    {
+                        float side = Mathf.Abs(path.Spline.LateralOffset(car.transform.position, d));
+                        if (side > maxExitLateral) { maxExitLateral = side; maxExitD = d; }
+                    }
+                    if (branch && tick % 12 == 0 && start >= 0 && d >= fork.ApproachDistance - 1f && d < exit + 80f)
                     {
                         float branchD = fork.Project(car.transform.position, out float error);
-                        if (!string.IsNullOrEmpty(traceDirectory))
-                            curve.AppendLine(System.FormattableString.Invariant($"{SimulationDriver.Instance.Tick - runStart},{d:F2},{branchD:F2},{Mathf.Sqrt(error):F2},{car.SpeedKmh:F2},{car.Surface}"));
-                        if (trace.Count == 12) trace.Dequeue();
                         float lateral = path.Spline.LateralOffset(car.transform.position, d);
+                        if (!string.IsNullOrEmpty(traceDirectory))
+                            curve.AppendLine(System.FormattableString.Invariant($"{SimulationDriver.Instance.Tick - runStart},{d:F2},{branchD:F2},{Mathf.Sqrt(error):F2},{car.SpeedKmh:F2},{car.Surface},{lateral:F2},{car.transform.position.y:F2},{car.LastCommand.Steer:F2},{car.IsGrounded}"));
+                        if (trace.Count == 12) trace.Dequeue();
                         trace.Enqueue($"{d:F1} lateral={lateral:F1} v={car.SpeedKmh:F1} y={car.transform.position.y:F1} {car.Surface} steer={car.LastCommand.Steer:F2}");
                     }
-                    Assert.AreEqual(0, racer.AutoResets, $"{bodyId} branch={branch} d={d:F1}, {string.Join(" | ", trace)}");
+                    if (racer.AutoResets != 0)
+                    {
+                        WriteCurve();
+                        Assert.Fail($"{bodyId} branch={branch} d={d:F1} autoResets={racer.AutoResets}, {string.Join(" | ", trace)}");
+                    }
                     yield return null;
                 }
-                if (!string.IsNullOrEmpty(traceDirectory) && branch)
-                    System.IO.File.WriteAllText(System.IO.Path.Combine(traceDirectory, bodyId + "-dirt.csv"), curve.ToString());
+                WriteCurve();
+
+                void WriteCurve()
+                {
+                    if (!string.IsNullOrEmpty(traceDirectory) && branch)
+                        System.IO.File.WriteAllText(System.IO.Path.Combine(traceDirectory, bodyId + "-dirt.csv"), curve.ToString());
+                }
                 float segment = (end - start) * SimulationDriver.FixedStep;
                 float lap = (SimulationDriver.Instance.Tick - runStart) * SimulationDriver.FixedStep;
-                Debug.Log($"[Quarry] body={bodyId} branch={branch} segment={segment:F2}s lap={lap:F2}s gates={gateChanges} dirtTicks={dirtTicks} shortcuts={racer.Shortcuts} resets={racer.Resets} d={racer.Progress.Distance:F1} pos={car.transform.position}");
+                Debug.Log($"[Quarry] body={bodyId} branch={branch} segment={segment:F2}s lap={lap:F2}s gates={gateChanges} maxExitLateral={maxExitLateral:F2}@{maxExitD:F1} dirtTicks={dirtTicks} shortcuts={racer.Shortcuts} resets={racer.Resets} d={racer.Progress.Distance:F1} pos={car.transform.position}");
                 Assert.AreEqual(1, racer.Progress.LapsCompleted, bodyId);
-                Assert.GreaterOrEqual(gateChanges, racer.Progress.gateCount - 1);
+                Assert.AreEqual(racer.Progress.gateCount, gateChanges, $"{bodyId} branch={branch} must cross every gate from the grid");
                 Assert.AreEqual(0, racer.Resets, "whole lap from the grid without teleporting");
                 Assert.Greater(end, start); Assert.Greater(start, 0);
-                if (branch) { Assert.Greater(dirtTicks, 100); Assert.AreEqual(1, racer.Shortcuts); }
+                if (branch)
+                {
+                    Assert.Greater(dirtTicks, 100);
+                    Assert.AreEqual(1, racer.Shortcuts);
+                    float halfBody = car.GetComponent<BoxCollider>().size.x * .5f;
+                    Assert.Less(maxExitLateral + halfBody, path.halfWidth,
+                        $"{bodyId} needs room for its hull after rejoining the asphalt at {maxExitD:F1} m");
+                }
                 else Assert.AreEqual(0, racer.Shortcuts);
                 times[body, route] = segment;
                 flow.EnterMenu(); yield return null;

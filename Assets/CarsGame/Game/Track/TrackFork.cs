@@ -80,16 +80,29 @@ namespace RacingGame
                 steer = AimForLanding(car, progress, speed);
             float desired = Mathf.Min(IsDirt ? 76f : 45f, car.MaxSpeedForCurvature(curvature) * 3.6f * (IsDirt ? .78f : .82f));
             if (progress < .07f) desired = Mathf.Min(desired, 36f);
-            if (IsDirt && progress > .87f) desired = Mathf.Min(desired, 45f);
+            if (IsDirt && progress > .87f) desired = Mathf.Min(desired, 39f);
             if (Course == MountainFork.Volcano && progress > .93f) desired = Mathf.Min(desired, 36f);
             throttle = Mathf.Clamp((desired - car.SpeedKmh) / 3f, -1f, 1f);
         }
 
         private Vector3 DrivingLine(float t)
         {
-            if (t >= 0f && t <= 1f) return Position(path.reversed ? 1f - t : t);
+            if (t >= 0f && t <= 1f)
+            {
+                Vector3 line = Position(path.reversed ? 1f - t : t);
+                // The wide dirt lane rejoins just before a bend. Aim towards the
+                // middle while there is still room to turn on the dirt.
+                const float mergeStart = .8f;
+                if (IsDirt && t > mergeStart)
+                {
+                    Vector3 mergeOffset = Position(path.reversed ? 0f : 1f) - path.Position(ApproachDistance + MainSpan);
+                    line -= mergeOffset * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(mergeStart, 1f, t));
+                }
+                return line;
+            }
             float d = ApproachDistance + t * MainSpan;
-            float lane = t <= 1f ? 2.2f : 2.2f * Mathf.Clamp01(1f - (t - 1f) * MainSpan / 16f);
+            if (IsDirt && t > 1f) return path.Position(d);
+            float lane = t < 0f ? 2.2f : 2.2f * Mathf.Clamp01(1f - (t - 1f) * MainSpan / 16f);
             return path.Position(d) + path.Right(d) * (path.reversed ? -lane : lane);
         }
 
