@@ -28,7 +28,10 @@ namespace RacingGame.Tests
                 var race = Object.FindAnyObjectByType<RaceManager>();
                 Object.FindAnyObjectByType<MenuScreens>().Show("events");
                 var card = GameObject.Find("elimination");
-                Assert.AreEqual(Loc.Get("format.elimination.rule"), card.transform.Find("Stats").GetComponent<TMP_Text>().text);
+                string stats = card.transform.Find("Stats").GetComponent<TMP_Text>().text;
+                StringAssert.Contains(Loc.Format("events.laps", "n", 3), stats);
+                StringAssert.Contains(Loc.Format("events.rivals", "n", 3), stats);
+                StringAssert.Contains(Loc.Get("format.elimination.rule"), stats);
                 card.transform.Find("Start_elimination").GetComponent<Button>().onClick.Invoke();
                 while (race.State == RaceState.Countdown) yield return null;
                 var cars = race.Participants.ToArray();

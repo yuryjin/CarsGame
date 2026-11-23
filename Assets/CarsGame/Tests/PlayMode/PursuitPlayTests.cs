@@ -29,7 +29,10 @@ namespace RacingGame.Tests
                 var debug = Object.FindAnyObjectByType<DebugBus>();
                 Object.FindAnyObjectByType<MenuScreens>().Show("events");
                 var card = GameObject.Find("pursuit");
-                Assert.AreEqual(Loc.Get("format.pursuit.rule"), card.transform.Find("Stats").GetComponent<TMP_Text>().text);
+                string stats = card.transform.Find("Stats").GetComponent<TMP_Text>().text;
+                StringAssert.Contains(Loc.Format("events.laps", "n", 1), stats);
+                StringAssert.Contains(Loc.Format("events.rivals", "n", 2), stats);
+                StringAssert.Contains(Loc.Get("format.pursuit.rule"), stats);
                 card.transform.Find("Start_pursuit").GetComponent<Button>().onClick.Invoke();
                 int results = 0;
                 race.OnRaceFinished += _ => results++;
