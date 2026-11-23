@@ -1125,6 +1125,8 @@ namespace RacingGame.Tests
         public IEnumerator RexReturnsInTheGrandFinalAndHisDuelUsesTheActualPairOfPlaces()
         {
             yield return OpenProfile();
+            // Physical finish times use the live race clock. Let physics run at its ordinary rate.
+            Time.captureDeltaTime = 0f;
             var menu = flow.GetComponent<MenuScreens>(); menu.Show("main");
             StringAssert.Contains("Rex", GameObject.Find("Rival_e1").transform.Find("Intro").GetComponent<TMPro.TMP_Text>().text);
             yield return StartFromEventList("e1");
@@ -1144,10 +1146,13 @@ namespace RacingGame.Tests
                     Assert.AreSame(final.featuredRival, rex.GetComponent<AiDriver>().profile);
                     long balance = PlatformGlue.Save.Data.Coins;
                     var forRun = run == 0 ? new[] { third, race.Player, rex } : new[] { rex, race.Player, third };
-                    // Staging each arrival keeps its physical crossing. Freezing a car at the
-                    // grid leaves its AI recovery active and lets resets move it while it waits.
+                    // Give consecutive arrivals separate intervals on the same clock that ranks them.
+                    double previousCrossing = race.RaceStartTime;
                     for (int slot = 0; slot < forRun.Length; slot++)
                     {
+                        while (RaceClock.Now < previousCrossing + .4d) yield return null;
+                        for (int waiting = slot; waiting < forRun.Length; waiting++)
+                            Assert.IsFalse(race.HasFinished(forRun[waiting]), forRun[waiting].displayName + " is still racing");
                         var car = forRun[slot];
                         var path = car.Progress.Path;
                         path.Pose(path.startLineDistance - 1f, (slot - 1) * 2.5f, out var position, out var facing);
@@ -1157,6 +1162,10 @@ namespace RacingGame.Tests
                         for (int tick = 0; tick < 80 && !race.HasFinished(car); tick++) yield return new WaitForFixedUpdate();
                         Assert.IsTrue(race.HasFinished(car), car.displayName + " crossed the final line");
                         Assert.AreEqual(race.laps, car.Progress.LapsCompleted);
+                        double crossed = car.Progress.LastCrossingTime;
+                        TestContext.WriteLine($"Run {run + 1}, {car.displayName}: tick {car.Progress.LastCrossingTick}, crossing {crossed - race.RaceStartTime:F4}s");
+                        Assert.Greater(crossed - previousCrossing, RaceManager.CloseFinishThreshold, "The staged arrivals must have distinct race times");
+                        previousCrossing = crossed;
                     }
                     float deadline = Time.realtimeSinceStartup + 8f;
                     while (flow.State == FlowState.Racing && Time.realtimeSinceStartup < deadline) yield return null;
