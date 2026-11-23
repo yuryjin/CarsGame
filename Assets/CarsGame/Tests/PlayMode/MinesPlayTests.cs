@@ -125,6 +125,19 @@ namespace RacingGame.Tests
             foreach (var p in race.Participants)
                 Assert.AreNotEqual(SecondaryWeaponType.None, p.Weapons.secondaryType, p.name + " has mines or charges in the arena");
 
+            // Give the gunner a real pursuer once its opening grace expires.
+            // A free fight can go forty seconds without a car entering its rear firing lane.
+            yield return Ticks(225);
+            RaceParticipant chargeBot = null;
+            foreach (var p in race.Participants)
+                if (!p.isPlayer && !p.Health.IsDead && p.Weapons.secondaryType == SecondaryWeaponType.RemoteCharge) { chargeBot = p; break; }
+            Assert.IsNotNull(chargeBot, "live opponent with a remote charge");
+            Quaternion inward = arena.transform.rotation * Quaternion.Euler(0, 180, 0);
+            Vector3 lane = arena.transform.TransformPoint(new Vector3(0, .6f, 92));
+            chargeBot.Car.Teleport(lane, inward);
+            race.Player.Car.Teleport(lane - inward * Vector3.forward * 14f, inward);
+            Physics.SyncTransforms();
+            Assert.AreSame(race.Player.Car, TargetFinder.FindPursuer(chargeBot.Car, lane, -(inward * Vector3.forward), 5f, 30f, 6f));
             int planted = 0;
             var observedCharges = new System.Collections.Generic.HashSet<(int car, int tick)>();
             for (int i = 0; i < 50 * 40; i++)
