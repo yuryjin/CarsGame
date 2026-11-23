@@ -117,7 +117,7 @@ namespace RacingGame
             EndRace();
         }
         public bool HasFinished(RaceParticipant p) => finishTimes.ContainsKey(p);
-        public bool CanShowResults => State == RaceState.Finishing && !IsArenaMode && !IsMissionMode
+        public bool CanShowResults => !GameFlow.RoomPlaying && State == RaceState.Finishing && !IsArenaMode && !IsMissionMode
             && Player != null && HasFinished(Player);
         /// <summary>The player's clock stops at the line while the remaining field can keep racing.</summary>
         public double PlayerElapsedTime => Player != null && finishTimes.TryGetValue(Player, out double time) ? time : RaceTime;
@@ -208,6 +208,7 @@ namespace RacingGame
 
         private void Update()
         {
+            if (GameFlow.RoomReplica) return;
             if (nextElimination > EliminationStage) RetireLastRacer();
             if (pendingFinishes.Count > 0) FlushFinishes();
             switch (State)
@@ -272,6 +273,7 @@ namespace RacingGame
 
         private void OnLap(RaceParticipant p, int lap)
         {
+            if (GameFlow.RoomReplica) return;
             if (State == RaceState.Finished || State == RaceState.Idle) return;
             if (RaceSetup.Event != null && RaceSetup.Event.IsPractice) return;
             if (RaceSetup.Event != null && RaceSetup.Event.format == CircuitFormat.Relay && p.isPlayer && (Relay == null || !Relay.Exchanged))
@@ -338,6 +340,7 @@ namespace RacingGame
             Rank();
             foreach (var p in pendingFinishes) Finish(p);
             pendingFinishes.Clear();
+            if (GameFlow.RoomPlaying) return;
             if (RaceSetup.Event != null && RaceSetup.Event.format == CircuitFormat.Pursuit) { EndRace(); return; }
             if (Player != null && PhotoFirst == null && finishTimes.TryGetValue(Player, out double playerTime))
             {
@@ -415,6 +418,15 @@ namespace RacingGame
                 return;
             }
             if (IsMissionMode) return;   // no laps, no rubber band: the mission ends itself
+
+            if (GameFlow.RoomPlaying)
+            {
+                bool everyoneHome = true;
+                for (int i = 0; i < participants.Count; i++)
+                    if ((GameFlow.Room.Members & (1 << i)) != 0 && !finishTimes.ContainsKey(participants[i])) everyoneHome = false;
+                if (everyoneHome || RaceTime >= 300d) EndRace();
+                return;
+            }
 
             bandTimer += Time.unscaledDeltaTime;
             if (bandTimer >= 0.5f) { bandTimer = 0f; ApplyRubberBand(); }
@@ -554,6 +566,29 @@ namespace RacingGame
         }
 
         private readonly Dictionary<RaceParticipant, RigidbodyConstraints> authoredConstraints = new Dictionary<RaceParticipant, RigidbodyConstraints>();
+
+        public void ApplyRoomStanding(int slot, int place)
+        {
+            if (!GameFlow.RoomReplica || slot < 0 || slot >= participants.Count) return;
+            var car = participants[slot];
+            if (positions.TryGetValue(car,out int old) && old == place) return;
+            positions[car] = place;
+            OnPositionsChanged?.Invoke();
+        }
+
+        public void ApplyRoomClock(RaceState state, int count, float elapsed)
+        {
+            if (!GameFlow.RoomReplica || State == RaceState.Idle) return;
+            if (state == RaceState.Countdown)
+            {
+                if (State == RaceState.Countdown && count != lastCountdownValue)
+                { lastCountdownValue = CountdownValue = count; OnCountdownTick?.Invoke(count); }
+                return;
+            }
+            if (State == RaceState.Countdown) Go();
+            RaceStartTime = RaceClock.Now - elapsed;
+            if (state == RaceState.Finishing) State = state;
+        }
 
         private void SetFrozen(RaceParticipant p, bool frozen)
         {

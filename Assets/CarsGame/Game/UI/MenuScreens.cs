@@ -155,6 +155,7 @@ namespace RacingGame
         private void Back()
         {
             if (CloseRaceSettingsIfOpen()) return;
+            if (current == "rooms") { GameFlow.Room?.Leave(); Show("main"); return; }
             if (current == "replay") { Show("leaders"); return; }
             if (current == "results") GoTo("main"); else Show(current == "arsenal" ? "garage" : (current == "missionBriefing" || current == "relay" || current == "customRace") ? "events" : "main");
         }
@@ -188,7 +189,9 @@ namespace RacingGame
             if (save != null && !save.LocalVersionTooNew && !RaceSettingsOpen && RaceCups.GrantCompleted(save.Data.progress)) save.MarkDirty();
             if (save != null && !save.LocalVersionTooNew && !RaceSettingsOpen && PlayerProgression.NormalizeLoadout(save.Data.progress)) save.MarkDirty();
             if (current == "garage" && name != "garage" && !flow.IsTestDrive) previewBodyId = null;
-            string selected = current == name ? EventSystem.current?.currentSelectedGameObject?.name : null;
+            var system = EventSystem.current;
+            var previousFocus = system != null ? system.currentSelectedGameObject : null;
+            string selected = current == name && previousFocus != null ? previousFocus.name : null;
             var scrollPositions = new Dictionary<string, float>();
             if (current == name && panel != null)
             {
@@ -239,6 +242,7 @@ namespace RacingGame
                 case "practice": BuildPractice(frame); break;
                 case "leaders": BuildLeaders(frame); break;
                 case "driver": BuildDriverProfile(frame); break;
+                case "rooms": BuildRooms(frame); break;
                 case "results": BuildResults(frame); break;
             }
             if (UiFactory.TextScale > 1f)
@@ -261,8 +265,9 @@ namespace RacingGame
             var buttons = panel.GetComponentsInChildren<Button>();
             Button focus = Array.Find(buttons, b => b.interactable && b.name == selected)
                 ?? (name == "results" ? Array.Find(buttons, b => b.interactable && b.name == "ResultAction0") : null)
-                ?? Array.Find(buttons, b => b.interactable && b.name != "Back" && b.name != "ModelStyle");
-            if (focus != null) EventSystem.current?.SetSelectedGameObject(focus.gameObject);
+                ?? Array.Find(buttons, b => b.interactable && b.name != "Back" && b.name != "ModelStyle")
+                ?? Array.Find(buttons, b => b.interactable && b.name == "Back");
+            if (system != null) system.SetSelectedGameObject(focus != null ? focus.gameObject : null);
             // OnSelect reveals keyboard focus. During a refresh the player may
             // have scrolled away from that control, so restore their view last.
             foreach (var scroll in panel.GetComponentsInChildren<ScrollRect>())
@@ -402,6 +407,9 @@ namespace RacingGame
             BuildRivalPreview(content, ev);
             BuildDailyCard(content);
             BuildWeeklyGoals(content);
+            if (GameFlow.Room != null)
+                UiFactory.Button(Item(content,"RoomLink",82f,false), "OpenRooms", Loc.Get("room.title"), () => Show("rooms"),
+                    Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 28f, UiFactory.Raised);
         }
 
         private RaceEventDefinition FeaturedEvent(List<RaceEventDefinition> list)

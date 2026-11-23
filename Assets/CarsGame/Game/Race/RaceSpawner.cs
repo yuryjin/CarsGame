@@ -72,7 +72,7 @@ namespace RacingGame
             int total = aiCount + 1;
             bool introTarget = RaceSetup.IsIntroRace && total > 1 && !site;
             bool pursuit = RaceSetup.Event != null && RaceSetup.Event.format == CircuitFormat.Pursuit;
-            int playerSlot = pursuit ? 0 : RaceSetup.Event != null && RaceSetup.Event.eventId == "e1" ? Mathf.Min(1, total - 1)
+            int playerSlot = GameFlow.RoomPlaying ? GameFlow.Room.Seat : pursuit ? 0 : RaceSetup.Event != null && RaceSetup.Event.eventId == "e1" ? Mathf.Min(1, total - 1)
                 : playerGridSlot < 0 ? total - 1 : Mathf.Clamp(playerGridSlot, 0, total - 1);
             int aiIndex = 0;
             for (int slot = 0; slot < total; slot++)
@@ -97,7 +97,7 @@ namespace RacingGame
                 var go = Instantiate(raceCarPrefab, pos, rot);
                 go.name = isPlayer ? "Player_Car" : $"AI_Car_{aiIndex + 1}";
                 if (isPlayer && RaceSetup.Event != null && RaceSetup.Event.format == CircuitFormat.Relay) CarBody.PrepareRelay(go);
-                CarBody.Apply(go, isPlayer ? PlayerBody() : RivalBody(aiIndex));   // before drivers and upgrades, which build on it
+                CarBody.Apply(go, GameFlow.RoomPlaying ? Core.Economy.CarBodies.Default : isPlayer ? PlayerBody() : RivalBody(aiIndex));
                 var car = go.GetComponent<CarController>();
                 var participant = go.GetComponent<RaceParticipant>() ?? go.AddComponent<RaceParticipant>();
                 var paint = go.GetComponent<CarPaint>() ?? go.AddComponent<CarPaint>();
@@ -175,6 +175,21 @@ namespace RacingGame
                 }
 
                 if (go.GetComponent<CarDamageSmoke>() == null && go.GetComponent<CarHealth>() != null) go.AddComponent<CarDamageSmoke>();
+                if (GameFlow.RoomPlaying)
+                {
+                    bool human = GameFlow.IsRoomDriver(slot);
+                    participant.displayName = Loc.Format(human ? "room.driver" : "room.bot", "n", slot + 1);
+                    paint.SetColor(paints[slot % paints.Length]);
+                    if (human && !isPlayer)
+                    {
+                        var stock = new Core.Save.ProgressData();
+                        PlayerProgression.ApplyWeapons(participant.Weapons,stock.weapons,stock.equippedSecondary,stock.equippedPrimary);
+                        participant.Weapons.ConfigureLoadout(true,(PrimaryWeaponType)stock.equippedPrimary,(PrimaryWeaponType)stock.reservePrimary);
+                        PlayerProgression.ApplyTo(car,participant.Health,car.Cannon,stock.upgrades,(Core.Economy.CarBuild)stock.buildPreset);
+                        car.driftEnabled = true;
+                        car.playerControlled = true;
+                    }
+                }
                 participants.Add(participant);
             }
 

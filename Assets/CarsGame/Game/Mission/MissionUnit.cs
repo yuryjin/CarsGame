@@ -82,6 +82,7 @@ namespace RacingGame
 
         public void SimulationStep(int tick)
         {
+            if (GameFlow.RoomReplica) return;
             if (!Alive)
             {
                 StepDying(tick);
@@ -97,7 +98,7 @@ namespace RacingGame
         /// <summary>A hit from <paramref name="attacker"/> (null = the world). Friendly fire is ignored. True when HP was lost.</summary>
         public virtual bool TakeHit(GameObject attacker, float damage, Vector3 point)
         {
-            if (!Alive || damage <= 0f || !Teams.Hostile(attacker, gameObject)) return false;
+            if (GameFlow.RoomReplica || !Alive || damage <= 0f || !Teams.Hostile(attacker, gameObject)) return false;
             float dealt = Mathf.Min(Health, damage * DamageTaken);
             if (dealt <= 0f) return false;
             Health = Mathf.Max(0f, Health - dealt);
@@ -110,6 +111,12 @@ namespace RacingGame
         }
 
         protected virtual void OnDamaged(GameObject attacker, float dealt, Vector3 point) { }
+
+        internal void ApplyRoomHealth(float value)
+        {
+            Health = Mathf.Clamp(value, 0f, MaxHealth);
+            if (Health <= 0f && Alive) { Alive = false; gameObject.SetActive(false); }
+        }
 
         /// <summary>Remove at once (the director's cleanup): no kill credit, no explosion.</summary>
         public void Remove() { Alive = false; DespawnTick = 0; }

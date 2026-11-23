@@ -46,6 +46,40 @@ namespace RacingGame
             public InputSnapshot input;
             public ReplaySnapshot replay;
             public TrainSnapshot train;
+            public RoomSnapshot room;
+        }
+
+        [Serializable] public sealed class RoomSnapshot
+        {
+            public string state, mission;
+            public uint code;
+            public int seat, members, outcome, phase, enemies, finished;
+            public int[] order, shots;
+            public float[] coreDamage;
+            public float core, distance;
+            public Vector3[] positions;
+            public float[] throttles, steering;
+        }
+
+        private RoomSnapshot ReadRoom()
+        {
+            var link = GameFlow.Room;
+            if (link == null) return null;
+            var mission = MissionDirector.Current;
+            int count = race == null ? 0 : race.Participants.Count;
+            var view = new RoomSnapshot { state = link.State.ToString(), code = link.Code, seat = link.Seat,
+                members = link.Members, outcome = link.Outcome, order = link.FinishOrder, finished = link.FinishedSeats, shots = link.Shots, coreDamage = link.CoreDamage,
+                mission = mission?.Result.ToString(), phase = mission?.Boss?.Phase ?? 0, core = mission?.Boss?.CoreFraction ?? 0f,
+                enemies = mission?.EnemiesAlive ?? 0, distance = mission?.Boss?.Distance ?? 0f,
+                positions = new Vector3[count], throttles = new float[count], steering = new float[count] };
+            for (int i = 0; i < count; i++)
+            {
+                var car = race.Participants[i].Car;
+                view.positions[i] = car.transform.position;
+                view.throttles[i] = car.LastCommand.Throttle;
+                view.steering[i] = car.LastCommand.Steer;
+            }
+            return view;
         }
 
         [Serializable] public sealed class TrainSnapshot
@@ -257,6 +291,7 @@ namespace RacingGame
                     case "ui": break;
                     case "ghosts": break;
                     case "train": break;
+                    case "room": break;
                     case "resources":
                         lastResources = new ResourceCounts {
                             materials = Resources.FindObjectsOfTypeAll<Material>().Length,
@@ -318,7 +353,16 @@ namespace RacingGame
             if (p == null) { lastError = "no race"; return; }
             var input = p.GetComponent<PlayerDriverInput>();
             var ai = p.GetComponent<AiDriver>();
-            if (on)
+            if (on && GameFlow.RoomPlaying && MissionDirector.Current != null)
+            {
+                var gunner = p.GetComponent<AiGunner>() ?? p.gameObject.AddComponent<AiGunner>();
+                gunner.Initialize(null,.85f); gunner.maxRange = 70f;
+                var ally = p.GetComponent<MissionDriver>() ?? p.gameObject.AddComponent<MissionDriver>();
+                ally.Initialize(MissionDirector.Current,null,MissionDriver.Side.Ally,GameFlow.Room.Seat);
+                p.Car.SetInputSource(ally);
+                if (input != null) input.enabled = false;
+            }
+            else if (on)
             {
                 if (ai == null) { ai = p.gameObject.AddComponent<AiDriver>(); ai.Initialize(null, 0f); }
                 ai.enabled = true;
@@ -409,6 +453,7 @@ namespace RacingGame
                 input = ReadInput(),
                 replay = lastCommand == "ghosts" ? ReadReplay() : null,
                 train = lastCommand == "train" ? ReadTrain(car) : null,
+                room = lastCommand == "room" ? ReadRoom() : null,
                 braking = car != null && car.LastCommand.Brake, deaths = p?.Deaths ?? 0,
                 aiResets = ai != null ? ai.ResetCount : 0,
                 raceSeed = director != null ? director.raceSeed : 0,

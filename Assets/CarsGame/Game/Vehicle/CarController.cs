@@ -232,6 +232,22 @@ namespace RacingGame
         /// <summary>Swap the driver at runtime (spawner assigns player/AI/network sources).</summary>
         public void SetInputSource(ICarInputSource source) { inputSource = source; }
 
+        public DriveCommand ReadRoomInput(int tick)
+        {
+            lastCommand = inputSource != null ? inputSource.Sample(tick) : DriveCommand.None(tick);
+            return lastCommand;
+        }
+
+        public void ApplyRoomPose(Vector3 position, Quaternion rotation, float speed)
+        {
+            if (!GameFlow.RoomReplica) return;
+            Body.isKinematic = true;
+            Body.position = position;
+            Body.rotation = rotation;
+            transform.SetPositionAndRotation(position, rotation);
+            currentSpeedKmh = speed;
+        }
+
         // Cars live on the "Car" layer so shells, AI avoidance casts and respawn overlap checks can
         // address them by mask. Only objects still on Default are moved, so authored layers survive.
         private void AssignCarLayer()
@@ -317,6 +333,11 @@ namespace RacingGame
         /// <summary>Fixed-rate step, called by <see cref="SimulationDriver"/>. All gameplay state changes happen here.</summary>
         public void SimulationStep(int tick)
         {
+            if (GameFlow.RoomReplica)
+            {
+                if (progress != null) progress.SimulationStep(tick);
+                return;
+            }
             if (rb == null) rb = GetComponent<Rigidbody>();
             if (weapons == null) weapons = GetComponent<CarWeapons>();
             if (cannon == null) cannon = GetComponent<CarCannon>();

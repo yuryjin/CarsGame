@@ -152,7 +152,7 @@ namespace RacingGame
         // grass must never have to find the track again (and AI reuse the same rule).
         private void FixedUpdate()
         {
-            if (Arena != null || Site != null) return;
+            if (GameFlow.RoomReplica || Arena != null || Site != null) return;
             if (Car == null || !Car.inputEnabled || Progress == null || Progress.Path == null) return;
             if (Health != null && Health.IsDead) return;
             bool offAsphalt = Car.Surface == GroundSurface.Ground || (Car.Surface == GroundSurface.None && Car.IsGrounded == false && transform.position.y > -5f);

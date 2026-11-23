@@ -67,12 +67,21 @@ namespace RacingGame.Net
             if (!secure && uri.Scheme != "ws") { Report($"bad scheme {uri.Scheme}"); return; }
             ushort port = (ushort)(uri.IsDefaultPort || uri.Port <= 0 ? (secure ? 443 : 80) : uri.Port);
 
-            var settings = new NetworkSettings();
-            settings.WithWebSocketParameters(uri.AbsolutePath);
-            if (secure) settings.WithSecureClientParameters(uri.Host);
-            driver = NetworkDriver.Create(new WebSocketNetworkInterface(), settings);
-            connection = driver.Connect(uri.Host, port);
+            connection = Connect(uri, port, out driver);
             Report($"connecting {url}");
+        }
+
+        internal static NetworkConnection Connect(Uri uri, ushort port, out NetworkDriver socket)
+        {
+            var settings = new NetworkSettings();
+            try
+            {
+                settings.WithWebSocketParameters(uri.AbsolutePath);
+                if (uri.Scheme == "wss") settings.WithSecureClientParameters(uri.Host);
+                socket = NetworkDriver.Create(new WebSocketNetworkInterface(), settings);
+            }
+            finally { settings.Dispose(); }
+            return socket.Connect(uri.Host, port);
         }
 
         private void OnDestroy()

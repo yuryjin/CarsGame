@@ -91,6 +91,13 @@ namespace RacingGame
         /// <summary>Tell progress that the car was moved by code, so the jump is not scored.</summary>
         public void NotifyTeleport() { Resync(); }
 
+        public void ApplyRoomStanding(int laps, int gate, bool armed)
+        {
+            if (!GameFlow.RoomReplica || !enabled || Path == null || Counter == null) return;
+            Distance = Path.Project(transform.position, ref hint);
+            Counter.ApplyStanding(Distance,laps,gate,armed);
+        }
+
         /// <summary>Called from the car's simulation step.</summary>
         public void SimulationStep(int tick)
         {

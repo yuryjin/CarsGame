@@ -291,6 +291,16 @@ namespace RacingGame
         }
 
         /// <summary>Core down: the tracks stop, every part goes dark (no kill credit for the parts themselves).</summary>
+        public void ApplyRoomState(Vector3 position, Quaternion rotation, float distance, int phase, float[] health)
+        {
+            if (!GameFlow.RoomReplica || health == null || health.Length != Parts.Count) return;
+            rb.position = position; rb.rotation = rotation;
+            transform.SetPositionAndRotation(position, rotation);
+            Distance = distance;
+            if (phase != Phase) { Phase = phase; PhaseChanged?.Invoke(phase); }
+            for (int i = 0; i < Parts.Count; i++) Parts[i].ApplyRoomHealth(health[i]);
+        }
+
         public void MarkDefeated()
         {
             if (Defeated) return;
