@@ -2257,6 +2257,10 @@ MonoBehaviour:
     m_Localized: "{ms} ms \xB7 Sans boost"
     m_Metadata:
       m_Items: []
+  - m_Id: 29707364823543808
+    m_Localized: "Podium dans {name} ou encore {n} \u2605"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

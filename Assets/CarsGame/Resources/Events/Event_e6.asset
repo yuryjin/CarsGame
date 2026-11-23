@@ -24,6 +24,7 @@ MonoBehaviour:
   pickupCount: 12
   mineFieldCount: 12
   unlockAfterEventId: e5
+  unlockStars: 10
   order: 5
   star1TargetPosition: 3
   star2TargetKills: 1

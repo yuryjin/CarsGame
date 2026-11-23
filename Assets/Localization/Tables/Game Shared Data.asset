@@ -2199,6 +2199,10 @@ MonoBehaviour:
     m_Key: practice.launch.miss
     m_Metadata:
       m_Items: []
+  - m_Id: 29707364823543808
+    m_Key: events.locked_stars
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

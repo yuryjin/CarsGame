@@ -2279,6 +2279,10 @@ MonoBehaviour:
     m_Localized: "{ms} ms \xB7 H\u0131zlanma yok"
     m_Metadata:
       m_Items: []
+  - m_Id: 29707364823543808
+    m_Localized: "{name} yar\u0131\u015F\u0131nda ilk 3 veya {n} \u2605 daha"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

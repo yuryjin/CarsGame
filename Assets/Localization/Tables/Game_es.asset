@@ -2260,6 +2260,10 @@ MonoBehaviour:
     m_Localized: "{ms} ms \xB7 Sin impulso"
     m_Metadata:
       m_Items: []
+  - m_Id: 29707364823543808
+    m_Localized: "Top 3 en {name} o {n} \u2605 m\xE1s"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

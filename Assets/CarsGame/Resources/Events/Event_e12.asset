@@ -23,6 +23,7 @@ MonoBehaviour:
   damageMultiplier: 1
   pickupCount: 12
   unlockAfterEventId: e11
+  unlockStars: 22
   order: 11
   star1TargetPosition: 3
   star2TargetKills: 1

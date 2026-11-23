@@ -2249,6 +2249,10 @@ MonoBehaviour:
     m_Localized: "{ms} ms \xB7 No boost"
     m_Metadata:
       m_Items: []
+  - m_Id: 29707364823543808
+    m_Localized: "Top 3 in {name} or {n} more \u2605"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

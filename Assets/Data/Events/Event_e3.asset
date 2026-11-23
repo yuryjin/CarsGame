@@ -22,6 +22,7 @@ MonoBehaviour:
   damageMultiplier: 1.2
   pickupCount: 16
   unlockAfterEventId: e2
+  unlockStars: 4
   order: 2
   skillGoal: 2
   skillTarget: 1

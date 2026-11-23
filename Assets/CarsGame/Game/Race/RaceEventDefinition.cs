@@ -44,7 +44,11 @@ namespace RacingGame
         public int MineFieldCount => mineFieldCount >= 0 ? mineFieldCount : mode == EventMode.Arena ? ArenaMineFieldDefault : 0;
         [Tooltip("Event that must be finished in the top 3 before this one unlocks (empty = always open).")]
         public string unlockAfterEventId = "";
+        [Tooltip("An alternative to the prerequisite podium. Zero uses only the podium rule.")]
+        [Min(0)] public int unlockStars;
         public int order;
+
+        public bool OpenedByStars(int totalStars) => unlockStars > 0 && totalStars >= unlockStars;
 
         [Header("3 Stars Goals")]
         [Tooltip("Target position for Star 1 (default 3 = top 3).")]

@@ -646,6 +646,7 @@ namespace RacingGame
 
             if (save != null && me != null)
             {
+                int previousStars = save.Data.TotalStars;
                 var row = save.Local;
                 row.coinsEarned += LastReward;
                 row.races++;
@@ -679,7 +680,7 @@ namespace RacingGame
                     }
                     if (LastWasPersonalBest || me.Finished && LastHadPreviousBest && LastBestDeltaMs == 0 && !LastBestSetupKnown)
                         best.setup = raceRecordSetup?.Copy();
-                    if (me.Finished && me.Position <= 3) UnlockNext(ev, save);
+                    if (!daily) UnlockNext(ev, me.Finished && me.Position <= 3, previousStars, save);
                     if (daily) RecordDaily(ev, me, save, row);
                 }
                 Core.Economy.RaceCups.GrantCompleted(save.Data.progress);
@@ -718,13 +719,17 @@ namespace RacingGame
         }
 
 
-        private void UnlockNext(RaceEventDefinition finished, Core.Save.SaveService save)
+        private void UnlockNext(RaceEventDefinition finished, bool podium, int previousStars, Core.Save.SaveService save)
         {
             if (events == null) return;
+            int stars = save.Data.TotalStars;
             foreach (var e in events)
             {
-                if (e == null || e.unlockAfterEventId != finished.eventId) continue;
-                if (!save.Data.progress.unlockedEvents.Contains(e.eventId)) { save.Data.progress.unlockedEvents.Add(e.eventId); LastUnlocked.Add(e); }
+                if (e == null || string.IsNullOrEmpty(e.unlockAfterEventId) || save.Data.progress.unlockedEvents.Contains(e.eventId)) continue;
+                bool openedByPlace = podium && e.unlockAfterEventId == finished.eventId;
+                if (!openedByPlace && !e.OpenedByStars(stars)) continue;
+                save.Data.progress.unlockedEvents.Add(e.eventId);
+                if (!e.OpenedByStars(previousStars)) LastUnlocked.Add(e);
             }
         }
 
@@ -746,7 +751,7 @@ namespace RacingGame
             if (e == null) return false;
             if (string.IsNullOrEmpty(e.unlockAfterEventId)) return true;
             var save = PlatformGlue.Save;
-            return save != null && save.Data.progress.unlockedEvents.Contains(e.eventId);
+            return save != null && (save.Data.progress.unlockedEvents.Contains(e.eventId) || e.OpenedByStars(save.Data.TotalStars));
         }
 
         /// <summary>Rewarded ad on the results screen: doubles the payout once.</summary>

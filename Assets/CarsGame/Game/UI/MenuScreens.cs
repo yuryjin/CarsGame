@@ -464,7 +464,10 @@ namespace RacingGame
                     Label(row, "Stars", starDisplay, 22f, Top, Vector2.one, new Vector2(144f, -302f), new Vector2(-236f, -178f));
                     var prerequisite = unlocked ? null : list.Find(e => e.eventId == ev.unlockAfterEventId);
                     string status = unlocked ? best != null && best.bestTimeMs > 0 ? Loc.Format("events.best", "t", UiFactory.FormatTime(best.bestTimeMs / 1000.0)) : ""
-                        : prerequisite != null ? Loc.Format("events.locked_after", "name", Loc.Get(prerequisite.nameKey)) : Loc.Get("events.locked");
+                        : prerequisite == null ? Loc.Get("events.locked")
+                        : ev.unlockStars > 0 ? Loc.Format("events.locked_stars", "name", Loc.Get(prerequisite.nameKey),
+                            "n", Mathf.Max(0, ev.unlockStars - (PlatformGlue.Save?.Data.TotalStars ?? 0)))
+                        : Loc.Format("events.locked_after", "name", Loc.Get(prerequisite.nameKey));
                     Label(row, "Status", status, 22f, Vector2.zero, new Vector2(1f, 0f), new Vector2(144f, 12f), new Vector2(-236f, Narrow ? 64f : 44f), unlocked ? UiFactory.Positive : UiFactory.Muted);
                     UiFactory.Button(row, "Start_" + ev.eventId, unlocked ? Loc.Get("menu.play") + " ›" : "—", unlocked ? () => flow.StartRace(ev, tier) : null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-216f, -36f), new Vector2(-24f, 36f), 26f, unlocked ? UiFactory.Accent : UiFactory.Raised);
                 }
