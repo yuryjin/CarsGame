@@ -282,9 +282,32 @@ try {
     }
     const limit=Date.now()+(fortress?610000:345000);
     let last;
+    let stoppedAt;
+    const recovery=process.env.CG_ROOM_RECOVERY;
+    assert(!recovery || ['manual','stuck'].includes(recovery),'unknown recovery mode');
     do {
       last=await Promise.all(pages.map(p=>command(p,'room')));
       report.samples.push(last.map(s=>({room:s.room,seconds:s.raceSeconds,lap:s.lap,laps:s.laps,speed:s.speedKmh,finishState:s.race})));
+      if(scenario==='race' && recovery && last[1].room.state==='Playing' && last[1].lap<last[1].laps) {
+        const position=last[0].room.positions[1];
+        const seconds=last[0].raceSeconds;
+        const requested=recovery==='manual' && !report.recoveries?.length && seconds>=18 && Math.abs(last[1].speedKmh)>10;
+        if(!requested && (!stoppedAt || Math.hypot(position.x-stoppedAt.x,position.z-stoppedAt.z)>3)) {
+          stoppedAt={x:position.x,z:position.z,seconds};
+        } else if(requested || seconds-stoppedAt.seconds>=7) {
+          // Use the same recovery key as a human driver, then continue around the real gates.
+          await command(guest.page,'autopilot','off');
+          try {
+            await guest.page.keyboard.down('r');
+            await guest.page.waitForTimeout(180);
+          } finally { await guest.page.keyboard.up('r'); }
+          await guest.page.waitForTimeout(350);
+          const after=await command(host.page,'room');
+          (report.recoveries??=[]).push({seconds,reason:requested?'driver request':'stopped',before:position,after:after.room.positions[1]});
+          await command(guest.page,'autopilot','on');
+          stoppedAt=undefined;
+        }
+      }
       if(report.samples.length%5===0) await save();
       if(last.every(s=>s.room?.state==='Results')) break;
       assert(last.every(s=>['Playing','Results'].includes(s.room?.state)),'room interrupted');

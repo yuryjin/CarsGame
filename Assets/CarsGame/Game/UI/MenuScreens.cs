@@ -563,6 +563,7 @@ namespace RacingGame
             string hint = ev.fixedRivalPace ? "route.fixed_pace" : ev.twist == Core.Daily.RaceTwist.HotBomb ? "bomb.pass"
                 : ev.twist == Core.Daily.RaceTwist.MinesOnly ? "lesson.mines"
                 : ev.mountainFork == MountainFork.Rooftops ? "route.roofs"
+                : ev.mountainFork == MountainFork.Volcano ? "route.volcano"
                 : ev.mountainFork == MountainFork.IceStation ? "route.ice"
                 : ev.mountainFork == MountainFork.Quarry ? "route.dirt" : ev.wastelandTrack ? "route.bridge_jump" : ev.starRingTrack ? "lesson.wall"
                 : ev.spaceTrack ? "lesson.space" : ev.abyssTrack ? "lesson.abyss"

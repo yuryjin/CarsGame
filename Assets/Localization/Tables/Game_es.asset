@@ -2985,6 +2985,102 @@ MonoBehaviour:
       y premios de carrera se ganan en los eventos."
     m_Metadata:
       m_Items: []
+  - m_Id: 29752733624250368
+    m_Localized: La cantera
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833280
+    m_Localized: "El atajo de tierra marr\xF3n favorece al buggy. Se une al asfalto
+      despu\xE9s de la curva."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833281
+    m_Localized: Jugar con amigos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833282
+    m_Localized: Carrera privada
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833283
+    m_Localized: "En equipo contra Leviat\xE1n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027584
+    m_Localized: "C\xF3digo de la sala de tu amigo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027585
+    m_Localized: Entrar en la sala
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027586
+    m_Localized: "Jugadores {n}/4 \xB7 C\xF3digo de invitaci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027587
+    m_Localized: Un piloto ha salido. La partida ha terminado.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027588
+    m_Localized: "Sala no disponible. Revisa el c\xF3digo o vuelve a intentarlo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027589
+    m_Localized: Piloto {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027590
+    m_Localized: Bot {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027591
+    m_Localized: Entre azoteas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027592
+    m_Localized: Acelera en la azotea. Apunta a la zona amarilla o toma la carretera
+      de abajo.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027593
+    m_Localized: Ritmo fijo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027594
+    m_Localized: Los rivales mantienen el ritmo de la dificultad elegida a cualquier
+      distancia.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027595
+    m_Localized: "Estaci\xF3n de hielo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027596
+    m_Localized: "La curva azul abierta tiene hielo. El t\xFAnel ofrece m\xE1s agarre."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027597
+    m_Localized: "Paso del volc\xE1n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027598
+    m_Localized: "Toma la v\xEDa principal en la primera vuelta. La se\xF1al abre
+      el atajo para la segunda."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027599
+    m_Localized: "V\xEDa principal abierta"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027600
+    m_Localized: 'Siguiente vuelta: toma el atajo'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027601
+    m_Localized: Atajo abierto
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

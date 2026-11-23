@@ -12,18 +12,23 @@ namespace RacingGame
         private void UpdateForkDecision(float distance)
         {
             var fork = path.Fork;
-            if (fork == null || participant == null || participant.isPlayer || race == null)
+            if (fork == null || participant == null || race == null || (participant.isPlayer && fork.Course != MountainFork.Volcano))
             {
                 CurrentFork = ForkRoute.Undecided;
                 return;
             }
             float along = path.SignedDelta(fork.ApproachDistance, distance);
-            if (along < -27f || along > fork.MainSpan + 16f)
+            if (along < -fork.DecisionLead || along > fork.MainSpan + fork.ExitRunout)
             {
                 CurrentFork = ForkRoute.Undecided;
                 return;
             }
             if (CurrentFork != ForkRoute.Undecided || along > 1f) return;
+            if (fork.Course == MountainFork.Volcano)
+            {
+                CurrentFork = fork.VolcanoRouteFor(participant);
+                return;
+            }
             var health = participant.Health;
             bool hurt = health != null && health.Health < health.maxHealth * .65f;
             bool trailing = race.PositionOf(participant) > (race.Participants.Count + 1) / 2;

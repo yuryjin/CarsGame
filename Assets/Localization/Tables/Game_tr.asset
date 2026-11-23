@@ -3013,6 +3013,102 @@ MonoBehaviour:
       var. Kariyer rekorlar\u0131 ve \xF6d\xFClleri kariyer etkinliklerinde."
     m_Metadata:
       m_Items: []
+  - m_Id: 29752733624250368
+    m_Localized: "Ta\u015F oca\u011F\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833280
+    m_Localized: "Kahverengi toprak kestirme buggy i\xE7in uygundur. Asfalt yolla
+      virajdan sonra birle\u015Fir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833281
+    m_Localized: "Arkada\u015Flarla oyna"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833282
+    m_Localized: "\xD6zel yar\u0131\u015F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733636833283
+    m_Localized: "Leviathan\u2019a kar\u015F\u0131 birlikte"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027584
+    m_Localized: "Arkada\u015F\u0131n\u0131n oda kodu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027585
+    m_Localized: "Odaya kat\u0131l"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027586
+    m_Localized: "Oyuncular {n}/4 \xB7 Davet kodu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027587
+    m_Localized: "Bir s\xFCr\xFCc\xFC ayr\u0131ld\u0131. Ma\xE7 sona erdi."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027588
+    m_Localized: "Oda kullan\u0131lam\u0131yor. Kodu kontrol edip yeniden dene."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027589
+    m_Localized: "S\xFCr\xFCc\xFC {n}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027590
+    m_Localized: Bot {n}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027591
+    m_Localized: "\xC7at\u0131lar Aras\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027592
+    m_Localized: "\xC7at\u0131da h\u0131zlan. Sar\u0131 ini\u015F alan\u0131n\u0131
+      hedefle veya alt yoldan git."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027593
+    m_Localized: Sabit tempo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027594
+    m_Localized: "Rakipler aran\u0131zdaki mesafe de\u011Fi\u015Fse de se\xE7ti\u011Fin
+      zorlu\u011Fun temposunu korur."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027595
+    m_Localized: Buz istasyonu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027596
+    m_Localized: "A\xE7\u0131k mavi viraj buzludur. Kapal\u0131 yol daha iyi tutunur."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027597
+    m_Localized: "Yanarda\u011F ge\xE7idi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027598
+    m_Localized: "\u0130lk tur ana yoldan gider. Uyar\u0131dan sonra ikinci turdaki
+      kestirme a\xE7\u0131l\u0131r."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027599
+    m_Localized: "Ana yol a\xE7\u0131k"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027600
+    m_Localized: Sonraki turda kestirmeden git
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29752733641027601
+    m_Localized: "Kestirme a\xE7\u0131k"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

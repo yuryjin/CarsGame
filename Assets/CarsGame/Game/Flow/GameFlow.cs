@@ -287,6 +287,7 @@ namespace RacingGame
             if (race.State == RaceState.Idle) { EnterMenu(); return; }
             if (abyssTrack != null && spaceTrack == null && race.Player != null) abyssTrack.Follow(race.Player.Progress);
             if (starRing != null) starRing.Follow(race);
+            if (trackFork != null) trackFork.FollowVolcano(race, hud);
             if (onCircuit && pickups != null) pickups.Spawn(ev != null ? ev.pickupCount : 9);
             LayMineField(ev);
             if (hud != null) hud.SetVisible(true);

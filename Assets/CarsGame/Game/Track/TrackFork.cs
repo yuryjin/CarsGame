@@ -26,13 +26,16 @@ namespace RacingGame
 
         public MountainFork Course { get; private set; }
         public bool IsDirt => Course == MountainFork.Quarry;
+        private bool HasWideDeck => Course == MountainFork.IceStation || Course == MountainFork.Volcano;
         public float RoadHalfWidth => Course switch
         {
             MountainFork.Quarry => 4.3f,
-            MountainFork.IceStation => 3.4f,
+            MountainFork.IceStation or MountainFork.Volcano => 3.4f,
             MountainFork.Rooftops => 4.8f,
             _ => HalfWidth
         };
+        public float DecisionLead => Course == MountainFork.Volcano ? 44f : 27f;
+        public float ExitRunout => Course == MountainFork.Volcano ? 62f : 16f;
         public float ApproachDistance => path.reversed ? path.Wrap(start + span) : start;
         public float MainSpan => Mathf.Abs(span);
 
@@ -78,6 +81,7 @@ namespace RacingGame
             float desired = Mathf.Min(IsDirt ? 76f : 45f, car.MaxSpeedForCurvature(curvature) * 3.6f * (IsDirt ? .78f : .82f));
             if (progress < .07f) desired = Mathf.Min(desired, 36f);
             if (IsDirt && progress > .87f) desired = Mathf.Min(desired, 45f);
+            if (Course == MountainFork.Volcano && progress > .93f) desired = Mathf.Min(desired, 36f);
             throttle = Mathf.Clamp((desired - car.SpeedKmh) / 3f, -1f, 1f);
         }
 
@@ -164,7 +168,7 @@ namespace RacingGame
                 if (firstClear < 0) firstClear = i;
                 lastClear = i;
             }
-            float deckRise = IsDirt ? .45f : Course == MountainFork.IceStation ? 2.8f : 6f;
+            float deckRise = IsDirt ? .45f : HasWideDeck ? 2.8f : 6f;
             for (int i = 0; i <= Steps; i++)
             {
                 float t = lastClear > firstClear ? Mathf.Clamp01((i - firstClear) / (float)(lastClear - firstClear)) : 0f;
@@ -235,6 +239,7 @@ namespace RacingGame
             var renderer = terrain != null ? terrain.GetComponentInChildren<Renderer>() : null;
             var material = renderer != null ? renderer.sharedMaterial : null;
             AddMeshes(road, material, true, 0.015f, surface);
+            if (Course == MountainFork.Volcano) BuildVolcano(material);
             if (Course == MountainFork.IceStation) BuildIceStation(material, forward, surface);
             AddMeshes(skirts, material, false, 0.015f);
             AddMeshes(markings, material, false);
@@ -406,6 +411,7 @@ namespace RacingGame
         {
             if (Course == MountainFork.Rooftops && path != null && path.RespawnGuard == RoofRespawn)
                 path.RespawnGuard = null;
+            if (Course == MountainFork.Volcano) ReleaseVolcano();
             if (iceStation == this) iceStation = null;
             if (path != null && path.Fork == this) path.Fork = null;
             foreach (var pair in originalSceneryMeshes) if (pair.Key != null) pair.Key.sharedMesh = pair.Value;

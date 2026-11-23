@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace RacingGame
 {
-    public enum MountainFork { Bridge = 0, Quarry = 1, IceStation = 2, Rooftops = 3 }
+    public enum MountainFork { Bridge = 0, Quarry = 1, IceStation = 2, Rooftops = 3, Volcano = 4 }
     public enum FinishGoal { NoDeaths, WinWithoutRepair, BeatTime, CleanRun }
     public enum SkillGoal { Kills, DriftBoosts, Shortcuts, CeilingBoost, CleanFinalLap, BombPasses }
 
