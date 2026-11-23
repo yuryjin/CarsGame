@@ -93,8 +93,11 @@ namespace RacingGame
             var p = Platform;
             if (p == null || p.Leaderboards == null || !p.Player.IsAuthorized || Save == null) return;
             int today = DailyRace.Today;
-            foreach (var b in Save.Data.progress.bests)
+            string owner = p.Player.Id;
+            // Another finish can add a local best while the SDK spaces out its writes.
+            foreach (var b in Save.Data.progress.bests.ToArray())
             {
+                if (Platform != p || !p.Player.IsAuthorized || p.Player.Id != owner) return;
                 if (b == null) continue;
                 if (b.eventId == "a1")
                 {
@@ -196,12 +199,17 @@ namespace RacingGame
 
         private async Task AfterRaceRecordedAsync()
         {
-            Platform?.SetGameplayActive(false);
+            var finished = race.Results;
+            var platform = Platform;
+            string owner = platform?.Player.Id;
+            bool SamePlayer() => Platform == platform && platform?.Player.Id == owner;
+            platform?.SetGameplayActive(false);
             Pacer.OnRaceFinished();
             await Save.FlushAsync();            // progress persisted first …
+            if (!SamePlayer()) return;
             await SubmitAllBestsAsync();       // … then the boards …
             await Task.Yield();                 // let the results screen appear before requesting the ad
-            if (this == null) return;
+            if (this == null || !isActiveAndEnabled || !SamePlayer() || race.State != RaceState.Finished || race.Results != finished) return;
             await MaybeInterstitialAsync();    // … and only then the ad
         }
 
