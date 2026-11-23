@@ -2277,6 +2277,54 @@ MonoBehaviour:
     m_Localized: "Training lap from best sectors \xB7 {t}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29712712435314688
+    m_Localized: Squad target
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091904
+    m_Localized: Stern core
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091905
+    m_Localized: Mortar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091906
+    m_Localized: Drone hangar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091907
+    m_Localized: Main gun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091908
+    m_Localized: Flak gun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091909
+    m_Localized: Time trial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091910
+    m_Localized: Beat your own time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091911
+    m_Localized: Watch replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091912
+    m_Localized: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091913
+    m_Localized: This recording uses a different track layout.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091914
+    m_Localized: Compact race HUD
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

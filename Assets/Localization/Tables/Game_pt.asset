@@ -2285,6 +2285,54 @@ MonoBehaviour:
     m_Localized: "Volta de treino com os melhores setores \xB7 {t}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29712712435314688
+    m_Localized: Alvo da equipe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091904
+    m_Localized: "N\xFAcleo da popa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091905
+    m_Localized: Morteiro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091906
+    m_Localized: Hangar de drones
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091907
+    m_Localized: "Canh\xE3o principal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091908
+    m_Localized: "Antia\xE9rea"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091909
+    m_Localized: "Contra o rel\xF3gio"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091910
+    m_Localized: Melhore seu tempo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091911
+    m_Localized: Ver replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091912
+    m_Localized: Pausar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091913
+    m_Localized: "Esta grava\xE7\xE3o usa outra vers\xE3o da pista."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091914
+    m_Localized: Interface de corrida compacta
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

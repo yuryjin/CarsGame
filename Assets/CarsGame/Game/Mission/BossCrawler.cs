@@ -18,6 +18,7 @@ namespace RacingGame
 
         public DesertMap Map { get; private set; }
         public float Distance { get; private set; }
+        public Vector3 Velocity { get; private set; }
         public int Phase { get; private set; } = 1;
         public bool Defeated { get; private set; }
         public bool ReachedTown { get; private set; }
@@ -201,6 +202,7 @@ namespace RacingGame
             UpdatePhase();
             if (!running) return;
             float speed = tick < holdUntilTick ? 0f : BaseSpeed * speedScale;
+            Velocity = Map.RouteForward(Distance) * speed;
             Distance = Mathf.Min(Map.RouteLength, Distance + speed * SimulationDriver.FixedStep);
             Vector3 pos = Map.RoutePoint(Distance);
             pos.y = Map.Height(pos);
@@ -345,7 +347,13 @@ namespace RacingGame
                         LowPoly.Cylinder(g, tube, new Vector3(0f, 4.9f, 0f), 0.8f, 0.8f, 0.15f, 8, MissionArt.EnemyGlow, false);
                     }), 0);
                     AddCollider(new Vector3(0f, 1.5f, 0f), new Vector3(5.5f, 3f, 5.5f));
-                    muzzle = MissionArt.Pivot(transform, "Muzzle", new Vector3(0f, 5.5f, 2.9f));
+                    var tubePivot = MissionArt.Pivot(transform, "MortarTube", Vector3.up * 1.4f);
+                    tubePivot.localRotation = Quaternion.Euler(-35f, 0f, 0f);
+                    var tubeHit = tubePivot.gameObject.AddComponent<CapsuleCollider>();
+                    tubeHit.center = Vector3.up * 2.5f;
+                    tubeHit.radius = 1.1f;
+                    tubeHit.height = 5f;
+                    muzzle = MissionArt.Pivot(tubePivot, "Muzzle", Vector3.up * 4.9f);
                     break;
                 case BossRole.Hangar:
                     SetHealth(480f); Radius = 3f;
@@ -388,7 +396,8 @@ namespace RacingGame
         }
 
         public override Vector3 AimPoint => Role == BossRole.Hull ? transform.TransformPoint(new Vector3(0f, 8f, 0f))
-            : muzzle != null && Role != BossRole.Mortar ? (head != null ? head.position : transform.position) + Vector3.up * 0.5f
+            : Role == BossRole.Mortar && muzzle != null ? muzzle.position - muzzle.up * .65f
+            : muzzle != null ? (head != null ? head.position : transform.position) + Vector3.up * 0.5f
             : transform.position + transform.up * 1.5f;
 
         // The hull is 46 m long: aim at the part of it nearest to the shooter, at a height the barrels reach.
@@ -401,7 +410,7 @@ namespace RacingGame
             return transform.TransformPoint(local);
         }
 
-        public override Vector3 Velocity => Boss != null ? Boss.transform.forward * BossCrawler.BaseSpeed : Vector3.zero;
+        public override Vector3 Velocity => Boss != null ? Boss.Velocity : Vector3.zero;
 
         public override bool TakeHit(GameObject attacker, float damage, Vector3 point)
         {

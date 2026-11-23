@@ -588,3 +588,15 @@ route.bridge_jump,race card driving cue,100,Build up speed before the broken bri
 hud.mini_map,expand the circuit mini-map,12,Map,Карта,Harita,地图,Karte,Mapa,Carte,Mapa,Мапа
 hud.slipstream,slipstream charge on the speedometer,14,DRAFTING,СЛИПСТРИМ,HAVA AKIMI,跟车加速,WINDSCHATTEN,REBUFO,ASPIRATION,VÁCUO,СЛІПСТРИМ
 results.sector.training,ideal lap target made from personal best sectors,60,Training lap from best sectors · {t},Тренировочный круг по лучшим секторам · {t},En iyi sektörlerden antrenman turu · {t},最佳分段训练圈 · {t},Trainingsrunde aus Bestsektoren · {t},Vuelta de práctica con tus mejores sectores · {t},Tour d’entraînement avec tes meilleurs secteurs · {t},Volta de treino com os melhores setores · {t},Тренувальне коло за найкращими секторами · {t}
+mission.squad_order,button to choose a fortress part for allies,32,Squad target,Цель для отряда,Manga hedefi,小队目标,Truppziel,Objetivo del equipo,Cible de l’équipe,Alvo da equipe,Ціль для загону
+mission.part.core,stern reactor,18,Stern core,Кормовое ядро,Kıç çekirdeği,尾部核心,Heckreaktor,Núcleo de popa,Cœur de poupe,Núcleo da popa,Кормове ядро
+mission.part.mortar,fortress station,18,Mortar,Миномёт,Havan,迫击炮,Mörser,Mortero,Mortier,Morteiro,Міномет
+mission.part.hangar,fortress station,18,Drone hangar,Ангар дронов,Dron hangarı,无人机库,Drohnenhangar,Hangar de drones,Hangar à drones,Hangar de drones,Ангар дронів
+mission.part.cannon,fortress station,18,Main gun,Орудие,Ana top,主炮,Hauptgeschütz,Cañón principal,Canon principal,Canhão principal,Гармата
+mission.part.flak,fortress station,18,Flak gun,Зенитка,Uçaksavar,高射炮,Flak,Antiaérea,DCA,Antiaérea,Зенітка
+events.tt1.name,solo time trial event,24,Time trial,Заезд на время,Zamana karşı,计时赛,Zeitfahren,Contrarreloj,Contre-la-montre,Contra o relógio,Заїзд на час
+time_trial.rules,personal time trial rule on the card and HUD,46,Beat your own time,Улучши своё время,Kendi zamanını geliştir,刷新自己的用时,Schlag deine eigene Zeit,Mejora tu tiempo,Améliore ton chrono,Melhore seu tempo,Поліпш свій час
+replay.watch,personal replay button,22,Watch replay,Смотреть запись,Kaydı izle,观看回放,Wiederholung ansehen,Ver repetición,Voir la rediffusion,Ver replay,Дивитися запис
+replay.pause,personal replay button,16,Pause,Пауза,Duraklat,暂停,Pause,Pausar,Pause,Pausar,Пауза
+replay.unavailable,missing compatible course,80,This recording uses a different track layout.,Запись сделана на другой версии трассы.,Bu kayıt farklı bir pist düzenini kullanıyor.,此回放使用不同的赛道布局。,Diese Aufnahme verwendet eine andere Streckenversion.,La grabación usa otra versión de la pista.,Cet enregistrement utilise une autre version du circuit.,Esta gravação usa outra versão da pista.,Запис зроблено на іншій версії траси.
+settings.compact_hud,race layout with model choice in pause,36,Compact race HUD,Компактный интерфейс гонки,Kompakt yarış arayüzü,精简比赛界面,Kompakte Rennanzeige,Interfaz de carrera compacta,Interface de course compacte,Interface de corrida compacta,Компактний інтерфейс гонки

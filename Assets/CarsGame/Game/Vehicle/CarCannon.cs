@@ -305,6 +305,13 @@ namespace RacingGame
             barrel.localRotation = barrelRestRotation * Quaternion.Euler(barrelPitch, 0f, 0f);
         }
 
+        public bool IsAlignedWith(Vector3 aimPoint)
+        {
+            if (turret == null || barrel == null) return false;
+            DesiredAngles(aimPoint, out float yaw, out float pitch);
+            return Mathf.Abs(turretYaw - yaw) <= 1.5f && Mathf.Abs(barrelPitch - pitch) <= 1.5f;
+        }
+
         private void DesiredAngles(Vector3 aimPoint, out float desiredYaw, out float desiredPitch)
         {
             Vector3 local = turret.parent.InverseTransformDirection(aimPoint - barrel.position);

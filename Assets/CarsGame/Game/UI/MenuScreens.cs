@@ -76,6 +76,7 @@ namespace RacingGame
         private void Update()
         {
             UpdateSaveRecovery();
+            if (current == "replay") UpdateReplayControls();
             menuScaler.scaleFactor = UiFactory.ReadableScale(Screen.width, Screen.height);
             if (toastPanel != null && toastPanel.gameObject.activeSelf && Time.unscaledTime > toastUntil) toastPanel.gameObject.SetActive(false);
             bool portrait = PlatformGlue.IsReady && PlatformGlue.IsMobileDevice && Screen.height > Screen.width;
@@ -137,6 +138,7 @@ namespace RacingGame
         private void Back()
         {
             if (CloseRaceSettingsIfOpen()) return;
+            if (current == "replay") { Show("leaders"); return; }
             if (current == "results") GoTo("main"); else Show(current == "arsenal" ? "garage" : "main");
         }
         private void OnFlowState(FlowState state)
@@ -163,6 +165,8 @@ namespace RacingGame
 
         public void Show(string name)
         {
+            if (name == "replay" && !flow.ViewingReplay) name = "leaders";
+            if (current == "replay" && name != "replay") flow.CloseReplay();
             var save = PlatformGlue.Save;
             if (save != null && !save.LocalVersionTooNew && !RaceSettingsOpen && RaceCups.GrantCompleted(save.Data.progress)) save.MarkDirty();
             if (save != null && !save.LocalVersionTooNew && !RaceSettingsOpen && PlayerProgression.NormalizeLoadout(save.Data.progress)) save.MarkDirty();
@@ -184,6 +188,13 @@ namespace RacingGame
             panel = UiFactory.Panel(canvas.transform, "Panel_" + name, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.015f, 0.025f, 0.045f, 0.82f), false);
             panel.GetComponent<Image>().raycastTarget = true;
             transition = panel.gameObject.AddComponent<CanvasGroup>(); transition.alpha = 0f;
+            if (name == "replay")
+            {
+                panel.GetComponent<Image>().color = Color.clear;
+                BuildReplayControls();
+                if (portraitPanel != null && portraitPanel.gameObject.activeSelf) portraitPanel.SetAsLastSibling();
+                return;
+            }
             float margin = Compact ? 12f : 32f;
             float width = Mathf.Min(name == "settings" ? 1320f : 1640f, layoutWidth - margin * 2f);
             var shell = UiFactory.Card(panel, "Shell", new Vector2(0.5f, 0f), new Vector2(0.5f, 1f), new Vector2(-width * 0.5f, margin), new Vector2(width * 0.5f, -margin));
@@ -406,7 +417,8 @@ namespace RacingGame
 
         private static string EventFireDetail(RaceEventDefinition ev, float tierInterval, CultureInfo culture)
         {
-            if (ev.twist == Core.Daily.RaceTwist.MinesOnly || ev.twist == Core.Daily.RaceTwist.HotBomb)
+            if (ev.twist == Core.Daily.RaceTwist.MinesOnly || ev.twist == Core.Daily.RaceTwist.HotBomb
+                || ev.twist == Core.Daily.RaceTwist.TimeTrial)
                 return Loc.Get("events.guns_disabled");
             if (ev.mode == EventMode.Mission && ev.eventId == TrainMission.EventId)
                 return Loc.Format("train.guard_fire", "s", TrainEscort.BaseFireCooldown.ToString("0.##", culture));
@@ -756,6 +768,8 @@ namespace RacingGame
                 Toast(Loc.Get("settings.hints.reset"));
             }, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 26f, UiFactory.Raised);
             Section(content, "DisplayTitle", Loc.Get("settings.group.display"));
+            ToggleRow(content, "CompactHud", "settings.compact_hud", save != null && save.Data.settings.compactHud, enabled =>
+            { if (save == null) return; save.Data.settings.compactHud = enabled; save.MarkDirty(); Show("settings"); });
             if (PlatformGlue.HasQualityChoice && save != null)
             {
                 var settings = save.Data.settings;
@@ -803,6 +817,12 @@ namespace RacingGame
             var label = Label(value, "VolumeValue", percent + "%", 27f, new Vector2(1f, 0f), Vector2.one,
                 new Vector2(-92f, 0f), Vector2.zero, Color.white, TextAlignmentOptions.Center);
             var root = UiFactory.Panel(value, name + "Volume", Vector2.zero, Vector2.one, Vector2.zero, new Vector2(-104f, 0f), new Color(0f, 0f, 0f, 0f));
+            var slider = BuildSlider(root, 100f, percent, true);
+            slider.onValueChanged.AddListener(v => { label.text = Mathf.RoundToInt(v) + "%"; change(v / 100f); });
+        }
+
+        private static Slider BuildSlider(RectTransform root, float maximum, float initial, bool whole)
+        {
             root.GetComponent<Image>().raycastTarget = true;
             var rail = UiFactory.Panel(root, "Rail", new Vector2(0f, 0.5f), new Vector2(1f, 0.5f),
                 new Vector2(28f, -5f), new Vector2(-28f, 5f), UiFactory.Raised);
@@ -813,13 +833,13 @@ namespace RacingGame
                 new Vector2(-28f, 4f), new Vector2(28f, -4f), Color.white);
             var slider = root.gameObject.AddComponent<Slider>();
             slider.fillRect = fill; slider.handleRect = handle; slider.targetGraphic = handle.GetComponent<Image>();
-            slider.minValue = 0f; slider.maxValue = 100f; slider.wholeNumbers = true;
-            slider.SetValueWithoutNotify(percent);
+            slider.minValue = 0f; slider.maxValue = maximum; slider.wholeNumbers = whole;
+            slider.SetValueWithoutNotify(initial);
             var colors = slider.colors;
             colors.highlightedColor = colors.selectedColor = UiFactory.Accent;
             slider.colors = colors;
             root.gameObject.AddComponent<UiButtonFx>();
-            slider.onValueChanged.AddListener(v => { label.text = Mathf.RoundToInt(v) + "%"; change(v / 100f); });
+            return slider;
         }
 
         private void BuildLeaders(RectTransform root)
@@ -831,7 +851,10 @@ namespace RacingGame
             {
                 var best = PlatformGlue.Save?.Data.progress.bests.Find(b => b.eventId == ev.eventId);
                 if (best == null || best.bestTimeMs <= 0) continue;
-                BoardRow(content, "Local_" + ev.eventId, (++count).ToString("00"), Loc.Get(ev.nameKey), UiFactory.FormatTime(best.bestTimeMs / 1000.0), true, RecordSetupText(best.setup));
+                Action watch = null;
+                if (ev.mode == EventMode.Race && PlatformGlue.Save.Data.personalGhosts.HasForEvent(ev.eventId, ev.laps))
+                    watch = () => { if (flow.OpenReplay(ev)) Show("replay"); else Toast(Loc.Get("replay.unavailable")); };
+                BoardRow(content, "Local_" + ev.eventId, (++count).ToString("00"), Loc.Get(ev.nameKey), UiFactory.FormatTime(best.bestTimeMs / 1000.0), true, RecordSetupText(best.setup), watch);
             }
             if (count == 0)
             {
@@ -875,7 +898,7 @@ namespace RacingGame
             return tier + " · " + body + " · " + build + "\n" + upgrades + (setup.continued ? " · " + Loc.Get("record.continued") : "");
         }
 
-        private static void BoardRow(Transform content, string id, string rank, string name, string time, bool highlight, string detail = null)
+        private static void BoardRow(Transform content, string id, string rank, string name, string time, bool highlight, string detail = null, Action watch = null)
         {
             bool hasDetail = !string.IsNullOrEmpty(detail);
             var row = Item(content, id, hasDetail ? 180f : 90f);
@@ -884,9 +907,12 @@ namespace RacingGame
             Label(row, "Time", time, 30f, new Vector2(1f, 0f), Vector2.one, new Vector2(-240f, hasDetail ? 96f : 12f), new Vector2(-26f, -12f), highlight ? UiFactory.Positive : Color.white, TextAlignmentOptions.MidlineRight);
             if (hasDetail)
             {
-                var setupLabel = Label(row, "RecordSetup", detail, 23f, Vector2.zero, new Vector2(1f, 0f), new Vector2(140f, 14f), new Vector2(-26f, 92f), UiFactory.Muted);
+                var setupLabel = Label(row, "RecordSetup", detail, 23f, Vector2.zero, new Vector2(1f, 0f), new Vector2(140f, 14f), new Vector2(watch == null ? -26f : -232f, 92f), UiFactory.Muted);
                 setupLabel.fontSizeMin = 22f;
             }
+            if (watch != null)
+                UiFactory.Button(row, "Replay_" + id, Loc.Get("replay.watch"), watch, new Vector2(1f, 0f), new Vector2(1f, 0f),
+                    new Vector2(-216f, 18f), new Vector2(-26f, 86f), 25f, UiFactory.Raised);
         }
         private async void FillCloudBoard(RectTransform content, ILeaderboards boards)
         {

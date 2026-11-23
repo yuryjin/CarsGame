@@ -2288,6 +2288,54 @@ MonoBehaviour:
     m_Localized: "Vuelta de pr\xE1ctica con tus mejores sectores \xB7 {t}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29712712435314688
+    m_Localized: Objetivo del equipo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091904
+    m_Localized: "N\xFAcleo de popa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091905
+    m_Localized: Mortero
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091906
+    m_Localized: Hangar de drones
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091907
+    m_Localized: "Ca\xF1\xF3n principal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091908
+    m_Localized: "Antia\xE9rea"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091909
+    m_Localized: Contrarreloj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091910
+    m_Localized: Mejora tu tiempo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091911
+    m_Localized: "Ver repetici\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091912
+    m_Localized: Pausar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091913
+    m_Localized: "La grabaci\xF3n usa otra versi\xF3n de la pista."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091914
+    m_Localized: Interfaz de carrera compacta
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

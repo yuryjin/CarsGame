@@ -2287,6 +2287,54 @@ MonoBehaviour:
     m_Localized: "Tour d\u2019entra\xEEnement avec tes meilleurs secteurs \xB7 {t}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29712712435314688
+    m_Localized: "Cible de l\u2019\xE9quipe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091904
+    m_Localized: "C\u0153ur de poupe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091905
+    m_Localized: Mortier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091906
+    m_Localized: "Hangar \xE0 drones"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091907
+    m_Localized: Canon principal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091908
+    m_Localized: DCA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091909
+    m_Localized: Contre-la-montre
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091910
+    m_Localized: "Am\xE9liore ton chrono"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091911
+    m_Localized: Voir la rediffusion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091912
+    m_Localized: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091913
+    m_Localized: Cet enregistrement utilise une autre version du circuit.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091914
+    m_Localized: Interface de course compacte
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

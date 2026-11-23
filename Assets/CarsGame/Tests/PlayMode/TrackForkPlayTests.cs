@@ -23,6 +23,17 @@ namespace RacingGame.Tests
             camera.transform.position = new Vector3(65f, 120f, 5f);
             camera.transform.LookAt(new Vector3(65f, 0f, 85f));
             camera.fieldOfView = 60f;
+            try { Capture(camera, output); }
+            finally { Object.Destroy(cameraObject); }
+        }
+
+        private static void Capture(Camera camera, string output)
+        {
+#if UNITY_EDITOR
+            bool previousAsync = UnityEditor.ShaderUtil.allowAsyncCompilation;
+            UnityEditor.ShaderUtil.allowAsyncCompilation = false;
+#endif
+            var originalTarget = camera.targetTexture;
             var target = new RenderTexture(1280, 720, 24);
             var pixels = new Texture2D(1280, 720, TextureFormat.RGB24, false);
             var previous = RenderTexture.active;
@@ -38,12 +49,96 @@ namespace RacingGame.Tests
             finally
             {
                 RenderTexture.active = previous;
-                camera.targetTexture = null;
+                camera.targetTexture = originalTarget;
+#if UNITY_EDITOR
+                UnityEditor.ShaderUtil.allowAsyncCompilation = previousAsync;
+#endif
                 target.Release();
                 Object.Destroy(target);
                 Object.Destroy(pixels);
-                Object.Destroy(cameraObject);
             }
+        }
+
+        [UnityTest, Timeout(300000)]
+        public IEnumerator BrakingBoardDistancesAndVisibilityFollowBothDrivingDirections()
+        {
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float until = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < until) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null; yield return null;
+            var flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = Object.FindAnyObjectByType<RaceManager>();
+            var path = TrackPath.Instance;
+            var original = RaceSetup.Event;
+            var tier = RaceSetup.Tier;
+            var drive = Object.Instantiate(System.Array.Find(flow.events, ev => ev.eventId == "e1"));
+            drive.aiCountOverride = drive.pickupCount = 0;
+            try
+            {
+                foreach (bool reverse in new[] { false, true })
+                {
+                    drive.reversed = reverse;
+                    flow.StartRace(drive, tier);
+                    while (race.State == RaceState.Countdown) yield return null;
+                    var boards = Object.FindAnyObjectByType<BrakingBoards>();
+                    Assert.NotNull(boards);
+                    var corner = boards.transform.Find("Turn");
+                    Assert.NotNull(corner);
+                    var labels = corner.GetComponentsInChildren<TMPro.TextMeshPro>();
+                    Assert.AreEqual(3, labels.Length);
+                    int hint = -1;
+                    float entry = path.Spline.Project(corner.position, ref hint);
+                    int[] distances = { 100, 50, 25 };
+                    for (int n = 0; n < labels.Length; n++)
+                    {
+                        hint = -1;
+                        Assert.AreEqual(distances[n].ToString(), labels[n].text);
+                        float sign = path.Spline.Project(labels[n].transform.position, ref hint);
+                        Assert.That(path.SignedDelta(sign, entry), Is.EqualTo(distances[n]).Within(1.25f));
+                    }
+                    var car = race.Player.Car;
+                    var input = car.gameObject.AddComponent<ScriptedDriverInput>();
+                    car.SetInputSource(input);
+                    path.Pose(entry - 140f, 0f, out var start, out var facing);
+                    car.Teleport(start + Vector3.up * .5f, facing);
+                    for (int settle = 0; settle < 25; settle++) yield return null;
+                    car.Body.linearVelocity = car.transform.forward * 15f;
+                    var camera = Camera.main;
+                    int crossed = 0;
+                    bool sawEarly = false;
+                    for (int t = 0; t < 1100 && crossed < 3; t++)
+                    {
+                        float d = race.Player.Progress.Distance, remaining = path.SignedDelta(d, entry);
+                        if (remaining <= distances[crossed]) crossed++;
+                        if (!sawEarly && remaining > 110f && car.SpeedKmh > 15f)
+                        {
+                            var face = labels[0].transform;
+                            Vector3 point = camera.WorldToViewportPoint(face.position);
+                            if (point.z > 0f && point.x > .03f && point.x < .97f && point.y > .03f && point.y < .97f
+                                && Vector3.Dot(face.forward, (face.position - camera.transform.position).normalized) > .55f
+                                && !Physics.Linecast(camera.transform.position, face.position, ~LayerMask.GetMask("Car"), QueryTriggerInteraction.Ignore))
+                            {
+                                sawEarly = true;
+                                var directory = System.Environment.GetEnvironmentVariable("CG_BRAKE_SHOTS");
+                                if (!string.IsNullOrEmpty(directory)) Capture(camera, System.IO.Path.Combine(directory, reverse ? "reverse.png" : "forward.png"));
+                            }
+                        }
+                        Vector3 aim = path.Position(d + 11f) - car.transform.position;
+                        float steer = Vector3.SignedAngle(car.transform.forward, aim, Vector3.up) / 25f - car.Body.angularVelocity.y * .35f;
+                        input.Set(car.SpeedKmh < 63f ? 1f : 0f, Mathf.Clamp(steer, -1f, 1f));
+                        yield return null;
+                    }
+                    Debug.Log($"[BrakingBoards] reverse={reverse} entry={entry:F1} visibleBeforeBraking={sawEarly} boardsPassed={crossed}");
+                    Assert.IsTrue(sawEarly, "The first distance must face the moving driver before braking");
+                    Assert.AreEqual(3, crossed, "The car drives past the 100, 50 and 25 metre boards in order");
+                    flow.EnterMenu();
+                    yield return null;
+                    Assert.IsNull(Object.FindAnyObjectByType<BrakingBoards>());
+                }
+            }
+            finally { flow.EnterMenu(); RaceSetup.Event = original; RaceSetup.Tier = tier; Object.Destroy(drive); }
         }
 
         [UnityTest, Timeout(300000)]

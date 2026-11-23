@@ -86,6 +86,26 @@ try {
       if(mobile) await tap({x:.01,y:.01});
       await cmd('startRace','e1','easy');
       for(let i=0;i<80 && (await cmd('state')).race!=='Racing';i++) await page.waitForTimeout(100);
+      if (process.env.CG_COMPACT_HUD === '1' && width === 640) {
+        const original = await cmd('ui');
+        const model = await reveal('RaceModelStyle'), reset = await reveal('Reset');
+        await page.screenshot({path:`${out}/road-standard.png`,scale:'css'});
+        await click('RaceModelStyle');
+        const switched = (await cmd('ui')).labels.find(l=>l.parent==='RaceModelStyle').text;
+        assert.notEqual(switched, original.labels.find(l=>l.parent==='RaceModelStyle').text);
+        await click('PauseButton'); await click('PauseSettings'); await click('CompactHudOn',true); await click('Back');
+        assert.equal((await cmd('ui')).labels.find(l=>l.parent==='RaceModelStyle').text,switched);
+        await click('RaceModelStyle');
+        assert.equal((await cmd('ui')).labels.find(l=>l.parent==='RaceModelStyle').text, original.labels.find(l=>l.parent==='RaceModelStyle').text);
+        await click('Resume');
+        const compact = await cmd('ui'), newReset = await reveal('Reset');
+        assert(!compact.buttons.some(b=>b.name==='RaceModelStyle'));
+        assert((reset.y-newReset.y)*height >= model.height, 'The width of the old reset button now shows the road for at least one button height');
+        await page.screenshot({path:`${out}/road-compact.png`,scale:'css'});
+        evidence.push({width,phase:'compact-road',model,reset,newReset,standard:original,compact});
+        await click('PauseButton'); await click('PauseSettings'); await click('CompactHudOff',true); await click('Back'); await click('Resume');
+        assert((await cmd('ui')).buttons.some(b=>b.name==='RaceModelStyle'&&b.interactable));
+      }
       await click('PauseButton');
       const before=await cmd('ui');
       assert(before.buttons.some(b=>b.name==='Resume'&&b.interactable),'Pause must be open before measuring frozen state');

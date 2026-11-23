@@ -113,6 +113,23 @@ namespace RacingGame
             Vector3 pos = transform.position;
             if (side == Side.Escort) { PlanEscort(boss, pos); return; }
 
+            var order = mission.SquadTarget;
+            if (order != null)
+            {
+                Vector3 station = order.transform.localPosition;
+                float flank = station.x == 0f ? orbitSign : Mathf.Sign(station.x);
+                Vector3 local = order.Role == BossRole.Core
+                    ? new Vector3(flank * (6f + slot * 2f), 0f, -66f)
+                    : new Vector3(flank * (56f + slot * 1.2f), 0f, station.z);
+                Vector3 lane = boss.transform.TransformPoint(local);
+                // Pass along the firing lane so the turret keeps its traverse and the car avoids the hull.
+                goal = (pos - lane).sqrMagnitude > 18f * 18f ? lane
+                    : lane + boss.transform.forward * (order.Role == BossRole.Core ? 12f : 20f);
+                goalSpeedKmh = (pos - lane).sqrMagnitude > 28f * 28f ? 85f : 30f;
+                KeepOffBossFront(boss);
+                return;
+            }
+
             // 1) An escort vehicle close by: drive past it on its flank (the turret does the work).
             var enemyCar = mission.NearestCar(pos, Team.Enemy, 75f);
             if (enemyCar != null)

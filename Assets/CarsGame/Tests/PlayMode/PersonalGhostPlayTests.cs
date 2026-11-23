@@ -86,6 +86,17 @@ namespace RacingGame.Tests
             Assert.AreEqual(race.laps, race.Results.Player.Laps);
         }
 
+        private IEnumerator StartFromEventList(string id)
+        {
+            Object.FindAnyObjectByType<MenuScreens>().Show("events");
+            var button = GameObject.Find("Start_" + id).GetComponent<UnityEngine.UI.Button>();
+            Assert.IsTrue(button.interactable, id);
+            button.onClick.Invoke();
+            while (race.State == RaceState.Countdown) yield return null;
+            Assert.AreEqual(RaceState.Racing, race.State);
+            Assert.AreEqual(id, flow.CurrentEvent.eventId);
+        }
+
         private static GhostRecord LegacyCircuit(int hash, TrackPath path, int laps)
         {
             var legacy = new GhostRecord { TrackHash = hash, PlayerName = "Legacy driver" };
@@ -203,6 +214,111 @@ namespace RacingGame.Tests
             yield return Reload();
             Assert.AreEqual(sum, PlatformGlue.Save.Data.progress.bests.Find(b => b.eventId == e1.eventId).sectors[0].LapMilliseconds);
             TestContext.WriteLine(heading + " = " + string.Join(" + ", sectors) + " ms");
+        }
+
+        [UnityTest, Timeout(300000)]
+        public IEnumerator PersonalReplaySeeksAcrossARecordedRecoveryAndLeavesTheProfileUntouched()
+        {
+            yield return OpenProfile();
+            yield return StartFromEventList("tt1");
+            while (race.RaceTime < 1.5f) yield return null;
+            var car = race.Player.Car;
+            car.Teleport(car.transform.position + car.transform.forward * 7f + Vector3.up * .5f,
+                car.transform.rotation * Quaternion.Euler(0f, 18f, 0f));
+            yield return DriveToFinish();
+            int hash = flow.GetComponent<GhostRecorder>().Record.TrackHash;
+            var record = PlatformGlue.Save.Data.personalGhosts.Find("tt1", hash, 1);
+            int cut = record.Samples.FindIndex(p => (p.Flags & GhostRecord.TeleportFlag) != 0);
+            Assert.Greater(cut, 0);
+            var after = record.Samples[cut];
+            var before = record.Samples[cut - 1];
+            Assert.Greater(Vector3.Distance(before.Position, after.Position), 4f);
+            var menu = Object.FindAnyObjectByType<MenuScreens>();
+            menu.GoTo("leaders");
+            var save = PlatformGlue.Save.Data;
+            string profile = SaveMigrator.ToJson(save);
+            GameObject.Find("Replay_Local_tt1").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+            Assert.IsTrue(flow.ViewingReplay);
+            Assert.AreEqual(FlowState.Menu, flow.State);
+            Assert.AreEqual(RaceState.Idle, race.State);
+            var viewer = Ghost();
+            Assert.AreEqual(viewer.transform, Camera.main.GetComponent<CarCameraFollow>().target);
+            var toggle = GameObject.Find("ReplayToggle").GetComponent<UnityEngine.UI.Button>();
+            var seek = GameObject.Find("ReplaySeek").GetComponent<UnityEngine.UI.Slider>();
+            toggle.onClick.Invoke();
+            Assert.IsTrue(flow.ReplayPaused);
+            foreach (float moment in new[] { after.TimeSeconds - .001f, after.TimeSeconds, after.TimeSeconds + .02f, after.TimeSeconds - .001f })
+            {
+                seek.value = moment;
+                Assert.IsTrue(record.EvaluatePose(moment, out var position, out var rotation));
+                Assert.Less(Vector3.Distance(position, viewer.transform.position), .001f);
+                Assert.Less(Quaternion.Angle(rotation, viewer.transform.rotation), .1f);
+                yield return null; yield return null;
+                Assert.AreEqual(moment, flow.ReplayTime, .0001f);
+                Assert.Less(Vector3.Distance(position, viewer.transform.position), .001f);
+            }
+            toggle.onClick.Invoke();
+            yield return null; yield return null;
+            Assert.Greater(flow.ReplayTime, after.TimeSeconds - .001f);
+            seek.value = record.Duration;
+            Assert.IsTrue(flow.ReplayPaused);
+            toggle.onClick.Invoke();
+            Assert.AreEqual(0f, flow.ReplayTime);
+            Assert.IsFalse(flow.ReplayPaused);
+            GameObject.Find("Panel_replay").GetComponentInChildren<UnityEngine.UI.Button>().onClick.Invoke();
+            Assert.AreEqual("leaders", menu.Current);
+            Assert.IsFalse(flow.ViewingReplay);
+            Assert.AreEqual(profile, SaveMigrator.ToJson(save));
+            TestContext.WriteLine($"Cut at {after.TimeMilliseconds} ms, distance {Vector3.Distance(before.Position, after.Position):F2} m; " +
+                $"races {save.Races}, coins {save.Coins}, best {record.DurationMilliseconds} ms unchanged");
+        }
+
+        [UnityTest, Timeout(300000)]
+        public IEnumerator SoloTimeTrialReplacesItsOwnGhostAndReturnsToAnArmedCareerField()
+        {
+            yield return OpenProfile();
+            yield return StartFromEventList("tt1");
+            Assert.AreEqual(1, race.Participants.Count);
+            Assert.AreEqual(1, race.laps);
+            Assert.IsNull(Ghost());
+            Assert.IsEmpty(Object.FindObjectsByType<Pickup>());
+            Assert.IsEmpty(Object.FindObjectsByType<MineHazard>());
+            var car = race.Player.Car;
+            Assert.IsTrue(car.Cannon.locked);
+            Assert.AreEqual(SecondaryWeaponType.None, race.Player.Weapons.secondaryType);
+            var command = car.gameObject.AddComponent<ScriptedDriverInput>();
+            command.fire = true; car.SetInputSource(command);
+            int ammo = car.Cannon.Ammo;
+            for (int i = 0; i < 15; i++) yield return null;
+            Assert.Greater(command.SamplesTaken, 0);
+            Assert.AreEqual(ammo, car.Cannon.Ammo);
+            Assert.AreEqual(0, RaceDirector.Instance.ShotsFired);
+            Assert.AreNotEqual("0:00.000", GameObject.Find("Timer").GetComponent<TMPro.TMP_Text>().text);
+            yield return DriveToFinish(28);
+            var best = PlatformGlue.Save.Data.progress.bests.Find(b => b.eventId == "tt1");
+            long originalTime = best.bestTimeMs;
+            int hash = flow.GetComponent<GhostRecorder>().Record.TrackHash;
+
+            flow.EnterMenu();
+            yield return StartFromEventList("tt1");
+            Assert.AreEqual(originalTime, Ghost().Record.DurationMilliseconds);
+            yield return DriveToFinish();
+            Assert.Less(best.bestTimeMs, originalTime);
+            Assert.AreEqual(best.bestTimeMs, PlatformGlue.Save.Data.personalGhosts.Find("tt1", hash, 1).DurationMilliseconds);
+            TestContext.WriteLine($"tt1 PB {originalTime} → {best.bestTimeMs} ms");
+
+            flow.EnterMenu();
+            yield return StartFromEventList("e1");
+            Assert.AreEqual(RaceSetup.Tier.aiCount + 1, race.Participants.Count);
+            Assert.Greater(race.Participants.Count, 1);
+            car = race.Player.Car;
+            Assert.IsFalse(car.Cannon.locked);
+            ammo = car.Cannon.Ammo;
+            command = car.gameObject.AddComponent<ScriptedDriverInput>();
+            command.fire = true; car.SetInputSource(command);
+            for (int i = 0; i < 30 && car.Cannon.Ammo == ammo; i++) yield return null;
+            Assert.Less(car.Cannon.Ammo, ammo);
+            Assert.Greater(RaceDirector.Instance.ShotsFired, 0);
         }
 
         [UnityTest, Timeout(240000)]

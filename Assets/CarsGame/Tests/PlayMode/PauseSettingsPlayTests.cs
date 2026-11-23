@@ -43,6 +43,56 @@ namespace RacingGame.Tests
 
         private static Button Button(string name) => System.Array.Find(Object.FindObjectsByType<Button>(), b => b.name == name);
 
+        [UnityTest, Timeout(120000)]
+        public IEnumerator CompactLayoutMovesTheLiveModelSwitchIntoPause()
+        {
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            yield return SceneManager.LoadSceneAsync("SampleScene");
+            float until = Time.realtimeSinceStartup + 60f;
+            while (!PlatformGlue.IsReady && Time.realtimeSinceStartup < until) yield return null;
+            Assert.IsTrue(PlatformGlue.IsReady);
+            yield return null; yield return null;
+            saved = JsonUtility.ToJson(PlatformGlue.Save.Data);
+            PlatformGlue.Save.Data.settings.compactHud = false;
+            flow = Object.FindAnyObjectByType<GameFlow>();
+            var race = flow.GetComponent<RaceManager>();
+            flow.StartRace(System.Array.Find(flow.events, e => e.eventId == "e1"), flow.tiers[0]);
+            while (race.State == RaceState.Countdown) yield return null;
+            var car = race.Player.GetComponent<CarBody>();
+            var model = Button("RaceModelStyle");
+            Assert.NotNull(model);
+            var parent = model.transform.parent;
+            model.onClick.Invoke();
+            void CheckModel()
+            {
+                var mesh = car.transform.Find("Tripo_" + car.Class);
+                Assert.AreEqual(!PlatformGlue.ClassicCarModels, mesh != null && mesh.gameObject.activeInHierarchy);
+                var original = car.transform.Find("ClassicHull") ?? car.transform.Find("Car_Visuals");
+                Assert.AreEqual(PlatformGlue.ClassicCarModels, original.gameObject.activeInHierarchy);
+            }
+            CheckModel();
+            Button("PauseButton").onClick.Invoke(); yield return null;
+            Button("PauseSettings").onClick.Invoke(); yield return null;
+            Button("CompactHudOn").onClick.Invoke(); yield return null;
+            Button("Back").onClick.Invoke(); yield return null;
+            Assert.AreSame(model, Button("RaceModelStyle"));
+            Assert.AreEqual("PauseCard", model.transform.parent.name);
+            Assert.IsTrue(model.IsInteractable());
+            model.onClick.Invoke();
+            CheckModel();
+            Button("Resume").onClick.Invoke(); yield return null;
+            Assert.IsNull(Button("RaceModelStyle"));
+            CheckModel();
+            Button("PauseButton").onClick.Invoke(); yield return null;
+            Button("PauseSettings").onClick.Invoke(); yield return null;
+            Button("CompactHudOff").onClick.Invoke(); yield return null;
+            Button("Back").onClick.Invoke(); yield return null;
+            Button("Resume").onClick.Invoke(); yield return null;
+            Assert.AreSame(model, Button("RaceModelStyle"));
+            Assert.AreSame(parent, model.transform.parent);
+            CheckModel();
+        }
+
         [UnityTest, Timeout(180000)]
         public IEnumerator SettingsBackAndEscapeKeepTheSameRaceAndEveryExternalPause()
         {

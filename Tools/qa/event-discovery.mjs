@@ -48,9 +48,10 @@ try {
       await fs.writeFile(`${out}/evidence.json`, JSON.stringify({ evidence, errors }, null, 2));
       if (['ru', 'zh'].includes(lang)) await page.screenshot({ path: `${out}/${lang}-events.png` });
       const cards = state.buttons.filter(b => b.name.startsWith('Start_'));
-      assert.equal(cards.length, 23, 'Every race, mission and arena remains available in the list');
+      assert.equal(cards.length, 24, 'Every race, mission and arena remains available in the list');
       const available = cards.filter(b => b.interactable), locked = cards.filter(b => !b.interactable);
-      assert.equal(available.length, 9, 'Fresh players can choose all nine unlocked modes');
+      assert.equal(available.length, 10, 'Fresh players can choose all ten unlocked modes');
+      assert(available.some(b => b.name === 'Start_tt1'), 'A new driver can start a solo time trial');
       assert(available.some(b => b.name === 'Start_a1'), 'The arena is available from the first launch');
       assert(available.some(b => b.name === 'Start_m2'), 'The train chase is available from the first launch');
       for (const field of ['Name', 'Stats', 'Stars']) {

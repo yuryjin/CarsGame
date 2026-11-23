@@ -2309,6 +2309,54 @@ MonoBehaviour:
     m_Localized: "En iyi sekt\xF6rlerden antrenman turu \xB7 {t}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29712712435314688
+    m_Localized: Manga hedefi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091904
+    m_Localized: "K\u0131\xE7 \xE7ekirde\u011Fi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091905
+    m_Localized: Havan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091906
+    m_Localized: "Dron hangar\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091907
+    m_Localized: Ana top
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091908
+    m_Localized: "U\xE7aksavar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091909
+    m_Localized: "Zamana kar\u015F\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091910
+    m_Localized: "Kendi zaman\u0131n\u0131 geli\u015Ftir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091911
+    m_Localized: "Kayd\u0131 izle"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091912
+    m_Localized: Duraklat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091913
+    m_Localized: "Bu kay\u0131t farkl\u0131 bir pist d\xFCzenini kullan\u0131yor."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091914
+    m_Localized: "Kompakt yar\u0131\u015F aray\xFCz\xFC"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

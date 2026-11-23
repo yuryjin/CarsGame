@@ -65,6 +65,7 @@ namespace RacingGame
         private SpaceTrack spaceTrack;
         private StarRingTrack starRing;
         private WastelandTrack wasteland;
+        private BrakingBoards brakingBoards;
         private MissionDirector mission;
         private TrainMission trainMission;
         private TrackFork trackFork;
@@ -146,6 +147,7 @@ namespace RacingGame
         private void Teardown()
         {
             raceGeneration++;
+            ReleaseReplayCar();
             if (recorder != null) recorder.Stop();
             ClearGhosts();
             if (hotBomb != null) { hotBomb.Stop(); Destroy(hotBomb); hotBomb = null; }
@@ -160,6 +162,7 @@ namespace RacingGame
             if (spaceTrack != null) { spaceTrack.Restore(); Destroy(spaceTrack.gameObject); spaceTrack = null; }
             if (starRing != null) { starRing.Restore(); Destroy(starRing.gameObject); starRing = null; }
             if (wasteland != null) { wasteland.Restore(); Destroy(wasteland.gameObject); wasteland = null; }
+            if (brakingBoards != null) { brakingBoards.gameObject.SetActive(false); Destroy(brakingBoards.gameObject); brakingBoards = null; }
             CarController.RamPushScale = 1f;
             if (abyssTrack != null) { abyssTrack.Restore(); Destroy(abyssTrack.gameObject); abyssTrack = null; }
             var director = RaceDirector.Current; if (director != null) director.ResetRace();   // no shell survives into the next race
@@ -188,6 +191,7 @@ namespace RacingGame
                     if (menus == null || !menus.CloseRaceSettingsIfOpen()) hud?.CloseHelpIfOpen();
                 }
             }
+            TickReplay();
             TickTestDrive();
             if (playerSectors != null && recorder.Recording)
             {
@@ -232,26 +236,15 @@ namespace RacingGame
             race.tier = tier;
             race.laps = ev != null ? ev.laps : 3;
             race.aiCountOverride = ev != null ? ev.aiCountOverride : -1;
-            if (track != null) { track.reversed = ev != null && ev.reversed; track.Build(); }
-            if (ev != null && ev.wastelandTrack && track != null) wasteland = WastelandTrack.Create(track);
-            else if (ev != null && ev.starRingTrack && track != null) starRing = StarRingTrack.Create(track, race, ev.IsPractice);
-            else if (ev != null && (ev.abyssTrack || ev.spaceTrack) && track != null)
-            {
-                abyssTrack = AbyssTrack.Create(track);
-                if (ev.spaceTrack) spaceTrack = SpaceTrack.Create(track, abyssTrack);
-            }
+            ConfigureCircuit(ev, false);
             if (ev != null && ev.mode == EventMode.Mission)
             {
                 if (ev.eventId == TrainMission.EventId) trainMission = TrainMission.Create(race);
                 else mission = MissionDirector.Create(race);
             }
             bool onCircuit = ev == null || ev.mode == EventMode.Race;
-            if (onCircuit && track != null && abyssTrack == null && starRing == null && wasteland == null)
-                trackFork = TrackFork.Create(track, pickups != null && (ev == null || ev.pickupCount > 0));
             CarHealth.GlobalDamageMultiplier = ev != null ? ev.damageMultiplier : 1f;
             CarController.RamPushScale = ev != null ? ev.ramPush : 1f;
-            // Look before the field spawns so the first frame of the countdown is already correct.
-            if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
 
             if (practiceReturnResults == null)
             {
@@ -275,6 +268,24 @@ namespace RacingGame
             if (overlays != null) overlays.SetVisible(true);
             SetState(FlowState.Racing);
             if (onCircuit && !IsTestDrive) SpawnGhosts(ev, generation);
+        }
+
+        private void ConfigureCircuit(RaceEventDefinition ev, bool viewing)
+        {
+            bool onCircuit = ev == null || ev.mode == EventMode.Race;
+            var signMaterial = onCircuit && track != null && !IsTestDrive ? AbyssTrack.SceneryMaterial() : null;
+            if (track != null) { track.reversed = ev != null && ev.reversed; track.Build(); }
+            if (ev != null && ev.wastelandTrack && track != null) wasteland = WastelandTrack.Create(track);
+            else if (ev != null && ev.starRingTrack && track != null) starRing = StarRingTrack.Create(track, race, viewing || ev.IsPractice);
+            else if (ev != null && (ev.abyssTrack || ev.spaceTrack) && track != null)
+            {
+                abyssTrack = AbyssTrack.Create(track);
+                if (ev.spaceTrack) spaceTrack = SpaceTrack.Create(track, abyssTrack);
+            }
+            if (onCircuit && track != null && abyssTrack == null && starRing == null && wasteland == null)
+                trackFork = TrackFork.Create(track, !viewing && pickups != null && (ev == null || ev.pickupCount > 0));
+            if (signMaterial != null) brakingBoards = BrakingBoards.Create(track, signMaterial);
+            if (sky != null) sky.Apply(sky.PresetFor(ev != null ? ev.sky : null, ev != null && ev.night));
         }
 
         // Arena: the fight zone; a race: slalom gates on the straights. Seeded from the race, so the daily race matches for everyone.
@@ -338,6 +349,7 @@ namespace RacingGame
                 personalGhostSectors = GhostSectorTimes.MeasureLaps(track, own, race.laps);
             }
 
+            if (ev != null && ev.twist == RaceTwist.TimeTrial) return;
             var sessions = PlatformGlue.Platform?.Sessions;
             if (sessions == null) return;
             // Yandex sessions filter by numeric meta1..meta3: meta1 = event/layout hash, meta2 = finish time (ms).
@@ -604,6 +616,7 @@ namespace RacingGame
             if (save != null && (ev == null || ev.mode == EventMode.Race) && save.Data.personalGhosts.KeepBest(
                 ev != null ? ev.eventId : "e1", race.laps, encoded, System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()))
                 save.MarkDirty();
+            if (ev != null && ev.twist == RaceTwist.TimeTrial) return;
             var sessions = PlatformGlue.Platform?.Sessions;
             if (sessions != null)
             {

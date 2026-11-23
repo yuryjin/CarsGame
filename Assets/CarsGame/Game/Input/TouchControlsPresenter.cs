@@ -36,7 +36,7 @@ namespace RacingGame
         private PerfectStart launch;
         private RectTransform resetButton, brakeButton, leftButton, rightButton;
         private float targetScale = -1f;
-        private bool targetLarge, targetLeft;
+        private bool targetLarge, targetLeft, targetCompact;
         private string secondaryKey = "touch.secondary";
 
         private void Awake()
@@ -139,9 +139,10 @@ namespace RacingGame
             var settings = PlatformGlue.Save?.Data.settings;
             bool large = settings != null && settings.touchLargeButtons;
             bool left = settings != null && settings.touchLeftHanded;
-            if (Mathf.Approximately(scale, targetScale) && targetLarge == large && targetLeft == left) return;
+            bool compact = settings != null && settings.compactHud;
+            if (Mathf.Approximately(scale, targetScale) && targetLarge == large && targetLeft == left && targetCompact == compact) return;
             targetScale = scale;
-            targetLarge = large; targetLeft = left;
+            targetLarge = large; targetLeft = left; targetCompact = compact;
             float size = large ? 1.25f : 1f;
             float Scaled(float value) => 40f + (value - 40f) * size;
             void Place(RectTransform control, Vector2 anchor, Vector2 lo, Vector2 hi)
@@ -169,7 +170,7 @@ namespace RacingGame
             Action((RectTransform)swapButton.transform, 40f, 260f, 280f, 370f);
             float edge = 44f / scale;
             float reset = Mathf.Max(100f, edge);
-            float resetTop = (HudScreen.ModelButtonBottomPixels(scale) + 8f) / scale;
+            float resetTop = (HudScreen.TopControlsBottomPixels(scale, compact) + 8f) / scale;
             float resetWidth = Mathf.Max(reset, 84f / scale);
             Place(resetButton, Vector2.one, new Vector2(-40f - resetWidth, -resetTop - reset), new Vector2(-40f, -resetTop));
             var resetLabel = resetButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();

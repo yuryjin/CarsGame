@@ -2281,6 +2281,54 @@ MonoBehaviour:
     m_Localized: "Trainingsrunde aus Bestsektoren \xB7 {t}"
     m_Metadata:
       m_Items: []
+  - m_Id: 29712712435314688
+    m_Localized: Truppziel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091904
+    m_Localized: Heckreaktor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091905
+    m_Localized: "M\xF6rser"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091906
+    m_Localized: Drohnenhangar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091907
+    m_Localized: "Hauptgesch\xFCtz"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091908
+    m_Localized: Flak
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091909
+    m_Localized: Zeitfahren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091910
+    m_Localized: Schlag deine eigene Zeit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091911
+    m_Localized: Wiederholung ansehen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091912
+    m_Localized: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091913
+    m_Localized: Diese Aufnahme verwendet eine andere Streckenversion.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29712712452091914
+    m_Localized: Kompakte Rennanzeige
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -23,6 +23,13 @@ namespace RacingGame
 
         public DesertMap Map { get; private set; }
         public BossCrawler Boss { get; private set; }
+        public BossPart SquadTarget { get; private set; }
+        public void MarkSquadTarget(BossPart part)
+        {
+            if (part == null || (Result == Outcome.None && part.Boss == Boss && part.Targetable && part.Role != BossRole.Hull))
+                SquadTarget = part;
+        }
+
         public MissionStrikes Strikes { get; private set; }
         public Outcome Result { get; private set; }
         public int SimulationOrder => int.MaxValue - 6000;   // after the cars, before the units and the shells
@@ -338,6 +345,7 @@ namespace RacingGame
 
         private void Finish(Outcome outcome, int tick)
         {
+            SquadTarget = null;
             Result = outcome;
             LastVictory = outcome == Outcome.Victory;
             endTick = tick + SimulationDriver.SecondsToTicks(outcome == Outcome.Victory ? 5.5f : 4.5f);
@@ -407,6 +415,7 @@ namespace RacingGame
 
         private void OnPartDestroyed(BossPart part)
         {
+            if (part == SquadTarget) SquadTarget = null;
             if (part.Role == BossRole.Core) { Boss.MarkDefeated(); return; }
             // Every station shot off opens the armour a little: the core takes +15 % per lost station.
             Boss.Core.DamageTaken = 1f + 0.15f * (Boss.Parts.Count - 1 - AliveStations());

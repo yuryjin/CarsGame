@@ -17,6 +17,9 @@ namespace RacingGame
         private HudScreen hud;
         private RectTransform root, bossMarker, distancePanel, bossPanel, coreTrack, routeTrack;
         private GameObject raceStatus;
+        private Button commandButton;
+        private TextMeshProUGUI commandLabel;
+        private RectTransform squadMap;
         private Image coreFill, routeFill;
         private TextMeshProUGUI bossName, corePct, routeText, countText, markerText, hitText;
         private readonly RectTransform[] bars = new RectTransform[MaxBars];
@@ -91,8 +94,33 @@ namespace RacingGame
                 bars[i] = bar;
                 bar.gameObject.SetActive(false);
             }
-            // These are informational overlays, never targets that intercept driving input.
+            // Only the command button receives input. World markers must let it through.
             foreach (var graphic in root.GetComponentsInChildren<Graphic>(true)) graphic.raycastTarget = false;
+            commandButton = UiFactory.Button(panel, "SquadCommand", Loc.Get("mission.squad_order") + " ›", ToggleSquadMap,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, 24f, UiFactory.Raised);
+            commandLabel = commandButton.GetComponentInChildren<TextMeshProUGUI>();
+        }
+
+        private void ToggleSquadMap()
+        {
+            if (squadMap != null) { Destroy(squadMap.gameObject); squadMap = null; return; }
+            if (mission.Boss == null || mission.Boss.Defeated) return;
+            squadMap = UiFactory.Card(root, "SquadMap", new Vector2(.16f, .21f), new Vector2(.84f, .68f), Vector2.zero, Vector2.zero);
+            foreach (var part in mission.Boss.Parts)
+            {
+                Vector3 pos = part.transform.localPosition;
+                int column = pos.x < -2f ? 0 : pos.x > 2f ? 2 : 1;
+                int row = part.Role == BossRole.Core ? 3 : pos.z > 0f ? 0 : pos.z < -6f ? 2 : 1;
+                var button = UiFactory.Button(squadMap, "Mark" + mission.Boss.Parts.IndexOf(part),
+                    Loc.Get("mission.part." + part.Role.ToString().ToLowerInvariant()), () =>
+                    {
+                        mission.MarkSquadTarget(part);
+                        ToggleSquadMap();
+                        nextSlowRefresh = 0f;
+                    }, new Vector2(column / 3f, 1f - (row + 1) / 4f), new Vector2((column + 1) / 3f, 1f - row / 4f),
+                    new Vector2(3f, 3f), new Vector2(-3f, -3f), 28f, part == mission.SquadTarget ? UiFactory.Accent : UiFactory.Raised);
+                button.interactable = part.Targetable;
+            }
         }
 
         internal static float StatusWidthPixels(float screenWidth, float scale) => Mathf.Min(screenWidth - 24f, Mathf.Max(250f, 760f * scale));
@@ -114,7 +142,8 @@ namespace RacingGame
             float nameHeight = bossName.GetPreferredValues(bossName.text, (width - percentageWidth - 28f) / scale, float.PositiveInfinity).y * scale;
             float count = Mathf.Max(12f, 22f * scale), header = Mathf.Max(title + 12f, nameHeight + 8f);
             float routeTop = header + 12f, routeBottom = routeTop + detail + 8f;
-            float countTop = routeBottom + 12f, height = countTop + count + 12f;
+            float countTop = routeBottom + 12f, orderTop = countTop + count + 8f;
+            float height = orderTop + Mathf.Max(32f, 42f * scale) + 4f;
             float top = 100f * scale + 8f; // below the ordinary race timer
             bossPanel.offsetMin = new Vector2(-width * 0.5f, -top - height) / scale;
             bossPanel.offsetMax = new Vector2(width * 0.5f, -top) / scale;
@@ -123,7 +152,9 @@ namespace RacingGame
             Place(coreTrack, 10f, header, width - 10f, header + 7f, scale);
             Place(routeText.rectTransform, 10f, routeTop, width - 10f, routeBottom, scale);
             Place(routeTrack, 10f, routeBottom + 3f, width - 10f, routeBottom + 8f, scale);
-            Place(countText.rectTransform, 10f, countTop, width - 10f, height - 4f, scale);
+            Place(countText.rectTransform, 10f, countTop, width - 10f, orderTop - 2f, scale);
+            Place((RectTransform)commandButton.transform, 6f, orderTop, width - 6f, height - 4f, scale);
+            commandLabel.fontSizeMax = Mathf.Max(14f, 22f * scale) / scale;
             routeText.fontSize = detail / scale; countText.fontSize = count / scale;
             routeText.alignment = TextAlignmentOptions.MidlineLeft;
             markerText.fontSize = Mathf.Max(12f, 20f * scale) / scale;
@@ -232,6 +263,9 @@ namespace RacingGame
             {
                 nextSlowRefresh = Time.unscaledTime + 0.2f;
                 corePct.SetText("{0:0}%", Mathf.Ceil(core * 100f));
+                var marked = mission.SquadTarget;
+                commandLabel.text = Loc.Get(marked != null ? "mission.part." + marked.Role.ToString().ToLowerInvariant() : "mission.squad_order") + " ›";
+                commandButton.interactable = !boss.Defeated;
                 routeText.text = Loc.Format("mission.route", "m", Mathf.RoundToInt(boss.RemainingMetres));
                 var me = PlayerCar() != null ? PlayerCar().GetComponent<RaceParticipant>() : null;
                 countText.text = Loc.Format("mission.count", "n", mission.EnemiesAlive, "k", me != null ? me.Kills : 0);
@@ -248,7 +282,8 @@ namespace RacingGame
             bossMarker.gameObject.SetActive(show);
             distancePanel.gameObject.SetActive(show);
             if (!show) return;
-            Vector3 target = boss.transform.position + Vector3.up * 30f;
+            var marked = mission.SquadTarget;
+            Vector3 target = marked != null ? marked.AimPoint : boss.transform.position + Vector3.up * 30f;
             Vector3 sp = cam.WorldToScreenPoint(target);
             Vector2 half = root.rect.size * 0.5f;
             float scale = root.rect.width / Mathf.Max(1f, Screen.width);
@@ -268,7 +303,7 @@ namespace RacingGame
             bossMarker.anchoredPosition = p;
             distancePanel.anchoredPosition = p + new Vector2(0f, -26f * scale);
             var car = PlayerCar();
-            float metres = car != null ? Vector3.Distance(car.transform.position, boss.transform.position) : 0f;
+            float metres = car != null ? Vector3.Distance(car.transform.position, marked != null ? target : boss.transform.position) : 0f;
             markerText.SetText("{0:0} m", metres);
         }
 
