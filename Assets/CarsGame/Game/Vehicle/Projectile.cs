@@ -43,6 +43,7 @@ namespace RacingGame
         public GameObject Owner => owner;
         public bool IsLive => live;
         public ProjectileKind Kind => kind;
+        public PrimaryWeaponType Weapon { get; private set; }
         public StatusKind StatusToApply => statusToApply;
 
         /// <summary>Builds one inactive shell for the pool.</summary>
@@ -88,7 +89,8 @@ namespace RacingGame
             homingTarget = spawn.HomingTarget;
             ricochets = Mathf.Max(0, spawn.Ricochets);
             travelVelocity = spawn.Velocity;
-            ConfigureVisual(spawn.Weapon);
+            Weapon = spawn.Weapon;
+            ConfigureVisual(Weapon);
             consumed = false;
             live = true;
 

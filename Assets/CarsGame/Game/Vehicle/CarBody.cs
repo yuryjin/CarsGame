@@ -13,7 +13,7 @@ namespace RacingGame
     /// Apply right after Instantiate and before the drivers, upgrades and paint: upgrades multiply on top.
     /// The standard body keeps the stock driving characteristics.
     /// </summary>
-    public sealed class CarBody : MonoBehaviour
+    public sealed partial class CarBody : MonoBehaviour
     {
         public string BodyId { get; private set; } = CarBodies.DefaultId;
         public BodyClass Class { get; private set; } = BodyClass.Sport;
@@ -43,6 +43,10 @@ namespace RacingGame
         {
             var body = go.GetComponent<CarBody>() ?? go.AddComponent<CarBody>();
             if (body.initialized && body.BodyId == def.Id) return body;
+            bool exchange = body.initialized && body.relayGeometry != null;
+            var previous = exchange ? CarBodies.Get(body.BodyId) : CarBodies.Default;
+            if (exchange) body.relayGeometry.Restore(body);
+            body.relayGeometry?.BeginBuild();
             if (body.newHull != null)
             {
                 body.newHull.gameObject.SetActive(false);
@@ -54,7 +58,7 @@ namespace RacingGame
             body.Class = def.Class;
             body.AiBrakePlan = 1f / Mathf.Sqrt(Mathf.Max(1f, def.Stats.Mass));
             body.car = go.GetComponent<CarController>();
-            if (!def.IsStandard) ApplyPhysics(go, def);
+            if (!def.IsStandard || exchange) ApplyPhysics(go, def, previous);
             var model = CarBodyModels.Get(def);
             body.ApplyVisuals(model, def);
             if (body.wearHealth == null && go.TryGetComponent(out body.wearHealth))
@@ -63,22 +67,23 @@ namespace RacingGame
                 body.wearHealth.OnRespawned += body.ClearWear;
             }
             body.SetModelStyle(PlatformGlue.ClassicCarModels);
-            if (def.IsStandard) return body;
+            body.relayGeometry?.EndBuild();
+            if (def.IsStandard && !exchange) return body;
 
             var health = go.GetComponent<CarHealth>();
-            if (health != null) health.SetMaxHealth(health.maxHealth * def.Stats.Health, true);
+            if (health != null) health.SetMaxHealth(health.maxHealth * (def.Stats.Health / previous.Stats.Health), true);
             var cannon = go.GetComponent<CarCannon>();
-            if (cannon != null) cannon.turretYawLimit *= def.Stats.TurretArc;
+            if (cannon != null) cannon.turretYawLimit *= def.Stats.TurretArc / previous.Stats.TurretArc;
             // Grass is a legal line for tracks and long-travel buggies: the lost-car reset waits longer for them.
             var participant = go.GetComponent<RaceParticipant>();
-            if (participant != null) participant.offTrackResetSeconds *= Mathf.Max(1f, def.Stats.Offroad);
+            if (participant != null) participant.offTrackResetSeconds *= Mathf.Max(1f, def.Stats.Offroad) / Mathf.Max(1f, previous.Stats.Offroad);
             return body;
         }
 
         // ---------------------------------------------------------------- physics
-        private static void ApplyPhysics(GameObject go, in BodyDef def)
+        private static void ApplyPhysics(GameObject go, in BodyDef def, in BodyDef previous)
         {
-            var st = def.Stats; var shape = def.Shape; var std = BodyShape.Standard;
+            var st = def.Stats; var old = previous.Stats; var shape = def.Shape; var std = BodyShape.Standard;
             var rb = go.GetComponent<Rigidbody>();
             var car = go.GetComponent<CarController>();
 
@@ -86,27 +91,28 @@ namespace RacingGame
             // stale, so it is never copied). It grows about with mass × footprint; the steering torque grows by the same
             // factor times Agility, so the turn rate a driver gets is the body's Agility while hits and shoves still meet
             // the full inertia. The factor comes from the data alone, so it is the same on every machine.
-            float footprint = (shape.Width * shape.Width + shape.Length * shape.Length) / (std.Width * std.Width + std.Length * std.Length);
-            float yawScale = st.Mass * footprint;
+            float footprint = (shape.Width * shape.Width + shape.Length * shape.Length) / (previous.Shape.Width * previous.Shape.Width + previous.Shape.Length * previous.Shape.Length);
+            float massRatio = st.Mass / old.Mass;
+            float yawScale = massRatio * footprint;
             if (rb != null)
             {
-                rb.mass *= st.Mass;
+                rb.mass *= massRatio;
                 rb.ResetInertiaTensor();
             }
 
             if (car != null)
             {
-                car.maxSpeed *= st.TopSpeed;
-                car.motorTorque *= st.Mass * st.Accel;       // forces, so they scale with mass to keep the accelerations
-                car.reverseTorque *= st.Mass * st.Accel;
-                car.brakeForce *= st.Mass * st.Brake;
-                car.downforce *= st.Mass;
-                car.grip *= st.Grip;
-                car.maxSteerAngle *= st.Steer;
-                car.steerTorqueScale *= yawScale * st.Agility;
+                car.maxSpeed *= st.TopSpeed / old.TopSpeed;
+                car.motorTorque *= massRatio * st.Accel / old.Accel;       // forces, so they scale with mass to keep the accelerations
+                car.reverseTorque *= massRatio * st.Accel / old.Accel;
+                car.brakeForce *= massRatio * st.Brake / old.Brake;
+                car.downforce *= massRatio;
+                car.grip *= st.Grip / old.Grip;
+                car.maxSteerAngle *= st.Steer / old.Steer;
+                car.steerTorqueScale *= yawScale * st.Agility / old.Agility;
                 car.driftYawTorque *= yawScale;
-                car.offTrackDeceleration /= Mathf.Max(0.1f, st.Offroad * st.Offroad);
-                car.offTrackMaxSpeedKmh *= st.Offroad;
+                car.offTrackDeceleration *= Mathf.Max(.1f, old.Offroad * old.Offroad) / Mathf.Max(.1f, st.Offroad * st.Offroad);
+                car.offTrackMaxSpeedKmh *= st.Offroad / old.Offroad;
             }
 
             var box = go.GetComponent<BoxCollider>();

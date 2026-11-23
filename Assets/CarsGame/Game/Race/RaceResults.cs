@@ -4,7 +4,7 @@ namespace RacingGame
 {
     public sealed class RaceResultEntry
     {
-        public string Name;
+        public string Name, RivalId;
         public bool IsPlayer;
         public int Position;
         public bool Finished;
@@ -23,14 +23,22 @@ namespace RacingGame
         public int CarId, Assists;
         public Core.Sim.ArenaPoints ArenaPoints;
         public int RepairsUsed;
-        public int DriftBoosts, Shortcuts, CeilingBoosts, BombPasses, Resets;
+        public int DriftBoosts, Shortcuts, CeilingBoosts, BombPasses, Resets, Rams;
         public bool CleanFinalLap;
+    }
+
+    internal struct RecentHit
+    {
+        public string driver;
+        public bool isPlayer, mine, environmental, fatal, shield;
+        public int damage;
     }
 
     public sealed class RaceResults
     {
         public bool IsArena;
         public readonly List<RaceResultEntry> Entries = new List<RaceResultEntry>();
+        internal RecentHit[] LastHits;
         public int LapsRequired;
         public double RaceDuration;
         public RaceResultEntry Player => Entries.Find(e => e.IsPlayer);

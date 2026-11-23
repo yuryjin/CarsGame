@@ -2751,6 +2751,170 @@ MonoBehaviour:
     m_Key: hud.effect_seconds
     m_Metadata:
       m_Items: []
+  - m_Id: 29745034027151360
+    m_Key: combat.recent_hits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122880
+    m_Key: combat.final_hit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122881
+    m_Key: combat.enemy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122882
+    m_Key: format.elimination
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122883
+    m_Key: format.elimination.rule
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122884
+    m_Key: format.eliminated
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317184
+    m_Key: body.challenge.sidewinder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317185
+    m_Key: body.challenge.raider
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317186
+    m_Key: body.challenge.granted
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317187
+    m_Key: measure.start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317188
+    m_Key: measure.auto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317189
+    m_Key: measure.gates
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317190
+    m_Key: measure.missed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317191
+    m_Key: measure.saved
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317192
+    m_Key: measure.values
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317193
+    m_Key: duel.first
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317194
+    m_Key: duel.final
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317195
+    m_Key: duel.rival
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317196
+    m_Key: duel.won
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317197
+    m_Key: duel.lost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317198
+    m_Key: duel.unclassified
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317199
+    m_Key: duel.places
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317200
+    m_Key: chapter.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317201
+    m_Key: chapter.route
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511488
+    m_Key: chapter.entry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511489
+    m_Key: duel.record
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511490
+    m_Key: format.pursuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511491
+    m_Key: format.pursuit.rule
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511492
+    m_Key: format.escaped
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511493
+    m_Key: format.caught
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511494
+    m_Key: format.relay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511495
+    m_Key: format.relay.rule
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511496
+    m_Key: format.relay.first
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511497
+    m_Key: format.relay.second
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511498
+    m_Key: format.custom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511499
+    m_Key: format.custom.course
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511500
+    m_Key: format.custom.rule
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511501
+    m_Key: format.custom.standard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511502
+    m_Key: format.custom.solo_bomb
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511503
+    m_Key: format.custom.invalid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511504
+    m_Key: format.custom.exhibition
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items:
     - rid: 4771536372321223228

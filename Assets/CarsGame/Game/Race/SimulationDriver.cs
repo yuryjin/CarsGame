@@ -37,6 +37,9 @@ namespace RacingGame
         public static SimulationDriver Current => instance;
 
         public int Tick { get; private set; }
+        public double StepEndClock { get; private set; }
+        private int physicsFrame = -1;
+        private int stepsThisFrame;
 
         private readonly List<ISimulated> simulated = new List<ISimulated>();
         private bool orderDirty;
@@ -77,6 +80,8 @@ namespace RacingGame
         private void FixedUpdate()
         {
             Tick++;
+            if (physicsFrame != Time.frameCount) { physicsFrame = Time.frameCount; stepsThisFrame = 0; }
+            StepEndClock = RaceClock.Now + stepsThisFrame++ * (double)FixedStep;
             if (orderDirty)
             {
                 simulated.Sort((a, b) => a.SimulationOrder.CompareTo(b.SimulationOrder));

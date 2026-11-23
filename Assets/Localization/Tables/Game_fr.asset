@@ -2814,6 +2814,177 @@ MonoBehaviour:
     m_Localized: '{n} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 29745034027151360
+    m_Localized: Derniers impacts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122880
+    m_Localized: "Coup d\xE9cisif"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122881
+    m_Localized: Ennemi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122882
+    m_Localized: "Course \xE0 \xE9limination"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122883
+    m_Localized: "\xC0 chaque tour du leader, le dernier est \xE9limin\xE9. En cas
+      de passage simultan\xE9, le plus petit num\xE9ro reste."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122884
+    m_Localized: "\xC9limin\xE9 \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317184
+    m_Localized: "D\xE9bloque Sidewinder en terminant une course apr\xE8s un raccourci
+      en buggy."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317185
+    m_Localized: "D\xE9bloque Raider en finissant une course apr\xE8s avoir percut\xE9
+      un rival en blind\xE9."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317186
+    m_Localized: "D\xE9fi r\xE9ussi \xB7 {name} d\xE9bloqu\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317187
+    m_Localized: "Mesurer acc\xE9l\xE9ration, freinage et slalom"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317188
+    m_Localized: "Test automatique \xB7 0\u201345 km/h et freinage complet"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317189
+    m_Localized: "Passe entre les poteaux \xB7 {n}/{all}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317190
+    m_Localized: "Essai interrompu \xB7 recommence"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317191
+    m_Localized: "Mesure enregistr\xE9e au garage"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317192
+    m_Localized: "0\u201345 {acc} \xB7 freinage {m} m \xB7 slalom {slalom}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317193
+    m_Localized: Voici {name}, au volant de la voiture orange.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317194
+    m_Localized: "Revanche en finale \xB7 {name} est de retour."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317195
+    m_Localized: "Rival \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317196
+    m_Localized: "Tu as devanc\xE9 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317197
+    m_Localized: '{name} a fini devant toi'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317198
+    m_Localized: "Duel avec {name} \xB7 les deux doivent finir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317199
+    m_Localized: "Toi n\xBA{you} \xB7 {name} n\xBA{rival}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317200
+    m_Localized: Rivaux du canyon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317201
+    m_Localized: "Monte deux fois sur le podium puis devance Rex. R\xE9compense \xB7
+      {reward}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511488
+    m_Localized: "D\xE9bloque la sixi\xE8me \xE9tape"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511489
+    m_Localized: "Face-\xE0-face \xB7 victoires {wins} / d\xE9faites {losses}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511490
+    m_Localized: La cavale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511491
+    m_Localized: "Franchis la ligne. Un poursuivant \xE0 moins de 7 m pendant 0,6
+      s te capture. Le pont est un raccourci."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511492
+    m_Localized: "Tu as sem\xE9 la poursuite"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511493
+    m_Localized: "Tu as \xE9t\xE9 intercept\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511494
+    m_Localized: "Relais \xE0 deux voitures"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511495
+    m_Localized: "Choisis deux voitures. Change sous l\u2019arche verte \xE0 mi-parcours.
+      Le buggy Dune est pr\xEAt\xE9 pour le relais."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511496
+    m_Localized: Premier relais
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511497
+    m_Localized: "Deuxi\xE8me relais"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511498
+    m_Localized: "Course personnalis\xE9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511499
+    m_Localized: Circuit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511500
+    m_Localized: "R\xE8gle"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511501
+    m_Localized: "R\xE8gles ordinaires"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511502
+    m_Localized: "La bombe exige un adversaire. Ajoutes-en un ou change de r\xE8gle."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511503
+    m_Localized: "Choisis un circuit ouvert et une r\xE8gle de la liste."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511504
+    m_Localized: "Cette course libre a son classement. Les records et r\xE9compenses
+      de carri\xE8re se gagnent en \xE9preuve."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

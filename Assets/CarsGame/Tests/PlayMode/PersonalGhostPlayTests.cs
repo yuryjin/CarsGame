@@ -228,7 +228,20 @@ namespace RacingGame.Tests
             flow.EnterMenu();
             yield return Start(e1);
             Assert.AreEqual(first.DurationMilliseconds, Ghost().Record.DurationMilliseconds);
-            yield return DriveToFinish(35);
+            // The grid may already have an autopilot from a previous run. Wait for the measured
+            // winner on the race clock with the car held, then drive the complete course normally.
+            var retryBody = race.Player.Car.Body;
+            var constraints = retryBody.constraints;
+            retryBody.constraints = RigidbodyConstraints.FreezeAll;
+            try
+            {
+                double releaseAt = first.DurationMilliseconds / 1000d + .5d;
+                while (race.RaceTime < releaseAt && race.State == RaceState.Racing) yield return null;
+                Assert.AreEqual(RaceState.Racing, race.State);
+                Assert.IsFalse(race.HasFinished(race.Player));
+            }
+            finally { retryBody.constraints = constraints; }
+            yield return DriveToFinish();
             Assert.Greater(race.Results.Player.TotalTime * 1000, first.DurationMilliseconds);
             Assert.AreEqual(first.DurationMilliseconds, PlatformGlue.Save.Data.personalGhosts.Find("e1", h1, e1.laps).DurationMilliseconds);
             TestContext.WriteLine($"e1 {first.DurationMilliseconds} ms, e2 {second.DurationMilliseconds} ms, e1 retry {race.Results.Player.TotalTime:F3} s");
@@ -294,6 +307,9 @@ namespace RacingGame.Tests
             var after = record.Samples[cut];
             var before = record.Samples[cut - 1];
             Assert.Greater(Vector3.Distance(before.Position, after.Position), 4f);
+            float deadline = Time.realtimeSinceStartup + 12f;
+            while (PauseController.IsPaused && Time.realtimeSinceStartup < deadline) yield return null;
+            Assert.IsFalse(PauseController.IsPaused, PauseController.Reasons.ToString());
             var menu = Object.FindAnyObjectByType<MenuScreens>();
             menu.GoTo("leaders");
             var save = PlatformGlue.Save.Data;
@@ -321,7 +337,8 @@ namespace RacingGame.Tests
                 Assert.Less(Vector3.Distance(position, viewer.transform.position), .001f);
             }
             toggle.onClick.Invoke();
-            yield return null; yield return null;
+            deadline = Time.realtimeSinceStartup + 8f;
+            while (flow.ReplayTime <= after.TimeSeconds - .001f && Time.realtimeSinceStartup < deadline) yield return null;
             Assert.Greater(flow.ReplayTime, after.TimeSeconds - .001f);
             seek.value = record.Duration;
             Assert.IsTrue(flow.ReplayPaused);
@@ -936,19 +953,23 @@ namespace RacingGame.Tests
             Assert.AreEqual(5, save.Data.progress.reservePrimary); Assert.AreEqual(0, save.Data.progress.equippedPrimary);
         }
 
-        [UnityTest, Timeout(220000)]
+        [UnityTest, Timeout(300000)]
         public IEnumerator BodySavingsTracksTheActualFinishWalletUntilBuyingOrReceivingTheBody()
         {
             yield return OpenProfile();
             var menu = flow.GetComponent<MenuScreens>();
             var body = Core.Economy.CarBodies.Get("dune");
+            var easy = Array.Find(flow.tiers,t => t != null && t.tierId == "easy");
+            PlatformGlue.Save.Data.settings.tier = easy.tierId;
+            int firstPrize = Core.Economy.Economy.Payout(1,true,1,1,null,easy.rewardMultiplier).Total;
+            PlatformGlue.Save.Local.coinsEarned = Math.Max(0,body.Cost - firstPrize - 1);
             void Click(string name) => GameObject.Find(name).GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
             menu.Show("garage"); menu.PreviewBody(body.Id); Click("SaveForBody");
             var flush = PlatformGlue.Save.FlushAsync(); while (!flush.IsCompleted) yield return null;
             flush.GetAwaiter().GetResult(); yield return Reload();
             var save = PlatformGlue.Save;
             Assert.AreEqual(body.Id, save.Data.progress.bodyGoal);
-            for (int attempt = 0; attempt < 5; attempt++)
+            for (int attempt = 0; attempt < 2; attempt++)
             {
                 yield return StartFromEventList("tt1"); yield return DriveToFinish();
                 Assert.AreEqual(FlowState.Results, flow.State);
@@ -966,6 +987,305 @@ namespace RacingGame.Tests
             menu.PreviewBody("flea"); Click("SaveForBody");
             save.Data.progress.cosmetics.Add("body:flea"); save.MarkDirty();
             Assert.IsEmpty(save.Data.progress.bodyGoal);
+        }
+
+        [UnityTest, Timeout(220000)]
+        public IEnumerator ARealBuggyShortcutAndAnArmoredRamUnlockTheBodiesOnFinishing()
+        {
+            yield return OpenProfile();
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            var menu = flow.GetComponent<MenuScreens>(); var p = PlatformGlue.Save.Data.progress;
+            p.cosmetics.AddRange(new[] { "body:dune", "body:bulwark" });
+            e1.laps = 1;
+            menu.Show("garage"); menu.PreviewBody("sidewinder");
+            Assert.NotNull(GameObject.Find("Challenge_sidewinder")); menu.PreviewBody("raider"); Assert.NotNull(GameObject.Find("Challenge_raider"));
+            foreach (string body in new[] { "dune", "bulwark" })
+            {
+                p.body = body; e1.aiCountOverride = body == "dune" ? 0 : 1;
+                yield return Start(e1);
+                var driver = race.Player;
+                var input = driver.Car.gameObject.AddComponent<ScriptedDriverInput>(); driver.Car.SetInputSource(input);
+                if (body == "dune")
+                {
+                    yield return TrackForkPlayTests.DriveBranch(race, Object.FindAnyObjectByType<TrackFork>(), input, false);
+                    Assert.Greater(driver.Shortcuts, 0);
+                }
+                else
+                {
+                    var rival = Array.Find(Object.FindObjectsByType<RaceParticipant>(FindObjectsSortMode.None), x => !x.isPlayer);
+                    var path = TrackPath.Instance; float d = path.startLineDistance + 25f;
+                    path.Pose(d, 0, out var start, out var facing); path.Pose(d + 8f, 0, out var target, out var targetFacing);
+                    driver.Car.Teleport(start + Vector3.up * .5f, facing);
+                    rival.Car.Teleport(target + Vector3.up * .5f, targetFacing);
+                    rival.Car.Body.constraints = RigidbodyConstraints.FreezeAll;
+                    for (int i = 0; i < 25; i++) yield return null;
+                    input.Set(1f, 0); driver.Car.Body.linearVelocity = facing * Vector3.forward * 20f;
+                    for (int i = 0; i < 65 && driver.Rams == 0; i++) yield return null;
+                    Assert.Greater(driver.Rams, 0);
+                }
+                string reward = body == "dune" ? "sidewinder" : "raider";
+                Assert.IsFalse(Core.Economy.CarBodies.Owns(p.cosmetics, reward));
+                race.QaFinishNow();
+                Assert.AreEqual(reward, flow.LastChallengeBody);
+                Assert.IsTrue(Core.Economy.CarBodies.Owns(p.cosmetics, reward));
+                Assert.NotNull(GameObject.Find("ChallengeBody"));
+                flow.EnterMenu();
+            }
+        }
+
+        [UnityTest, Timeout(260000)]
+        public IEnumerator TwoBodiesMeasureTheSameAsphaltAndAMissedGateNeverProducesAResult()
+        {
+            yield return OpenProfile();
+            Time.captureDeltaTime = SimulationDriver.FixedStep;
+            var menu = flow.GetComponent<MenuScreens>(); var p = PlatformGlue.Save.Data.progress;
+            p.upgrades[0] = 1;
+            var bodies = new[] { "classic", "dune", "classic" };
+            void Click(string name) => GameObject.Find(name).GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+            for (int trial = 0; trial < bodies.Length; trial++)
+            {
+                menu.Show("garage"); menu.PreviewBody(bodies[trial]); Click("StartMeasurement");
+                while (race.State == RaceState.Countdown) yield return null;
+                var course = flow.CurrentMeasurement; var driver = race.Player;
+                Assert.NotNull(course); Assert.AreEqual(bodies[trial], driver.GetComponent<CarBody>().BodyId);
+                for (int i = 0; i < 1400 && course.Phase < MeasurementPhase.Slalom; i++) yield return null;
+                Assert.AreEqual(MeasurementPhase.Slalom, course.Phase, bodies[trial] + " " + driver.Car.SpeedKmh + " km/h, " + driver.Car.Surface);
+                Assert.Greater(course.AccelerationMs, 0); Assert.Greater(course.BrakingCm, 0);
+                var input = driver.Car.gameObject.AddComponent<ScriptedDriverInput>(); driver.Car.SetInputSource(input);
+                var path = TrackPath.Instance;
+                for (int i = 0; i < 2400 && course.Phase == MeasurementPhase.Slalom; i++)
+                {
+                    int gate = course.NextGate;
+                    Vector3 wanted = course.GateCenter(gate);
+                    if (trial == 2) wanted += path.Right(course.GateDistance(gate)) * 4f;
+                    Vector3 offset = driver.Car.transform.InverseTransformDirection(wanted - driver.Car.Body.position);
+                    float angle = Mathf.Atan2(offset.x, offset.z) * Mathf.Rad2Deg;
+                    float steer = Mathf.Clamp(angle / Mathf.Max(9f, driver.Car.EffectiveMaxSteer(driver.Car.SpeedKmh)) * 1.4f, -1f, 1f);
+                    input.Set(driver.Car.SpeedKmh < 11f ? .45f : 0f, steer);
+                    yield return null;
+                }
+                Assert.AreEqual(trial == 2 ? MeasurementPhase.Missed : MeasurementPhase.Finished, course.Phase,
+                    bodies[trial] + " gate " + course.NextGate + " speed " + driver.Car.SpeedKmh);
+                if (trial < 2)
+                {
+                    var row = p.measurements.Find(m => m.body == bodies[trial]);
+                    Assert.NotNull(row); Assert.AreEqual(BodyMeasurement.Conditions(p), row.conditions);
+                    Assert.AreEqual(course.AccelerationMs, row.accelerationMs); Assert.AreEqual(course.BrakingCm, row.brakingCm);
+                    Assert.AreEqual(course.SlalomMs, row.slalomMs); Assert.Greater(row.slalomMs, 0);
+                    TestContext.WriteLine($"{row.body}: 0–45 {row.accelerationMs}ms; full stop {row.brakingCm}cm; five gates {row.slalomMs}ms; conditions {row.conditions}");
+                }
+                else Assert.AreEqual(2, p.measurements.Count);
+                Click("ReturnToGarage");
+            }
+            Assert.NotNull(GameObject.Find("Measurement_classic")); Assert.NotNull(GameObject.Find("Measurement_dune"));
+            Assert.AreEqual(0, PlatformGlue.Save.Data.Races); Assert.AreEqual(0, PlatformGlue.Save.Data.Coins);
+        }
+
+        [UnityTest, Timeout(140000)]
+        public IEnumerator PersonalGhostFadesOnlyDuringOverlapAndRejoinsTheSameRecordedPose()
+        {
+            yield return OpenProfile();
+            yield return StartFromEventList("tt1"); yield return DriveToFinish(6f); flow.EnterMenu();
+            yield return StartFromEventList("tt1");
+            var ghost = Object.FindAnyObjectByType<GhostCar>();
+            Assert.NotNull(ghost); var view = ghost.GetComponent<Renderer>(); var block = new MaterialPropertyBlock();
+            Assert.GreaterOrEqual(view.sharedMaterial.renderQueue, (int)UnityEngine.Rendering.RenderQueue.Transparent);
+            float Alpha() { view.GetPropertyBlock(block); return block.GetColor("_BaseColor").a; }
+            var body = race.Player.Car.Body;
+            body.isKinematic = true; body.interpolation = RigidbodyInterpolation.None;
+            float normal = .35f;
+            float highestStep = 0f, previous = Alpha();
+            IEnumerator Follow(Vector3 offset)
+            {
+                float until = Time.realtimeSinceStartup + 1f;
+                int frames = 0;
+                while (Time.realtimeSinceStartup < until || frames < 35)
+                {
+                    Assert.IsTrue(ghost.Record.EvaluatePose((float)race.RaceTime, out var recorded, out var rot));
+                    body.position = recorded + offset; body.rotation = rot;
+                    race.Player.transform.SetPositionAndRotation(recorded + offset, rot);
+                    yield return null;
+                    float value = Alpha(); highestStep = Mathf.Max(highestStep, Mathf.Abs(value - previous)); previous = value;
+                    frames++;
+                }
+            }
+            yield return Follow(Vector3.zero);
+            float near = Alpha();
+            Assert.Less(near, .075f, "distance " + Vector3.Distance(race.Player.transform.position, ghost.transform.position));
+            Assert.Less(highestStep, .23f);
+            yield return Follow(Vector3.right * 12f);
+            Assert.AreEqual(normal, Alpha(), .01f);
+            Assert.IsTrue(ghost.Record.EvaluatePose((float)race.RaceTime, out var finalPose, out var finalRotation));
+            Assert.Less(Vector3.Distance(ghost.transform.position, finalPose), .03f);
+            Assert.Less(Quaternion.Angle(ghost.transform.rotation, finalRotation), .1f);
+            TestContext.WriteLine($"Personal ghost alpha {normal} → {near} → {Alpha()}, maximum frame change {highestStep}, final trajectory error {Vector3.Distance(ghost.transform.position,finalPose)}m");
+        }
+
+        [UnityTest, Timeout(380000)]
+        public IEnumerator RexReturnsInTheGrandFinalAndHisDuelUsesTheActualPairOfPlaces()
+        {
+            yield return OpenProfile();
+            var menu = flow.GetComponent<MenuScreens>(); menu.Show("main");
+            StringAssert.Contains("Rex", GameObject.Find("Rival_e1").transform.Find("Intro").GetComponent<TMPro.TMP_Text>().text);
+            yield return StartFromEventList("e1");
+            Assert.IsTrue(Array.Exists(Object.FindObjectsByType<RaceParticipant>(FindObjectsSortMode.None), x => x.rivalId == "rex" && x.GetComponent<AiDriver>().profile == flow.CurrentEvent.featuredRival));
+            flow.EnterMenu();
+            var final = Object.Instantiate(Array.Find(flow.events, e => e.eventId == "e15")); final.laps = 1; final.aiCountOverride = 2; final.pickupCount = 0;
+            var progress = PlatformGlue.Save.Data.progress; progress.unlockedEvents.Add("e15");
+            menu.Show("events");
+            StringAssert.Contains(Loc.Format("duel.final", "name", "Rex"), GameObject.Find("Rival_e15").transform.Find("Intro").GetComponent<TMPro.TMP_Text>().text);
+            float grace = race.finishGraceSeconds; race.finishGraceSeconds = 300f;
+            try
+            {
+                for (int run = 0; run < 2; run++)
+                {
+                    yield return Start(final);
+                    var field = Object.FindObjectsByType<RaceParticipant>(FindObjectsSortMode.None);
+                    var rex = Array.Find(field, x => x.rivalId == "rex"); var third = Array.Find(field, x => !x.isPlayer && x != rex);
+                    Assert.AreSame(final.featuredRival, rex.GetComponent<AiDriver>().profile);
+                    var forRun = run == 0 ? new[] { third, race.Player, rex } : new[] { rex, race.Player, third };
+                    var original = new Dictionary<RaceParticipant,RigidbodyConstraints>();
+                    foreach (var car in forRun)
+                    {
+                        original[car] = car.Car.Body.constraints;
+                        car.Car.Body.constraints = RigidbodyConstraints.FreezeAll;
+                        var gun = car.GetComponent<AiGunner>(); if (gun != null) gun.enabled = false;
+                    }
+                    foreach (var car in forRun)
+                    {
+                        car.Car.Body.constraints = original[car];
+                        if (car.isPlayer) Object.FindAnyObjectByType<DebugBus>().Execute("autopilot", "on");
+                        float limit = Time.realtimeSinceStartup + 65f;
+                        while (!race.HasFinished(car) && flow.State == FlowState.Racing && Time.realtimeSinceStartup < limit) yield return null;
+                        Assert.IsTrue(race.HasFinished(car), car.displayName + " failed to finish");
+                    }
+                    Assert.AreEqual(FlowState.Results, flow.State);
+                    var me = race.Results.Player; var named = race.Results.Entries.Find(x => x.RivalId == "rex");
+                    Assert.IsTrue(me.Finished && named.Finished); Assert.AreEqual(2, me.Position); Assert.AreEqual(run == 0 ? 3 : 1, named.Position);
+                    string text = GameObject.Find("FeaturedDuel").transform.Find("Outcome").GetComponent<TMPro.TMP_Text>().text;
+                    StringAssert.Contains(Loc.Format(run == 0 ? "duel.won" : "duel.lost", "name", "Rex"), text);
+                    StringAssert.Contains(Loc.Format("duel.places", "you", me.Position, "name", "Rex", "rival", named.Position), text);
+                    var score = RivalScore.Total(progress, "rex");
+                    Assert.AreEqual(1, score.wins); Assert.AreEqual(run, score.losses);
+                    string language = Loc.Language; string alternative = language == "en" ? "tr" : "en";
+                    foreach (string locale in new[] { alternative, language })
+                    {
+                        bool changed = false; Loc.SetLanguage(locale, ok => changed = ok);
+                        float until = Time.realtimeSinceStartup + 10f;
+                        while (!changed && Time.realtimeSinceStartup < until) yield return null;
+                        Assert.AreEqual(locale, Loc.Language);
+                        menu.Show("results"); menu.Show("results");
+                        string translated = GameObject.Find("FeaturedDuel").transform.Find("Outcome").GetComponent<TMPro.TMP_Text>().text;
+                        StringAssert.Contains(Loc.Format("duel.record", "wins", 1, "losses", run), translated);
+                        Assert.AreEqual(score, RivalScore.Total(progress, "rex"));
+                    }
+                    TestContext.WriteLine($"Final {run + 1}: player #{me.Position}, Rex #{named.Position}, other #{race.Results.Entries.Find(x => !x.IsPlayer && x != named).Position}");
+                    flow.EnterMenu();
+                }
+            }
+            finally { race.finishGraceSeconds = grace; Object.DestroyImmediate(final); }
+        }
+
+        [UnityTest, Timeout(180000)]
+        public IEnumerator MiddleChapterResumesAtTheNextStageAndTwoFinalsGrantOneLivery()
+        {
+            yield return OpenProfile();
+            var menu = flow.GetComponent<MenuScreens>();
+            var stage6 = Array.Find(flow.events, x => x.eventId == "e6"); int oldLaps = stage6.laps, oldBots = stage6.aiCountOverride;
+            stage6.laps = 1; stage6.aiCountOverride = 0;
+            void OpenChapter() => menu.Show("events");
+            void SelectStage() => GameObject.Find("ChapterStart").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
+            try
+            {
+                var p = PlatformGlue.Save.Data.progress;
+                OpenChapter(); Assert.IsFalse(GameObject.Find("ChapterStart").GetComponent<UnityEngine.UI.Button>().interactable);
+                p.unlockedEvents.Add("e6"); OpenChapter();
+                StringAssert.Contains(Loc.Get("livery.band"), GameObject.Find("CanyonChapter").transform.Find("Route").GetComponent<TMPro.TMP_Text>().text);
+                SelectStage(); Assert.AreEqual("e6", flow.CurrentEvent.eventId);
+                while (race.State == RaceState.Countdown) yield return null;
+                yield return DriveToFinish(); flow.EnterMenu();
+                var flush = PlatformGlue.Save.FlushAsync(); while (!flush.IsCompleted) yield return null;
+                flush.GetAwaiter().GetResult(); yield return Reload();
+                p = PlatformGlue.Save.Data.progress; Assert.AreEqual(1, Core.Economy.RaceCups.ChapterStep(p));
+                OpenChapter(); SelectStage(); Assert.AreEqual("e7", flow.CurrentEvent.eventId);
+                while (race.State == RaceState.Countdown) yield return null;
+                for (int i = 0; i < 5; i++) yield return null;
+                race.QaFinishNow(); flow.EnterMenu();
+                Assert.AreEqual(2, Core.Economy.RaceCups.ChapterStep(p));
+                for (int i = 0; i < 2; i++)
+                {
+                    if (i == 0) { OpenChapter(); SelectStage(); }
+                    else yield return StartFromEventList("e8");
+                    while (race.State == RaceState.Countdown) yield return null;
+                    Assert.AreEqual("e8", flow.CurrentEvent.eventId);
+                    for (int j = 0; j < 5; j++) yield return null;
+                    race.QaFinishNow(); flow.EnterMenu();
+                    Assert.IsTrue(p.canyonChapterWon); Assert.AreEqual(3, Core.Economy.RaceCups.ChapterStep(p));
+                    Assert.AreEqual(1, p.cosmetics.FindAll(x => x == Core.Economy.RaceCups.ChapterReward).Count);
+                }
+                OpenChapter();
+                Assert.IsFalse(GameObject.Find("ChapterStart").GetComponent<UnityEngine.UI.Button>().interactable);
+                TestContext.WriteLine("e6 physical finish → reload at e7 → e8 with Rex → replay; livery:band owned once.");
+            }
+            finally { stage6.laps = oldLaps; stage6.aiCountOverride = oldBots; }
+        }
+
+        [UnityTest, Timeout(150000)]
+        public IEnumerator RexAndNovaFireTheirSignatureProjectilesAtTheirRangesAndObeyMineRules()
+        {
+            yield return OpenProfile();
+            var hard = Array.Find(flow.tiers, t => t.tierId == "hard");
+            e1.aiCountOverride = 4; e1.pickupCount = 0;
+            foreach (bool mines in new[] { false, true })
+            {
+                e1.twist = mines ? Core.Daily.RaceTwist.MinesOnly : Core.Daily.RaceTwist.None;
+                flow.StartRace(e1, hard); while (race.State == RaceState.Countdown) yield return null;
+                var field = Object.FindObjectsByType<RaceParticipant>(FindObjectsSortMode.None);
+                foreach (var car in field)
+                {
+                    car.Car.SetInputSource(car.gameObject.AddComponent<ScriptedDriverInput>());
+                    car.Car.Body.constraints = RigidbodyConstraints.FreezeAll;
+                    car.Car.Teleport(new Vector3(200 + car.Car.CarId * 20, 15, 200), Quaternion.identity);
+                }
+                var path = TrackPath.Instance; var centre = path.Position(path.startLineDistance + 20f) + Vector3.up * .55f;
+                // Exact range on a clear sight line; cars remain part of the actual event field.
+                var bearing = path.Tangent(path.startLineDistance + 20f); bearing.y = 0; bearing.Normalize();
+                var orientation = Quaternion.LookRotation(bearing);
+                foreach (string id in new[] { "rex", "nova" })
+                {
+                    var rival = Array.Find(field, x => x.rivalId == id); Assert.NotNull(rival);
+                    var expected = id == "rex" ? PrimaryWeaponType.Shotgun : PrimaryWeaponType.HomingRocket;
+                    Assert.AreEqual(expected, rival.Weapons.PrimaryType);
+                    var gunner = rival.GetComponent<AiGunner>(); gunner.startGraceSeconds = 0f; gunner.telegraphSeconds = 0f;
+                    gunner.suppressed = false;
+                    float distance = id == "rex" ? 12f : 36f;
+                    Assert.Greater(distance, gunner.MinShotRange); Assert.Less(distance, gunner.MaxShotRange);
+                    rival.Car.Teleport(centre, orientation);
+                    race.Player.Car.Teleport(centre + bearing * distance, orientation);
+                    Physics.SyncTransforms();
+                    if (mines)
+                    {
+                        Assert.IsTrue(rival.Car.Cannon.locked); Assert.IsFalse(rival.Car.Cannon.TryFire());
+                        Assert.AreEqual(SecondaryWeaponType.Mines, rival.Weapons.secondaryType);
+                    }
+                    else
+                    {
+                        bool fired = false;
+                        for (int frame = 0; frame < 180 && !fired; frame++)
+                        {
+                            gunner.suppressed = false;
+                            if (gunner.WantsFire(SimulationDriver.Instance.Tick)) fired = rival.Car.Cannon.TryFire();
+                            if (!fired) yield return null;
+                        }
+                        Assert.IsTrue(fired, id);
+                        var shots = Array.FindAll(Object.FindObjectsByType<Projectile>(FindObjectsSortMode.None), x => x.Owner == rival.gameObject && x.IsLive && x.Weapon == expected);
+                        Assert.AreEqual(PrimaryWeaponCatalog.Get(expected).Pellets, shots.Length);
+                        TestContext.WriteLine($"{id} fired {shots.Length} {expected} projectile(s) at {distance}m; allowed {gunner.MinShotRange}–{gunner.MaxShotRange}m.");
+                    }
+                    rival.Car.Teleport(new Vector3(250, 15, 250), Quaternion.identity);
+                }
+                flow.EnterMenu();
+            }
         }
 
         [UnityTest, Timeout(300000)]

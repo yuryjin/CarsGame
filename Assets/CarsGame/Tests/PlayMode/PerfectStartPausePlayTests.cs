@@ -69,6 +69,7 @@ namespace RacingGame.Tests
             Assert.NotNull(entry, "The training menu must offer the launch drill");
             entry.GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
             string progress = JsonUtility.ToJson(PlatformGlue.Save.Data.progress);
+            var probe = race.gameObject.AddComponent<LaunchTrainingInputProbe>();
             foreach (float target in new[] { -.50f, 0f, .50f })
             {
                 yield return null;
@@ -76,30 +77,9 @@ namespace RacingGame.Tests
                 Assert.IsFalse(launch.Awarded);
                 var display = GameObject.Find("ReturnToGarage").GetComponentInChildren<TMPro.TMP_Text>();
                 StringAssert.Contains(Loc.Get("practice.launch"), display.text);
-                double pressedAt;
-                if (target == 0f)
-                {
-                    void PressOnGo()
-                    {
-                        InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W));
-                        InputSystem.Update();
-                    }
-                    race.OnRaceStarted += PressOnGo;
-                    while (race.State == RaceState.Countdown) yield return null;
-                    race.OnRaceStarted -= PressOnGo;
-                    pressedAt = race.RaceStartTime;
-                    yield return null;
-                }
-                else
-                {
-                    if (target < 0f)
-                        while (RaceClock.Now < race.countdownSeconds + target) yield return null;
-                    else
-                        while (race.State == RaceState.Countdown || race.RaceTime < target) yield return null;
-                    InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.W));
-                    yield return null;
-                    pressedAt = RaceClock.Now;
-                }
+                probe.Schedule(race, keyboard, target);
+                while (!probe.PressedAt.HasValue) yield return null;
+                double pressedAt = probe.PressedAt.Value;
                 InputSystem.QueueStateEvent(keyboard, new KeyboardState());
                 while (race.State == RaceState.Countdown) yield return null;
                 for (int frame = 0; frame < 5; frame++) yield return null;
@@ -110,11 +90,12 @@ namespace RacingGame.Tests
                 var match = System.Text.RegularExpressions.Regex.Match(display.text, @"[+-]?\d+");
                 Assert.IsTrue(match.Success, "Expected the signed timing error on screen: " + display.text);
                 int shown = int.Parse(match.Value, System.Globalization.CultureInfo.InvariantCulture);
-                Assert.AreEqual((pressedAt - race.RaceStartTime) * 1000d, shown, 24d);
+                int measured = Mathf.RoundToInt((float)((pressedAt - race.RaceStartTime) * 1000d));
+                Assert.AreEqual(measured, shown, "The displayed offset must match the frame when throttle was delivered");
                 if (target < 0f) Assert.Less(shown, -launch.earlySeconds * 1000f);
                 if (target > 0f) Assert.Greater(shown, launch.lateSeconds * 1000f);
                 StringAssert.Contains(Loc.Format(hit ? "practice.launch.hit" : "practice.launch.miss", "ms", match.Value), display.text);
-                Debug.Log($"[LaunchTraining] expected={target:F2}s shown={shown}ms boost={race.Player.Car.IsBoosting}");
+                Debug.Log($"[LaunchTraining] target={target:F2}s actual={measured}ms shown={shown}ms boost={race.Player.Car.IsBoosting}");
                 GameObject.Find("PracticeRetry").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
             }
 

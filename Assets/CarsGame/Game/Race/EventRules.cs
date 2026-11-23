@@ -15,6 +15,15 @@ namespace RacingGame
         public const int ArenaChargeAmmo = 2;
         public const float ArenaChargeCooldown = 4f;
 
+        public static string CustomError(RaceEventDefinition course, int laps, int rivals, RaceTwist twist)
+        {
+            if (course == null || course.mode != EventMode.Race || course.format != CircuitFormat.Standard ||
+                laps < 1 || laps > 5 || rivals < 0 || rivals > 5) return "format.custom.invalid";
+            if (twist == RaceTwist.HotBomb && rivals == 0) return "format.custom.solo_bomb";
+            return twist == RaceTwist.None || twist == RaceTwist.MinesOnly || twist == RaceTwist.OneLife || twist == RaceTwist.HotBomb
+                ? null : "format.custom.invalid";
+        }
+
         public static void Apply(RaceTwist twist, RaceManager race)
         {
             if (race == null) return;

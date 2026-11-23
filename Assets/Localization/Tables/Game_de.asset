@@ -2808,6 +2808,177 @@ MonoBehaviour:
     m_Localized: '{n} s'
     m_Metadata:
       m_Items: []
+  - m_Id: 29745034027151360
+    m_Localized: Letzte Treffer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122880
+    m_Localized: Entscheidender Treffer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122881
+    m_Localized: Gegner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122882
+    m_Localized: Ausscheidungsrennen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122883
+    m_Localized: "Nach jeder Runde des F\xFChrenden scheidet der Letzte aus. Bei
+      gleichzeitigem \xDCberqueren bleibt die kleinere Startnummer."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122884
+    m_Localized: "Ausgeschieden \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317184
+    m_Localized: "Fahre mit einem Buggy eine Abk\xFCrzung und beende das Rennen f\xFCr
+      Sidewinder."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317185
+    m_Localized: "Ramme ein Auto mit einem Panzerwagen und beende das Rennen f\xFCr
+      Raider."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317186
+    m_Localized: "Aufgabe erf\xFCllt \xB7 {name} freigeschaltet"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317187
+    m_Localized: Beschleunigung, Bremsen und Slalom messen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317188
+    m_Localized: "Automatik \xB7 0\u201345 km/h und Vollbremsung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317189
+    m_Localized: "Fahre durch jedes Tor \xB7 {n}/{all}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317190
+    m_Localized: "Tor verpasst \xB7 Messung wiederholen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317191
+    m_Localized: Messung in der Garage gespeichert
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317192
+    m_Localized: "0\u201345 {acc} \xB7 Bremsweg {m} m \xB7 Slalom {slalom}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317193
+    m_Localized: Lerne {name} im orangefarbenen Wagen kennen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317194
+    m_Localized: "Revanche im gro\xDFen Finale \xB7 {name} ist zur\xFCck."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317195
+    m_Localized: "Rivale \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317196
+    m_Localized: Du warst vor {name} im Ziel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317197
+    m_Localized: '{name} lag im Ziel vor dir'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317198
+    m_Localized: "Duell mit {name} \xB7 beide m\xFCssen ins Ziel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317199
+    m_Localized: "Du #{you} \xB7 {name} #{rival}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317200
+    m_Localized: Rivalen im Canyon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317201
+    m_Localized: "Zweimal aufs Podium, dann vor Rex ins Ziel. Preis \xB7 {reward}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511488
+    m_Localized: Zum Einstieg Rennen 6 freischalten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511489
+    m_Localized: "Direkte Duelle \xB7 Siege {wins} / Niederlagen {losses}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511490
+    m_Localized: Fluchtfahrt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511491
+    m_Localized: "Flieh \xFCber die Ziellinie. Bleibt ein Verfolger 0,6 s in 7 m
+      Reichweite, f\xE4ngt er dich. Die Br\xFCcke k\xFCrzt ab."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511492
+    m_Localized: Du bist entkommen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511493
+    m_Localized: Du wurdest abgefangen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511494
+    m_Localized: Zwei-Wagen-Staffel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511495
+    m_Localized: "W\xE4hle zwei Autos. Am gr\xFCnen Bogen nach der halben Runde wechselst
+      du. Der Dune-Buggy ist leihweise verf\xFCgbar."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511496
+    m_Localized: Erster Abschnitt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511497
+    m_Localized: Zweiter Abschnitt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511498
+    m_Localized: Eigenes Rennen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511499
+    m_Localized: Strecke
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511500
+    m_Localized: Regel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511501
+    m_Localized: Standardregeln
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511502
+    m_Localized: "F\xFCr die hei\xDFe Bombe brauchst du einen Gegner. F\xFCge einen
+      hinzu oder \xE4ndere die Regel."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511503
+    m_Localized: "W\xE4hle eine offene Strecke und eine Regel aus der Liste."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511504
+    m_Localized: "Dieses freie Rennen hat ein eigenes Ergebnis. Karriererekorde und
+      Pr\xE4mien gibt es in Karriere-Events."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

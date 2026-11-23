@@ -209,7 +209,7 @@ namespace RacingGame
         // ---------- transitions ----------
         public void EnterMenu()
         {
-            ReturningFromPractice = IsPractice && !IsGarageDrill || yesterdayPractice != null;
+            ReturningFromPractice = IsPractice && !IsGarageDrill && !IsBodyMeasurement || yesterdayPractice != null;
             ReturningFromTestDrive = IsTestDrive;
             bool resumeResult = IsPractice && practiceReturnResults != null;
             if (!resumeResult) practiceReturnResults = null;
@@ -233,6 +233,7 @@ namespace RacingGame
             if (ev != null && !IsUnlocked(ev)) { MenuScreens.Toast(Loc.Get("events.locked")); return; }
             // A rejected request must leave the current race and any test-drive snapshot intact.
             if (IsTestDrive && ev != testDriveEvent) RestoreTestDrive();
+            if (customEvent != null && ev != customEvent) { Destroy(customEvent); customEvent = null; }
             if (!IsTestDrive) practiceReturnResults = null;
             if (yesterdayPractice != null && ev != yesterdayPractice) RestoreYesterdayPractice();
             if (friendChallenge != null && ev != friendEvent)
@@ -290,7 +291,7 @@ namespace RacingGame
             if (speedFx != null) speedFx.SetVisible(true);
             if (overlays != null) overlays.SetVisible(true);
             SetState(FlowState.Racing);
-            if (onCircuit && !IsTestDrive && yesterdayPractice == null) SpawnGhosts(ev, generation);
+            if (onCircuit && !IsTestDrive && yesterdayPractice == null && (ev == null || !ev.IsCustom)) SpawnGhosts(ev, generation);
         }
 
         private void RestoreDailyTier()
@@ -316,6 +317,8 @@ namespace RacingGame
             if (onCircuit && track != null && abyssTrack == null && starRing == null && wasteland == null)
             {
                 trackFork = TrackFork.Create(track, !viewing && pickups != null && (ev == null || ev.pickupCount > 0));
+                if (!viewing && trackFork != null && ev != null && ev.format == CircuitFormat.Relay) trackFork.gameObject.AddComponent<RelayRace>().Build(race, track, hud, signMaterial, ev);
+                if (!viewing && trackFork != null && ev != null && ev.format == CircuitFormat.Pursuit) trackFork.gameObject.AddComponent<PursuitRace>().Follow(race);
                 if (!viewing && !IsTestDrive && trackFork != null) trackFork.gameObject.AddComponent<GrandstandReaction>().Watch(race, track);
                 if (!viewing && trackFork != null) trackFork.gameObject.AddComponent<DriftTireMarks>().Follow(race);
                 if (trackFork != null && preset != null && preset.lampsOn && signMaterial != null)
@@ -382,7 +385,7 @@ namespace RacingGame
             var own = personal?.Find(eventId, hash, race.laps);
             if (own != null)
             {
-                AddGhost(GhostCar.Spawn(prefab, own, GhostTint));
+                AddGhost(GhostCar.Spawn(prefab, own, GhostTint, race.Player != null ? race.Player.transform : null));
                 personalGhostSectors = GhostSectorTimes.MeasureLaps(track, own, race.laps);
             }
 
@@ -478,7 +481,7 @@ namespace RacingGame
                 player.Weapons.ConfigureLoadout(!equipment.fullArsenal,
                     (PrimaryWeaponType)equipment.equippedPrimary, (PrimaryWeaponType)equipment.reservePrimary);
                 // A rewarded "try it for one race" level rides on top of the saved levels and is used up here.
-                var appliedUpgrades = IsTestDrive || standardEquipment || friendChallenge != null ? equipment.upgrades : RewardedOffers.ConsumeTrial(equipment.upgrades);
+                var appliedUpgrades = IsTestDrive || RaceSetup.Event != null && RaceSetup.Event.IsCustom || standardEquipment || friendChallenge != null ? equipment.upgrades : RewardedOffers.ConsumeTrial(equipment.upgrades);
                 PlayerProgression.ApplyTo(playerCar, player.Health, playerCar.GetComponent<CarCannon>(), appliedUpgrades,
                     (Core.Economy.CarBuild)equipment.buildPreset);
                 if (!IsTestDrive)
@@ -649,7 +652,7 @@ namespace RacingGame
             if (playerEngine != null) playerEngine.SetRunning(true);
             if (friendChallenge != null) hud?.ShowHint(Loc.Format("challenge.target", "t", UiFactory.FormatMilliseconds(FriendTargetMs)), 8f);
             foreach (var g in ghosts) if (g != null) g.Begin(race.RaceStartTime);
-            if (!IsTestDrive && yesterdayPractice == null && trainMission == null && settlementMission == null && race.Player != null)
+            if (!IsTestDrive && yesterdayPractice == null && (RaceSetup.Event == null || !RaceSetup.Event.IsCustom) && trainMission == null && settlementMission == null && race.Player != null)
                 recorder.Begin(race.Player, TrackHash(RaceSetup.Event), UiFactory.Escape(PlatformGlue.Platform != null ? PlatformGlue.Platform.Player.Name : "You"));
         }
         private void OnParticipantFinished(RaceParticipant p)
@@ -657,7 +660,8 @@ namespace RacingGame
             if (IsTestDrive || yesterdayPractice != null) return;
             if (!p.isPlayer) return;
             SfxPlayer.Instance.PlayUi(SfxSynth.Finish);
-            var rec = recorder.Stop();
+            if (!recorder.Recording) return;
+            var rec = recorder.Stop(race.PlayerElapsedTime);
             if (rec == null || rec.Samples.Count < 10) return;
             if (playerSectors != null && playerSectors.Finish(rec) && personalGhostSectors != null)
             {
@@ -694,6 +698,7 @@ namespace RacingGame
         {
             if (IsTestDrive) { EnterMenu(); return; }
             if (yesterdayPractice != null) { EndYesterdayPractice(results.Player); return; }
+            results.LastHits = hud != null ? hud.SnapshotLastHits() : null;
             if (hotBomb != null) hotBomb.Stop();
             if (playerEngine != null) playerEngine.SetRunning(false);
             recorder.Stop();                                   // DNF path never reached OnParticipantFinished
@@ -702,6 +707,13 @@ namespace RacingGame
             if (me != null && !me.Finished) playerSectors?.Advance(recorder.Record, stopped: true);
             var save = PlatformGlue.Save;
             var ev = RaceSetup.Event;
+            if (ev != null && ev.IsCustom)
+            {
+                PlatformGlue.Platform?.SetGameplayActive(false);
+                if (hud != null) hud.SetVisible(false);
+                SetState(FlowState.Results);
+                return;
+            }
             float mult = RaceSetup.Tier != null ? RaceSetup.Tier.rewardMultiplier : 1f;
             // A tied arena place pays the same kill bonus regardless of which rivals were hit.
             int[] killsPerVictim = results.IsArena && me != null ? new[] { me.Kills } : me?.KillsPerVictim;
@@ -714,6 +726,9 @@ namespace RacingGame
             LastReward += LastFirstFinishBonus;
             LastRewardFinished = me != null && me.Finished;
 
+            string featuredId = ev != null && ev.mode == EventMode.Race && ev.featuredRival != null ? ev.featuredRival.rivalId : null;
+            var featured = string.IsNullOrEmpty(featuredId) ? null : results.Entries.Find(entry => entry.RivalId == featuredId);
+            LastChallengeBody = null;
             int runStars = 0;
             bool daily = DailyRace.IsDaily(ev);
             if (ev != null && me != null && !daily)   // the daily race has no stars (they count towards the event total)
@@ -733,7 +748,12 @@ namespace RacingGame
                 if (actualBody != null) Core.Save.BodyMastery.Record(row, actualBody.Class, me.Shortcuts, me.DriftBoosts, me.Kills, me.BombPasses);
                 if (me.Finished)
                 {
-                    if (actualBody != null) Core.Save.DriverProfile.Finish(row, actualBody.BodyId);
+                    if (actualBody != null)
+                    {
+                        Core.Save.DriverProfile.Finish(row, actualBody.BodyId);
+                        if (ev != null && ev.mode == EventMode.Race)
+                            LastChallengeBody = CarBodies.GrantChallenge(save.Data.progress.cosmetics, actualBody.Class, me.Shortcuts, me.Rams, true);
+                    }
                     if (ev != null && ev.mode == EventMode.Race && me.TotalTime > 0)
                     {
                         var progress = save.Data.progress;
@@ -745,6 +765,7 @@ namespace RacingGame
                                     driverMs = (long)System.Math.Round(me.TotalTime * 1000), rivalMs = (long)System.Math.Round(rival.TotalTime * 1000)
                                 });
                     }
+                    if (featured != null && featured.Finished) Core.Save.RivalScore.Record(row, featured.RivalId, me.Position < featured.Position);
                     if (me.Position == 1) row.wins++;
                 }
                 if (ev != null)
@@ -789,6 +810,8 @@ namespace RacingGame
                     if (playerSectors != null)
                         LastTrainingSectors = best.KeepSectors(TrackHash(ev), race.laps, playerSectors.BestDurations());
                     if (!daily) UnlockNext(ev, me.Finished && me.Position <= 3, previousStars, save);
+                    if (ev.eventId == Core.Economy.RaceCups.ChapterEvents[2])
+                        Core.Economy.RaceCups.FinishChapter(save.Data.progress, ev.eventId, me.Finished && featured != null && me.Position < featured.Position);
                     if (daily) RecordDaily(ev, me, save, row);
                     var discipline = ev.mode == EventMode.Race ? Core.Save.WeeklyDiscipline.Circuit
                         : ev.mode == EventMode.Arena ? Core.Save.WeeklyDiscipline.Arena : Core.Save.WeeklyDiscipline.Mission;
@@ -802,6 +825,7 @@ namespace RacingGame
             SetState(FlowState.Results);
         }
 
+        public string LastChallengeBody { get; private set; }
         public bool LastRewardFinished { get; private set; }
 
         /// <summary>Daily race finish: streak, the once-a-day bonus, and pruning of old daily bests.</summary>

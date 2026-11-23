@@ -38,6 +38,25 @@ namespace RacingGame
                 new Vector2(6f, 5f), new Vector2(-6f, -5f), 24f, UiFactory.Raised);
         }
 
+        private void BuildMeasurements(Transform content)
+        {
+            var p = PlatformGlue.Save.Data.progress;
+            var start = Item(content, "BodyMeasure", 104f, false);
+            UiFactory.Button(start, "StartMeasurement", Loc.Get("measure.start"), () => flow.StartBodyMeasurement(previewBodyId),
+                Vector2.zero, Vector2.one, new Vector2(6f, 7f), new Vector2(-6f, -7f), 26f, UiFactory.Raised);
+            string conditions = Core.Save.BodyMeasurement.Conditions(p);
+            if (p.measurements == null) return;
+            foreach (var result in p.measurements)
+            {
+                if (result == null || result.conditions != conditions) continue;
+                var row = Item(content, "Measurement_" + result.body, 134f);
+                string metrics = Loc.Format("measure.values", "acc", UiFactory.FormatMilliseconds(result.accelerationMs),
+                    "m", (result.brakingCm / 100f).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture), "slalom", UiFactory.FormatMilliseconds(result.slalomMs));
+                Label(row, "Metrics", Loc.Get(CarBodies.Get(result.body).NameKey) + "\n" + metrics, 24f, Vector2.zero,
+                    Vector2.one, new Vector2(16f, 5f), new Vector2(-16f, -5f), UiFactory.Accent);
+            }
+        }
+
         private void BuildWeaponDrills(Transform content)
         {
             Section(content, "WeaponDrills", Loc.Get("drill.title"));

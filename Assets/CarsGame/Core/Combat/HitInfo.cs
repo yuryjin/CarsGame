@@ -17,6 +17,7 @@ namespace RacingGame.Core.Combat
         public float StatusDuration;
         public int StatusDurationTicks;
         public HitType HitType;
+        public bool FromMine;
 
         public HitInfo(GameObject attacker, float damage, HitType hitType = HitType.Direct)
         {
@@ -29,6 +30,7 @@ namespace RacingGame.Core.Combat
             StatusDuration = 0f;
             StatusDurationTicks = 0;
             HitType = hitType;
+            FromMine = false;
         }
     }
 }

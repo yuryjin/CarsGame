@@ -28,9 +28,9 @@ namespace RacingGame
             Capture(0);
         }
 
-        public GhostRecord Stop()
+        public GhostRecord Stop(double? finishElapsed = null)
         {
-            if (Recording) Capture(0);
+            if (Recording) Capture(0, finishElapsed);
             Recording = false;
             Detach();
             return Record;
@@ -51,10 +51,16 @@ namespace RacingGame
             lastSampledTick = SimulationDriver.Instance.Tick;
         }
 
-        private void Capture(byte extraFlags)
+        private void Capture(byte extraFlags, double? finishElapsed = null)
         {
             if (Record == null || target == null) return;
-            double elapsed = System.Math.Max(0d, RaceClock.Now - startClock);
+            double elapsed = System.Math.Max(0d, finishElapsed ?? (RaceClock.Now - startClock));
+            if (finishElapsed.HasValue)
+            {
+                double end = elapsed * 1000d;
+                while (Record.Samples.Count > 1 && Record.Samples[Record.Samples.Count - 1].TimeMilliseconds > end)
+                    Record.Samples.RemoveAt(Record.Samples.Count - 1);
+            }
             if (Record.Samples.Count >= GhostRecord.MaxSamples || elapsed * 1000d > GhostRecord.MaxDurationMilliseconds)
             {
                 // A truncated run must never replace a complete best with an artificially short duration.

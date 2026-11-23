@@ -19,5 +19,10 @@ MonoBehaviour:
   aggression: 0.9
   baseLane: 0
   role: 1
+  rivalId: rex
   rivalName: Rex
   paint: {r: 0.95, g: 0.55, b: 0.1, a: 1}
+  signaturePrimary: 1
+  signatureWeapon: 2
+  signatureMinRange: 4
+  signatureMaxRange: 20

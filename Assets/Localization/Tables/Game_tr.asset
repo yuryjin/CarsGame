@@ -2841,6 +2841,178 @@ MonoBehaviour:
     m_Localized: '{n} sn'
     m_Metadata:
       m_Items: []
+  - m_Id: 29745034027151360
+    m_Localized: Son isabetler
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122880
+    m_Localized: Son darbe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122881
+    m_Localized: "D\xFC\u015Fman"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122882
+    m_Localized: Eleme pisti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122883
+    m_Localized: "Lider her turu bitirdi\u011Finde sonuncu elenir. Ayn\u0131 anda
+      ge\xE7i\u015Fte k\xFC\xE7\xFCk start numaras\u0131 kal\u0131r."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034048122884
+    m_Localized: "Elendi \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317184
+    m_Localized: "Bir yar\u0131\u015F\u0131 buggy ile kestirmeden gidip bitir ve
+      Sidewinder kazan."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317185
+    m_Localized: "Z\u0131rhl\u0131 ara\xE7la bir rakibe \xE7arp\u0131p yar\u0131\u015F\u0131
+      bitir ve Raider kazan."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317186
+    m_Localized: "G\xF6rev tamam \xB7 {name} a\xE7\u0131ld\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317187
+    m_Localized: "H\u0131zlanma, fren ve slalomu \xF6l\xE7"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317188
+    m_Localized: "Otomatik test \xB7 0\u201345 km/sa ve tam fren"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317189
+    m_Localized: "Kap\u0131lar\u0131n aras\u0131ndan ge\xE7 \xB7 {n}/{all}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317190
+    m_Localized: "Kap\u0131 ka\xE7t\u0131 \xB7 testi yinele"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317191
+    m_Localized: "\xD6l\xE7\xFCm garaja kaydedildi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317192
+    m_Localized: "0\u201345 {acc} \xB7 fren {m} m \xB7 slalom {slalom}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317193
+    m_Localized: "Turuncu ara\xE7taki {name} ile tan\u0131\u015F."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317194
+    m_Localized: "B\xFCy\xFCk finalde r\xF6van\u015F \xB7 {name} geri d\xF6nd\xFC."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317195
+    m_Localized: "Rakip \xB7 {name}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317196
+    m_Localized: "{name} \xF6n\xFCnde bitirdin"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317197
+    m_Localized: "{name} \xF6n\xFCnde bitirdi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317198
+    m_Localized: "{name} ile d\xFCello \xB7 ikiniz de bitirmelisiniz"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317199
+    m_Localized: "Sen #{you} \xB7 {name} #{rival}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317200
+    m_Localized: Kanyon rakipleri
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034052317201
+    m_Localized: "\u0130ki kez podyuma \xE7\u0131k, ard\u0131ndan Rex\u2019i ge\xE7.
+      \xD6d\xFCl \xB7 {reward}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511488
+    m_Localized: "Girmek i\xE7in 6. etab\u0131 a\xE7"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511489
+    m_Localized: "Kar\u015F\u0131la\u015Fmalar \xB7 galibiyet {wins} / yenilgi {losses}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511490
+    m_Localized: "Ka\xE7\u0131\u015F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511491
+    m_Localized: "Biti\u015Fe ka\xE7. Takip\xE7i 0,6 sn boyunca 7 m yak\u0131n\u0131nda
+      kal\u0131rsa yakalan\u0131rs\u0131n. K\xF6pr\xFC kestirmedir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511492
+    m_Localized: "Ka\xE7may\u0131 ba\u015Fard\u0131n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511493
+    m_Localized: "Yakaland\u0131n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511494
+    m_Localized: "\u0130ki ara\xE7l\u0131 bayrak yar\u0131\u015F\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511495
+    m_Localized: "\u0130ki ara\xE7 se\xE7. Turun ortas\u0131ndaki ye\u015Fil kemerde
+      ara\xE7 de\u011Fi\u015Ftir. Dune buggy \xF6d\xFCn\xE7 verilir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511496
+    m_Localized: "\u0130lk etap"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511497
+    m_Localized: "\u0130kinci etap"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511498
+    m_Localized: "\xD6zel yar\u0131\u015F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511499
+    m_Localized: Pist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511500
+    m_Localized: Kural
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511501
+    m_Localized: Normal kurallar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511502
+    m_Localized: "S\u0131cak Bomba i\xE7in en az bir rakip ekle veya ba\u015Fka kural
+      se\xE7."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511503
+    m_Localized: "A\xE7\u0131k bir pist ve listedeki kurallardan birini se\xE7."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29745034056511504
+    m_Localized: "Bu \xF6zel yar\u0131\u015F\u0131n ayr\u0131 s\u0131ralamas\u0131
+      var. Kariyer rekorlar\u0131 ve \xF6d\xFClleri kariyer etkinliklerinde."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -10,6 +10,12 @@ namespace RacingGame
 
         private void StartMenuEvent(RaceEventDefinition ev, DifficultyTier tier)
         {
+            if (ev != null && ev.format == CircuitFormat.Relay)
+            {
+                relayEvent = ev; relayTier = tier;
+                if (flow.State == FlowState.Results) GoTo("relay"); else Show("relay");
+                return;
+            }
             if (ev == null || ev.eventId != "m1") { flow.StartRace(ev, tier); return; }
             briefingEvent = ev;
             briefingTier = tier;

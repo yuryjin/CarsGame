@@ -14,8 +14,14 @@ namespace RacingGame
         private bool running;
         private static Material translucentMaterial;
         private GameObject sourcePrefab;
+        private Transform overlapCar;
+        private Renderer ghostRenderer;
+        private MaterialPropertyBlock colorBlock;
+        private Color fullTint;
+        private float visibleAlpha;
+        private static readonly int BaseColor = Shader.PropertyToID("_BaseColor"), ColorProperty = Shader.PropertyToID("_Color");
 
-        public static GhostCar Spawn(GameObject carPrefab, GhostRecord record, Color tint)
+        public static GhostCar Spawn(GameObject carPrefab, GhostRecord record, Color tint, Transform overlapCar = null)
         {
             // Build the body on an inactive template, as in the garage. Its gameplay components
             // never run Awake/OnEnable; only visible meshes become part of the replay.
@@ -30,11 +36,13 @@ namespace RacingGame
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
             var block = new MaterialPropertyBlock();
-            block.SetColor("_BaseColor", tint); block.SetColor("_Color", tint); renderer.SetPropertyBlock(block);
+            block.SetColor(BaseColor, tint); block.SetColor(ColorProperty, tint); renderer.SetPropertyBlock(block);
             int ghostLayer = LayerMask.NameToLayer("Ignore Raycast");
             foreach (var t in go.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = ghostLayer >= 0 ? ghostLayer : 0;
             var ghost = go.AddComponent<GhostCar>();
             ghost.Record = record;
+            ghost.overlapCar = overlapCar; ghost.ghostRenderer = renderer; ghost.colorBlock = block;
+            ghost.fullTint = tint; ghost.visibleAlpha = tint.a;
             ghost.sourcePrefab = carPrefab;
             ghost.RefreshModel();
             ghost.Seek(0f);
@@ -51,6 +59,17 @@ namespace RacingGame
         {
             if (Record.EvaluatePose(seconds, out var p, out var rotation))
                 transform.SetPositionAndRotation(p, rotation);
+        }
+
+        private void LateUpdate()
+        {
+            if (overlapCar == null || !running || PauseController.IsPaused) return;
+            float distance = Vector3.Distance(transform.position, overlapCar.position);
+            float target = Mathf.Lerp(fullTint.a * .10f, fullTint.a, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(1.6f, 5f, distance)));
+            float alpha = Mathf.MoveTowards(visibleAlpha, target, fullTint.a * Time.unscaledDeltaTime * 4f);
+            if (Mathf.Approximately(alpha, visibleAlpha)) return;
+            visibleAlpha = alpha; var color = fullTint; color.a = alpha;
+            colorBlock.SetColor(BaseColor, color); colorBlock.SetColor(ColorProperty, color); ghostRenderer.SetPropertyBlock(colorBlock);
         }
 
         private void Update()

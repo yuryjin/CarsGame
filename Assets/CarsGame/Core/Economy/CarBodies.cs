@@ -186,10 +186,19 @@ namespace RacingGame.Core.Economy
         }
 
         /// <summary>Grant after a watched rewarded ad; false when the body is not a rewarded one or already owned.</summary>
-        public static bool GrantRewarded(IList<string> owned, string id)
+        public static bool GrantRewarded(IList<string> owned, string id) => GrantRewardBody(owned, id);
+
+        public static string GrantChallenge(IList<string> owned, BodyClass body, int shortcuts, int rams, bool finished)
+        {
+            if (!finished) return null;
+            string id = body == BodyClass.Buggy && shortcuts > 0 ? "sidewinder" : body == BodyClass.Armored && rams > 0 ? "raider" : null;
+            return id != null && GrantRewardBody(owned, id) ? id : null;
+        }
+
+        private static bool GrantRewardBody(IList<string> owned, string id)
         {
             int i = Index(id);
-            if (i < 0 || owned == null || All[i].Unlock != UnlockKind.Rewarded || owned.Contains(All[i].OwnedKey)) return false;
+            if (i < 0 || owned == null || All[i].Unlock != UnlockKind.Rewarded || Owns(owned, id)) return false;
             owned.Add(All[i].OwnedKey);
             return true;
         }

@@ -28,6 +28,10 @@ namespace RacingGame
         public double CurrentLapStart { get; private set; }
         public double BestLapTime { get; private set; } = double.PositiveInfinity;
         public double LastLapTime { get; private set; }
+        public double LastCrossingTime { get; private set; }
+        public int LastCrossingTick { get; private set; }
+        public Vector3 LastCrossingPosition { get; private set; }
+        private Vector3 previousWorld;
         public float TotalProgress => Counter != null ? Counter.TotalProgress(Distance) : 0f;
         public float SpeedAlongTrack { get; private set; }  // m/s, negative when driving backwards
 
@@ -57,6 +61,7 @@ namespace RacingGame
             hint = -1;
             Distance = Path.Project(transform.position, ref hint);
             Counter.Resync(Distance);
+            previousWorld = transform.position;
             wrongWayTime = 0f;
             WrongWay = false;
         }
@@ -75,6 +80,8 @@ namespace RacingGame
             }
             else Array.Clear(gateLaps, 0, gateLaps.Length);
             CurrentLapStart = RaceClock.Now;
+            LastCrossingTime = 0d;
+            previousWorld = transform.position;
             BestLapTime = double.PositiveInfinity;
             LastLapTime = 0d;
             wrongWayTime = 0f;
@@ -89,6 +96,7 @@ namespace RacingGame
         {
             if (!enabled || Path == null || Counter == null) return;
 
+            float previousDistance = Distance;
             Distance = Path.Project(transform.position, ref hint);
             int gate = Counter.NextGate;
             float delta = Counter.Step(Distance);
@@ -99,7 +107,21 @@ namespace RacingGame
             }
             SpeedAlongTrack = delta / SimulationDriver.FixedStep;
 
-            if (Counter.LapJustCompleted) CompleteLap();
+            if (Counter.LapJustCompleted)
+            {
+                Vector3 line = Path.Position(Path.startLineDistance), tangent = Path.Spline.Tangent(Path.startLineDistance);
+                float before = Vector3.Dot(previousWorld - line, tangent);
+                float after = Vector3.Dot(transform.position - line, tangent);
+                float fraction = before <= 0f && after >= 0f && after > before
+                    ? -before / (after - before)
+                    : Mathf.Clamp01(Path.SignedDelta(previousDistance, Path.startLineDistance) / Mathf.Max(delta, .0001f));
+                double end = Time.inFixedTimeStep && SimulationDriver.Current != null ? SimulationDriver.Current.StepEndClock : RaceClock.Now;
+                LastCrossingTick = tick;
+                LastCrossingPosition = Vector3.Lerp(previousWorld, transform.position, fraction);
+                LastCrossingTime = Math.Max(CurrentLapStart, end - (1d - fraction) * SimulationDriver.FixedStep);
+                CompleteLap(LastCrossingTime);
+            }
+            previousWorld = transform.position;
 
             if (SpeedAlongTrack < -2f) wrongWayTime += SimulationDriver.FixedStep; else wrongWayTime = 0f;
             WrongWay = wrongWayTime >= wrongWaySeconds;
@@ -121,9 +143,8 @@ namespace RacingGame
             return false;
         }
 
-        private void CompleteLap()
+        private void CompleteLap(double now)
         {
-            double now = RaceClock.Now;
             LastLapTime = now - CurrentLapStart;
             CurrentLapStart = now;
             if (LastLapTime < BestLapTime) BestLapTime = LastLapTime;

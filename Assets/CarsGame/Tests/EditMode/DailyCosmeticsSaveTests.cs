@@ -86,5 +86,30 @@ namespace RacingGame.Tests
             CollectionAssert.AreEqual(new long[] { 1, 3, 3, 4 },
                 System.Array.ConvertAll(Core.Economy.CarBodies.Classes, body => BodyMastery.Count(merged.progress, body)));
         }
+        [Test]
+        public void ChallengeAndRewardedBodyUnlocksAreIdempotentInBothOrdersAfterReload()
+        {
+            foreach (bool adFirst in new[] { true, false })
+            foreach (var pair in new[] { ("sidewinder", Core.Economy.BodyClass.Buggy), ("raider", Core.Economy.BodyClass.Armored) })
+            {
+                var save = Blob(10);
+                var owned = save.progress.cosmetics;
+                Assert.IsNull(Core.Economy.CarBodies.GrantChallenge(owned, pair.Item2, 0, 0, true));
+                Assert.IsNull(Core.Economy.CarBodies.GrantChallenge(owned, pair.Item2, 1, 1, false));
+                if (adFirst)
+                {
+                    Assert.IsTrue(Core.Economy.CarBodies.GrantRewarded(owned, pair.Item1));
+                    Assert.IsNull(Core.Economy.CarBodies.GrantChallenge(owned, pair.Item2, 1, 1, true));
+                }
+                else
+                {
+                    Assert.AreEqual(pair.Item1, Core.Economy.CarBodies.GrantChallenge(owned, pair.Item2, 1, 1, true));
+                    Assert.IsFalse(Core.Economy.CarBodies.GrantRewarded(owned, pair.Item1));
+                }
+                var restored = SaveMigrator.FromJson(SaveMigrator.ToJson(save));
+                Assert.AreEqual(1, restored.progress.cosmetics.FindAll(key => key == "body:" + pair.Item1).Count);
+                Assert.IsTrue(Core.Economy.CarBodies.Owns(restored.progress.cosmetics, pair.Item1));
+            }
+        }
     }
 }

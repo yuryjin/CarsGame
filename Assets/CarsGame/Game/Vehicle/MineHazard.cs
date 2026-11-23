@@ -214,6 +214,7 @@ namespace RacingGame
                             Point = blastCenter,
                             Normal = Vector3.up,
                             HitType = HitType.Hazard,
+                            FromMine = true,
                             Impulse = dir * impulse,
                             Status = activeStatus,
                             StatusDuration = activeStatusDuration

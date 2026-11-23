@@ -19,5 +19,10 @@ MonoBehaviour:
   aggression: 0.25
   baseLane: -0.5
   role: 0
+  rivalId: nova
   rivalName: Nova
   paint: {r: 0.15, g: 0.65, b: 0.95, a: 1}
+  signaturePrimary: 1
+  signatureWeapon: 49
+  signatureMinRange: 20
+  signatureMaxRange: 60

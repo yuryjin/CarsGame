@@ -15,6 +15,8 @@ namespace RacingGame
         public float fireCooldown = 1.5f;
         public float coneDegrees = 9f;
         public float minRange = 6f, maxRange = 45f;
+        public float MinShotRange => profile != null && profile.signaturePrimary ? profile.signatureMinRange : minRange;
+        public float MaxShotRange => profile != null && profile.signaturePrimary ? profile.signatureMaxRange : maxRange;
         [Tooltip("No shooting for this long after the race starts.")]
         public float startGraceSeconds = 3f;
         [Tooltip("Set by the race manager while this car is far ahead of the player.")]
@@ -204,7 +206,7 @@ namespace RacingGame
         private bool FireAtUnit(int tick)
         {
             var muzzle = cannon.muzzle != null ? cannon.muzzle : transform;
-            var unit = TargetFinder.FindUnit(car, muzzle.position, muzzle.forward, coneDegrees * 1.6f, minRange * 0.5f, maxRange);
+            var unit = TargetFinder.FindUnit(car, muzzle.position, muzzle.forward, coneDegrees * 1.6f, MinShotRange * 0.5f, MaxShotRange);
             if (unit == null) return false;
             cannon.CommitAim(cannon.SolveAimPoint(unit));
             aimHeld = true;
@@ -283,7 +285,7 @@ namespace RacingGame
             float aggression = profile != null ? profile.aggression : 0.5f;
             float cone = coneFromAggression && profile != null ? Mathf.Lerp(rookieConeDegrees, aceConeDegrees, aggression) : coneDegrees;
             float lead = profile != null && aggression >= leadFromAggression ? cannon.shellSpeed : 0f;
-            return TargetFinder.Find(car, muzzle.position, muzzle.forward, cone, minRange, maxRange, lead);
+            return TargetFinder.Find(car, muzzle.position, muzzle.forward, cone, MinShotRange, MaxShotRange, lead);
         }
     }
 }
